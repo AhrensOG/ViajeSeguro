@@ -6,7 +6,7 @@ import Routes from "./Routes";
 import Pricing from "./Pricing";
 import CTA from "./CTA";
 import Contact from "./Contact";
-import Footer from "./Footer";
+import Footer from "../navigation/Footer";
 
 const HomePage = () => {
   return (
