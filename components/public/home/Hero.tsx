@@ -38,11 +38,9 @@ const Hero = () => {
         <div className="relative max-w-4xl mx-auto">
           <div className="absolute inset-0 -z-10 overflow-hidden">
             <Image
-              src="/placeholder.svg?height=400&width=1200"
+              src="/main/main.webp"
               alt="Ilustración de coches en carretera"
-              width={1200}
-              height={400}
-              className="object-cover w-full h-full"
+              fill
             />
           </div>
 

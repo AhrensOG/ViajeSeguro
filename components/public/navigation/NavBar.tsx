@@ -5,11 +5,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Ellipsis, User, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
+import { signOut, useSession } from "next-auth/react";
 
 const NavBar = () => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
-
+    const { data: session } = useSession();
     return (
         <header className="sticky top-0 bg-first-white z-50 w-full shadow-sm">
             <div className="w-full px-6 py-3 flex items-center justify-between">
@@ -53,9 +54,7 @@ const NavBar = () => {
                         onMouseEnter={() => setIsUserMenuOpen(true)}
                         onMouseLeave={() => setIsUserMenuOpen(false)}
                     >
-                        <button
-                            className="flex items-center gap-1 bg-second-white text-first-black rounded-full p-2 hover:transition"
-                        >
+                        <button className="flex items-center gap-1 bg-second-white text-first-black rounded-full p-2 hover:transition">
                             <User className="h-5 w-5" />
                             <ChevronDown
                                 className={`h-4 w-4 ${
@@ -64,33 +63,63 @@ const NavBar = () => {
                             />
                         </button>
                         <AnimatePresence>
-                            {isUserMenuOpen && (
+                            {isUserMenuOpen && session && session?.user ? (
                                 <motion.div
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
                                     transition={{ duration: 0.3 }}
-                                    className="absolute right-0 mt-2 w-40 bg-first-white shadow-lg rounded-md z-10"
+                                    className="p-1 absolute right-0 w-44 text- bg-first-white shadow-lg rounded-md z-10"
                                 >
                                     <Link
                                         href="/perfil"
-                                        className="block px-4 py-2 text-sm text-first-black hover:bg-gray-100"
+                                        className="block px-4 py-2 text-sm text-first-black hover:bg-fifth-gray"
                                     >
                                         Perfil
                                     </Link>
                                     <Link
                                         href="/viajes"
-                                        className="block px-4 py-2 text-sm text-first-black hover:bg-gray-100"
+                                        className="block px-4 py-2 text-sm text-first-black hover:bg-fifth-gray"
                                     >
                                         Viajes
                                     </Link>
                                     <Link
                                         href="/mis-compras"
-                                        className="block px-4 py-2 text-sm text-first-black hover:bg-gray-100"
+                                        className="block px-4 py-2 text-sm text-first-black hover:bg-fifth-gray"
                                     >
                                         Mis compras
                                     </Link>
+                                    <button
+                                        onClick={() => signOut()}
+                                        className="w-full text-start block px-4 py-2 text-sm text-first-black hover:bg-fifth-gray"
+                                    >
+                                        Cerrar sesión
+                                    </button>
                                 </motion.div>
+                            ) : (
+                                isUserMenuOpen &&
+                                !session && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        transition={{ duration: 0.3 }}
+                                        className="p-1 absolute right-0 w-44 text-center bg-first-white shadow-lg rounded-md z-10"
+                                    >
+                                        <Link
+                                            href="/auth/login"
+                                            className="block px-4 py-2 text-sm text-first-black hover:bg-fifth-gray"
+                                        >
+                                            Iniciar sesión
+                                        </Link>
+                                        <Link
+                                            href="/auth/register"
+                                            className="block px-4 py-2 text-sm text-first-black hover:bg-fifth-gray"
+                                        >
+                                            Registrate
+                                        </Link>
+                                    </motion.div>
+                                )
                             )}
                         </AnimatePresence>
                     </div>
@@ -145,27 +174,51 @@ const NavBar = () => {
                         </nav>
 
                         <hr className="my-4 border-t border-gray-300" />
-
-                        <nav className="flex flex-col items-start space-y-4">
-                            <Link
-                                href="/perfil"
-                                className="text-first-black font-medium hover:text-first-golden transition"
-                            >
-                                Perfil
-                            </Link>
-                            <Link
-                                href="/viajes"
-                                className="text-first-gray hover:text-first-black transition"
-                            >
-                                Viajes
-                            </Link>
-                            <Link
-                                href="/mis-compras"
-                                className="text-first-gray hover:text-first-black transition"
-                            >
-                                Mis compras
-                            </Link>
-                        </nav>
+                        {session && session?.user ? (
+                            <nav className="flex flex-col items-start space-y-4">
+                                <Link
+                                    href="/perfil"
+                                    className="text-first-gray hover:text-first-black transition"
+                                >
+                                    Perfil
+                                </Link>
+                                <Link
+                                    href="/viajes"
+                                    className="text-first-gray hover:text-first-black transition"
+                                >
+                                    Viajes
+                                </Link>
+                                <Link
+                                    href="/mis-compras"
+                                    className="text-first-gray hover:text-first-black transition"
+                                >
+                                    Mis compras
+                                </Link>
+                                <button
+                                    onClick={() => signOut()}
+                                    className="text-first-gray hover:text-first-black transition"
+                                >
+                                    Cerrar sesión
+                                </button>
+                            </nav>
+                        ) : (
+                            !session && (
+                                <nav className="flex flex-col items-start space-y-4">
+                                    <Link
+                                        href="/auth/login"
+                                        className="text-first-gray hover:text-first-black transition"
+                                    >
+                                        Iniciar sesión
+                                    </Link>
+                                    <Link
+                                        href="/auth/register"
+                                        className="text-first-gray hover:text-first-black transition"
+                                    >
+                                        Registrate
+                                    </Link>
+                                </nav>
+                            )
+                        )}
                     </motion.div>
                 )}
             </AnimatePresence>

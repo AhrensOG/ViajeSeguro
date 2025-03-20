@@ -1,8 +1,14 @@
+"use client";
+
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+import { signIn } from "next-auth/react";
+import { toast } from "sonner";
+import { useRouter, useSearchParams } from "next/navigation";
+import Link from "next/link";
 
-interface FormInputs {
+interface FormData {
     email: string;
     password: string;
 }
@@ -12,11 +18,28 @@ const LogInForm: React.FC = () => {
         register,
         handleSubmit,
         formState: { errors },
-    } = useForm<FormInputs>();
-    const [showPassword, setShowPassword] = useState(false);
+    } = useForm<FormData>();
 
-    const onSubmit: SubmitHandler<FormInputs> = (data) => {
-        console.log(data);
+    const [showPassword, setShowPassword] = useState(false);
+    const router = useRouter();
+    const searchParams = useSearchParams();
+    const callbackUrl = searchParams.get("callbackUrl") || "/";
+
+    const onSubmit: SubmitHandler<FormData> = async (data) => {
+        try {
+            const res = await signIn("credentials", {
+                email: data.email,
+                password: data.password,
+                redirect: false,
+            });
+            if (res?.ok) {
+                toast.success("¡Inicio de sesión exitoso!");
+                return router.push(callbackUrl);
+            }
+            toast.warning("Credenciales incorrectas. Intente nuevamente.");
+        } catch (error) {
+            toast.info("Ups! Ocurrió un error inesperado.");
+        }
     };
 
     return (
@@ -29,15 +52,13 @@ const LogInForm: React.FC = () => {
                     Email
                 </label>
                 <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Mail className="h-5 w-5 text-third-gray" />
-                    </div>
+                    <Mail className="absolute left-3 top-3 h-5 w-5 text-third-gray" />
                     <input
                         id="email"
                         {...register("email", {
                             required: "El email es obligatorio",
                             pattern: {
-                                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/i,
+                                value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
                                 message: "Formato de email inválido",
                             },
                         })}
@@ -64,9 +85,7 @@ const LogInForm: React.FC = () => {
                     Contraseña
                 </label>
                 <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                        <Lock className="h-5 w-5 text-third-gray" />
-                    </div>
+                    <Lock className="absolute left-3 top-3 h-5 w-5 text-third-gray" />
                     <input
                         id="password"
                         type={showPassword ? "text" : "password"}
@@ -74,8 +93,7 @@ const LogInForm: React.FC = () => {
                             required: "La contraseña es obligatoria",
                             minLength: {
                                 value: 6,
-                                message:
-                                    "La contraseña debe tener al menos 6 caracteres",
+                                message: "Mínimo 6 caracteres",
                             },
                         })}
                         className={`block w-full pl-10 pr-10 py-2 border ${
@@ -87,7 +105,7 @@ const LogInForm: React.FC = () => {
                     />
                     <button
                         type="button"
-                        className="absolute inset-y-0 right-0 pr-3 flex items-center"
+                        className="absolute right-3 top-2.5"
                         onClick={() => setShowPassword(!showPassword)}
                     >
                         {showPassword ? (
@@ -104,21 +122,19 @@ const LogInForm: React.FC = () => {
                 )}
             </div>
 
-            <div className="flex items-center justify-between">
-                <div className="text-sm">
-                    <a
-                        href="#"
-                        className="font-medium text-first-golden hover:text-second-golden duration-300"
-                    >
-                        ¿Olvidaste tu contraseña?
-                    </a>
-                </div>
+            <div className="text-sm">
+                <Link
+                    href={"/auth/forgot-password"}
+                    className="font-medium text-first-golden hover:text-second-golden duration-300"
+                >
+                    ¿Olvidaste tu contraseña?
+                </Link>
             </div>
 
             <div>
                 <button
                     type="submit"
-                    className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-first-white bg-first-golden hover:bg-second-golden duration-300"
+                    className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white bg-first-golden hover:bg-second-golden duration-300"
                 >
                     Iniciar sesión
                 </button>
