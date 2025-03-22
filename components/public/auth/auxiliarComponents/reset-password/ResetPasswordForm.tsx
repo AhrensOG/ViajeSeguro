@@ -28,6 +28,7 @@ const ResetPasswordForm: React.FC = () => {
     } = useForm<FormData>();
 
     const onSubmit: SubmitHandler<FormData> = async (data) => {
+        const toastId = toast.loading("Actualizando contraseña...");
         try {
             const response = await fetch(BACKEND_URL + "/auth/reset-password", {
                 method: "POST",
@@ -39,21 +40,26 @@ const ResetPasswordForm: React.FC = () => {
             });
 
             if (response.ok) {
-                toast.success("Contraseña actualizada con éxito.");
+                toast.success("Contraseña actualizada con éxito.", {
+                    id: toastId,
+                });
                 router.push("/auth/login");
+            } else if (response.status === 401) {
+                return toast.warning("El token es incorrecto o ha expirado.", {
+                    description:
+                        "Solicita un nuevo restablecimiento de contraseña.",
+                    id: toastId,
+                });
             } else {
-                response.status === 401
-                    ? toast.warning("El token es incorrecto o ha expirado.", {
-                          description:
-                              "Solicita un nuevo restablecimiento de contraseña.",
-                      })
-                    : toast.warning("Ups! Ocurrio un error inesperado.", {
-                          description:
-                              "Intenta nuevamente o contacta con nuestro soporte.",
-                      });
+                return toast.warning("Ups! Ocurrió un error inesperado.", {
+                    description:
+                        "Intenta nuevamente o contacta con nuestro soporte.",
+                    id: toastId,
+                });
             }
         } catch (error) {
-            toast.error("Error en el servidor.");
+            toast.error("Ups! Ocurrió un error inesperado.", { id: toastId });
+            console.error(error);
         }
     };
 

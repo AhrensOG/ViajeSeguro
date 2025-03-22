@@ -26,6 +26,7 @@ const LogInForm: React.FC = () => {
     const callbackUrl = searchParams.get("callbackUrl") || "/";
 
     const onSubmit: SubmitHandler<FormData> = async (data) => {
+        const toastId = toast.loading("Iniciando sesión...");
         try {
             const res = await signIn("credentials", {
                 email: data.email,
@@ -33,12 +34,19 @@ const LogInForm: React.FC = () => {
                 redirect: false,
             });
             if (res?.ok) {
-                toast.success("¡Inicio de sesión exitoso!");
+                toast.success("¡Inicio de sesión exitoso!", { id: toastId });
                 return router.push(callbackUrl);
             }
-            toast.warning("Credenciales incorrectas. Intente nuevamente.");
+            toast.warning("Credenciales incorrectas. Intente nuevamente.", {
+                id: toastId,
+            });
         } catch (error) {
-            toast.info("Ups! Ocurrió un error inesperado.");
+            toast.info("Ups! Ocurrió un error inesperado.", {
+                description:
+                    "Intenta nuevamente o contacta con nuestro soporte",
+                id: toastId,
+            });
+            console.error(error);
         }
     };
 

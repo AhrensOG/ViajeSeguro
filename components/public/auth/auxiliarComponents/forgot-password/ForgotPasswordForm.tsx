@@ -2,65 +2,71 @@ import { BACKEND_URL } from "@/lib/constants";
 import { Mail } from "lucide-react";
 import Link from "next/link";
 import React from "react";
-import { useForm } from "react-hook-form";
+import { useForm, SubmitHandler } from "react-hook-form";
 import { toast } from "sonner";
 
 interface ForgotPasswordForm {
-    forgotEmail: string;
+    email: string;
 }
 
 const ForgotPasswordForm = () => {
     const {
-        register: registerForgot,
-        handleSubmit: handleForgotSubmit,
-        watch: watchForgot,
-        formState: { errors: forgotErrors },
+        register,
+        handleSubmit,
+        formState: { errors },
     } = useForm<ForgotPasswordForm>();
 
-    const handleForgotPassword = async () => {
-        const email = watchForgot("forgotEmail");
-        if (!email) {
-            toast.warning("Por favor, ingresa un email válido.");
-            return;
-        }
-
+    const handleForgotPassword: SubmitHandler<ForgotPasswordForm> = async (
+        data
+    ) => {
+        const toastId = toast.loading("Enviando solicitud...");
         try {
             const response = await fetch(
-                BACKEND_URL + "/auth/forgot-password",
+                `${BACKEND_URL}/auth/forgot-password`,
                 {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email }),
+                    body: JSON.stringify({ email: data.email }),
                 }
             );
 
             if (response.ok) {
-                toast.success(
-                    "Se ha enviado un código de recuperación a tu email."
+                return toast.success(
+                    "Se ha enviado un código de recuperación a tu email.",
+                    {
+                        id: toastId,
+                    }
                 );
+            } else if (response.status === 404) {
+                return toast.warning("Usuario no encontrado.", {
+                    description: "Verifica tu email",
+                    id: toastId,
+                });
             } else {
-                response.status === 404
-                    ? toast.warning("Usuario no encontrado.", {
-                          description: "Verifica tu email",
-                      })
-                    : toast.warning("Ups! Ocurrio un error inesperado.", {
-                          description:
-                              "Intenta nuevamente o comunicate con nuestro soporte",
-                      });
+                return toast.warning("Ups! Ocurrió un error inesperado.", {
+                    description:
+                        "Intenta nuevamente o comunícate con nuestro soporte",
+                    id: toastId,
+                });
             }
         } catch (error) {
-            toast.error("Error al enviar la solicitud de recuperación.");
+            toast.error("Error al enviar la solicitud de recuperación.", {
+                description:
+                    "Intenta nuevamente o comunícate con nuestro soporte",
+                id: toastId,
+            });
+            console.error(error);
         }
     };
 
     return (
         <form
-            onSubmit={handleForgotSubmit(handleForgotPassword)}
+            onSubmit={handleSubmit(handleForgotPassword)}
             className="space-y-4"
         >
             <div>
                 <label
-                    htmlFor="forgotEmail"
+                    htmlFor="email"
                     className="block text-sm font-medium text-first-gray mb-1"
                 >
                     Ingresa tu correo para recuperar tu contraseña
@@ -68,8 +74,8 @@ const ForgotPasswordForm = () => {
                 <div className="relative">
                     <Mail className="absolute left-3 top-3 h-5 w-5 text-third-gray" />
                     <input
-                        id="forgotEmail"
-                        {...registerForgot("forgotEmail", {
+                        id="email"
+                        {...register("email", {
                             required: "El email es obligatorio",
                             pattern: {
                                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
@@ -77,16 +83,16 @@ const ForgotPasswordForm = () => {
                             },
                         })}
                         className={`block w-full pl-10 pr-3 py-2 border ${
-                            forgotErrors.forgotEmail
+                            errors.email
                                 ? "border-red-500"
                                 : "border-fourth-gray"
                         } rounded-md shadow-sm outline-none focus:ring-first-golden focus:border-first-golden`}
                         placeholder="tu@email.com"
                     />
                 </div>
-                {forgotErrors.forgotEmail && (
+                {errors.email && (
                     <p className="text-red-500 text-xs mt-1">
-                        {forgotErrors.forgotEmail.message}
+                        {errors.email.message}
                     </p>
                 )}
             </div>

@@ -28,25 +28,39 @@ const RegisterForm: React.FC = () => {
     const router = useRouter();
 
     const onSubmit: SubmitHandler<FormData> = async (data) => {
+        const toastId = toast.loading("Registrando...");
         try {
-            data.role = "CLIENT";
+            const rest = {
+                name: data.name,
+                lastName: data.lastName,
+                email: data.email,
+                password: data.password,
+                role: "CLIENT",
+            };
             const res = await fetch(BACKEND_URL + "/auth/register", {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
-                body: JSON.stringify(data),
+                body: JSON.stringify(rest),
             });
-            if (!res.ok) {
-                toast.info("Ups, ocurrio un error al registrar tu cuenta.", {
-                    description:
-                        "Intenta nuevamente o contacta con nuestro soporte.",
+            if (res.ok) {
+                return toast.success("Te has registrado correctamente.", {
+                    id: toastId,
                 });
-                return;
             }
-            toast.success("Te has registrado correctamente.");
+            toast.info("Ups! ocurrió un error al registrar tu cuenta.", {
+                description:
+                    "Intenta nuevamente o contacta con nuestro soporte.",
+                id: toastId,
+            });
             return router.push("/auth/login");
         } catch (error) {
+            toast.info("Ups! ocurrió un error inesperado.", {
+                description:
+                    "Intenta nuevamente o contacta con nuestro soporte.",
+                id: toastId,
+            });
             console.log(error);
         }
     };
