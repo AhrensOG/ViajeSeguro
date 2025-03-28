@@ -15,7 +15,7 @@ type FormData = {
     terms: boolean;
 };
 
-const RegisterForm: React.FC = () => {
+const RegisterForm = () => {
     const {
         register,
         handleSubmit,
@@ -45,16 +45,17 @@ const RegisterForm: React.FC = () => {
                 body: JSON.stringify(rest),
             });
             if (res.ok) {
-                return toast.success("Te has registrado correctamente.", {
+                toast.success("Te has registrado correctamente.", {
+                    description: "Recuerda validar tu cuenta. Te enviamos un email.",
                     id: toastId,
                 });
+                return router.push("/auth/login");
             }
             toast.info("Ups! ocurrió un error al registrar tu cuenta.", {
                 description:
                     "Intenta nuevamente o contacta con nuestro soporte.",
                 id: toastId,
             });
-            return router.push("/auth/login");
         } catch (error) {
             toast.info("Ups! ocurrió un error inesperado.", {
                 description:

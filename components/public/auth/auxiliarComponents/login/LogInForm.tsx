@@ -13,7 +13,7 @@ interface FormData {
     password: string;
 }
 
-const LogInForm: React.FC = () => {
+const LogInForm = () => {
     const {
         register,
         handleSubmit,

@@ -12,7 +12,7 @@ interface FormData {
     confirmPassword: string;
 }
 
-const ResetPasswordForm: React.FC = () => {
+const ResetPasswordForm = () => {
     const searchParams = useSearchParams();
     const token = searchParams.get("token");
     const router = useRouter();

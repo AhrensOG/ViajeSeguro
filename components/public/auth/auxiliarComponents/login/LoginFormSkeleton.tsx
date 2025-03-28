@@ -1,6 +1,6 @@
 import React from "react";
 
-const LoginFormSkeleton: React.FC = () => {
+const LoginFormSkeleton = () => {
     return (
         <div className="space-y-4 animate-pulse">
             {/* Email Input */}

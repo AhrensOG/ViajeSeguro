@@ -1,6 +1,6 @@
 import React from "react";
 
-const ResetPasswordFormSkeleton: React.FC = () => {
+const ResetPasswordFormSkeleton = () => {
     return (
         <div className="mx-auto mt-10 bg-white animate-pulse">
             {/* Title */}
