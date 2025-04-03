@@ -16,37 +16,38 @@ const Footer = () => {
             <Link
               href="#servicios"
               className="text-second-gray hover:text-first-gray transition-colors"
-              aria-label="Ver servicios"
-            >
+              aria-label="Ver servicios">
               Servicios
             </Link>
             <Link
               href="#rutas"
               className="text-second-gray hover:text-first-gray transition-colors"
-              aria-label="Ver rutas"
-            >
+              aria-label="Ver rutas">
               Rutas
             </Link>
             <Link
               href="#precios"
               className="text-second-gray hover:text-first-gray transition-colors"
-              aria-label="Ver precios"
-            >
+              aria-label="Ver precios">
               Precios
             </Link>
             <Link
               href="#contacto"
               className="text-second-gray hover:text-first-gray transition-colors"
-              aria-label="Ver contacto"
-            >
+              aria-label="Ver contacto">
               Contacto
             </Link>
             <Link
-              href="#"
+              href="/terminos-y-condiciones"
               className="text-second-gray hover:text-first-gray transition-colors"
-              aria-label="Ver términos y condiciones"
-            >
+              aria-label="Ver términos y condiciones">
               Términos y condiciones
+            </Link>
+            <Link
+              href="/politicas-de-privacidad"
+              className="text-second-gray hover:text-first-gray transition-colors"
+              aria-label="Ver términos y condiciones">
+              Politicas de privacidad
             </Link>
           </nav>
         </div>
