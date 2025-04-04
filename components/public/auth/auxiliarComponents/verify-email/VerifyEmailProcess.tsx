@@ -39,9 +39,9 @@ const VerifyEmailProcess = () => {
 
     if (status === "loading") {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-first-white px-4 text-center">
-                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-first-golden border-solid mb-6"></div>
-                <h1 className="text-2xl font-semibold text-first-gray">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-custom-white-100 px-4 text-center">
+                <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-custom-golden-600 border-solid mb-6"></div>
+                <h1 className="text-2xl font-semibold text-custom-gray-800">
                     Verificando tu correo electrónico...
                 </h1>
             </div>
@@ -50,7 +50,7 @@ const VerifyEmailProcess = () => {
 
     if (status === "success") {
         return (
-            <div className="min-h-screen flex flex-col items-center justify-center bg-first-white px-4 text-center">
+            <div className="min-h-screen flex flex-col items-center justify-center bg-custom-white-100 px-4 text-center">
                 <h1 className="text-2xl font-bold text-green-600 mb-4">
                     ¡Correo verificado con éxito!
                 </h1>
@@ -58,7 +58,7 @@ const VerifyEmailProcess = () => {
                     Gracias por confirmar tu correo. Ya podés acceder a la
                     plataforma.
                 </p>
-                <span className="px-6 py-2 text-first-golden font-semibold rounded-md">
+                <span className="px-6 py-2 text-custom-golden-600 font-semibold rounded-md">
                     ¡Te has registrado con éxito!
                 </span>
             </div>
@@ -66,7 +66,7 @@ const VerifyEmailProcess = () => {
     }
 
     return (
-        <div className="min-h-screen flex flex-col items-center justify-center bg-first-white px-4 text-center">
+        <div className="min-h-screen flex flex-col items-center justify-center bg-custom-white-100 px-4 text-center">
             <h1 className="text-2xl font-bold text-red-600 mb-4">
                 Error al verificar el correo
             </h1>
@@ -76,7 +76,7 @@ const VerifyEmailProcess = () => {
             </p>
             <button
                 onClick={() => router.push("/")}
-                className="px-6 py-2 bg-first-golden hover:bg-second-golden text-first-white font-semibold rounded-md"
+                className="px-6 py-2 bg-custom-golden-600 hover:bg-custom-golden-700 text-custom-white-100 font-semibold rounded-md"
             >
                 Ir al inicio
             </button>

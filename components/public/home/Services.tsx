@@ -50,7 +50,7 @@ const Services = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-4xl font-extrabold text-center text-first-gray mb-12"
+          className="text-4xl font-extrabold text-center text-custom-gray-800 mb-12"
         >
           Nuestros Servicios
         </motion.h2>
@@ -62,10 +62,10 @@ const Services = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.2 }}
-              className="bg-first-white rounded-lg shadow-lg overflow-hidden border border-fifth-gray flex flex-col justify-center items-center"
+              className="bg-custom-white-100 rounded-lg shadow-lg overflow-hidden border border-custom-gray-100 flex flex-col justify-center items-center"
             >
-              <div className="bg-gradient-to-r from-first-gray to-first-black p-5 text-center w-full">
-                <h3 className="text-xl font-bold text-first-white">
+              <div className="bg-gradient-to-r from-custom-gray-800 to-custom-black-900 p-5 text-center w-full">
+                <h3 className="text-xl font-bold text-custom-white-100">
                   {service.title}
                 </h3>
               </div>
@@ -74,7 +74,7 @@ const Services = () => {
                 <ul className="space-y-3">
                   {service.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start">
-                      <Check className="h-5 w-5 text-first-golden mr-2 flex-shrink-0" />
+                      <Check className="h-5 w-5 text-custom-golden-600 mr-2 flex-shrink-0" />
                       <span className="text-gray-700">{feature}</span>
                     </li>
                   ))}
@@ -83,7 +83,7 @@ const Services = () => {
                 <motion.button
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
-                  className="w-full mt-6 bg-first-golden hover:bg-second-golden text-first-white font-medium py-3 px-6 rounded-lg transition"
+                  className="w-full mt-6 bg-custom-golden-600 hover:bg-custom-golden-700 text-custom-white-100 font-medium py-3 px-6 rounded-lg transition"
                   aria-label={`Reservar ${service.title}`}
                 >
                   Reservar

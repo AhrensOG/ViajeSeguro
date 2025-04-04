@@ -55,12 +55,12 @@ const LogInForm = () => {
             <div>
                 <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-first-gray mb-1"
+                    className="block text-sm font-medium text-custom-gray-800 mb-1"
                 >
                     Email
                 </label>
                 <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-5 w-5 text-third-gray" />
+                    <Mail className="absolute left-3 top-3 h-5 w-5 text-custom-gray-500" />
                     <input
                         id="email"
                         {...register("email", {
@@ -73,8 +73,8 @@ const LogInForm = () => {
                         className={`block w-full pl-10 pr-3 py-2 border ${
                             errors.email
                                 ? "border-red-500"
-                                : "border-fourth-gray"
-                        } rounded-md shadow-sm outline-none focus:ring-first-golden focus:border-first-golden`}
+                                : "border-custom-gray-300"
+                        } rounded-md shadow-sm outline-none focus:ring-custom-golden-600 focus:border-custom-golden-600`}
                         placeholder="tu@email.com"
                     />
                 </div>
@@ -88,12 +88,12 @@ const LogInForm = () => {
             <div>
                 <label
                     htmlFor="password"
-                    className="block text-sm font-medium text-first-gray mb-1"
+                    className="block text-sm font-medium text-custom-gray-800 mb-1"
                 >
                     Contraseña
                 </label>
                 <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-5 w-5 text-third-gray" />
+                    <Lock className="absolute left-3 top-3 h-5 w-5 text-custom-gray-500" />
                     <input
                         id="password"
                         type={showPassword ? "text" : "password"}
@@ -107,8 +107,8 @@ const LogInForm = () => {
                         className={`block w-full pl-10 pr-10 py-2 border ${
                             errors.password
                                 ? "border-red-500"
-                                : "border-fourth-gray"
-                        } rounded-md shadow-sm outline-none focus:ring-first-golden focus:border-first-golden`}
+                                : "border-custom-gray-300"
+                        } rounded-md shadow-sm outline-none focus:ring-custom-golden-600 focus:border-custom-golden-600`}
                         placeholder="••••••••"
                     />
                     <button
@@ -117,9 +117,9 @@ const LogInForm = () => {
                         onClick={() => setShowPassword(!showPassword)}
                     >
                         {showPassword ? (
-                            <EyeOff className="h-5 w-5 text-third-gray" />
+                            <EyeOff className="h-5 w-5 text-custom-gray-500" />
                         ) : (
-                            <Eye className="h-5 w-5 text-third-gray" />
+                            <Eye className="h-5 w-5 text-custom-gray-500" />
                         )}
                     </button>
                 </div>
@@ -133,7 +133,7 @@ const LogInForm = () => {
             <div className="text-sm">
                 <Link
                     href={"/auth/forgot-password"}
-                    className="font-medium text-first-golden hover:text-second-golden duration-300"
+                    className="font-medium text-custom-golden-600 hover:text-custom-golden-700 duration-300"
                 >
                     ¿Olvidaste tu contraseña?
                 </Link>
@@ -142,7 +142,7 @@ const LogInForm = () => {
             <div>
                 <button
                     type="submit"
-                    className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white bg-first-golden hover:bg-second-golden duration-300"
+                    className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white bg-custom-golden-600 hover:bg-custom-golden-700 duration-300"
                 >
                     Iniciar sesión
                 </button>

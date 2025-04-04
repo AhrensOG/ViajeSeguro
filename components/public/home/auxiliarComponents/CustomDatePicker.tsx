@@ -28,10 +28,10 @@ const CustomDatePicker = ({ onSelect }: CustomDatePickerProps) => {
         <div className="relative w-full">
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full flex items-center justify-between border border-fourth-gray bg-first-white px-4 py-3 rounded-lg shadow-sm text-third-gray hover: focus:ring-1 focus:ring-first-golden transition"
+                className="w-full flex items-center justify-between border border-custom-gray-300 bg-custom-white-100 px-4 py-3 rounded-lg shadow-sm text-custom-gray-500 hover: focus:ring-1 focus:ring-custom-golden-600 transition"
             >
                 <div className="flex items-center gap-3">
-                    <CalendarDays className="h-5 w-5 text-second-gray" />
+                    <CalendarDays className="h-5 w-5 text-custom-gray-600" />
                     {selectedDate
                         ? formatDateToDDMMYYYY(selectedDate)
                         : "Fecha"}
@@ -39,12 +39,12 @@ const CustomDatePicker = ({ onSelect }: CustomDatePickerProps) => {
             </button>
 
             {isOpen && (
-                <div className="absolute top-full left-0 mt-2 bg-first-white border border-fourth-gray rounded-lg shadow-lg z-10 p-4">
+                <div className="absolute top-full left-0 mt-2 bg-custom-white-100 border border-custom-gray-300 rounded-lg shadow-lg z-10 p-4">
                     <DayPicker
                         mode="single"
                         selected={selectedDate}
                         onSelect={handleSelect}
-                        className="text-first-gray"
+                        className="text-custom-gray-800"
                     />
                 </div>
             )}

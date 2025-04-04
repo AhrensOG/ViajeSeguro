@@ -3,11 +3,11 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className=" py-8 mt-auto border-t border-fourth-gray">
+    <footer className=" py-8 mt-auto border-t border-custom-gray-300">
       <div className="container mx-auto px-6">
         <div className="flex flex-col md:flex-row justify-between items-center gap-6">
           <div className="flex items-center">
-            <span className="text-lg font-bold text-first-gray">
+            <span className="text-lg font-bold text-custom-gray-800">
               Viaje Seguro
             </span>
           </div>
@@ -15,37 +15,37 @@ const Footer = () => {
           <nav className="flex flex-wrap gap-4 justify-center text-sm">
             <Link
               href="#servicios"
-              className="text-second-gray hover:text-first-gray transition-colors"
+              className="text-custom-gray-600 hover:text-custom-gray-800 transition-colors"
               aria-label="Ver servicios">
               Servicios
             </Link>
             <Link
               href="#rutas"
-              className="text-second-gray hover:text-first-gray transition-colors"
+              className="text-custom-gray-600 hover:text-custom-gray-800 transition-colors"
               aria-label="Ver rutas">
               Rutas
             </Link>
             <Link
               href="#precios"
-              className="text-second-gray hover:text-first-gray transition-colors"
+              className="text-custom-gray-600 hover:text-custom-gray-800 transition-colors"
               aria-label="Ver precios">
               Precios
             </Link>
             <Link
               href="#contacto"
-              className="text-second-gray hover:text-first-gray transition-colors"
+              className="text-custom-gray-600 hover:text-custom-gray-800 transition-colors"
               aria-label="Ver contacto">
               Contacto
             </Link>
             <Link
               href="/terminos-y-condiciones"
-              className="text-second-gray hover:text-first-gray transition-colors"
+              className="text-custom-gray-600 hover:text-custom-gray-800 transition-colors"
               aria-label="Ver términos y condiciones">
               Términos y condiciones
             </Link>
             <Link
               href="/politicas-de-privacidad"
-              className="text-second-gray hover:text-first-gray transition-colors"
+              className="text-custom-gray-600 hover:text-custom-gray-800 transition-colors"
               aria-label="Ver términos y condiciones">
               Politicas de privacidad
             </Link>

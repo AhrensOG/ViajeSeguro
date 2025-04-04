@@ -15,7 +15,7 @@ const Hero = () => {
 
     return (
         <section className="relative bg-[url('/main/main.webp')] bg-cover bg-no-repeat sm:bg-repeat sm:bg-auto bg-bottom py-16">
-            <div className="w-full mx-auto px-4 text-center text-first-white">
+            <div className="w-full mx-auto px-4 text-center text-custom-white-100">
                 <motion.h1
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
@@ -52,7 +52,7 @@ const Hero = () => {
                             ease: "easeOut",
                             delay: 0.3,
                         }}
-                        className="bg-first-white rounded-lg shadow-lg p-6 mt-8"
+                        className="bg-custom-white-100 rounded-lg shadow-lg p-6 mt-8"
                     >
                         <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
                             <motion.div
@@ -75,7 +75,7 @@ const Hero = () => {
                                     placeholder="Origen"
                                     onSelect={setOrigen}
                                     icon={
-                                        <MapPin className="h-5 w-5 text-third-gray" />
+                                        <MapPin className="h-5 w-5 text-custom-gray-500" />
                                     }
                                 />
                             </motion.div>
@@ -100,7 +100,7 @@ const Hero = () => {
                                     placeholder="Destino"
                                     onSelect={setDestino}
                                     icon={
-                                        <MapPin className="h-5 w-5 text-third-gray" />
+                                        <MapPin className="h-5 w-5 text-custom-gray-500" />
                                     }
                                 />
                             </motion.div>
@@ -119,20 +119,20 @@ const Hero = () => {
                                 transition={{ duration: 0.6, delay: 0.7 }}
                                 className="flex gap-2"
                             >
-                                <div className="flex items-center gap-3 border border-fourth-gray rounded-lg p-3 bg-first-white hover:">
-                                    <Users className="h-5 w-5 text-third-gray" />
+                                <div className="flex items-center gap-3 border border-custom-gray-300 rounded-lg p-3 bg-custom-white-100 hover:">
+                                    <Users className="h-5 w-5 text-custom-gray-500" />
                                     <input
                                         type="text"
                                         defaultValue={1}
                                         disabled
-                                        className="bg-transparent text-third-gray outline-none w-full"
+                                        className="bg-transparent text-custom-gray-500 outline-none w-full"
                                     />
                                 </div>
 
                                 <motion.button
                                     whileHover={{ scale: 1.05 }}
                                     whileTap={{ scale: 0.95 }}
-                                    className="bg-first-golden hover:bg-second-golden text-first-white font-medium rounded-lg px-6 py-3 transition"
+                                    className="bg-custom-golden-600 hover:bg-custom-golden-700 text-custom-white-100 font-medium rounded-lg px-6 py-3 transition"
                                 >
                                     Buscar
                                 </motion.button>
@@ -144,7 +144,7 @@ const Hero = () => {
                         initial={{ opacity: 0, y: 10 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.6, delay: 0.8 }}
-                        className="mt-6 text-sm font-bold text-first-white"
+                        className="mt-6 text-sm font-bold text-custom-white-100"
                     >
                         Origen: {origen || "Ninguno"} | Destino:{" "}
                         {destino || "Ninguno"} | Fecha:{" "}

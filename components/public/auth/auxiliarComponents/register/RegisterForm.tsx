@@ -71,19 +71,19 @@ const RegisterForm = () => {
             <div>
                 <label
                     htmlFor="name"
-                    className="block text-sm font-medium text-second-gray mb-1"
+                    className="block text-sm font-medium text-custom-gray-600 mb-1"
                 >
                     Nombre
                 </label>
                 <div className="relative">
-                    <User className="absolute left-3 top-3 h-5 w-5 text-third-gray" />
+                    <User className="absolute left-3 top-3 h-5 w-5 text-custom-gray-500" />
                     <input
                         id="name"
                         {...register("name", {
                             required: "El nombre es obligatorio",
                         })}
                         type="text"
-                        className="block w-full pl-10 pr-3 py-2 border border-fourth-gray rounded-md shadow-sm outline-none focus:ring-first-golden focus:border-first-golden"
+                        className="block w-full pl-10 pr-3 py-2 border border-custom-gray-300 rounded-md shadow-sm outline-none focus:ring-custom-golden-600 focus:border-custom-golden-600"
                         placeholder="Tu nombre"
                     />
                 </div>
@@ -97,19 +97,19 @@ const RegisterForm = () => {
             <div>
                 <label
                     htmlFor="lastName"
-                    className="block text-sm font-medium text-second-gray mb-1"
+                    className="block text-sm font-medium text-custom-gray-600 mb-1"
                 >
                     Apellido
                 </label>
                 <div className="relative">
-                    <User className="absolute left-3 top-3 h-5 w-5 text-third-gray" />
+                    <User className="absolute left-3 top-3 h-5 w-5 text-custom-gray-500" />
                     <input
                         id="lastName"
                         {...register("lastName", {
                             required: "El apellido es obligatorio",
                         })}
                         type="text"
-                        className="block w-full pl-10 pr-3 py-2 border border-fourth-gray rounded-md shadow-sm outline-none focus:ring-first-golden focus:border-first-golden"
+                        className="block w-full pl-10 pr-3 py-2 border border-custom-gray-300 rounded-md shadow-sm outline-none focus:ring-custom-golden-600 focus:border-custom-golden-600"
                         placeholder="Tu apellido"
                     />
                 </div>
@@ -123,12 +123,12 @@ const RegisterForm = () => {
             <div>
                 <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-second-gray mb-1"
+                    className="block text-sm font-medium text-custom-gray-600 mb-1"
                 >
                     Email
                 </label>
                 <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-5 w-5 text-third-gray" />
+                    <Mail className="absolute left-3 top-3 h-5 w-5 text-custom-gray-500" />
                     <input
                         id="email"
                         {...register("email", {
@@ -139,7 +139,7 @@ const RegisterForm = () => {
                             },
                         })}
                         type="email"
-                        className="block w-full pl-10 pr-3 py-2 border border-fourth-gray rounded-md shadow-sm outline-none focus:ring-first-golden focus:border-first-golden"
+                        className="block w-full pl-10 pr-3 py-2 border border-custom-gray-300 rounded-md shadow-sm outline-none focus:ring-custom-golden-600 focus:border-custom-golden-600"
                         placeholder="tu@email.com"
                     />
                 </div>
@@ -153,12 +153,12 @@ const RegisterForm = () => {
             <div>
                 <label
                     htmlFor="password"
-                    className="block text-sm font-medium text-second-gray mb-1"
+                    className="block text-sm font-medium text-custom-gray-600 mb-1"
                 >
                     Contraseña
                 </label>
                 <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-5 w-5 text-third-gray" />
+                    <Lock className="absolute left-3 top-3 h-5 w-5 text-custom-gray-500" />
                     <input
                         id="password"
                         {...register("password", {
@@ -169,7 +169,7 @@ const RegisterForm = () => {
                             },
                         })}
                         type={showPassword ? "text" : "password"}
-                        className="block w-full pl-10 pr-10 py-2 border border-fourth-gray rounded-md shadow-sm outline-none focus:ring-first-golden focus:border-first-golden"
+                        className="block w-full pl-10 pr-10 py-2 border border-custom-gray-300 rounded-md shadow-sm outline-none focus:ring-custom-golden-600 focus:border-custom-golden-600"
                         placeholder="••••••••"
                     />
                     <button
@@ -178,9 +178,9 @@ const RegisterForm = () => {
                         onClick={() => setShowPassword(!showPassword)}
                     >
                         {showPassword ? (
-                            <EyeOff className="h-5 w-5 text-third-gray" />
+                            <EyeOff className="h-5 w-5 text-custom-gray-500" />
                         ) : (
-                            <Eye className="h-5 w-5 text-third-gray" />
+                            <Eye className="h-5 w-5 text-custom-gray-500" />
                         )}
                     </button>
                 </div>
@@ -194,12 +194,12 @@ const RegisterForm = () => {
             <div>
                 <label
                     htmlFor="confirmPassword"
-                    className="block text-sm font-medium text-second-gray mb-1"
+                    className="block text-sm font-medium text-custom-gray-600 mb-1"
                 >
                     Confirmar Contraseña
                 </label>
                 <div className="relative">
-                    <Lock className="absolute left-3 top-3 h-5 w-5 text-third-gray" />
+                    <Lock className="absolute left-3 top-3 h-5 w-5 text-custom-gray-500" />
                     <input
                         id="confirmPassword"
                         {...register("confirmPassword", {
@@ -209,7 +209,7 @@ const RegisterForm = () => {
                                 "Las contraseñas no coinciden",
                         })}
                         type={showConfirmPassword ? "text" : "password"}
-                        className="block w-full pl-10 pr-10 py-2 border border-fourth-gray rounded-md shadow-sm outline-none focus:ring-first-golden focus:border-first-golden"
+                        className="block w-full pl-10 pr-10 py-2 border border-custom-gray-300 rounded-md shadow-sm outline-none focus:ring-custom-golden-600 focus:border-custom-golden-600"
                         placeholder="••••••••"
                     />
                     <button
@@ -220,9 +220,9 @@ const RegisterForm = () => {
                         }
                     >
                         {showConfirmPassword ? (
-                            <EyeOff className="h-5 w-5 text-third-gray" />
+                            <EyeOff className="h-5 w-5 text-custom-gray-500" />
                         ) : (
-                            <Eye className="h-5 w-5 text-third-gray" />
+                            <Eye className="h-5 w-5 text-custom-gray-500" />
                         )}
                     </button>
                 </div>
@@ -242,16 +242,16 @@ const RegisterForm = () => {
                                 "Debes aceptar los términos y condiciones",
                         })}
                         type="checkbox"
-                        className="h-4 w-4 text-first-golden focus:ring-first-golden border-fourth-gray rounded"
+                        className="h-4 w-4 text-custom-golden-600 focus:ring-custom-golden-600 border-custom-gray-300 rounded"
                     />
                     <label
                         htmlFor="terms"
-                        className="ml-2 block text-sm text-second-gray"
+                        className="ml-2 block text-sm text-custom-gray-600"
                     >
                         Acepto los{" "}
                         <a
                             href="#"
-                            className="font-medium text-first-golden hover:text-second-golden"
+                            className="font-medium text-custom-golden-600 hover:text-custom-golden-700"
                         >
                             términos y condiciones
                         </a>
@@ -267,7 +267,7 @@ const RegisterForm = () => {
             <div>
                 <button
                     type="submit"
-                    className="w-full py-2 px-4 rounded-md text-sm font-medium text-white bg-first-golden hover:bg-second-golden duration-300"
+                    className="w-full py-2 px-4 rounded-md text-sm font-medium text-white bg-custom-golden-600 hover:bg-custom-golden-700 duration-300"
                 >
                     Crear cuenta
                 </button>

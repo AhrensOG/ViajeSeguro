@@ -67,12 +67,12 @@ const ForgotPasswordForm = () => {
             <div>
                 <label
                     htmlFor="email"
-                    className="block text-sm font-medium text-first-gray mb-1"
+                    className="block text-sm font-medium text-custom-gray-800 mb-1"
                 >
                     Ingresa tu correo para recuperar tu contraseña
                 </label>
                 <div className="relative">
-                    <Mail className="absolute left-3 top-3 h-5 w-5 text-third-gray" />
+                    <Mail className="absolute left-3 top-3 h-5 w-5 text-custom-gray-500" />
                     <input
                         id="email"
                         {...register("email", {
@@ -85,8 +85,8 @@ const ForgotPasswordForm = () => {
                         className={`block w-full pl-10 pr-3 py-2 border ${
                             errors.email
                                 ? "border-red-500"
-                                : "border-fourth-gray"
-                        } rounded-md shadow-sm outline-none focus:ring-first-golden focus:border-first-golden`}
+                                : "border-custom-gray-300"
+                        } rounded-md shadow-sm outline-none focus:ring-custom-golden-600 focus:border-custom-golden-600`}
                         placeholder="tu@email.com"
                     />
                 </div>
@@ -99,14 +99,14 @@ const ForgotPasswordForm = () => {
             <p className="text-sm mt-2">
                 <Link
                     href="/auth/login"
-                    className="text-first-golden hover:text-second-golden"
+                    className="text-custom-golden-600 hover:text-custom-golden-700"
                 >
                     Volver al inicio de sesión
                 </Link>
             </p>
             <button
                 type="submit"
-                className="w-full mt-2 py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white bg-first-golden hover:bg-second-golden duration-300"
+                className="w-full mt-2 py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white bg-custom-golden-600 hover:bg-custom-golden-700 duration-300"
             >
                 Enviar código de recuperación
             </button>

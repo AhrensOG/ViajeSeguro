@@ -34,7 +34,7 @@ const LoginPage = () => {
                             {/* Back to home link */}
                             <Link
                                 href="/"
-                                className="inline-flex items-center text-sm text-second-gray hover:text-black"
+                                className="inline-flex items-center text-sm text-custom-gray-600 hover:text-black"
                             >
                                 <ArrowLeft className="h-4 w-4 mr-1" />
                                 Volver a la página principal
@@ -43,13 +43,13 @@ const LoginPage = () => {
                             {/* Tabs */}
                             <div className="flex">
                                 <span
-                                    className={`flex-1 py-4 text-center font-medium transition-colors text-first-golden border-b-2 border-first-golden`}
+                                    className={`flex-1 py-4 text-center font-medium transition-colors text-custom-golden-600 border-b-2 border-custom-golden-600`}
                                 >
                                     Iniciar sesión
                                 </span>
                                 <Link
                                     href="/auth/register"
-                                    className={`flex-1 py-4 text-center font-medium transition-colors text-second-gray hover:text-first-gray`}
+                                    className={`flex-1 py-4 text-center font-medium transition-colors text-custom-gray-600 hover:text-custom-gray-800`}
                                 >
                                     Registrarse
                                 </Link>
@@ -70,18 +70,18 @@ const LoginPage = () => {
 
                             {/* Additional Info */}
                             <div className="p-6 pt-0 text-center">
-                                <p className="text-sm text-second-gray">
+                                <p className="text-sm text-custom-gray-600">
                                     Al registrarte, aceptas nuestra{" "}
                                     <a
                                         href="#"
-                                        className="font-medium text-first-golden hover:text-second-golden duration-300"
+                                        className="font-medium text-custom-golden-600 hover:text-custom-golden-700 duration-300"
                                     >
                                         Política de Privacidad
                                     </a>{" "}
                                     y{" "}
                                     <a
                                         href="#"
-                                        className="font-medium text-first-golden hover:text-second-golden duration-300"
+                                        className="font-medium text-custom-golden-600 hover:text-custom-golden-700 duration-300"
                                     >
                                         Términos de Servicio
                                     </a>

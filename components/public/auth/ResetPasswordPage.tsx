@@ -45,18 +45,18 @@ const ResetPasswordPage = () => {
 
                             {/* Additional Info */}
                             <div className="p-6 pt-0 text-center">
-                                <p className="text-sm text-second-gray">
+                                <p className="text-sm text-custom-gray-600">
                                     Al registrarte, aceptas nuestra{" "}
                                     <a
                                         href="#"
-                                        className="font-medium text-first-golden hover:text-second-golden duration-300"
+                                        className="font-medium text-custom-golden-600 hover:text-custom-golden-700 duration-300"
                                     >
                                         Política de Privacidad
                                     </a>{" "}
                                     y{" "}
                                     <a
                                         href="#"
-                                        className="font-medium text-first-golden hover:text-second-golden duration-300"
+                                        className="font-medium text-custom-golden-600 hover:text-custom-golden-700 duration-300"
                                     >
                                         Términos de Servicio
                                     </a>

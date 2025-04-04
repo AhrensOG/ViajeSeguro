@@ -65,10 +65,10 @@ const ResetPasswordForm = () => {
 
     return (
         <div className="mx-auto mt-10 bg-white">
-            <h2 className="text-2xl font-semibold text-center text-first-gray mb-4">
+            <h2 className="text-2xl font-semibold text-center text-custom-gray-800 mb-4">
                 Restablecer Contraseña
             </h2>
-            <p className="text-sm text-center text-second-gray mb-6">
+            <p className="text-sm text-center text-custom-gray-600 mb-6">
                 Ingresa tu nueva contraseña. Asegúrate de recordarla.
             </p>
 
@@ -76,12 +76,12 @@ const ResetPasswordForm = () => {
                 <div>
                     <label
                         htmlFor="password"
-                        className="block text-sm font-medium text-first-gray mb-1"
+                        className="block text-sm font-medium text-custom-gray-800 mb-1"
                     >
                         Nueva Contraseña
                     </label>
                     <div className="relative">
-                        <Lock className="absolute left-3 top-3 h-5 w-5 text-third-gray" />
+                        <Lock className="absolute left-3 top-3 h-5 w-5 text-custom-gray-500" />
                         <input
                             id="password"
                             type={showPassword ? "text" : "password"}
@@ -95,8 +95,8 @@ const ResetPasswordForm = () => {
                             className={`block w-full pl-10 pr-10 py-2 border ${
                                 errors.password
                                     ? "border-red-500"
-                                    : "border-fourth-gray"
-                            } rounded-md shadow-sm outline-none focus:ring-first-golden focus:border-first-golden`}
+                                    : "border-custom-gray-300"
+                            } rounded-md shadow-sm outline-none focus:ring-custom-golden-600 focus:border-custom-golden-600`}
                             placeholder="••••••••"
                         />
                         <button
@@ -105,9 +105,9 @@ const ResetPasswordForm = () => {
                             onClick={() => setShowPassword(!showPassword)}
                         >
                             {showPassword ? (
-                                <EyeOff className="h-5 w-5 text-third-gray" />
+                                <EyeOff className="h-5 w-5 text-custom-gray-500" />
                             ) : (
-                                <Eye className="h-5 w-5 text-third-gray" />
+                                <Eye className="h-5 w-5 text-custom-gray-500" />
                             )}
                         </button>
                     </div>
@@ -121,12 +121,12 @@ const ResetPasswordForm = () => {
                 <div>
                     <label
                         htmlFor="confirmPassword"
-                        className="block text-sm font-medium text-first-gray mb-1"
+                        className="block text-sm font-medium text-custom-gray-800 mb-1"
                     >
                         Confirmar Contraseña
                     </label>
                     <div className="relative">
-                        <Lock className="absolute left-3 top-3 h-5 w-5 text-third-gray" />
+                        <Lock className="absolute left-3 top-3 h-5 w-5 text-custom-gray-500" />
                         <input
                             id="confirmPassword"
                             type={showConfirmPassword ? "text" : "password"}
@@ -139,8 +139,8 @@ const ResetPasswordForm = () => {
                             className={`block w-full pl-10 pr-10 py-2 border ${
                                 errors.confirmPassword
                                     ? "border-red-500"
-                                    : "border-fourth-gray"
-                            } rounded-md shadow-sm outline-none focus:ring-first-golden focus:border-first-golden`}
+                                    : "border-custom-gray-300"
+                            } rounded-md shadow-sm outline-none focus:ring-custom-golden-600 focus:border-custom-golden-600`}
                             placeholder="••••••••"
                         />
                         <button
@@ -151,9 +151,9 @@ const ResetPasswordForm = () => {
                             }
                         >
                             {showConfirmPassword ? (
-                                <EyeOff className="h-5 w-5 text-third-gray" />
+                                <EyeOff className="h-5 w-5 text-custom-gray-500" />
                             ) : (
-                                <Eye className="h-5 w-5 text-third-gray" />
+                                <Eye className="h-5 w-5 text-custom-gray-500" />
                             )}
                         </button>
                     </div>
@@ -167,7 +167,7 @@ const ResetPasswordForm = () => {
                 <div>
                     <button
                         type="submit"
-                        className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white bg-first-golden hover:bg-second-golden duration-300"
+                        className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white bg-custom-golden-600 hover:bg-custom-golden-700 duration-300"
                     >
                         Restablecer Contraseña
                     </button>

@@ -39,16 +39,16 @@ const CustomSelect = ({
     >
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between border border-fourth-gray bg-first-white px-4 py-3 rounded-lg shadow-sm text-third-gray hover: focus:ring-1 focus:ring-first-golden transition"
+        className="w-full flex items-center justify-between border border-custom-gray-300 bg-custom-white-100 px-4 py-3 rounded-lg shadow-sm text-custom-gray-500 hover: focus:ring-1 focus:ring-custom-golden-600 transition"
       >
         <div className="flex items-center gap-3">
-          {icon && <span className="text-third-gray">{icon}</span>}
+          {icon && <span className="text-custom-gray-500">{icon}</span>}
           {selected
             ? options.find((opt) => opt.value === selected)?.label
             : placeholder}
         </div>
         <ChevronDown
-          className={`h-5 w-5 text-third-gray transition-transform ${
+          className={`h-5 w-5 text-custom-gray-500 transition-transform ${
             isOpen ? "rotate-180" : ""
           }`}
         />
@@ -61,14 +61,14 @@ const CustomSelect = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -5 }}
             transition={{ duration: 0.2 }}
-            className="absolute w-full bg-first-white border border-fourth-gray mt-2 rounded-lg shadow-lg overflow-hidden z-10"
+            className="absolute w-full bg-custom-white-100 border border-custom-gray-300 mt-2 rounded-lg shadow-lg overflow-hidden z-10"
           >
             {options.map((option) => (
               <li
                 key={option.value}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleSelect(option.value)}
-                className="px-4 py-3 text-third-gray cursor-pointer hover:bg-amber-100 transition"
+                className="px-4 py-3 text-custom-gray-500 cursor-pointer hover:bg-amber-100 transition"
               >
                 {option.label}
               </li>

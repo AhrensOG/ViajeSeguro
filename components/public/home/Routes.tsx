@@ -50,12 +50,12 @@ const Routes = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={isInView && { opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-4xl font-extrabold text-center text-first-gray mb-12"
+          className="text-4xl font-extrabold text-center text-custom-gray-800 mb-12"
         >
           Nuestras Rutas
         </motion.h2>
 
-        <div className="max-w-3xl mx-auto bg-first-white rounded-lg shadow-lg overflow-hidden border border-fourth-gray">
+        <div className="max-w-3xl mx-auto bg-custom-white-100 rounded-lg shadow-lg overflow-hidden border border-custom-gray-300">
           <div className="p-6">
             <div className="flex flex-col space-y-6">
               {routes.map((route, index) => (
@@ -66,27 +66,27 @@ const Routes = () => {
                   transition={{ duration: 0.6, delay: index * 0.2 }}
                   className={`flex items-center justify-between pb-4 ${
                     index !== routes.length - 1
-                      ? "border-b border-third-gray"
+                      ? "border-b border-custom-gray-500"
                       : ""
                   }`}
                 >
                   <div className="flex items-center">
                     <div className="w-12 h-12  rounded-full flex items-center justify-center mr-4">
-                      <MapPin className="h-6 w-6 text-first-black" />
+                      <MapPin className="h-6 w-6 text-custom-black-900" />
                     </div>
                     <div>
                       <h4 className="font-semibold text-lg">
                         {route.from} - {route.to}
                       </h4>
-                      <p className="text-third-gray">{route.duration}</p>
+                      <p className="text-custom-gray-500">{route.duration}</p>
                     </div>
                   </div>
 
                   <div className="text-right">
-                    <span className="text-lg font-bold text-first-golden">
+                    <span className="text-lg font-bold text-custom-golden-600">
                       {route.price}
                     </span>
-                    <p className="text-sm text-third-gray">por asiento</p>
+                    <p className="text-sm text-custom-gray-500">por asiento</p>
                   </div>
                 </motion.div>
               ))}

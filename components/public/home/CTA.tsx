@@ -63,7 +63,7 @@ const CTA = () => {
             >
               <Link
                 href="https://bit.ly/Viajamosespaña"
-                className="bg-first-golden hover:bg-second-golden text-white font-medium rounded-full px-6 py-3 transition-all duration-300 shadow-md hover:shadow-lg"
+                className="bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-medium rounded-full px-6 py-3 transition-all duration-300 shadow-md hover:shadow-lg"
               >
                 Reserva ahora
               </Link>

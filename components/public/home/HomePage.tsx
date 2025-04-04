@@ -10,7 +10,7 @@ import Footer from "../navigation/Footer";
 
 const HomePage = () => {
   return (
-    <div className="bg-fifth-gray">
+    <div className="bg-custom-gray-100">
       <NavBar />
       <Hero />
       <Services />
