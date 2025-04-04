@@ -1,4 +1,5 @@
 @import "tailwindcss";
+@plugin 'tailwind-scrollbar';
 
 @theme {
   /* Black scale (de más oscuro a menos oscuro) */

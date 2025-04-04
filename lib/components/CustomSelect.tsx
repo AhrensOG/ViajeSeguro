@@ -13,6 +13,7 @@ interface CustomSelectProps {
   options: Option[];
   placeholder?: string;
   onSelect: (value: string) => void;
+  value?: string;
   icon?: ReactNode;
 }
 
@@ -20,10 +21,11 @@ const CustomSelect = ({
   options,
   placeholder = "Selecciona una opción",
   onSelect,
+  value,
   icon,
 }: CustomSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
-  const [selected, setSelected] = useState<string | null>(null);
+  const [selected, setSelected] = useState<string | null>(value || null);
 
   const handleSelect = (value: string) => {
     setSelected(value);
@@ -35,12 +37,10 @@ const CustomSelect = ({
     <div
       className="relative w-full"
       tabIndex={0}
-      onBlur={() => setIsOpen(false)}
-    >
+      onBlur={() => setIsOpen(false)}>
       <button
         onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between border border-custom-gray-300 bg-custom-white-100 px-4 py-3 rounded-lg shadow-sm text-custom-gray-500 hover: focus:ring-1 focus:ring-custom-golden-600 transition"
-      >
+        className="w-full flex items-center justify-between border border-custom-gray-300 bg-custom-white-100 px-4 py-3 rounded-lg shadow-sm text-custom-gray-500 hover: focus:ring-1 focus:ring-custom-golden-600 transition">
         <div className="flex items-center gap-3">
           {icon && <span className="text-custom-gray-500">{icon}</span>}
           {selected
@@ -61,15 +61,13 @@ const CustomSelect = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -5 }}
             transition={{ duration: 0.2 }}
-            className="absolute w-full bg-custom-white-100 border border-custom-gray-300 mt-2 rounded-lg shadow-lg overflow-hidden z-10"
-          >
+            className="absolute w-full bg-custom-white-100 border border-custom-gray-300 mt-2 rounded-lg shadow-lg overflow-hidden z-10">
             {options.map((option) => (
               <li
                 key={option.value}
                 onMouseDown={(e) => e.preventDefault()}
                 onClick={() => handleSelect(option.value)}
-                className="px-4 py-3 text-custom-gray-500 cursor-pointer hover:bg-amber-100 transition"
-              >
+                className="px-4 py-3 text-custom-gray-500 cursor-pointer hover:bg-amber-100 transition">
                 {option.label}
               </li>
             ))}

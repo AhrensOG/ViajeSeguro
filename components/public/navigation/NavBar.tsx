@@ -7,13 +7,13 @@ import Image from "next/image";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 
-const NavBar = () => {
+const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const { data: session } = useSession();
     return (
-        <header className="sticky top-0 bg-custom-white-100 z-50 w-full shadow-sm">
-            <div className="w-full px-6 py-3 flex items-center justify-between">
+        <header className={`h-[60px] sticky top-0 bg-custom-white-100 z-50 w-full ${ shadow ? "shadow-sm" : "" }`}>
+            <div className="w-full h-full px-6 py-3 flex items-center justify-between">
                 <Link href="/" className="flex items-center">
                     <Image
                         src="/main/logoNoBg.png"
