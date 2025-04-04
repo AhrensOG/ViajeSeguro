@@ -1,16 +1,7 @@
+import TripCardType from "@/lib/types/TripCard.type";
 import { ArrowRight } from "lucide-react";
 
-interface Trip {
-  id: string;
-  departureTime: string;
-  arrivalTime: string;
-  departureLocation: string;
-  arrivalLocation: string;
-  duration: string;
-  price: number;
-}
-
-const TripCard = ({ trip }: { trip: Trip }) => {
+const TripCard = ({ trip }: { trip: TripCardType }) => {
   const [int, decimal] = trip.price.toFixed(2).split(".");
 
   return (
