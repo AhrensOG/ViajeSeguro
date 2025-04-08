@@ -1,4 +1,4 @@
-import TripRouteCompactType from "@/lib/types/TripRouteCompact.type";
+import { TripRouteCompactType } from "@/lib/client/trip/types/trip.types";
 import { MapIcon } from "lucide-react";
 
 const TripRouteCompact = ({
