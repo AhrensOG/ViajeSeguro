@@ -5,7 +5,6 @@ import Image from "next/image";
 import SearchForm from "../../../lib/client/components/SearchForm";
 import { useRouter } from "next/navigation";
 import { SearchFormData } from "@/lib/client/trip/types/search-form.type";
-import { formatDateToYYYYMMDD } from "@/lib/functions";
 import { DateTime } from "luxon";
 
 const Hero = () => {

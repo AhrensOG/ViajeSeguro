@@ -92,7 +92,7 @@ const SearchProcess = () => {
     };
 
     fetchTrips();
-  }, [searchParams]);
+  }, [searchParams, departureParam]);
 
   const tripsOnSameDay = trips.filter((trip) => {
     const localDate = convertUTCToLocalTime(
