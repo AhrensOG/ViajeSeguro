@@ -66,7 +66,7 @@ function convertUTCToLocalTime(
   return dt.setZone(timeZone).toFormat(format);
 }
 
-export function convertUTCToLocalDate(
+function convertUTCToLocalDate(
   utcDate: string | Date,
   timeZone: string
 ): string {
@@ -83,4 +83,24 @@ export function convertUTCToLocalDate(
   return dt.setZone(timeZone).toFormat("dd/MM/yyyy");
 }
 
-export { formatDateToDDMMYYYY, formatDateToYYYYMMDD, getDurationString, convertUTCToLocalTime }
+export const fetcher = async <T = any>(
+  input: RequestInfo,
+  options?: RequestInit
+): Promise<T> => {
+  const res = await fetch(input, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...(options?.headers || {}),
+    },
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.message || 'Error al realizar la petición');
+  }
+
+  return res.json();
+};
+
+export { formatDateToDDMMYYYY, formatDateToYYYYMMDD, getDurationString, convertUTCToLocalTime, convertUTCToLocalDate }

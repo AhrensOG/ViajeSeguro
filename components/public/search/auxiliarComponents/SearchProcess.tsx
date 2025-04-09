@@ -3,16 +3,19 @@
 import React, { useState, useEffect } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import SearchForm from "@/lib/client/components/SearchForm";
-import { TripServiceType } from "@/lib/shared/types/trip-service-type.type";
-import { SearchFormData } from "@/lib/client/trip/types/search-form.type";
+import {
+  SearchTrip,
+  TripCardType,
+  TripServiceType,
+} from "@/lib/shared/types/trip-service-type.type";
 import Image from "next/image";
-import { BACKEND_URL } from "@/lib/constants";
 import { toast } from "sonner";
 import TripCard from "./TripCard";
 import { convertUTCToLocalTime } from "@/lib/functions";
-import { TripCardType } from "@/lib/client/trip/types/trip.types";
 import TripCardFallback from "@/lib/client/components/fallbacks/TripCardFallback";
 import { DateTime } from "luxon";
+import { searchTrips } from "@/lib/api/trip";
+import { ClientSearchFormData } from "@/lib/client/trip/types/search-form.type";
 
 const SearchProcess = () => {
   const router = useRouter();
@@ -23,7 +26,7 @@ const SearchProcess = () => {
   const [trips, setTrips] = useState<TripCardType[]>([]);
   const [isLoading, setIsLoading] = useState(false);
 
-  const updateSearchParams = (formData: SearchFormData) => {
+  const updateSearchParams = (formData: ClientSearchFormData) => {
     const params = new URLSearchParams(searchParams.toString());
 
     Object.entries(formData).forEach(([key, value]) => {
@@ -67,24 +70,22 @@ const SearchProcess = () => {
   useEffect(() => {
     const fetchTrips = async () => {
       setIsLoading(true);
-      const query = new URLSearchParams({
+      const query: SearchTrip = {
         origin: searchParams.get("origin") || "",
         destination: searchParams.get("destination") || "",
-        serviceType: searchParams.get("serviceType") || "SIMPLE_TRIP",
+        serviceType:
+          (searchParams.get("serviceType") as TripServiceType) || "SIMPLE_TRIP",
         departure: departureParam || "",
-      }).toString();
+      };
 
       try {
-        const response = await fetch(BACKEND_URL + `/trip/search?${query}`);
-        if (!response.ok) {
-          toast.info("Error al obtener los datos de los viajes.", {
-            description: "Intenta nuevamente o contacta a nuestro soporte.",
-          });
-        }
-        const data = await response.json();
+        const data = await searchTrips(query);
         setTrips(data);
       } catch (error) {
-        console.error(error);
+        console.log(error);
+        toast.info("¡Ups! Ocurrió un error inesperado.", {
+          description: "Intenta nuevamente o contacta con nuestro soporte",
+        });
         setTrips([]);
       } finally {
         setIsLoading(false);

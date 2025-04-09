@@ -4,8 +4,8 @@ import { motion } from "framer-motion";
 import Image from "next/image";
 import SearchForm from "../../../lib/client/components/SearchForm";
 import { useRouter } from "next/navigation";
-import { SearchFormData } from "@/lib/client/trip/types/search-form.type";
 import { DateTime } from "luxon";
+import { ClientSearchFormData } from "@/lib/client/trip/types/search-form.type";
 
 const Hero = () => {
   const router = useRouter();
@@ -15,7 +15,7 @@ const Hero = () => {
     destination,
     serviceType,
     departure,
-  }: SearchFormData) => {
+  }: ClientSearchFormData) => {
     const userTimeZone = DateTime.local().zoneName;
 
     const selectedDate = DateTime.fromJSDate(departure).setZone(userTimeZone);

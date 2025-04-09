@@ -1,10 +1,11 @@
-import { TripCardType } from "@/lib/client/trip/types/trip.types";
 import {
   convertUTCToLocalDate,
   convertUTCToLocalTime,
   getDurationString,
 } from "@/lib/functions";
+import { TripCardType } from "@/lib/shared/types/trip-service-type.type";
 import { ArrowRight } from "lucide-react";
+import Link from "next/link";
 
 const TripCard = ({
   trip,
@@ -19,7 +20,6 @@ const TripCard = ({
   const localDate = convertUTCToLocalDate(trip.departure, timeZone);
 
   const [int, decimal] = trip.basePrice.toFixed(2).split(".");
-
   return (
     <div className="bg-white rounded-lg shadow-md border border-custom-gray-300 overflow-hidden">
       <div className="p-4 flex flex-col md:flex-row justify-between gap-4">
@@ -47,12 +47,14 @@ const TripCard = ({
           <div className="max-w-sm flex justify-between text-custom-gray-800 font-semibold text-sm">
             <div className="text-start">{trip.originLocation}</div>
             <div className="text-end">{trip.destinationLocation}</div>
-          </div> 
+          </div>
         </div>
 
         <div className="flex items-center justify-end">
           <div className="text-right">
-            <span className="text-sm text-custom-gray-800 font-light">{localDate}</span>
+            <span className="text-sm text-custom-gray-800 font-light">
+              {localDate}
+            </span>
             <div className="font-bold text-2xl text-custom-black-700">
               {int}
               <span className="text-sm align-top"> ,{decimal}</span> €
@@ -67,10 +69,12 @@ const TripCard = ({
             Viaje Seguro
           </span>
         </div>
-        <button className="bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-medium rounded-lg px-4 py-2 flex items-center">
+        <Link
+          href={`/trip?id=${trip.id}`}
+          className="bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-medium rounded-lg px-4 py-2 flex items-center">
           Reservar
           <ArrowRight className="ml-2 h-4 w-4" />
-        </button>
+        </Link>
       </div>
     </div>
   );

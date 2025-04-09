@@ -2,29 +2,46 @@
 
 import { Calendar1Icon, ChevronRight } from "lucide-react";
 import TripRouteCompact from "./TripRouteCompact";
+import { DateTime } from "luxon";
+import { Trip } from "@/lib/shared/types/trip-service-type.type";
 
-const BookingSidebar = () => {
+type BookingSidebarProps = {
+  trip: Trip;
+};
+
+const BookingSidebar = ({ trip }: BookingSidebarProps) => {
+  const departure = DateTime.fromISO(trip.departure).setZone(
+    trip.originalTimeZone
+  );
+  const arrival = DateTime.fromISO(trip.arrival).setZone(trip.originalTimeZone);
+  const duration = arrival.diff(departure, ["hours", "minutes"]).toObject();
+  const durationStr = `${duration.hours?.toFixed(
+    0
+  )}h${duration.minutes?.toFixed(0)}m`;
+
+  const formattedDate = departure.setLocale("es").toFormat("cccc, d 'de' LLLL");
+  const fullname = `${trip.user.name} ${trip.user.lastName}`;
+
   return (
     <div className="space-y-4">
       <div className="p-6 bg-custom-white-100 shadow-sm rounded-lg border border-custom-gray-300">
-        <h2 className="text-xl font-bold text-custom-black-700 mb-4">
-          Domingo, 6 de abril
+        <h2 className="text-xl font-bold text-custom-black-900 mb-4">
+          {formattedDate}
         </h2>
 
-        {/* Trip summary */}
         <TripRouteCompact
-          departureTime="00:20"
-          duration="3h40"
-          arrivalTime="04:00"
-          originCity="Valencia"
-          originLocation="Valencia"
-          destinationCity="Madrid"
-          destinationLocation="Madrid"
+          departureTime={departure.toFormat("HH:mm")}
+          duration={durationStr}
+          arrivalTime={arrival.toFormat("HH:mm")}
+          originCity={trip.origin}
+          originLocation={trip.originLocation}
+          destinationCity={trip.destination}
+          destinationLocation={trip.destinationLocation}
           size="md"
         />
 
         <div className="flex items-center gap-3 mt-4 mb-6">
-          <span className="font-medium">Mohammed</span>
+          <span className="font-medium">{fullname ?? "Conductor"}</span>
         </div>
 
         <div className="flex items-center justify-between border-t border-b border-custom-gray-300 py-4 my-4">
@@ -33,7 +50,7 @@ const BookingSidebar = () => {
             <ChevronRight size={16} className="text-custom-gray-500" />
           </div>
           <div className="text-2xl font-bold text-custom-black-800">
-            66<span className="text-sm align-top">,98</span> €
+            {trip.basePrice.toFixed(2).replace(".", ",")} €
           </div>
         </div>
 

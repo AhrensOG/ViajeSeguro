@@ -21,7 +21,7 @@ const Contact = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={isInView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-4xl font-extrabold text-center text-custom-gray-800 mb-12"
+          className="text-4xl font-extrabold text-center text-custom-black-800 mb-12"
         >
           Contacta con nosotros
         </motion.h2>
@@ -40,7 +40,7 @@ const Contact = () => {
               >
                 <label
                   htmlFor="name"
-                  className="block text-sm font-medium text-custom-gray-800 mb-1"
+                  className="block text-sm font-medium text-custom-black-800 mb-1"
                 >
                   Nombre
                 </label>
@@ -49,7 +49,7 @@ const Contact = () => {
                   id="name"
                   aria-label="Nombre"
                   required
-                  className="w-full px-4 py-2 border border-custom-gray-300 rounded-md focus:ring-2 focus:ring-custom-golden-600 focus:border-custom-golden-600 transition-all outline-none bg-custom-white-100 text-custom-gray-800"
+                  className="w-full px-4 py-2 border border-custom-gray-300 rounded-md focus:ring-2 focus:ring-custom-golden-600 focus:border-custom-golden-600 transition-all outline-none bg-custom-white-100 text-custom-black-800"
                 />
               </motion.div>
 
@@ -59,7 +59,7 @@ const Contact = () => {
               >
                 <label
                   htmlFor="email"
-                  className="block text-sm font-medium text-custom-gray-800 mb-1"
+                  className="block text-sm font-medium text-custom-black-800 mb-1"
                 >
                   Email
                 </label>
@@ -68,7 +68,7 @@ const Contact = () => {
                   id="email"
                   aria-label="Email"
                   required
-                  className="w-full px-4 py-2 border border-custom-gray-300 rounded-md focus:ring-2 focus:ring-custom-golden-600 focus:border-custom-golden-600 transition-all outline-none bg-custom-white-100 text-custom-gray-800"
+                  className="w-full px-4 py-2 border border-custom-gray-300 rounded-md focus:ring-2 focus:ring-custom-golden-600 focus:border-custom-golden-600 transition-all outline-none bg-custom-white-100 text-custom-black-800"
                 />
               </motion.div>
             </div>
@@ -79,7 +79,7 @@ const Contact = () => {
             >
               <label
                 htmlFor="phone"
-                className="block text-sm font-medium text-custom-gray-800 mb-1"
+                className="block text-sm font-medium text-custom-black-800 mb-1"
               >
                 Teléfono
               </label>
@@ -88,7 +88,7 @@ const Contact = () => {
                 id="phone"
                 aria-label="Teléfono"
                 required
-                className="w-full px-4 py-2 border border-custom-gray-300 rounded-md focus:ring-2 focus:ring-custom-golden-600 focus:border-custom-golden-600 transition-all outline-none bg-custom-white-100 text-custom-gray-800"
+                className="w-full px-4 py-2 border border-custom-gray-300 rounded-md focus:ring-2 focus:ring-custom-golden-600 focus:border-custom-golden-600 transition-all outline-none bg-custom-white-100 text-custom-black-800"
               />
             </motion.div>
 
@@ -98,7 +98,7 @@ const Contact = () => {
             >
               <label
                 htmlFor="message"
-                className="block text-sm font-medium text-custom-gray-800 mb-1"
+                className="block text-sm font-medium text-custom-black-800 mb-1"
               >
                 Mensaje
               </label>
@@ -107,7 +107,7 @@ const Contact = () => {
                 rows={4}
                 aria-label="Mensaje"
                 required
-                className="w-full px-4 py-2 border border-custom-gray-300 rounded-md focus:ring-2 focus:ring-custom-golden-600 focus:border-custom-golden-600 transition-all outline-none bg-custom-white-100 text-custom-gray-800"
+                className="w-full px-4 py-2 border border-custom-gray-300 rounded-md focus:ring-2 focus:ring-custom-golden-600 focus:border-custom-golden-600 transition-all outline-none bg-custom-white-100 text-custom-black-800"
               ></textarea>
             </motion.div>
 

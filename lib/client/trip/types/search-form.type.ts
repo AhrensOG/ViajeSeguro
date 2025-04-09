@@ -1,6 +1,6 @@
 import { TripServiceType } from "@/lib/shared/types/trip-service-type.type";
 
-export interface SearchFormData {
+export interface ClientSearchFormData {
   origin: string;
   destination: string;
   departure: Date;

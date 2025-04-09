@@ -1,4 +1,4 @@
-import { TripRouteCompactType } from "@/lib/client/trip/types/trip.types";
+import { ClientTripRouteCompactType } from "@/lib/client/trip/types/trip.types";
 import { MapIcon } from "lucide-react";
 
 const TripRouteCompact = ({
@@ -10,7 +10,7 @@ const TripRouteCompact = ({
   destinationCity,
   destinationLocation,
   size = "md",
-}: TripRouteCompactType) => {
+}: ClientTripRouteCompactType) => {
   const textSize = {
     sm: "text-sm",
     md: "text-base",
@@ -45,7 +45,7 @@ const TripRouteCompact = ({
         <div className="flex flex-col w-full items-start justify-between">
           <div
             className={`font-medium text-custom-black-800 flex flex-col ${textSize}`}>
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1 capitalize">
               {originCity}
               <MapIcon size={iconSize} className="text-custom-golden-600" />
             </span>
@@ -58,7 +58,7 @@ const TripRouteCompact = ({
 
           <div
             className={`font-medium text-custom-black-800 flex flex-col ${textSize}`}>
-            <span className="flex items-center gap-1">
+            <span className="flex items-center gap-1 capitalize">
               {destinationCity}
               <MapIcon size={iconSize} className="text-custom-golden-600" />
             </span>

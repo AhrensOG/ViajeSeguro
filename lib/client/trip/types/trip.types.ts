@@ -1,17 +1,6 @@
-import { TripServiceType } from "@/lib/shared/types/trip-service-type.type";
+import { Trip } from "@/lib/shared/types/trip-service-type.type";
 
-export interface TripCardType {
-  id: string;
-  basePrice: number;
-  origin: string;
-  destination: string;
-  departure: string;
-  arrival: string;
-  originLocation: string;
-  destinationLocation: string;
-}
-
-export interface TripRouteCompactType {
+export interface ClientTripRouteCompactType {
   departureTime: string;
   duration: string;
   arrivalTime: string;
@@ -20,11 +9,4 @@ export interface TripRouteCompactType {
   destinationCity: string;
   destinationLocation?: string;
   size?: "sm" | "md" | "lg";
-}
-
-export interface SearchTripDto {
-  origin: string;
-  destination: string;
-  departure: string;
-  serviceType: TripServiceType
 }

@@ -1,24 +1,36 @@
-import {
-  AlertCircle,
-  ChevronRight,
-  MessageCircle,
-  ShieldCheck,
-} from "lucide-react";
+import { AlertCircle, MessageCircle, ShieldCheck } from "lucide-react";
 import TripRouteCompact from "./TripRouteCompact";
+import { DateTime } from "luxon";
+import Image from "next/image";
+import { Trip } from "@/lib/shared/types/trip-service-type.type";
 
-const TripDetail = () => {
+type TripDetailProps = {
+  trip: Trip;
+};
+
+const TripDetail = ({ trip }: TripDetailProps) => {
+  const departure = DateTime.fromISO(trip.departure).setZone(
+    trip.originalTimeZone
+  );
+  const arrival = DateTime.fromISO(trip.arrival).setZone(trip.originalTimeZone);
+  const duration = arrival.diff(departure, ["hours", "minutes"]).toObject();
+  const durationStr = `${duration.hours?.toFixed(
+    0
+  )}h${duration.minutes?.toFixed(0)}m`;
+  const fullname = `${trip.user.name} ${trip.user.lastName}`;
+
   return (
     <div className="lg:col-span-2 space-y-4">
       {/* Info principal del viaje */}
       <div className="p-6 bg-custom-white-100 shadow-sm rounded-lg border border-custom-gray-300">
         <TripRouteCompact
-          departureTime="00:20"
-          duration="3h40"
-          arrivalTime="04:00"
-          originCity="Paterna"
-          originLocation="Heron City"
-          destinationCity="Cerdanyola del Vallès"
-          destinationLocation="Bellaterra"
+          departureTime={departure.toFormat("HH:mm")}
+          duration={durationStr}
+          arrivalTime={arrival.toFormat("HH:mm")}
+          originCity={trip.origin}
+          originLocation={trip.originLocation}
+          destinationCity={trip.destination}
+          destinationLocation={trip.destinationLocation}
           size="md"
         />
       </div>
@@ -27,29 +39,40 @@ const TripDetail = () => {
       <div className="p-6 bg-custom-white-100 shadow-sm rounded-lg border border-custom-gray-300">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
+            {trip.user.avatarUrl && (
+              <div className="relative w-20 h-20 rounded-full overflow-hidden">
+                <Image
+                  src={trip.user.avatarUrl}
+                  fill
+                  alt="Avatar"
+                  className="object-cover object-center"
+                />
+              </div>
+            )}
             <h3 className="text-xl font-medium text-custom-black-800">
-              Mohammed
+              {fullname ?? "Viaje Seguro"}
             </h3>
           </div>
-          <ChevronRight className="text-custom-gray-500" />
         </div>
 
-        <div className="mt-4 flex items-center gap-2">
-          <ShieldCheck size={18} className="text-custom-golden-600" />
-          <span className="text-custom-gray-600 text-sm">
-            Perfil verificado
-          </span>
-        </div>
+        {trip.user.driverVerified && (
+          <div className="mt-4 flex items-center gap-2">
+            <ShieldCheck size={18} className="text-custom-golden-600" />
+            <span className="text-custom-gray-600 text-sm">
+              Perfil verificado
+            </span>
+          </div>
+        )}
 
         <div className="mt-4 text-custom-gray-600">
-          Pasajeros directo a Montpellier.
+          Viaje desde <span className="capitalize">{trip.origin}</span> hacia{" "}
+          <span className="capitalize">{trip.destination}</span>
         </div>
 
         <div className="mt-6 flex items-center gap-2 text-custom-gray-600 border-t border-custom-gray-300 pt-4">
           <AlertCircle size={16} className="text-custom-golden-600" />
           <span className="text-sm">
-            Tu reserva no se confirmará hasta que Viaje Seguro acepte la
-            solicitud
+            Tu reserva no se confirmará hasta que {fullname} acepte la solicitud
           </span>
         </div>
 
