@@ -21,21 +21,14 @@ const LoginPage = () => {
                         transition={{ duration: 0.8, ease: "easeOut" }}
                         className="hidden md:block md:w-[60%] relative"
                     >
-                        <Image
-                            src="/main/login.jpg"
-                            alt="Viaje seguro y confortable"
-                            fill
-                        />
+                        <Image src="/main/login.jpg" alt="Viaje seguro y confortable" fill />
                     </motion.div>
 
                     {/* Form Column */}
                     <div className="md:w-[40%] grid place-items-center w-full h-full">
                         <div className="w-full p-2">
                             {/* Back to home link */}
-                            <Link
-                                href="/"
-                                className="inline-flex items-center text-sm text-custom-gray-600 hover:text-black"
-                            >
+                            <Link href="/" className="inline-flex items-center text-sm text-custom-gray-600 hover:text-black">
                                 <ArrowLeft className="h-4 w-4 mr-1" />
                                 Volver a la página principal
                             </Link>
@@ -72,17 +65,11 @@ const LoginPage = () => {
                             <div className="p-6 pt-0 text-center">
                                 <p className="text-sm text-custom-gray-600">
                                     Al registrarte, aceptas nuestra{" "}
-                                    <a
-                                        href="#"
-                                        className="font-medium text-custom-golden-600 hover:text-custom-golden-700 duration-300"
-                                    >
+                                    <a href="#" className="font-medium text-custom-golden-600 hover:text-custom-golden-700 duration-300">
                                         Política de Privacidad
                                     </a>{" "}
                                     y{" "}
-                                    <a
-                                        href="#"
-                                        className="font-medium text-custom-golden-600 hover:text-custom-golden-700 duration-300"
-                                    >
+                                    <a href="#" className="font-medium text-custom-golden-600 hover:text-custom-golden-700 duration-300">
                                         Términos de Servicio
                                     </a>
                                     .
