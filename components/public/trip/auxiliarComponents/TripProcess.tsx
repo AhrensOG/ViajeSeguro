@@ -22,9 +22,9 @@ const TripProcess = () => {
         setLoading(true);
         const tripData = await getTripById(id);
         setTrip(tripData as Trip);
-      } catch (err: any) {
+      } catch (err) {
         console.log("Error al cargar el viaje:", err);
-        setError(err.message || "Error al obtener el viaje");
+        setError("Error al obtener el viaje");
       } finally {
         setLoading(false);
       }

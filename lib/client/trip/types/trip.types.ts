@@ -1,5 +1,3 @@
-import { Trip } from "@/lib/shared/types/trip-service-type.type";
-
 export interface ClientTripRouteCompactType {
   departureTime: string;
   duration: string;

@@ -3,7 +3,7 @@ import { fetcher } from "@/lib/functions";
 import { SearchTrip, Trip, TripCardType } from "@/lib/shared/types/trip-service-type.type";
 
 export const getTripById = async (id: string): Promise<Trip> => {
-  return fetcher(`${BACKEND_URL}/trip/${id}`);
+  return fetcher<Trip>(`${BACKEND_URL}/trip/${id}`);
 };
 
 export const searchTrips = async (query: SearchTrip): Promise<TripCardType[]> => {
@@ -14,5 +14,5 @@ export const searchTrips = async (query: SearchTrip): Promise<TripCardType[]> =>
     serviceType: query.serviceType,
   });
 
-  return fetcher(`${BACKEND_URL}/trip/search?${params.toString()}`);
+  return fetcher<TripCardType[]>(`${BACKEND_URL}/trip/search?${params.toString()}`);
 };
