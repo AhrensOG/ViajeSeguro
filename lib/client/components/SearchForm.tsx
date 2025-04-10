@@ -5,12 +5,12 @@ import { MapPin } from "lucide-react";
 import { LOCATIONS, SERVICES } from "@/lib/constants";
 import CustomSelect from "./CustomSelect";
 import CustomDatePicker from "./CustomDatePicker";
-import { SearchFormData } from "../trip/types/search-form.type";
 import { TripServiceType } from "@/lib/shared/types/trip-service-type.type";
+import { ClientSearchFormData } from "../trip/types/search-form.type";
 
 interface SearchFormProps {
-  initialData?: SearchFormData;
-  onSearch: (data: SearchFormData) => void;
+  initialData?: ClientSearchFormData;
+  onSearch: (data: ClientSearchFormData) => void;
 }
 
 const SearchForm = ({
@@ -36,7 +36,7 @@ const SearchForm = ({
   const handleSearch = () => {
     if (!isFormValid) return;
 
-    const searchData: SearchFormData = {
+    const searchData: ClientSearchFormData = {
       origin,
       destination,
       serviceType: serviceType as TripServiceType,
