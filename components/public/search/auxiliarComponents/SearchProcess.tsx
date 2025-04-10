@@ -12,7 +12,7 @@ import Image from "next/image";
 import { toast } from "sonner";
 import TripCard from "./TripCard";
 import { convertUTCToLocalTime } from "@/lib/functions";
-import TripCardFallback from "@/lib/client/components/fallbacks/TripCardFallback";
+import TripCardFallback from "@/lib/client/components/fallbacks/shared/TripCardFallback";
 import { DateTime } from "luxon";
 import { searchTrips } from "@/lib/api/trip";
 import { ClientSearchFormData } from "@/lib/client/trip/types/search-form.type";

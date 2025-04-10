@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import NavBar from "../navigation/NavBar";
 import SearchProcess from "./auxiliarComponents/SearchProcess";
-import SearchProcessFallback from "@/lib/client/components/fallbacks/SearchProcessFallback";
+import SearchProcessFallback from "@/lib/client/components/fallbacks/search/SearchProcessFallback";
 
 export default function SearchPage() {
   return (

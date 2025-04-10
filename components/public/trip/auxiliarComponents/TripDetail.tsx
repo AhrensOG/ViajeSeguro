@@ -1,8 +1,8 @@
 import { AlertCircle, MessageCircle, ShieldCheck } from "lucide-react";
-import TripRouteCompact from "./TripRouteCompact";
 import { DateTime } from "luxon";
 import Image from "next/image";
 import { Trip } from "@/lib/shared/types/trip-service-type.type";
+import TripRouteCompact from "@/lib/client/components/TripRouteCompact";
 
 type TripDetailProps = {
   trip: Trip;

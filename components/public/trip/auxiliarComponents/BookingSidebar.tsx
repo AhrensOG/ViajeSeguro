@@ -1,9 +1,10 @@
 // Archivo: components/trip/BookingSidebar.tsx
 
 import { Calendar1Icon, ChevronRight } from "lucide-react";
-import TripRouteCompact from "./TripRouteCompact";
+import TripRouteCompact from "../../../../lib/client/components/TripRouteCompact";
 import { DateTime } from "luxon";
 import { Trip } from "@/lib/shared/types/trip-service-type.type";
+import Link from "next/link";
 
 type BookingSidebarProps = {
   trip: Trip;
@@ -54,10 +55,12 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
           </div>
         </div>
 
-        <button className="w-full bg-custom-golden-600 hover:bg-custom-golden-700 text-custom-white-100 py-4 mt-4 rounded-lg flex items-center justify-center">
+        <Link
+          href={`/purchase?id=${trip.id}`}
+          className="w-full bg-custom-golden-600 hover:bg-custom-golden-700 text-custom-white-100 py-4 mt-4 rounded-lg flex items-center justify-center">
           <Calendar1Icon size={16} className="mr-2" />
           Enviar solicitud
-        </button>
+        </Link>
       </div>
     </div>
   );

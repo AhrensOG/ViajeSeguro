@@ -1,5 +1,5 @@
 import SearchFormFallback from "./SearchFormFallback";
-import TripCardFallback from "./TripCardFallback";
+import TripCardFallback from "../shared/TripCardFallback";
 import ImageFallback from "./ImageFallback";
 
 const SearchProcessFallback = () => {
