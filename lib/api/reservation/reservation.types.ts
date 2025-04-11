@@ -1,19 +1,21 @@
-export interface CreateReservationPayload {
-  userId: string;
+export type ReservationStatus =
+  | 'PENDING'
+  | 'APPROVED'
+  | 'CANCELLED';
+
+export type ReservationPaymentMethods = "STRIPE" | "CASH";
+
+export type CreateReservationPayload = {
   tripId: string;
+  userId: string;
+  price: number;
   seatCode?: string;
   discountId?: string;
-  price: number;
-}
+  status: ReservationStatus;
+  paymentMethod: ReservationPaymentMethods;
+};
 
-export interface PreviewReservationPayload {
-  userId: string;
-  tripId: string;
-  discountId?: string;
-}
-
-export interface ReservationPreview {
-  basePrice: number;
-  finalPrice: number;
-  discounts?: { description: string; amount: number }[];
-}
+export type ReservationConfirmationResponse = {
+  success: true;
+  message: string;
+};

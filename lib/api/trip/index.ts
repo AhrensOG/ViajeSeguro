@@ -2,10 +2,6 @@ import { BACKEND_URL } from "@/lib/constants";
 import { fetcher } from "@/lib/functions";
 import { SearchTrip, Trip, TripCardType } from "@/lib/shared/types/trip-service-type.type";
 
-export const getTripById = async (id: string): Promise<Trip> => {
-  return fetcher<Trip>(`${BACKEND_URL}/trip/${id}`);
-};
-
 export const getTripForDetail = async (id: string): Promise<Trip> => {
   return fetcher<Trip>(`${BACKEND_URL}/trip/for_detail/${id}`);
 };

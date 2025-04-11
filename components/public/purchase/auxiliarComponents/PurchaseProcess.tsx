@@ -9,41 +9,26 @@ import {
   Clock,
   CreditCard,
 } from "lucide-react";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Trip } from "@/lib/shared/types/trip-service-type.type";
 import { getTripForPurchase } from "@/lib/api/trip";
-import { DateTime } from "luxon";
 import NotFoundMessage from "@/lib/client/components/NotFoundMessage";
-
-const getSummaryFromTrip = (trip: Trip) => {
-  const departure = DateTime.fromISO(trip.departure).setZone(
-    trip.originalTimeZone
-  );
-  const arrival = DateTime.fromISO(trip.arrival).setZone(trip.originalTimeZone);
-  const durationInMinutes = arrival.diff(departure, "minutes").minutes;
-  const hours = Math.floor(durationInMinutes / 60);
-  const minutes = Math.round(durationInMinutes % 60);
-
-  return {
-    dateLabel: departure.setLocale("es").toFormat("ccc, dd 'de' LLLL"),
-    departureTime: departure.toFormat("HH:mm"),
-    arrivalTime: arrival.toFormat("HH:mm"),
-    duration: `${hours}h${minutes > 0 ? ` ${minutes}m` : ""}`,
-    originCity: trip.origin,
-    originLocation: trip.originLocation,
-    destinationCity: trip.destination,
-    destinationLocation: trip.destinationLocation,
-    price: trip.basePrice,
-    size: "md" as const,
-  };
-};
+import { toast } from "sonner";
+import { CreateReservationPayload } from "@/lib/api/reservation/reservation.types";
+import { createReservation } from "@/lib/api/reservation";
+import { getSummaryFromTrip } from "@/lib/client/purchase/functions";
+import { useSession } from "next-auth/react";
 
 const PurchaseProcess = () => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const [trip, setTrip] = useState<Trip | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
+  const router = useRouter();
+  const { data: session } = useSession();
+
+  console.log(session);
 
   useEffect(() => {
     const fetchTrip = async () => {
@@ -54,7 +39,7 @@ const PurchaseProcess = () => {
         const tripData = await getTripForPurchase(id);
         setTrip(tripData as Trip);
       } catch (err) {
-        console.error("Error al cargar el viaje:", err);
+        console.log("Error al cargar el viaje:", err);
         setError("Error al obtener el viaje");
       } finally {
         setLoading(false);
@@ -63,6 +48,30 @@ const PurchaseProcess = () => {
 
     fetchTrip();
   }, [id]);
+
+  const handleCashPayment = async () => {
+    if (!trip || !id || !session) return;
+
+    const payload: CreateReservationPayload = {
+      tripId: trip.id,
+      userId: session.user.id as string,
+      price: trip.basePrice,
+      status: "PENDING",
+      paymentMethod: "CASH",
+    };
+
+    try {
+      await createReservation(payload);
+      toast.success("Reserva generada correctamente.", {
+        description: "Puedes ver el estado de la misma en tu perfil.",
+      });
+    } catch (error) {
+      console.info("Error al crear la reserva:", error);
+      toast.error("Hubo un error al crear la reserva", {
+        description: "Intenta nuevamente o contacta con el soporte",
+      });
+    }
+  };
 
   if (loading) {
     return <p className="text-center text-gray-500 py-8">Cargando viaje...</p>;
@@ -127,7 +136,7 @@ const PurchaseProcess = () => {
             ]}
             buttonLabel="Pagar con efectivo"
             secure
-            onClick={() => console.log("Pago en efectivo seleccionado")}
+            onClick={handleCashPayment}
           />
 
           <PaymentTrustInfo />
