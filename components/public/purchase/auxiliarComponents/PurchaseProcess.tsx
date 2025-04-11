@@ -11,7 +11,7 @@ import {
 } from "lucide-react";
 import { useSearchParams } from "next/navigation";
 import { Trip } from "@/lib/shared/types/trip-service-type.type";
-import { getTripById } from "@/lib/api/trip";
+import { getTripForPurchase } from "@/lib/api/trip";
 import { DateTime } from "luxon";
 import NotFoundMessage from "@/lib/client/components/NotFoundMessage";
 
@@ -51,7 +51,7 @@ const PurchaseProcess = () => {
 
       try {
         setLoading(true);
-        const tripData = await getTripById(id);
+        const tripData = await getTripForPurchase(id);
         setTrip(tripData as Trip);
       } catch (err) {
         console.error("Error al cargar el viaje:", err);
@@ -69,7 +69,7 @@ const PurchaseProcess = () => {
   }
 
   if (error) {
-    return <NotFoundMessage/>;
+    return <NotFoundMessage />;
   }
 
   if (!trip) return null;

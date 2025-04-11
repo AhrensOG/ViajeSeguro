@@ -73,7 +73,7 @@ const PaymentOption = ({
               </span>
             )}
             <button
-              className={`rounded-md px-6 py-2 font-medium transition ${
+              className={`rounded-md px-6 py-2 font-medium transition cursor-pointer ${
                 highlighted
                   ? "bg-custom-golden-600 hover:bg-custom-golden-700 text-white"
                   : "border border-custom-gray-300 text-custom-gray-800 hover:bg-custom-gray-100"

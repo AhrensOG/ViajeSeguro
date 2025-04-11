@@ -6,6 +6,15 @@ export const getTripById = async (id: string): Promise<Trip> => {
   return fetcher<Trip>(`${BACKEND_URL}/trip/${id}`);
 };
 
+export const getTripForDetail = async (id: string): Promise<Trip> => {
+  return fetcher<Trip>(`${BACKEND_URL}/trip/for_detail/${id}`);
+};
+
+export const getTripForPurchase = async (id: string): Promise<TripCardType> => {
+  return fetcher<TripCardType>(`${BACKEND_URL}/trip/for_purchase/${id}`);
+};
+
+
 export const searchTrips = async (query: SearchTrip): Promise<TripCardType[]> => {
   const params = new URLSearchParams({
     origin: query.origin,

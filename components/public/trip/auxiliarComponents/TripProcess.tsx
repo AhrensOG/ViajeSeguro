@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import TripDetail from "./TripDetail";
 import BookingSidebar from "./BookingSidebar";
 import { useSearchParams } from "next/navigation";
-import { getTripById } from "@/lib/api/trip";
+import { getTripForDetail } from "@/lib/api/trip";
 import { Trip } from "@/lib/shared/types/trip-service-type.type";
 import NotFoundMessage from "@/lib/client/components/NotFoundMessage";
 import TripProcessFallback from "@/lib/client/components/fallbacks/trip/TripProcessFallback";
@@ -20,7 +20,7 @@ const TripProcess = () => {
 
       try {
         setLoading(true);
-        const tripData = await getTripById(id);
+        const tripData = await getTripForDetail(id);
         setTrip(tripData as Trip);
       } catch (err) {
         console.log("Error al cargar el viaje:", err);

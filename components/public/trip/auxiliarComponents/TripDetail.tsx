@@ -1,3 +1,6 @@
+"use client";
+
+import { motion } from "framer-motion";
 import { AlertCircle, MessageCircle, ShieldCheck } from "lucide-react";
 import { DateTime } from "luxon";
 import Image from "next/image";
@@ -22,7 +25,11 @@ const TripDetail = ({ trip }: TripDetailProps) => {
   return (
     <div className="lg:col-span-2 space-y-4">
       {/* Info principal del viaje */}
-      <div className="p-6 bg-custom-white-100 shadow-sm rounded-lg border border-custom-gray-300">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4 }}
+        className="p-6 bg-custom-white-100 shadow-sm rounded-lg border border-custom-gray-300">
         <TripRouteCompact
           departureTime={departure.toFormat("HH:mm")}
           duration={durationStr}
@@ -33,10 +40,14 @@ const TripDetail = ({ trip }: TripDetailProps) => {
           destinationLocation={trip.destinationLocation}
           size="md"
         />
-      </div>
+      </motion.div>
 
       {/* Info del conductor */}
-      <div className="p-6 bg-custom-white-100 shadow-sm rounded-lg border border-custom-gray-300">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.4, delay: 0.2 }}
+        className="p-6 bg-custom-white-100 shadow-sm rounded-lg border border-custom-gray-300">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-4">
             {trip.user.avatarUrl && (
@@ -76,11 +87,14 @@ const TripDetail = ({ trip }: TripDetailProps) => {
           </span>
         </div>
 
-        <button className="mt-6 w-full flex items-center justify-center gap-2 text-custom-golden-600 border border-custom-golden-600 hover:bg-custom-golden-100 rounded-lg py-2 px-4">
+        <motion.button
+          whileHover={{ scale: 1.02 }}
+          whileTap={{ scale: 0.97 }}
+          className="mt-6 w-full flex items-center justify-center gap-2 text-custom-golden-600 border border-custom-golden-600 hover:bg-custom-golden-100 rounded-lg py-2 px-4">
           <MessageCircle size={18} />
           <span>Contactar con Viaje Seguro</span>
-        </button>
-      </div>
+        </motion.button>
+      </motion.div>
     </div>
   );
 };

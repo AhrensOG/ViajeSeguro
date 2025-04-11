@@ -1,5 +1,6 @@
-// Archivo: components/trip/BookingSidebar.tsx
+"use client";
 
+import { motion } from "framer-motion";
 import { Calendar1Icon, ChevronRight } from "lucide-react";
 import TripRouteCompact from "../../../../lib/client/components/TripRouteCompact";
 import { DateTime } from "luxon";
@@ -24,7 +25,11 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
   const fullname = `${trip.user.name} ${trip.user.lastName}`;
 
   return (
-    <div className="space-y-4">
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.4, delay: 0.3 }}
+      className="space-y-4">
       <div className="p-6 bg-custom-white-100 shadow-sm rounded-lg border border-custom-gray-300">
         <h2 className="text-xl font-bold text-custom-black-900 mb-4">
           {formattedDate}
@@ -55,14 +60,16 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
           </div>
         </div>
 
-        <Link
-          href={`/purchase?id=${trip.id}`}
-          className="w-full bg-custom-golden-600 hover:bg-custom-golden-700 text-custom-white-100 py-4 mt-4 rounded-lg flex items-center justify-center">
-          <Calendar1Icon size={16} className="mr-2" />
-          Enviar solicitud
-        </Link>
+        <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.96 }}>
+          <Link
+            href={`/purchase?id=${trip.id}`}
+            className="w-full bg-custom-golden-600 hover:bg-custom-golden-700 text-custom-white-100 py-4 mt-4 rounded-lg flex items-center justify-center">
+            <Calendar1Icon size={16} className="mr-2" />
+            Enviar solicitud
+          </Link>
+        </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 };
 
