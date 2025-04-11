@@ -6,8 +6,6 @@ import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
-    log("token: " + token.backendTokens);
-
     const res = await fetch(BACKEND_URL + "/auth/refresh", {
         method: "POST",
         headers: {
@@ -21,6 +19,16 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
         ...token,
         backendTokens: response,
     };
+}
+async function loginGoogle(data: any): Promise<any> {
+    const response = await fetch(`${BACKEND_URL}/auth/login`, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+    });
+    return response;
 }
 
 export const authOptions: NextAuthOptions = {
@@ -65,29 +73,44 @@ export const authOptions: NextAuthOptions = {
     },
     callbacks: {
         async jwt({ token, user, account }) {
-            log("jwt token: " + token.backendTokens, user, account);
-
             if (account?.provider === "google") {
-                token.expiresAt = account.expires_at;
-                token.user = {
-                    id: user.id,
-                    email: user.email || "",
-                    name: user.name?.split(" ")[0] || "",
-                    googleId: account.providerAccountId || "",
-                    lastName: user.name?.split(" ")[1] || "",
-                    role: "",
-                };
-                token.backendTokens = {
-                    accessToken: account.access_token || "",
-                    refreshToken: account.refresh_token || "",
-                    expiresIn: (account.expires_at ?? 0) * 1000, // Convertir a milisegundos
-                };
-                return token;
+                let userData;
+                const email = user.email || "";
+                const password = account.providerAccountId;
+                const res = await loginGoogle({ email, password });
+
+                if (res.status === 401) {
+                    const res = await fetch(BACKEND_URL + "/auth/register", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                        },
+                        body: JSON.stringify({
+                            name: user.name?.split(" ")[0],
+                            lastName: user.name?.split(" ")[1],
+                            email: user.email,
+                            password: account.providerAccountId,
+                            googleId: user.id,
+                            role: "CLIENT",
+                        }),
+                    });
+                    if (res.status === 401) {
+                        return null;
+                    }
+                    if (res.status === 201) {
+                        const res = await loginGoogle({ email, password });
+                        userData = await res.json();
+                        return { ...token, ...userData };
+                    }
+                }
+                userData = await res.json();
+
+                return { ...token, ...userData };
             }
 
             if (user) return { ...token, ...user };
 
-            if (token.backendTokens && new Date().getTime() < token.backendTokens.expiresIn) return token;
+            if (new Date().getTime() < token.backendTokens.expiresIn) return token;
 
             return await refreshAccessToken(token);
         },
