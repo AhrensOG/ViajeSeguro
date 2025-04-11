@@ -9,7 +9,7 @@ import {
   Clock,
   CreditCard,
 } from "lucide-react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { Trip } from "@/lib/shared/types/trip-service-type.type";
 import { getTripForPurchase } from "@/lib/api/trip";
 import NotFoundMessage from "@/lib/client/components/NotFoundMessage";
@@ -18,14 +18,17 @@ import { CreateReservationPayload } from "@/lib/api/reservation/reservation.type
 import { createReservation } from "@/lib/api/reservation";
 import { getSummaryFromTrip } from "@/lib/client/purchase/functions";
 import { useSession } from "next-auth/react";
+import { BASE_URL } from "@/lib/constants";
 
 const PurchaseProcess = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
+  const pathname = usePathname();
+
   const id = searchParams.get("id");
   const [trip, setTrip] = useState<Trip | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const router = useRouter();
   const { data: session } = useSession();
 
   console.log(session);
@@ -50,7 +53,16 @@ const PurchaseProcess = () => {
   }, [id]);
 
   const handleCashPayment = async () => {
-    if (!trip || !id || !session) return;
+    if (!trip || !id) return;
+
+    if (!session) {
+      const current = `${BASE_URL}${pathname}?${searchParams.toString()}`;
+      const encoded = encodeURIComponent(current);
+      toast.info("Debes iniciar sesión para realizar la reserva");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      router.push(`/auth/login?callbackUrl=${encoded}`);
+      return;
+    }
 
     const payload: CreateReservationPayload = {
       tripId: trip.id,
