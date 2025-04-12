@@ -31,8 +31,6 @@ const PurchaseProcess = () => {
   const [error, setError] = useState<string | null>(null);
   const { data: session } = useSession();
 
-  console.log(session);
-
   useEffect(() => {
     const fetchTrip = async () => {
       if (!id) return;
@@ -77,6 +75,7 @@ const PurchaseProcess = () => {
       toast.success("Reserva generada correctamente.", {
         description: "Puedes ver el estado de la misma en tu perfil.",
       });
+      router.push("/dashboard/client/reservations");
     } catch (error) {
       console.info("Error al crear la reserva:", error);
       toast.error("Hubo un error al crear la reserva", {

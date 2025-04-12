@@ -1,5 +1,5 @@
 import { fetcher } from "@/lib/functions";
-import { CreateReservationPayload, ReservationConfirmationResponse } from "./reservation.types";
+import { CreateReservationPayload, ReservationConfirmationResponse, ReservationResponse } from "./reservation.types";
 import { BACKEND_URL } from "@/lib/constants";
 
 export const createReservation = async (
@@ -9,4 +9,12 @@ export const createReservation = async (
     method: "POST",
     body: JSON.stringify(payload),
   });
+};
+
+export const getReservationsByUser = async (
+  userId: string
+): Promise<ReservationResponse[]> => {
+  return fetcher<ReservationResponse[]>(
+    `${BACKEND_URL}/reservation/by-user/${userId}`
+  );
 };
