@@ -1,9 +1,9 @@
 import { BACKEND_URL } from "@/lib/constants";
-import { log } from "console";
 import type { NextAuthOptions } from "next-auth";
 import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
+import { GoogleLoginData } from "@/lib/types/authTypes";
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
     const res = await fetch(BACKEND_URL + "/auth/refresh", {
@@ -20,7 +20,7 @@ async function refreshAccessToken(token: JWT): Promise<JWT> {
         backendTokens: response,
     };
 }
-async function loginGoogle(data: any): Promise<any> {
+async function loginGoogle(data: GoogleLoginData): Promise<Response> {
     const response = await fetch(`${BACKEND_URL}/auth/login`, {
         method: "POST",
         headers: {
