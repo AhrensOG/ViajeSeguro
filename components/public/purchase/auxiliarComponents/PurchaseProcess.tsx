@@ -1,3 +1,4 @@
+// PurchaseProcess.tsx
 import React, { useEffect, useState } from "react";
 import PurchaseTripSummary from "./PurchaseTripSummary";
 import PaymentOption from "./PaymentOption";
@@ -10,7 +11,7 @@ import {
   CreditCard,
 } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
-import { Trip } from "@/lib/shared/types/trip-service-type.type";
+import { TripWithPriceDetails } from "@/lib/shared/types/trip-service-type.type";
 import { getTripForPurchase } from "@/lib/api/trip";
 import NotFoundMessage from "@/lib/client/components/NotFoundMessage";
 import { toast } from "sonner";
@@ -19,6 +20,8 @@ import { createReservation } from "@/lib/api/reservation";
 import { getSummaryFromTrip } from "@/lib/client/purchase/functions";
 import { useSession } from "next-auth/react";
 import { BASE_URL } from "@/lib/constants";
+import { createCheckoutSession } from "@/lib/api/stripe";
+import PurchaseProcessFallback from "@/lib/client/components/fallbacks/purchase/PurchaseProcessFallback";
 
 const PurchaseProcess = () => {
   const searchParams = useSearchParams();
@@ -26,7 +29,7 @@ const PurchaseProcess = () => {
   const pathname = usePathname();
 
   const id = searchParams.get("id");
-  const [trip, setTrip] = useState<Trip | null>(null);
+  const [trip, setTrip] = useState<TripWithPriceDetails | null>(null);
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { data: session } = useSession();
@@ -34,11 +37,10 @@ const PurchaseProcess = () => {
   useEffect(() => {
     const fetchTrip = async () => {
       if (!id) return;
-
       try {
         setLoading(true);
         const tripData = await getTripForPurchase(id);
-        setTrip(tripData as Trip);
+        setTrip(tripData as TripWithPriceDetails);
       } catch (err) {
         console.log("Error al cargar el viaje:", err);
         setError("Error al obtener el viaje");
@@ -46,13 +48,11 @@ const PurchaseProcess = () => {
         setLoading(false);
       }
     };
-
     fetchTrip();
   }, [id]);
 
   const handleCashPayment = async () => {
     if (!trip || !id) return;
-
     if (!session) {
       const current = `${BASE_URL}${pathname}?${searchParams.toString()}`;
       const encoded = encodeURIComponent(current);
@@ -61,15 +61,12 @@ const PurchaseProcess = () => {
       router.push(`/auth/login?callbackUrl=${encoded}`);
       return;
     }
-
     const payload: CreateReservationPayload = {
       tripId: trip.id,
-      userId: session.user.id as string,
-      price: trip.basePrice,
+      price: trip.priceDetails?.finalPrice ?? trip.basePrice,
       status: "PENDING",
       paymentMethod: "CASH",
     };
-
     try {
       await createReservation(payload);
       toast.success("Reserva generada correctamente.", {
@@ -84,18 +81,44 @@ const PurchaseProcess = () => {
     }
   };
 
-  if (loading) {
-    return <p className="text-center text-gray-500 py-8">Cargando viaje...</p>;
-  }
+  const handleStripeRedirect = async () => {
+    if (!trip || !id) return;
+    if (!session) {
+      const current = `${BASE_URL}${pathname}?${searchParams.toString()}`;
+      const encoded = encodeURIComponent(current);
+      toast.info("Debes iniciar sesión para realizar la reserva");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      router.push(`/auth/login?callbackUrl=${encoded}`);
+      return;
+    }
+    const payload: CreateReservationPayload = {
+      tripId: trip.id,
+      price: trip.priceDetails?.finalPrice ?? trip.basePrice,
+      status: "PENDING",
+      paymentMethod: "STRIPE",
+    };
+    try {
+      const data = await createCheckoutSession({
+        amount: (trip.priceDetails?.finalPrice ?? trip.basePrice) * 100,
+        metadata: payload,
+      });
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      console.error("Error al iniciar el checkout:", err);
+      toast.error("No se pudo redirigir al pago");
+    }
+  };
 
-  if (error) {
-    return <NotFoundMessage />;
-  }
-
+  if (loading) return <PurchaseProcessFallback />;
+  if (error) return <NotFoundMessage />;
   if (!trip) return null;
 
   const tripSummary = getSummaryFromTrip(trip);
-  const priceFormatted = tripSummary.price.toFixed(2).replace(".", ",");
+  const priceFormatted = (trip.priceDetails?.finalPrice ?? trip.basePrice)
+    .toFixed(2)
+    .replace(".", ",");
 
   return (
     <main className="container mx-auto p-8 grow">
@@ -107,7 +130,6 @@ const PurchaseProcess = () => {
       </p>
 
       <div className="flex flex-col-reverse lg:flex-row lg:items-start lg:gap-8 w-full">
-        {/* Columna izquierda: Opciones de pago */}
         <div className="flex-1 space-y-6">
           <PaymentOption
             icon={<CreditCard className="h-6 w-6 text-custom-golden-700" />}
@@ -128,7 +150,7 @@ const PurchaseProcess = () => {
             badgeLabel="Recomendado"
             buttonLabel={`Pagar ${priceFormatted} €`}
             secure
-            onClick={() => console.log("Pago online confirmado")}
+            onClick={handleStripeRedirect}
           />
 
           <PaymentOption
@@ -153,9 +175,11 @@ const PurchaseProcess = () => {
           <PaymentTrustInfo />
         </div>
 
-        {/* Columna derecha: Resumen del viaje */}
         <div className="lg:w-lg mb-6 lg:mb-0">
-          <PurchaseTripSummary {...tripSummary} />
+          <PurchaseTripSummary
+            {...tripSummary}
+            priceDetails={trip.priceDetails}
+          />
         </div>
       </div>
     </main>
