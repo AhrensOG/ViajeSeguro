@@ -1,18 +1,21 @@
 import { BACKEND_URL } from "@/lib/constants";
+import { CreateReservationPayload } from "../reservation/reservation.types";
+import { fetchWithAuth } from "@/lib/functions";
 
-type CreateCchekoutSessionPayload = {
+type CreateCheckoutSessionPayload = {
   amount: number;
-  metadata?: Record<string, any>;
+  metadata?: CreateReservationPayload;
 };
 
-export const createCheckoutSession = async (payload: CreateCchekoutSessionPayload) => {
-  const response = await fetch(`${BACKEND_URL}/stripe/create-checkout-session`, {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify(payload),
-  });
-
-  if (!response.ok) throw new Error("Error al crear la sesión de Checkout");
-
-  return await response.json();
+export const createCheckoutSession = async (payload: CreateCheckoutSessionPayload) => {
+  return await fetchWithAuth<{ url: string }>(
+    `${BACKEND_URL}/stripe/create-checkout-session`,
+    {
+      method: "POST",
+      body: JSON.stringify(payload),
+      headers: {
+        "Content-Type": "application/json",
+      },
+    }
+  );
 };

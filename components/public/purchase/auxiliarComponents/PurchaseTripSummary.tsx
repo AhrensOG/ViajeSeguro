@@ -5,11 +5,20 @@ import { ChevronRight } from "lucide-react";
 import { ClientTripRouteCompactType } from "@/lib/client/trip/types/trip.types";
 import TripRouteCompact from "@/lib/client/components/TripRouteCompact";
 import { motion, AnimatePresence } from "framer-motion";
+import { PriceDetails } from "@/lib/api/reservation/reservation.types";
+
+const DISCOUNT_LABELS: Record<string, string> = {
+  PREFERENCIAL: "Cliente Preferencial",
+  CLUB_LEALTAD: "Club Lealtad",
+  CLUB_FIDELIDAD: "Club Fidelidad",
+};
 
 type Props = {
   dateLabel: string;
   price: number;
-} & ClientTripRouteCompactType;
+} & ClientTripRouteCompactType & {
+    priceDetails?: PriceDetails | null;
+  };
 
 const PurchaseTripSummary = ({
   dateLabel,
@@ -22,8 +31,12 @@ const PurchaseTripSummary = ({
   destinationCity,
   destinationLocation,
   size = "md",
+  priceDetails,
 }: Props) => {
   const [showDetails, setShowDetails] = useState(false);
+
+  const hasDiscounts = priceDetails && priceDetails.discounts.length > 0;
+  const finalPrice = priceDetails?.finalPrice ?? price;
 
   return (
     <motion.div
@@ -36,7 +49,7 @@ const PurchaseTripSummary = ({
           Resumen de tu viaje
         </h2>
         <div className="text-2xl font-bold text-custom-black-800">
-          {price.toFixed(2).replace(".", ",")} €
+          {finalPrice.toFixed(2).replace(".", ",")} €
         </div>
       </div>
 
@@ -87,13 +100,28 @@ const PurchaseTripSummary = ({
               <span>Precio base:</span>
               <span>{price.toFixed(2).replace(".", ",")} €</span>
             </div>
+
+            {hasDiscounts &&
+              priceDetails?.discounts.map((discount) => {
+                const label =
+                  DISCOUNT_LABELS[discount.key] || discount.description;
+                return (
+                  <div className="flex justify-between" key={discount.key}>
+                    <span className="text-custom-gray-700">{label}</span>
+                    <span className="text-custom-golden-700 font-semibold">
+                      -{discount.amount.toFixed(2).replace(".", ",")} €
+                    </span>
+                  </div>
+                );
+              })}
+
             <div className="flex justify-between">
               <span>Gastos de gestión:</span>
               <span>0,00 €</span>
             </div>
             <div className="flex justify-between font-medium">
               <span>Total:</span>
-              <span>{price.toFixed(2).replace(".", ",")} €</span>
+              <span>{finalPrice.toFixed(2).replace(".", ",")} €</span>
             </div>
           </motion.div>
         )}

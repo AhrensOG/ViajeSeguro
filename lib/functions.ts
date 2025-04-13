@@ -115,4 +115,64 @@ const fetcher = async <T = unknown>(
   return res.json();
 };
 
-export { formatDateToDDMMYYYY, formatDateToYYYYMMDD, getDurationString, convertUTCToLocalTime, convertUTCToLocalDate, formatDateTime, fetcher }
+import { getSession } from 'next-auth/react';
+
+const fetchWithAuth = async <T = unknown>(
+  input: RequestInfo,
+  options: RequestInit = {}
+): Promise<T> => {
+  const session = await getSession();
+  const token = session?.backendTokens?.accessToken;
+
+  if (!token) {
+    throw new Error('No autenticado');
+  }
+
+  const res = await fetch(input, {
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${token}`,
+      ...(options.headers || {}),
+    },
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.message || 'Error en la petición autenticada');
+  }
+
+  return res.json();
+};
+
+const fetchWithOptionalAuth = async <T = unknown>(
+  input: RequestInfo,
+  options: RequestInit = {}
+): Promise<T> => {
+  const session = await getSession();
+  const token = session?.backendTokens?.accessToken;
+
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+    ...(options.headers as Record<string, string>),
+  };
+
+  if (token) {
+    headers['Authorization'] = `Bearer ${token}`;
+  }
+
+  const res = await fetch(input, {
+    ...options,
+    headers,
+  });
+
+  if (!res.ok) {
+    const error = await res.json().catch(() => ({}));
+    throw new Error(error.message || 'Error en la petición');
+  }
+
+  return res.json();
+};
+
+
+export { formatDateToDDMMYYYY, formatDateToYYYYMMDD, getDurationString, convertUTCToLocalTime, convertUTCToLocalDate, formatDateTime, fetcher, fetchWithAuth, fetchWithOptionalAuth }
