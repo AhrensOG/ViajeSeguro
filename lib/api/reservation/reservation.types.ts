@@ -1,5 +1,3 @@
-import { TripServiceType } from "@/lib/shared/types/trip-service-type.type";
-
 export type ReservationStatus =
   | 'PENDING'
   | 'CONFIRMED'
@@ -9,7 +7,6 @@ export type ReservationPaymentMethods = "STRIPE" | "CASH";
 
 export type CreateReservationPayload = {
   tripId: string;
-  userId: string;
   price: number;
   seatCode?: string;
   discountId?: string;
@@ -31,11 +28,8 @@ export type TripSummary = {
   departure: string;
   arrival: string;
   originalTimeZone: string;
-  serviceType: TripServiceType;
-  capacity: number;
   minPassengers: number;
   status: ReservationStatus;
-  basePrice: number;
   tripStatus: ReservationStatus;
 };
 
@@ -45,18 +39,35 @@ export type PriceDetails = {
   finalPrice: number;
 }
 
+export type Qr = {
+  id: string;
+  reservationId: string;
+  imageUrl: string;
+  usedAt: Date | null;
+  isValid: boolean;
+  createdAt: Date;
+}
+
+export type User = {
+  id: string;
+  email: string;
+  emailVerified: boolean;
+  googleId: null;
+  name: string;
+  lastName: string;
+  avatarUrl: string;
+}
+
 export type ReservationResponse = {
   id: string;
   userId: string;
   tripId: string;
   seatCode?: string | null;
-  qrCode?: string | null;
-  discountId?: string | null;
-  notes?: string | null;
   price: number;
   paymentMethod: ReservationPaymentMethods;
   status: ReservationStatus;
-  createdAt: string;
   trip: TripSummary;
   priceDetails: PriceDetails;
+  qr: Qr | null;
+  user: User;
 };

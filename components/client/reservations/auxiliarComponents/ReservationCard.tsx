@@ -7,10 +7,12 @@ import {
   CheckCircle2,
   XCircle,
   ChevronDown,
+  QrCode,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ReservationResponse } from "@/lib/api/reservation/reservation.types";
 import ReservationPriceInfo from "./ReservationPriceInfo";
+import QrModal from "./QrModal";
 
 type Props = {
   reservation: ReservationResponse;
@@ -21,6 +23,7 @@ const ReservationCard = ({ reservation }: Props) => {
   const [showCancelWarning, setShowCancelWarning] = useState(false);
   const [hideButton, setHideButton] = useState(false);
   const [openCard, setOpenCard] = useState(false);
+  const [showQrModal, setShowQrModal] = useState(false);
 
   const departure = DateTime.fromISO(trip.departure).setZone(
     trip.originalTimeZone
@@ -155,65 +158,84 @@ const ReservationCard = ({ reservation }: Props) => {
 
             {/* Precio + Info de referidos */}
             <ReservationPriceInfo reservation={reservation} />
+            <div className="flex flex-col justify-center items-end gap-4 relative">
+              {reservation.qr && (
+                <button
+                  onClick={() => setShowQrModal(true)}
+                  className="cursor-pointer text-sm font-medium text-custom-golden-700 hover:underline transition flex justify-center items-center gap-2">
+                  <QrCode className="size-6" />
+                  Ver QR del viaje
+                </button>
+              )}
 
-            {/* Cancelar reserva */}
-            {reservation.status !== "CANCELLED" && (
-              <div className="flex flex-col gap-2 items-center">
-                <AnimatePresence>
-                  {!hideButton && (
-                    <motion.button
-                      initial={{ opacity: 1 }}
-                      exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                      transition={{ duration: 0.3 }}
-                      onClick={() => {
-                        setHideButton(true);
-                        setTimeout(() => setShowCancelWarning(true), 300);
-                      }}
-                      className="max-w-52 text-gray-700 cursor-pointer font-medium rounded-lg px-4 py-2 text-sm flex items-center justify-center gap-2 transition">
-                      <XCircle className="size-4" />
-                      Cancelar reserva
-                    </motion.button>
-                  )}
-                </AnimatePresence>
+              {/* Cancelar reserva */}
+              {reservation.status !== "CANCELLED" && (
+                <div className="flex flex-col gap-2 items-center">
+                  <AnimatePresence>
+                    {!hideButton && (
+                      <motion.button
+                        initial={{ opacity: 1 }}
+                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                        transition={{ duration: 0.3 }}
+                        onClick={() => {
+                          setHideButton(true);
+                          setTimeout(() => setShowCancelWarning(true), 300);
+                        }}
+                        className="absolute top-0 left-0 max-w-52 text-gray-700 cursor-pointer font-medium rounded-lg text-sm flex items-center justify-center gap-2 transition">
+                        <XCircle className="size-4" />
+                        Cancelar reserva
+                      </motion.button>
+                    )}
+                  </AnimatePresence>
 
-                <AnimatePresence>
-                  {showCancelWarning && (
-                    <motion.div
-                      initial={{ opacity: 0, y: -10 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      exit={{ opacity: 0, y: -10 }}
-                      transition={{ duration: 0.3 }}
-                      className="bg-[#f3f4f6] border border-gray-300 p-4 rounded-xl text-sm text-gray-700">
-                      <p className="mb-2">
-                        Al cancelar tu reserva podrías perder tu lugar. La
-                        disponibilidad es limitada y no garantizamos que queden
-                        plazas más adelante.
-                      </p>
-                      <div className="flex flex-col gap-2 mt-3">
-                        <button
-                          onClick={() =>
-                            alert("Aquí se confirmaría la cancelación")
-                          }
-                          className="w-full bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition">
-                          Confirmar cancelación
-                        </button>
-                        <button
-                          onClick={() => {
-                            setShowCancelWarning(false);
-                            setTimeout(() => setHideButton(false), 300);
-                          }}
-                          className="w-full bg-white border border-gray-300 hover:bg-gray-100 text-sm font-medium py-2 px-4 rounded-lg transition">
-                          Volver atrás
-                        </button>
-                      </div>
-                    </motion.div>
-                  )}
-                </AnimatePresence>
-              </div>
-            )}
+                  <AnimatePresence>
+                    {showCancelWarning && (
+                      <motion.div
+                        initial={{ opacity: 0, y: -10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        exit={{ opacity: 0, y: -10 }}
+                        transition={{ duration: 0.3 }}
+                        className="bg-[#f3f4f6] border border-gray-300 p-4 rounded-xl text-sm text-gray-700">
+                        <p className="mb-2">
+                          Al cancelar tu reserva podrías perder tu lugar. La
+                          disponibilidad es limitada y no garantizamos que
+                          queden plazas más adelante.
+                        </p>
+                        <div className="flex flex-col gap-2 mt-3">
+                          <button
+                            onClick={() =>
+                              alert("Aquí se confirmaría la cancelación")
+                            }
+                            className="w-full bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition">
+                            Confirmar cancelación
+                          </button>
+                          <button
+                            onClick={() => {
+                              setShowCancelWarning(false);
+                              setTimeout(() => setHideButton(false), 300);
+                            }}
+                            className="w-full bg-white border border-gray-300 hover:bg-gray-100 text-sm font-medium py-2 px-4 rounded-lg transition">
+                            Volver atrás
+                          </button>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+              )}
+            </div>
           </motion.div>
         )}
       </AnimatePresence>
+
+      {reservation.qr && (
+        <QrModal
+          isOpen={showQrModal}
+          onClose={() => setShowQrModal(false)}
+          qrUrl={reservation.qr.imageUrl}
+          reservationId={reservation.id}
+        />
+      )}
     </div>
   );
 };

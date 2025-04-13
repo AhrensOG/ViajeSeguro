@@ -1,17 +1,34 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Calendar1Icon, ChevronRight } from "lucide-react";
+import { Calendar1Icon, ChevronDown, ChevronRight } from "lucide-react";
 import TripRouteCompact from "../../../../lib/client/components/TripRouteCompact";
 import { DateTime } from "luxon";
-import { Trip } from "@/lib/shared/types/trip-service-type.type";
-import Link from "next/link";
+import { TripWithPriceDetails } from "@/lib/shared/types/trip-service-type.type";
+import { useState } from "react";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import AuthRequiredModal from "./AuthRequiredModal";
+import { BASE_URL } from "@/lib/constants";
 
 type BookingSidebarProps = {
-  trip: Trip;
+  trip: TripWithPriceDetails;
 };
 
+const DISCOUNT_LABELS = {
+  PREFERENCIAL: "Cliente Preferencial",
+  CLUB_LEALTAD: "Club Lealtad",
+  CLUB_FIDELIDAD: "Club Fidelidad",
+};
+
+type DiscountKey = keyof typeof DISCOUNT_LABELS;
+
 const BookingSidebar = ({ trip }: BookingSidebarProps) => {
+  const [showModal, setShowModal] = useState(false);
+  const [showDiscountDetails, setShowDiscountDetails] = useState(false);
+  const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
+
   const departure = DateTime.fromISO(trip.departure).setZone(
     trip.originalTimeZone
   );
@@ -20,9 +37,26 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
   const durationStr = `${duration.hours?.toFixed(
     0
   )}h${duration.minutes?.toFixed(0)}m`;
-
   const formattedDate = departure.setLocale("es").toFormat("cccc, d 'de' LLLL");
   const fullname = `${trip.user.name} ${trip.user.lastName}`;
+
+  const handleLoginRedirect = () => {
+    const current = `${BASE_URL}${pathname}?${searchParams.toString()}`;
+    const encoded = encodeURIComponent(current);
+    router.push(`/auth/login?callbackUrl=${encoded}`);
+  };
+
+  const handleBookingClick = () => {
+    if (!trip.priceDetails) {
+      setShowModal(true);
+    } else {
+      router.push(`/purchase?id=${trip.id}`);
+    }
+  };
+
+  const basePrice = trip.basePrice;
+  const finalPrice = trip.priceDetails?.finalPrice ?? basePrice;
+  const hasDiscounts = !!trip.priceDetails?.discounts?.length;
 
   return (
     <motion.div
@@ -50,25 +84,89 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
           <span className="font-medium">{fullname ?? "Conductor"}</span>
         </div>
 
-        <div className="flex items-center justify-between border-t border-b border-custom-gray-300 py-4 my-4">
-          <div className="flex items-center gap-2">
-            <span className="font-medium">Importe</span>
-            <ChevronRight size={16} className="text-custom-gray-500" />
+        <div className="border-t border-b border-custom-gray-300 py-4 my-4">
+          <div className="flex items-center justify-between mb-1">
+            <div className="flex items-center gap-2">
+              <span className="font-medium">Importe</span>
+              <ChevronRight size={16} className="text-custom-gray-500" />
+            </div>
+            {hasDiscounts ? (
+              <div className="text-right">
+                <div className="text-sm text-gray-500 line-through">
+                  {basePrice.toFixed(2).replace(".", ",")} €
+                </div>
+                <div className="text-2xl font-bold text-custom-black-800">
+                  {finalPrice.toFixed(2).replace(".", ",")} €
+                </div>
+              </div>
+            ) : (
+              <div className="text-2xl font-bold text-custom-black-800">
+                {basePrice.toFixed(2).replace(".", ",")} €
+              </div>
+            )}
           </div>
-          <div className="text-2xl font-bold text-custom-black-800">
-            {trip.basePrice.toFixed(2).replace(".", ",")} €
-          </div>
+
+          {hasDiscounts && (
+            <div className="mt-2">
+              <button
+                onClick={() => setShowDiscountDetails((prev) => !prev)}
+                className="text-sm text-custom-golden-700 hover:underline flex items-center gap-1">
+                Ver detalles de descuentos
+                <ChevronDown
+                  size={16}
+                  className={`${
+                    showDiscountDetails ? "rotate-180" : ""
+                  } transition-transform`}
+                />
+              </button>
+
+              <motion.div
+                initial={false}
+                animate={{
+                  height: showDiscountDetails ? "auto" : 0,
+                  opacity: showDiscountDetails ? 1 : 0,
+                }}
+                transition={{ duration: 0.3, ease: "easeInOut" }}
+                className="overflow-hidden mt-3">
+                <ul className="space-y-1">
+                  {trip.priceDetails?.discounts.map((discount) => {
+                    const label =
+                      DISCOUNT_LABELS[discount.key as DiscountKey] ||
+                      discount.description;
+
+                    return (
+                      <li
+                        key={discount.key}
+                        className="flex items-center justify-between text-sm text-custom-gray-500">
+                        <span className="text-custom-gray-700">{label}</span>
+                        <span className="text-custom-golden-700 font-semibold">
+                          -{discount.amount.toFixed(2).replace(".", ",")} €
+                        </span>
+                      </li>
+                    );
+                  })}
+                </ul>
+              </motion.div>
+            </div>
+          )}
         </div>
 
         <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.96 }}>
-          <Link
-            href={`/purchase?id=${trip.id}`}
+          <button
+            onClick={handleBookingClick}
             className="w-full bg-custom-golden-600 hover:bg-custom-golden-700 text-custom-white-100 py-4 mt-4 rounded-lg flex items-center justify-center">
             <Calendar1Icon size={16} className="mr-2" />
             Enviar solicitud
-          </Link>
+          </button>
         </motion.div>
       </div>
+
+      {/* Modal para login */}
+      <AuthRequiredModal
+        show={showModal}
+        onClose={() => setShowModal(false)}
+        onConfirm={handleLoginRedirect}
+      />
     </motion.div>
   );
 };

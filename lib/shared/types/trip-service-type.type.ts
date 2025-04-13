@@ -45,3 +45,18 @@ export interface SearchTrip {
   departure: string;
   serviceType: TripServiceType
 }
+
+export interface DiscountItem {
+  key: string;
+  description: string;
+  amount: number;
+}
+
+export interface PriceDetails {
+  basePrice: number;
+  finalPrice: number;
+  discounts: DiscountItem[];
+}
+export interface TripWithPriceDetails extends Trip {
+  priceDetails?: PriceDetails | null
+}
