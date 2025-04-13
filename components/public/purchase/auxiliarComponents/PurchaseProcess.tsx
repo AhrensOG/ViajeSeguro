@@ -19,6 +19,7 @@ import { createReservation } from "@/lib/api/reservation";
 import { getSummaryFromTrip } from "@/lib/client/purchase/functions";
 import { useSession } from "next-auth/react";
 import { BASE_URL } from "@/lib/constants";
+import { createCheckoutSession } from "@/lib/api/stripe";
 
 const PurchaseProcess = () => {
   const searchParams = useSearchParams();
@@ -84,6 +85,41 @@ const PurchaseProcess = () => {
     }
   };
 
+  const handleStripeRedirect = async () => {
+    if (!trip || !id) return;
+
+    if (!session) {
+      const current = `${BASE_URL}${pathname}?${searchParams.toString()}`;
+      const encoded = encodeURIComponent(current);
+      toast.info("Debes iniciar sesión para realizar la reserva");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      router.push(`/auth/login?callbackUrl=${encoded}`);
+      return;
+    }
+
+    const payload: CreateReservationPayload = {
+      tripId: trip.id,
+      userId: session.user.id as string,
+      price: trip.basePrice,
+      status: "PENDING",
+      paymentMethod: "STRIPE",
+    };
+
+    try {
+      const data = await createCheckoutSession({
+        amount: trip.basePrice * 100,
+        metadata: payload,
+      });
+
+      if (data.url) {
+        window.location.href = data.url;
+      }
+    } catch (err) {
+      console.error("Error al iniciar el checkout:", err);
+      toast.error("No se pudo redirigir al pago");
+    }
+  };
+
   if (loading) {
     return <p className="text-center text-gray-500 py-8">Cargando viaje...</p>;
   }
@@ -128,7 +164,7 @@ const PurchaseProcess = () => {
             badgeLabel="Recomendado"
             buttonLabel={`Pagar ${priceFormatted} €`}
             secure
-            onClick={() => console.log("Pago online confirmado")}
+            onClick={handleStripeRedirect}
           />
 
           <PaymentOption
