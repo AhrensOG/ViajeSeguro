@@ -63,7 +63,6 @@ const PurchaseProcess = () => {
     }
     const payload: CreateReservationPayload = {
       tripId: trip.id,
-      userId: session.user.id as string,
       price: trip.priceDetails?.finalPrice ?? trip.basePrice,
       status: "PENDING",
       paymentMethod: "CASH",
