@@ -83,7 +83,19 @@ function convertUTCToLocalDate(
   return dt.setZone(timeZone).toFormat("dd/MM/yyyy");
 }
 
-export const fetcher = async <T = unknown>(
+function formatDateTime(value: string | Date | number): string | null {
+  const dateTime = DateTime.fromJSDate(
+    typeof value === "string" || typeof value === "number"
+      ? new Date(value)
+      : value
+  );
+
+  if (!dateTime.isValid) return null;
+
+  return dateTime.toFormat("dd/MM/yyyy HH:mm");
+}
+
+const fetcher = async <T = unknown>(
   input: RequestInfo,
   options?: RequestInit
 ): Promise<T> => {
@@ -103,4 +115,4 @@ export const fetcher = async <T = unknown>(
   return res.json();
 };
 
-export { formatDateToDDMMYYYY, formatDateToYYYYMMDD, getDurationString, convertUTCToLocalTime, convertUTCToLocalDate }
+export { formatDateToDDMMYYYY, formatDateToYYYYMMDD, getDurationString, convertUTCToLocalTime, convertUTCToLocalDate, formatDateTime, fetcher }

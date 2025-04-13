@@ -18,3 +18,11 @@ export const getReservationsByUser = async (
     `${BACKEND_URL}/reservation/by-user/${userId}`
   );
 };
+
+export const getReservationById = async (
+  id: string
+): Promise<ReservationResponse> => {
+  return fetcher<ReservationResponse>(
+    `${BACKEND_URL}/reservation/by-id-for-qr-detail/${id}`
+  );
+};
