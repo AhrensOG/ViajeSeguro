@@ -81,10 +81,10 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
                                         href="/viajes"
                                         className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100"
                                     >
-                                        Viajes
+                                        Reservas
                                     </Link>
                                     <Link
-                                        href="/mis-compras"
+                                        href="/dashboard/client/reservations"
                                         className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100"
                                     >
                                         Mis compras
@@ -183,10 +183,10 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
                                     Perfil
                                 </Link>
                                 <Link
-                                    href="/viajes"
+                                    href="/dashboard/client/reservations"
                                     className="text-custom-gray-800 hover:text-custom-black-900 transition"
                                 >
-                                    Viajes
+                                    Reservas
                                 </Link>
                                 <Link
                                     href="/mis-compras"
