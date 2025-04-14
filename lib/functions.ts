@@ -95,6 +95,28 @@ function formatDateTime(value: string | Date | number): string | null {
   return dateTime.toFormat("dd/MM/yyyy HH:mm");
 }
 
+function formatFullDate(
+  date: string | Date | number,
+  timeZone: string
+): string | null {
+  const browserLocale = "es";
+
+  const dt = DateTime.fromJSDate(
+    typeof date === "string" || typeof date === "number"
+      ? new Date(date)
+      : date
+  )
+    .setZone(timeZone)
+    .setLocale(browserLocale);
+
+  if (!dt.isValid) {
+    console.error("❌ Fecha o zona horaria inválida:", date, timeZone);
+    return null;
+  }
+
+  return dt.toFormat("cccc, d 'de' LLLL");
+}
+
 const fetcher = async <T = unknown>(
   input: RequestInfo,
   options?: RequestInit
@@ -175,4 +197,4 @@ const fetchWithOptionalAuth = async <T = unknown>(
 };
 
 
-export { formatDateToDDMMYYYY, formatDateToYYYYMMDD, getDurationString, convertUTCToLocalTime, convertUTCToLocalDate, formatDateTime, fetcher, fetchWithAuth, fetchWithOptionalAuth }
+export { formatDateToDDMMYYYY, formatDateToYYYYMMDD, getDurationString, convertUTCToLocalTime, convertUTCToLocalDate, formatDateTime, fetcher, fetchWithAuth, fetchWithOptionalAuth, formatFullDate };
