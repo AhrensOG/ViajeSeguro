@@ -6,6 +6,7 @@ import { getTripForDetail } from "@/lib/api/trip";
 import { Trip } from "@/lib/shared/types/trip-service-type.type";
 import NotFoundMessage from "@/lib/client/components/NotFoundMessage";
 import TripProcessFallback from "@/lib/client/components/fallbacks/trip/TripProcessFallback";
+import { formatFullDate } from "@/lib/functions";
 
 const TripProcess = () => {
   const searchParams = useSearchParams();
@@ -49,8 +50,10 @@ const TripProcess = () => {
 
   return (
     <main className="flex-1 w-full max-w-6xl mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold text-custom-black-800 mb-6">
-        Domingo, 6 de abril
+      <h1 className="text-3xl font-bold text-custom-black-800 mb-6 capitalize">
+        {trip?.departure && trip?.originalTimeZone
+          ? formatFullDate(trip?.departure, trip?.originalTimeZone)
+          : ""}
       </h1>
 
       {!loading && trip && (

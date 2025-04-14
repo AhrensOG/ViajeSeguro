@@ -3,12 +3,16 @@
 import { motion } from "framer-motion";
 import { Calendar1Icon, ChevronDown, ChevronRight } from "lucide-react";
 import TripRouteCompact from "../../../../lib/client/components/TripRouteCompact";
-import { DateTime } from "luxon";
 import { TripWithPriceDetails } from "@/lib/shared/types/trip-service-type.type";
 import { useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import AuthRequiredModal from "./AuthRequiredModal";
 import { BASE_URL } from "@/lib/constants";
+import {
+  convertUTCToLocalTime,
+  formatFullDate,
+  getDurationString,
+} from "@/lib/functions";
 
 type BookingSidebarProps = {
   trip: TripWithPriceDetails;
@@ -29,15 +33,16 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const departure = DateTime.fromISO(trip.departure).setZone(
+  const departureTime = convertUTCToLocalTime(
+    trip.departure,
     trip.originalTimeZone
   );
-  const arrival = DateTime.fromISO(trip.arrival).setZone(trip.originalTimeZone);
-  const duration = arrival.diff(departure, ["hours", "minutes"]).toObject();
-  const durationStr = `${duration.hours?.toFixed(
-    0
-  )}h${duration.minutes?.toFixed(0)}m`;
-  const formattedDate = departure.setLocale("es").toFormat("cccc, d 'de' LLLL");
+  const arrivalTime = convertUTCToLocalTime(
+    trip.arrival,
+    trip.originalTimeZone
+  );
+  const durationStr = getDurationString(trip.departure, trip.arrival);
+  const dateLabel = formatFullDate(trip.departure, trip.originalTimeZone);
   const fullname = `${trip.user.name} ${trip.user.lastName}`;
 
   const handleLoginRedirect = () => {
@@ -65,14 +70,14 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
       transition={{ duration: 0.4, delay: 0.3 }}
       className="space-y-4">
       <div className="p-6 bg-custom-white-100 shadow-sm rounded-lg border border-custom-gray-300">
-        <h2 className="text-xl font-bold text-custom-black-900 mb-4">
-          {formattedDate}
+        <h2 className="text-xl font-bold text-custom-black-900 mb-4 capitalize">
+          {dateLabel}
         </h2>
 
         <TripRouteCompact
-          departureTime={departure.toFormat("HH:mm")}
+          departureTime={departureTime}
           duration={durationStr}
-          arrivalTime={arrival.toFormat("HH:mm")}
+          arrivalTime={arrivalTime}
           originCity={trip.origin}
           originLocation={trip.originLocation}
           destinationCity={trip.destination}

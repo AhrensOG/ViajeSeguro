@@ -156,8 +156,24 @@ const ReservationCard = ({ reservation }: Props) => {
               )}
             </div>
 
+            {/* Método de pago en efectivo */}
+            {reservation.paymentMethod === "CASH" && (
+              <div className="rounded-md border-l-4 border-yellow-400 bg-yellow-50 p-4 text-sm text-yellow-800">
+                <p className="font-bold mb-2 text-yellow-800">
+                  Método de pago: Efectivo
+                </p>
+                <p className="mb-2">
+                  Deberás abonar el <strong>día del viaje</strong> el monto
+                  exacto. No se aceptan pagos con cambio, y de no presentarte
+                  con el importe correcto,{" "}
+                  <strong>la reserva podrá ser cancelada</strong>.
+                </p>
+              </div>
+            )}
+
             {/* Precio + Info de referidos */}
             <ReservationPriceInfo reservation={reservation} />
+
             <div className="flex flex-col justify-center items-end gap-4 relative">
               {reservation.qr && (
                 <button

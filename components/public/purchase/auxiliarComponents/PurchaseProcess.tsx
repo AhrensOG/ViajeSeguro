@@ -22,6 +22,7 @@ import { useSession } from "next-auth/react";
 import { BASE_URL } from "@/lib/constants";
 import { createCheckoutSession } from "@/lib/api/stripe";
 import PurchaseProcessFallback from "@/lib/client/components/fallbacks/purchase/PurchaseProcessFallback";
+import CashConfirmationModal from "./CashConfirmationModal";
 
 const PurchaseProcess = () => {
   const searchParams = useSearchParams();
@@ -33,6 +34,7 @@ const PurchaseProcess = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { data: session } = useSession();
+  const [showCashModal, setShowCashModal] = useState(false);
 
   useEffect(() => {
     const fetchTrip = async () => {
@@ -52,7 +54,6 @@ const PurchaseProcess = () => {
   }, [id]);
 
   const handleCashPayment = async () => {
-    if (!trip || !id) return;
     if (!session) {
       const current = `${BASE_URL}${pathname}?${searchParams.toString()}`;
       const encoded = encodeURIComponent(current);
@@ -61,12 +62,19 @@ const PurchaseProcess = () => {
       router.push(`/auth/login?callbackUrl=${encoded}`);
       return;
     }
+    setShowCashModal(true);
+  };
+
+  const confirmCashPayment = async () => {
+    if (!trip || !session) return;
+
     const payload: CreateReservationPayload = {
       tripId: trip.id,
       price: trip.priceDetails?.finalPrice ?? trip.basePrice,
       status: "PENDING",
       paymentMethod: "CASH",
     };
+
     try {
       await createReservation(payload);
       toast.success("Reserva generada correctamente.", {
@@ -74,10 +82,12 @@ const PurchaseProcess = () => {
       });
       router.push("/dashboard/client/reservations");
     } catch (error) {
-      console.info("Error al crear la reserva:", error);
-      toast.error("Hubo un error al crear la reserva", {
+      console.log("Error al crear la reserva:", error);
+      toast.info("Hubo un error al crear la reserva", {
         description: "Intenta nuevamente o contacta con el soporte",
       });
+    } finally {
+      setShowCashModal(false);
     }
   };
 
@@ -106,8 +116,8 @@ const PurchaseProcess = () => {
         window.location.href = data.url;
       }
     } catch (err) {
-      console.error("Error al iniciar el checkout:", err);
-      toast.error("No se pudo redirigir al pago");
+      console.log("Error al iniciar el checkout:", err);
+      toast.info("No se pudo redirigir al pago");
     }
   };
 
@@ -182,6 +192,11 @@ const PurchaseProcess = () => {
           />
         </div>
       </div>
+      <CashConfirmationModal
+        show={showCashModal}
+        onClose={() => setShowCashModal(false)}
+        onConfirm={confirmCashPayment}
+      />
     </main>
   );
 };
