@@ -8,12 +8,14 @@ interface UserFormValues {
     email: string;
     name: string;
     lastName: string;
+    phone?: string;
 }
 
 interface UserProfile {
     email: string;
     name: string;
     lastName: string;
+    phone?: string; // Opcional, si no se requiere
 }
 
 const ProfilePage = () => {
@@ -25,6 +27,7 @@ const ProfilePage = () => {
         email: "usuario@example.com", // Reemplaza con datos reales
         name: "Juan",
         lastName: "Pérez",
+        phone: "123456789", // Opcional
     };
 
     // Esquema de validación con Yup
@@ -32,6 +35,7 @@ const ProfilePage = () => {
         email: Yup.string().email("El correo no es válido").required("El correo es obligatorio"),
         name: Yup.string().required("El nombre es obligatorio"),
         lastName: Yup.string().required("El apellido es obligatorio"),
+        phone: Yup.string().matches(/^\d+$/, "El teléfono solo puede contener números").optional(), // Opcional, si no se requiere
     });
 
     // Valores iniciales del formulario
@@ -39,6 +43,7 @@ const ProfilePage = () => {
         email: userProfile.email || "",
         name: userProfile.name || "",
         lastName: userProfile.lastName || "",
+        phone: userProfile.phone || "",
     };
 
     // Función para manejar el envío del formulario
@@ -99,6 +104,21 @@ const ProfilePage = () => {
                                 className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"
                             />
                             <ErrorMessage name="email" component="div" className="text-sm text-orange-600 mt-1" />
+                        </div>
+
+                        {/* Campo de teléfono (opcional) */}
+                        <div>
+                            <label htmlFor="phone" className="block text-sm font-medium text-gray-700">
+                                Teléfono (opcional):
+                            </label>
+                            <Field
+                                type="tel"
+                                name="phone"
+                                id="phone"
+                                placeholder="Ingresa tu teléfono"
+                                className="mt-1 block w-full p-2 border border-gray-300 rounded-md shadow-sm focus:ring-orange-500 focus:border-orange-500"
+                            />
+                            <ErrorMessage name="phone" component="div" className="text-sm text-orange-600 mt-1" />
                         </div>
 
                         {/* Botón de envío */}
