@@ -50,7 +50,7 @@ const Services = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-4xl font-extrabold text-center text-custom-gray-800 mb-12"
+          className="text-4xl font-extrabold text-center text-custom-black-800 mb-12"
         >
           Nuestros Servicios
         </motion.h2>
@@ -64,7 +64,7 @@ const Services = () => {
               transition={{ duration: 0.6, delay: index * 0.2 }}
               className="bg-custom-white-100 rounded-lg shadow-lg overflow-hidden border border-custom-gray-100 flex flex-col justify-center items-center"
             >
-              <div className="bg-gradient-to-r from-custom-gray-800 to-custom-black-900 p-5 text-center w-full">
+              <div className="bg-gradient-to-r from-custom-black-800 to-custom-black-900 p-5 text-center w-full">
                 <h3 className="text-xl font-bold text-custom-white-100">
                   {service.title}
                 </h3>

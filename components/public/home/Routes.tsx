@@ -50,7 +50,7 @@ const Routes = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={isInView && { opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-4xl font-extrabold text-center text-custom-gray-800 mb-12"
+          className="text-4xl font-extrabold text-center text-custom-black-800 mb-12"
         >
           Nuestras Rutas
         </motion.h2>
@@ -72,7 +72,7 @@ const Routes = () => {
                 >
                   <div className="flex items-center">
                     <div className="w-12 h-12  rounded-full flex items-center justify-center mr-4">
-                      <MapPin className="h-6 w-6 text-custom-black-900" />
+                      <MapPin className="h-6 w-6 text-custom-black-800" />
                     </div>
                     <div>
                       <h4 className="font-semibold text-lg">

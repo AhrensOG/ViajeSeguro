@@ -119,6 +119,8 @@ export const authOptions: NextAuthOptions = {
             session.user = {
                 id: token.user.id,
                 email: token.user.email,
+                emailVerified: token.user.emailVerified,
+                avatarUrl: token.user.avatarUrl,
                 googleId: token.user.googleId,
                 name: token.user.name,
                 lastName: token.user.lastName,
