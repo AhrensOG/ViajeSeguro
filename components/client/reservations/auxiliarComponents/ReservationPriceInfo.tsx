@@ -16,7 +16,9 @@ const ReservationPriceInfo = ({ reservation }: Props) => {
       {/* Total pagado */}
       <div className="flex items-center justify-between">
         <p className="text-sm text-custom-gray-700 font-medium">
-          Total pagado:
+          {reservation.paymentMethod === "CASH"
+            ? "Total a pagar: "
+            : "Total pagado: "}
         </p>
         <p className="text-lg font-bold text-custom-black-900">
           € {reservation.price.toFixed(2).replace(".", ",")}
@@ -44,9 +46,9 @@ const ReservationPriceInfo = ({ reservation }: Props) => {
         <AnimatePresence initial={false}>
           {showDetails && (
             <motion.ul
-              initial={{ opacity: 0, height: 0 , y: -6 }}
-              animate={{ opacity: 1, height: "auto" , y: 0 }}
-              exit={{ opacity: 0, height: 0 , y: -6 }}
+              initial={{ opacity: 0, height: 0, y: -6 }}
+              animate={{ opacity: 1, height: "auto", y: 0 }}
+              exit={{ opacity: 0, height: 0, y: -6 }}
               transition={{ duration: 0.2 }}
               className="mt-2 space-y-1 border-l border-custom-gray-200 pl-3 text-custom-gray-700">
               <li>
