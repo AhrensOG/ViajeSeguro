@@ -4,10 +4,10 @@ import PurchaseTripSummary from "./PurchaseTripSummary";
 import PaymentOption from "./PaymentOption";
 import PaymentTrustInfo from "./PaymentTrustInfo";
 import {
-  AlertCircle,
-  Banknote,
+  // AlertCircle,
+  // Banknote,
   CheckCircle,
-  Clock,
+  // Clock,
   CreditCard,
 } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
@@ -16,13 +16,13 @@ import { getTripForPurchase } from "@/lib/api/trip";
 import NotFoundMessage from "@/lib/client/components/NotFoundMessage";
 import { toast } from "sonner";
 import { CreateReservationPayload } from "@/lib/api/reservation/reservation.types";
-import { createReservation } from "@/lib/api/reservation";
+// import { createReservation } from "@/lib/api/reservation";
 import { getSummaryFromTrip } from "@/lib/client/purchase/functions";
 import { useSession } from "next-auth/react";
 import { BASE_URL } from "@/lib/constants";
 import { createCheckoutSession } from "@/lib/api/stripe";
 import PurchaseProcessFallback from "@/lib/client/components/fallbacks/purchase/PurchaseProcessFallback";
-import CashConfirmationModal from "./CashConfirmationModal";
+// import CashConfirmationModal from "./CashConfirmationModal";
 
 const PurchaseProcess = () => {
   const searchParams = useSearchParams();
@@ -34,7 +34,7 @@ const PurchaseProcess = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const { data: session } = useSession();
-  const [showCashModal, setShowCashModal] = useState(false);
+  // const [showCashModal, setShowCashModal] = useState(false);
 
   useEffect(() => {
     const fetchTrip = async () => {
@@ -53,43 +53,43 @@ const PurchaseProcess = () => {
     fetchTrip();
   }, [id]);
 
-  const handleCashPayment = async () => {
-    if (!session) {
-      const current = `${BASE_URL}${pathname}?${searchParams.toString()}`;
-      const encoded = encodeURIComponent(current);
-      toast.info("Debes iniciar sesión para realizar la reserva");
-      await new Promise((resolve) => setTimeout(resolve, 2000));
-      router.push(`/auth/login?callbackUrl=${encoded}`);
-      return;
-    }
-    setShowCashModal(true);
-  };
+  // const handleCashPayment = async () => {
+  //   if (!session) {
+  //     const current = `${BASE_URL}${pathname}?${searchParams.toString()}`;
+  //     const encoded = encodeURIComponent(current);
+  //     toast.info("Debes iniciar sesión para realizar la reserva");
+  //     await new Promise((resolve) => setTimeout(resolve, 2000));
+  //     router.push(`/auth/login?callbackUrl=${encoded}`);
+  //     return;
+  //   }
+  //   setShowCashModal(true);
+  // };
 
-  const confirmCashPayment = async () => {
-    if (!trip || !session) return;
+  // const confirmCashPayment = async () => {
+  //   if (!trip || !session) return;
 
-    const payload: CreateReservationPayload = {
-      tripId: trip.id,
-      price: trip.priceDetails?.finalPrice ?? trip.basePrice,
-      status: "PENDING",
-      paymentMethod: "CASH",
-    };
+  //   const payload: CreateReservationPayload = {
+  //     tripId: trip.id,
+  //     price: trip.priceDetails?.finalPrice ?? trip.basePrice,
+  //     status: "PENDING",
+  //     paymentMethod: "CASH",
+  //   };
 
-    try {
-      await createReservation(payload);
-      toast.success("Reserva generada correctamente.", {
-        description: "Puedes ver el estado de la misma en tu perfil.",
-      });
-      router.push("/dashboard/client/reservations");
-    } catch (error) {
-      console.log("Error al crear la reserva:", error);
-      toast.info("Hubo un error al crear la reserva", {
-        description: "Intenta nuevamente o contacta con el soporte",
-      });
-    } finally {
-      setShowCashModal(false);
-    }
-  };
+  //   try {
+  //     await createReservation(payload);
+  //     toast.success("Reserva generada correctamente.", {
+  //       description: "Puedes ver el estado de la misma en tu perfil.",
+  //     });
+  //     router.push("/dashboard/client/reservations");
+  //   } catch (error) {
+  //     console.log("Error al crear la reserva:", error);
+  //     toast.info("Hubo un error al crear la reserva", {
+  //       description: "Intenta nuevamente o contacta con el soporte",
+  //     });
+  //   } finally {
+  //     setShowCashModal(false);
+  //   }
+  // };
 
   const handleStripeRedirect = async () => {
     if (!trip || !id) return;
@@ -163,7 +163,7 @@ const PurchaseProcess = () => {
             onClick={handleStripeRedirect}
           />
 
-          <PaymentOption
+          {/* <PaymentOption
             icon={<Banknote className="h-6 w-6 text-custom-gray-600" />}
             title="Pagar en efectivo"
             description="Paga directamente al conductor el día del viaje"
@@ -180,7 +180,7 @@ const PurchaseProcess = () => {
             buttonLabel="Pagar con efectivo"
             secure
             onClick={handleCashPayment}
-          />
+          /> */}
 
           <PaymentTrustInfo />
         </div>
@@ -192,11 +192,11 @@ const PurchaseProcess = () => {
           />
         </div>
       </div>
-      <CashConfirmationModal
+      {/* <CashConfirmationModal
         show={showCashModal}
         onClose={() => setShowCashModal(false)}
         onConfirm={confirmCashPayment}
-      />
+      /> */}
     </main>
   );
 };

@@ -43,7 +43,6 @@ export interface SearchTrip {
   origin: string;
   destination: string;
   departure: string;
-  serviceType: TripServiceType
 }
 
 export interface DiscountItem {

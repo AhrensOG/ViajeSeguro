@@ -13,7 +13,6 @@ const Hero = () => {
   const handleSearch = ({
     origin,
     destination,
-    serviceType,
     departure,
   }: ClientSearchFormData) => {
     const userTimeZone = DateTime.local().zoneName;
@@ -39,7 +38,6 @@ const Hero = () => {
       origin,
       destination,
       departure: isoStringWithTZ,
-      serviceType,
     });
 
     router.push(`/search?${params.toString()}`);
@@ -65,7 +63,7 @@ const Hero = () => {
           Madrid, cómodo y flexible para ti.
         </motion.p>
 
-        <div className="relative max-w-7xl mx-auto">
+        <div className="relative max-w-4xl mx-auto">
           <div className="absolute inset-0 -z-10 overflow-hidden">
             <Image
               src="/main/main.webp"

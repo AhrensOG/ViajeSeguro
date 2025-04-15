@@ -6,7 +6,6 @@ import SearchForm from "@/lib/client/components/SearchForm";
 import {
   SearchTrip,
   TripCardType,
-  TripServiceType,
 } from "@/lib/shared/types/trip-service-type.type";
 import Image from "next/image";
 import { toast } from "sonner";
@@ -73,8 +72,6 @@ const SearchProcess = () => {
       const query: SearchTrip = {
         origin: searchParams.get("origin") || "",
         destination: searchParams.get("destination") || "",
-        serviceType:
-          (searchParams.get("serviceType") as TripServiceType) || "SIMPLE_TRIP",
         departure: departureParam || "",
       };
 
@@ -115,17 +112,19 @@ const SearchProcess = () => {
 
   return (
     <div>
-      <SearchForm
-        initialData={{
-          origin: searchParams.get("origin") || "",
-          destination: searchParams.get("destination") || "",
-          serviceType:
-            (searchParams.get("serviceType") as TripServiceType) ||
-            "SIMPLE_TRIP",
-          departure: departureDate,
-        }}
-        onSearch={updateSearchParams}
-      />
+      <div className="w-full bg-white shadow-sm">
+        <div className="max-w-4xl mx-auto">
+          <SearchForm
+            initialData={{
+              origin: searchParams.get("origin") || "",
+              destination: searchParams.get("destination") || "",
+              departure: departureDate,
+            }}
+            onSearch={updateSearchParams}
+            shadow={false}
+          />
+        </div>
+      </div>
 
       <div className="container mx-auto px-4 py-4 flex gap-2 grow h-[calc(100vh-316px)] sm:h-[calc(100vh-200px)] lg:h-[calc(100vh-160px)]">
         <div className="w-1/3 relative rounded-md overflow-hidden hidden lg:block">

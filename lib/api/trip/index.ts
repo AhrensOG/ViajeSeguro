@@ -16,7 +16,7 @@ export const searchTrips = async (query: SearchTrip): Promise<TripCardType[]> =>
     origin: query.origin,
     destination: query.destination,
     departure: query.departure,
-    serviceType: query.serviceType,
+    serviceType: "SIMPLE_TRIP"
   });
 
   return fetcher<TripCardType[]>(`${BACKEND_URL}/trip/search?${params.toString()}`);
