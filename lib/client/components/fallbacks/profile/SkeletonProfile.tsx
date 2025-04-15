@@ -1,6 +1,6 @@
 import { JSX } from "react";
 
-export default function Spinner(): JSX.Element {
+export default function SkeletonProfile(): JSX.Element {
     return (
         <div className="w-full max-w-lg mx-auto p-6 bg-white rounded-lg shadow-md animate-pulse">
             {/* Título o encabezado */}
