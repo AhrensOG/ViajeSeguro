@@ -72,19 +72,19 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
                                     className="p-1 absolute right-0 w-44 text- bg-custom-white-100 shadow-lg rounded-md z-10"
                                 >
                                     <Link
-                                        href="/perfil"
+                                        href="#"
                                         className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100"
                                     >
                                         Perfil
                                     </Link>
                                     <Link
-                                        href="/viajes"
+                                        href="/dashboard/client/reservations"
                                         className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100"
                                     >
                                         Reservas
                                     </Link>
                                     <Link
-                                        href="/dashboard/client/reservations"
+                                        href="#"
                                         className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100"
                                     >
                                         Mis compras
@@ -177,7 +177,7 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
                         {session && session?.user ? (
                             <nav className="flex flex-col items-start space-y-4">
                                 <Link
-                                    href="/perfil"
+                                    href="#"
                                     className="text-custom-gray-800 hover:text-custom-black-900 transition"
                                 >
                                     Perfil
@@ -189,7 +189,7 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
                                     Reservas
                                 </Link>
                                 <Link
-                                    href="/mis-compras"
+                                    href="#"
                                     className="text-custom-gray-800 hover:text-custom-black-900 transition"
                                 >
                                     Mis compras
