@@ -1,27 +1,11 @@
-import { BACKEND_URL } from "@/lib/constants";
-import { fetchWithAuth } from "@/lib/functions";
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Eye, EyeOff } from "lucide-react";
 import { toast } from "sonner";
+import { changePassword } from "@/lib/api/client-profile";
+import { ChangePasswordFormValues, ChangePasswordModalProps } from "@/lib/api/client-profile/clientProfile.types";
 
-interface ChangePasswordFormValues {
-    currentPassword: string;
-    newPassword: string;
-    confirmPassword: string;
-}
-
-interface ChangePasswordModalProps {
-    isOpen: boolean;
-    onClose: () => void;
-    user: {
-        email: string;
-        name: string;
-        lastName: string;
-    };
-}
-
-const ChangePasswordModal = ({ isOpen, onClose, user }: ChangePasswordModalProps) => {
+const ChangePasswordModal = ({ isOpen, onClose }: ChangePasswordModalProps) => {
     const defaultValues: ChangePasswordFormValues = {
         currentPassword: "",
         newPassword: "",
@@ -33,7 +17,6 @@ const ChangePasswordModal = ({ isOpen, onClose, user }: ChangePasswordModalProps
         handleSubmit,
         watch,
         formState: { errors, isSubmitting },
-        reset,
     } = useForm<ChangePasswordFormValues>({ defaultValues });
 
     const newPassword = watch("newPassword");
@@ -50,32 +33,16 @@ const ChangePasswordModal = ({ isOpen, onClose, user }: ChangePasswordModalProps
     };
 
     const onSubmit = async (values: ChangePasswordFormValues) => {
-        return toast.promise(changePassword(values), {
-            loading: "Cambiando contraseña...",
-            success: () => {
-                reset();
-                onClose();
-                return "Contraseña cambiada exitosamente";
-            },
-            error: (err) => {
-                return "Error al cambiar la contraseña";
-            },
-        });
-    };
-
-    const changePassword = async (values: ChangePasswordFormValues): Promise<void> => {
+        const toastId = toast.loading("Cambiando contraseña...");
         try {
-            const res = await fetchWithAuth(`${BACKEND_URL}/user/change-password`, {
-                method: "PUT",
-                body: JSON.stringify({
-                    currentPassword: values.currentPassword,
-                    newPassword: values.newPassword,
-                }),
-                headers: { "Content-Type": "application/json" },
-            });
-            console.log("Respuesta del servidor:", res);
+            await changePassword(values);
+            toast.success("Contraseña cambiada exitosamente", { id: toastId });
         } catch (error) {
             console.error("Error al cambiar la contraseña:", error);
+            toast.info("Error al cambiar la contraseña", {
+                description: "Intenta nuevamente o contacta con nuestro soporte",
+                id: toastId,
+            });
         }
     };
 

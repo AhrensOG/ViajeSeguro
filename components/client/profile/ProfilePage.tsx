@@ -3,17 +3,10 @@ import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import ChangePasswordModal from "./auxiliarComponents/ChangePasswordModal";
 import { useSession } from "next-auth/react";
-import { BACKEND_URL } from "@/lib/constants";
-import { fetchWithAuth } from "@/lib/functions";
 import SkeletonProfile from "@/lib/client/components/fallbacks/profile/SkeletonProfile";
 import { toast } from "sonner";
-
-interface UserProfile {
-    email: string;
-    name: string;
-    lastName: string;
-    phone?: string;
-}
+import { fetchUserData, updateProfile } from "../../../lib/api/client-profile";
+import { UserProfile } from "@/lib/api/client-profile/clientProfile.types";
 
 const ProfilePage = () => {
     const [isOpen, setIsOpen] = useState(false);
@@ -37,11 +30,12 @@ const ProfilePage = () => {
     useEffect(() => {
         const fetchUser = async () => {
             setIsLoading(true);
+            if (!session?.user?.id) {
+                setIsLoading(false);
+                return;
+            }
             try {
-                const res = await fetchWithAuth<UserProfile>(`${BACKEND_URL}/user/${session?.user?.id}`, {
-                    method: "GET",
-                });
-
+                const res = await fetchUserData(session.user.id);
                 if (res) {
                     setValue("email", res.email);
                     setValue("name", res.name);
@@ -55,37 +49,20 @@ const ProfilePage = () => {
             }
         };
 
-        if (session?.user?.id) {
-            fetchUser();
-        }
+        fetchUser();
     }, [session?.user?.id, setValue]);
 
     const onSubmit = async (values: UserProfile) => {
-        return toast.promise(updateProfile(values), {
-            loading: "Actualizando perfil...",
-            success: () => {
-                return "Perfil actualizado exitosamente";
-            },
-            error: (err) => {
-                return "Error al actualizar el perfil";
-            },
-        });
-    };
-
-    const updateProfile = async (values: UserProfile): Promise<void> => {
+        const toastId = toast.loading("Actualizando informacion...");
         try {
-            await fetchWithAuth(`${BACKEND_URL}/user/update`, {
-                method: "PUT",
-                body: JSON.stringify({
-                    name: values.name,
-                    lastName: values.lastName,
-                }),
-                headers: {
-                    "Content-Type": "application/json",
-                },
-            });
+            await updateProfile(values);
+            toast.success("Información actualizada exitosamente", { id: toastId });
         } catch (error) {
-            throw new Error("Error al actualizar el perfil");
+            console.log("Error al actualizar el perfil:", error);
+            toast.info("Error al actualizar la información", {
+                description: "Intenta nuevamente o contacta con nuestro soporte",
+                id: toastId,
+            });
         }
     };
 
