@@ -24,4 +24,6 @@ export interface CreateSubscriptionPayload {
     amount: number;
     paymentMethod: string;
     subscriptionId: string;
+    type: string;
+    subscriptionPlan?: string;
 }

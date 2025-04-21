@@ -45,24 +45,27 @@ const handleSubscribe = async (data: CreateSubscriptionRequest, amount: number) 
     const payload: CreateSubscriptionPayload = {
         amount: amount,
         paymentMethod: "STRIPE",
-        subscriptionId: data.plan,
+        subscriptionPlan: data.plan,
+        type: "SUBSCRIPTION",
+        subscriptionId: "",
     };
     try {
-        const responde = await createSubscription(data);
+        const response = (await createSubscription(data)) as { id: string };
         const stripeData = await createCheckoutSession({
             amount: amount * 100,
-            metadata: payload,
+            metadata: { ...payload, subscriptionId: response.id },
         });
         if (stripeData.url) {
             window.location.href = stripeData.url;
         } else {
-            console.log("Error al crear la sesión de pago:", responde);
+            console.log("Error al crear la sesión de pago:", response);
 
             toast.info("Error al crear la sesión de pago", {
                 description: "Intenta nuevamente o contacta con nuestro soporte",
             });
         }
     } catch (error) {
+        console.error("Error al crear la suscripción:", error);
         toast.info("Error al crear la suscripción", { description: "Intenta nuevamente o contacta con nuestro soporte" });
     }
 };
