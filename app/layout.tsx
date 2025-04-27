@@ -22,7 +22,7 @@ export default function RootLayout({
     return (
         <html lang="en">
             <body className={`${montserrat.className} antialiased`}>
-                <Toaster position="bottom-right" richColors/>
+                <Toaster position="bottom-right" richColors />
                 <Providers>{children}</Providers>
             </body>
         </html>
