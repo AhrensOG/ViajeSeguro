@@ -34,9 +34,9 @@ const PurchaseTripSummary = ({
     priceDetails,
 }: Props) => {
     const [showDetails, setShowDetails] = useState(false);
-    const IBA = process.env.NEXT_PUBLIC_IBA || 0;
+    const IVA = process.env.NEXT_PUBLIC_IVA || 0;
     const hasDiscounts = priceDetails && priceDetails.discounts.length > 0;
-    const finalPrice = (priceDetails?.finalPrice ?? price) * (1 + Number(IBA) / 100);
+    const finalPrice = (priceDetails?.finalPrice ?? price) * (1 + Number(IVA) / 100);
 
     return (
         <motion.div

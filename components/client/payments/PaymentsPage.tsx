@@ -13,40 +13,11 @@ export default function PaymentsPage() {
     useEffect(() => {
         const fetchPayments = async () => {
             const res = await getAllPaymentsByUser();
-            console.log(res);
-
             setPayments(res);
         };
         if (!session?.user?.id) fetchPayments();
         return;
     }, [session?.user?.id]);
-
-    const paymentsMock: PaymentCardData[] = [
-        {
-            id: "pay_1234567890",
-            amount: 59.99,
-            status: "PAID",
-            createdAt: "2025-04-27T10:30:00Z",
-            method: "Tarjeta de Crédito",
-            subscriptionName: "Suscripción Premium",
-        },
-        {
-            id: "pay_9876543210",
-            amount: 29.99,
-            status: "PENDING",
-            createdAt: "2025-04-28T15:45:00Z",
-            method: "PayPal",
-            subscriptionName: "Suscripción Básica",
-        },
-        {
-            id: "pay_2468101214",
-            amount: 19.99,
-            status: "FAILED",
-            createdAt: "2025-04-26T08:15:00Z",
-            method: "Transferencia Bancaria",
-            subscriptionName: "Suscripción Starter",
-        },
-    ];
 
     return (
         <div className="w-full flex flex-col items-center px-0 md:px-6 my-4 pb-10 bg-white">

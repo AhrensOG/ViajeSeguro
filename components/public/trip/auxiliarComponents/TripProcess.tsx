@@ -9,61 +9,55 @@ import TripProcessFallback from "@/lib/client/components/fallbacks/trip/TripProc
 import { formatFullDate } from "@/lib/functions";
 
 const TripProcess = () => {
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
-  const [trip, setTrip] = useState<Trip | null>(null);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+    const searchParams = useSearchParams();
+    const id = searchParams.get("id");
+    const [trip, setTrip] = useState<Trip | null>(null);
+    const [loading, setLoading] = useState(false);
+    const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    const fetchTrip = async () => {
-      if (!id) return;
+    useEffect(() => {
+        const fetchTrip = async () => {
+            if (!id) return;
 
-      try {
-        setLoading(true);
-        const tripData = await getTripForDetail(id);
-        setTrip(tripData as Trip);
-      } catch (err) {
-        console.log("Error al cargar el viaje:", err);
-        setError("Error al obtener el viaje");
-      } finally {
-        setLoading(false);
-      }
-    };
+            try {
+                setLoading(true);
+                const tripData = await getTripForDetail(id);
+                console.log(tripData);
 
-    fetchTrip();
-  }, [id]);
+                setTrip(tripData as Trip);
+            } catch (err) {
+                console.log("Error al cargar el viaje:", err);
+                setError("Error al obtener el viaje");
+            } finally {
+                setLoading(false);
+            }
+        };
 
-  if (loading) {
-    return <TripProcessFallback />;
-  }
+        fetchTrip();
+    }, [id]);
 
-  if (error) {
+    if (loading) {
+        return <TripProcessFallback />;
+    }
+
+    if (error) {
+        return <NotFoundMessage message="No se encontró ningun viaje relacionado" actionHref="/" actionLabel="Volver" />;
+    }
+
     return (
-      <NotFoundMessage
-        message="No se encontró ningun viaje relacionado"
-        actionHref="/"
-        actionLabel="Volver"
-      />
+        <main className="flex-1 w-full max-w-6xl mx-auto py-8 px-4">
+            <h1 className="text-3xl font-bold text-custom-black-800 mb-6 capitalize">
+                {trip?.departure && trip?.originalTimeZone ? formatFullDate(trip?.departure, trip?.originalTimeZone) : ""}
+            </h1>
+
+            {!loading && trip && (
+                <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <TripDetail trip={trip} />
+                    <BookingSidebar trip={trip} />
+                </div>
+            )}
+        </main>
     );
-  }
-
-  return (
-    <main className="flex-1 w-full max-w-6xl mx-auto py-8 px-4">
-      <h1 className="text-3xl font-bold text-custom-black-800 mb-6 capitalize">
-        {trip?.departure && trip?.originalTimeZone
-          ? formatFullDate(trip?.departure, trip?.originalTimeZone)
-          : ""}
-      </h1>
-
-      {!loading && trip && (
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <TripDetail trip={trip} />
-          <BookingSidebar trip={trip} />
-        </div>
-      )}
-    </main>
-  );
 };
 
 export default TripProcess;

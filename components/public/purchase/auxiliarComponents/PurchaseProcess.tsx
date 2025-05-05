@@ -22,7 +22,8 @@ const PurchaseProcess = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
-    const IBA = process.env.NEXT_PUBLIC_IBA || 0;
+    const IVA = process.env.NEXT_PUBLIC_IVA || 0;
+    const referralId = searchParams.get("referral");
 
     const id = searchParams.get("id");
     const [trip, setTrip] = useState<TripWithPriceDetails | null>(null);
@@ -68,6 +69,7 @@ const PurchaseProcess = () => {
             price: trip.priceDetails?.finalPrice ?? trip.basePrice,
             status: "PENDING",
             paymentMethod: "CASH",
+            referralId: referralId || undefined,
         };
 
         try {
@@ -99,13 +101,14 @@ const PurchaseProcess = () => {
 
         const payload: CreateReservationPayload = {
             tripId: trip.id,
-            price: (trip.priceDetails?.finalPrice ?? trip.basePrice) * (1 + Number(IBA) / 100),
+            price: (trip.priceDetails?.finalPrice ?? trip.basePrice) * (1 + Number(IVA) / 100),
             status: "PENDING",
             paymentMethod: "STRIPE",
+            referralId: referralId || undefined,
         };
         try {
             const data = await createCheckoutSession({
-                amount: Math.round((trip.priceDetails?.finalPrice ?? trip.basePrice) * (1 + Number(IBA) / 100) * 100),
+                amount: Math.round((trip.priceDetails?.finalPrice ?? trip.basePrice) * (1 + Number(IVA) / 100) * 100),
                 metadata: payload,
             });
             if (data.url) {
@@ -122,7 +125,7 @@ const PurchaseProcess = () => {
     if (!trip) return null;
 
     const tripSummary = getSummaryFromTrip(trip);
-    const priceFormatted = ((trip.priceDetails?.finalPrice ?? trip.basePrice) * (1 + Number(IBA) / 100)).toFixed(2).replace(".", ",");
+    const priceFormatted = ((trip.priceDetails?.finalPrice ?? trip.basePrice) * (1 + Number(IVA) / 100)).toFixed(2).replace(".", ",");
 
     return (
         <main className="container mx-auto p-8 grow">

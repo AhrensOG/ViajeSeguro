@@ -3,6 +3,15 @@ export interface UserProfile {
     name: string;
     lastName: string;
     phone?: string;
+    referralCode: string;
+    referralCodeFrom?: string;
+    referredByName?: string | null;
+    referralsTo?: {
+        referrer: {
+            name: string;
+            lastName: string;
+        };
+    }[];
 }
 
 export interface ChangePasswordFormValues {

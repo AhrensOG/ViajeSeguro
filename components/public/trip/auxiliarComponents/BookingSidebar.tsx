@@ -3,12 +3,14 @@
 import { motion } from "framer-motion";
 import { Calendar1Icon, ChevronDown, ChevronRight } from "lucide-react";
 import TripRouteCompact from "../../../../lib/client/components/TripRouteCompact";
-import { TripWithPriceDetails } from "@/lib/shared/types/trip-service-type.type";
-import { useState } from "react";
+import { TripDiscount, TripWithPriceDetails } from "@/lib/shared/types/trip-service-type.type";
+import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import AuthRequiredModal from "./AuthRequiredModal";
 import { BASE_URL } from "@/lib/constants";
 import { convertUTCToLocalTime, formatFullDate, getDurationString } from "@/lib/functions";
+import { useSession } from "next-auth/react";
+import { getDiscountByUserId } from "@/lib/api/trip";
 
 type BookingSidebarProps = {
     trip: TripWithPriceDetails;
@@ -25,16 +27,29 @@ type DiscountKey = keyof typeof DISCOUNT_LABELS;
 const BookingSidebar = ({ trip }: BookingSidebarProps) => {
     const [showModal, setShowModal] = useState(false);
     const [showDiscountDetails, setShowDiscountDetails] = useState(false);
+    const { data: session } = useSession();
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const IBA = process.env.NEXT_PUBLIC_IBA;
+    const IVA = process.env.NEXT_PUBLIC_IVA;
+    const [referral, setReferral] = useState("");
 
     const departureTime = convertUTCToLocalTime(trip.departure, trip.originalTimeZone);
     const arrivalTime = convertUTCToLocalTime(trip.arrival, trip.originalTimeZone);
     const durationStr = getDurationString(trip.departure, trip.arrival);
     const dateLabel = formatFullDate(trip.departure, trip.originalTimeZone);
     const fullname = `${trip.user.name} ${trip.user.lastName}`;
+
+    useEffect(() => {
+        const fetchDiscounts = async () => {
+            if (!session) return;
+            const res = await getDiscountByUserId();
+            if (res) {
+                setReferral(res?.id);
+            }
+        };
+        fetchDiscounts();
+    }, [session]);
 
     const handleLoginRedirect = () => {
         const current = `${BASE_URL}${pathname}?${searchParams.toString()}`;
@@ -46,7 +61,7 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
         if (!trip.priceDetails) {
             setShowModal(true);
         } else {
-            router.push(`/purchase?id=${trip.id}`);
+            router.push(`/purchase?id=${trip.id}&&referral=${referral}`);
         }
     };
 
@@ -58,7 +73,6 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }} className="space-y-4">
             <div className="p-6 bg-custom-white-100 shadow-sm rounded-lg border border-custom-gray-300">
                 <h2 className="text-xl font-bold text-custom-black-900 mb-4 capitalize">{dateLabel}</h2>
-
                 <TripRouteCompact
                     departureTime={departureTime}
                     duration={durationStr}
@@ -91,18 +105,18 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
                     </div>
                     <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
-                            <span className="font-medium">IBA</span>
+                            <span className="font-medium">IVA</span>
                             <ChevronRight size={16} className="text-custom-gray-500" />
                         </div>
                         {hasDiscounts ? (
                             <div className="text-right">
                                 <div className="text-xl font-semibold text-custom-black-800">
-                                    {((finalPrice * Number(IBA)) / 100).toFixed(2).replace(".", ",")} €
+                                    {((finalPrice * Number(IVA)) / 100).toFixed(2).replace(".", ",")} €
                                 </div>
                             </div>
                         ) : (
                             <div className="text-2xl font-semibold text-custom-black-800">
-                                {((basePrice * Number(IBA)) / 100).toFixed(2).replace(".", ",")} €
+                                {((basePrice * Number(IVA)) / 100).toFixed(2).replace(".", ",")} €
                             </div>
                         )}
                     </div>
@@ -115,15 +129,15 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
                         {hasDiscounts ? (
                             <div className="text-right">
                                 <div className="text-sm text-gray-500 line-through">
-                                    {(basePrice * (1 + Number(IBA) / 100)).toFixed(2).replace(".", ",")} €
+                                    {(basePrice * (1 + Number(IVA) / 100)).toFixed(2).replace(".", ",")} €
                                 </div>
                                 <div className="text-2xl font-bold text-custom-black-800">
-                                    {(finalPrice * (1 + Number(IBA) / 100)).toFixed(2).replace(".", ",")} €
+                                    {(finalPrice * (1 + Number(IVA) / 100)).toFixed(2).replace(".", ",")} €
                                 </div>
                             </div>
                         ) : (
                             <div className="text-2xl font-bold text-custom-black-800">
-                                {(basePrice * (1 + Number(IBA) / 100)).toFixed(2).replace(".", ",")} €
+                                {(basePrice * (1 + Number(IVA) / 100)).toFixed(2).replace(".", ",")} €
                             </div>
                         )}
                     </div>

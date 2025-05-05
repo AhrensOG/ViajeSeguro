@@ -4,6 +4,7 @@ import { JWT } from "next-auth/jwt";
 import CredentialsProvider from "next-auth/providers/credentials";
 import GoogleProvider from "next-auth/providers/google";
 import { GoogleLoginData } from "@/lib/types/authTypes";
+import { cookies } from "next/headers";
 
 async function refreshAccessToken(token: JWT): Promise<JWT> {
     const res = await fetch(BACKEND_URL + "/auth/refresh", {
@@ -73,6 +74,8 @@ export const authOptions: NextAuthOptions = {
     },
     callbacks: {
         async jwt({ token, user, account }) {
+            const cookie = (await cookies()).get("referralCode")?.value;
+
             if (account?.provider === "google") {
                 let userData;
                 const email = user.email || "";
@@ -92,6 +95,8 @@ export const authOptions: NextAuthOptions = {
                             password: account.providerAccountId,
                             googleId: user.id,
                             role: "CLIENT",
+                            avatarUrl: user.image,
+                            referralCodeFrom: cookie,
                         }),
                     });
                     if (res.status === 401) {

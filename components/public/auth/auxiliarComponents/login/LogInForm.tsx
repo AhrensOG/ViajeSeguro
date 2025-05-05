@@ -29,7 +29,7 @@ const LogInForm = () => {
     const { data: session } = useSession();
 
     if (session) {
-        console.log(session);
+        return;
     }
 
     const onSubmit: SubmitHandler<FormData> = async (data) => {
