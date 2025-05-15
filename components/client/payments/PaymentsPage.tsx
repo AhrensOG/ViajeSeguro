@@ -1,35 +1,22 @@
-"use client";
-
-import React, { useEffect, useState } from "react";
-import { useSession } from "next-auth/react";
-import { getReservationsByUser } from "@/lib/api/reservation";
-import { ReservationResponse } from "@/lib/api/reservation/reservation.types";
-import ReservationCard from "./auxiliarComponents/ReservationCard";
-import { toast } from "sonner";
+import { PaymentCardData } from "@/lib/api/payments/payments.type";
 import ReservationCardFallback from "@/lib/client/components/reservations/ReservationCardFallback";
+import { useSession } from "next-auth/react";
+import { useEffect, useState } from "react";
+import PaymentCard from "./auxiliarComponents/PaymentCard";
+import { getAllPaymentsByUser } from "@/lib/api/payments/intex";
 
-const ReservationsPage = () => {
+export default function PaymentsPage() {
     const { data: session } = useSession();
-    const [reservations, setReservations] = useState<ReservationResponse[]>([]);
-    const [loading, setLoading] = useState(true);
+    const [loading, setLoading] = useState(false);
+    const [payments, setPayments] = useState<PaymentCardData[]>([]);
 
     useEffect(() => {
-        const fetchReservations = async () => {
-            if (!session?.user?.id) return;
-            try {
-                const data = await getReservationsByUser(session.user.id);
-                setReservations(data);
-            } catch (error) {
-                console.log("Error al obtener reservas:", error);
-                toast.info("¡Ups! Ocurrió un error al obtener tus reservas.", {
-                    description: "Intenta recargando la pagina o contacta con el soporte",
-                });
-            } finally {
-                setLoading(false);
-            }
+        const fetchPayments = async () => {
+            const res = await getAllPaymentsByUser();
+            setPayments(res);
         };
-
-        fetchReservations();
+        if (!session?.user?.id) fetchPayments();
+        return;
     }, [session?.user?.id]);
 
     return (
@@ -56,13 +43,11 @@ const ReservationsPage = () => {
                             tu reserva podría ser cancelada. Esta medida busca garantizar la seguridad de todos los pasajeros.
                         </p>
                     </div>
-                    {reservations.map((reservation) => (
-                        <ReservationCard key={reservation.id} reservation={reservation} />
+                    {payments.map((payment, i) => (
+                        <PaymentCard key={i} payment={payment} />
                     ))}
                 </div>
             )}
         </div>
     );
-};
-
-export default ReservationsPage;
+}

@@ -12,55 +12,30 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
     const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
     const { data: session } = useSession();
     return (
-        <header className={`h-[60px] sticky top-0 bg-custom-white-100 z-50 w-full ${ shadow ? "shadow-sm" : "" }`}>
+        <header className={`h-[60px] sticky top-0 bg-custom-white-100 z-50 w-full ${shadow ? "shadow-sm" : ""}`}>
             <div className="w-full h-full px-6 py-3 flex items-center justify-between">
                 <Link href="/" className="flex items-center">
-                    <Image
-                        src="/main/logoNoBg.png"
-                        width={100}
-                        height={34}
-                        alt="Logo"
-                    />
+                    <Image src="/main/logoNoBg.png" width={100} height={34} alt="Logo" />
                 </Link>
 
                 <nav className="hidden md:flex items-center space-x-6">
-                    <Link
-                        href="#servicios"
-                        className="text-custom-black-900 font-medium hover:text-custom-golden-600 transition"
-                    >
+                    <Link href="#servicios" className="text-custom-black-900 font-medium hover:text-custom-golden-600 transition">
                         Servicios
                     </Link>
-                    <Link
-                        href="#rutas"
-                        className="text-custom-gray-800 hover:text-custom-black-900 transition"
-                    >
+                    <Link href="#rutas" className="text-custom-gray-800 hover:text-custom-black-900 transition">
                         Rutas
                     </Link>
-                    <Link
-                        href="#precios"
-                        className="text-custom-gray-800 hover:text-custom-black-900 transition"
-                    >
+                    <Link href="#precios" className="text-custom-gray-800 hover:text-custom-black-900 transition">
                         Precios
                     </Link>
-                    <Link
-                        href="#contacto"
-                        className="text-custom-gray-800 hover:text-custom-black-900 transition"
-                    >
+                    <Link href="#contacto" className="text-custom-gray-800 hover:text-custom-black-900 transition">
                         Contacto
                     </Link>
                     {/* Dropdown para opciones de usuario en versión escritorio */}
-                    <div
-                        className="relative"
-                        onMouseEnter={() => setIsUserMenuOpen(true)}
-                        onMouseLeave={() => setIsUserMenuOpen(false)}
-                    >
+                    <div className="relative" onMouseEnter={() => setIsUserMenuOpen(true)} onMouseLeave={() => setIsUserMenuOpen(false)}>
                         <button className="flex items-center gap-1 bg-custom-white-50 text-custom-black-900 rounded-full p-2 hover:transition">
                             <User className="h-5 w-5" />
-                            <ChevronDown
-                                className={`h-4 w-4 ${
-                                    isUserMenuOpen ? "rotate-180" : ""
-                                } transition duration-300`}
-                            />
+                            <ChevronDown className={`h-4 w-4 ${isUserMenuOpen ? "rotate-180" : ""} transition duration-300`} />
                         </button>
                         <AnimatePresence>
                             {isUserMenuOpen && session && session?.user ? (
@@ -72,7 +47,7 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
                                     className="p-1 absolute right-0 w-44 text- bg-custom-white-100 shadow-lg rounded-md z-10"
                                 >
                                     <Link
-                                        href="#"
+                                        href="/dashboard/client/profile"
                                         className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100"
                                     >
                                         Perfil
@@ -83,14 +58,11 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
                                     >
                                         Reservas
                                     </Link>
-                                    <Link
-                                        href="#"
-                                        className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100"
-                                    >
+                                    <Link href="#" className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
                                         Mis compras
                                     </Link>
                                     <button
-                                        onClick={() => signOut()}
+                                        onClick={() => signOut({ callbackUrl: "/" })}
                                         className="w-full text-start block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100"
                                     >
                                         Cerrar sesión
@@ -106,10 +78,7 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
                                         transition={{ duration: 0.3 }}
                                         className="p-1 absolute right-0 w-44 text-center bg-custom-white-100 shadow-lg rounded-md z-10"
                                     >
-                                        <Link
-                                            href="/auth/login"
-                                            className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100"
-                                        >
+                                        <Link href="/auth/login" className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
                                             Iniciar sesión
                                         </Link>
                                         <Link
@@ -125,15 +94,8 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
                     </div>
                 </nav>
 
-                <button
-                    className="md:hidden text-custom-black-900 focus:outline-none"
-                    onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                >
-                    {isMobileMenuOpen ? (
-                        <X className="h-7 w-7" />
-                    ) : (
-                        <Ellipsis className="h-7 w-7" />
-                    )}
+                <button className="md:hidden text-custom-black-900 focus:outline-none" onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+                    {isMobileMenuOpen ? <X className="h-7 w-7" /> : <Ellipsis className="h-7 w-7" />}
                 </button>
             </div>
 
@@ -147,28 +109,16 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
                         className="md:hidden bg-custom-white-100 shadow-md absolute top-full left-0 w-full p-4"
                     >
                         <nav className="flex flex-col items-start space-y-4">
-                            <Link
-                                href="#servicios"
-                                className="text-custom-black-900 font-medium hover:text-custom-golden-600 transition"
-                            >
+                            <Link href="#servicios" className="text-custom-black-900 font-medium hover:text-custom-golden-600 transition">
                                 Servicios
                             </Link>
-                            <Link
-                                href="#rutas"
-                                className="text-custom-gray-800 hover:text-custom-black-900 transition"
-                            >
+                            <Link href="#rutas" className="text-custom-gray-800 hover:text-custom-black-900 transition">
                                 Rutas
                             </Link>
-                            <Link
-                                href="#precios"
-                                className="text-custom-gray-800 hover:text-custom-black-900 transition"
-                            >
+                            <Link href="#precios" className="text-custom-gray-800 hover:text-custom-black-900 transition">
                                 Precios
                             </Link>
-                            <Link
-                                href="#contacto"
-                                className="text-custom-gray-800 hover:text-custom-black-900 transition"
-                            >
+                            <Link href="#contacto" className="text-custom-gray-800 hover:text-custom-black-900 transition">
                                 Contacto
                             </Link>
                         </nav>
@@ -176,44 +126,26 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
                         <hr className="my-4 border-t border-gray-300" />
                         {session && session?.user ? (
                             <nav className="flex flex-col items-start space-y-4">
-                                <Link
-                                    href="#"
-                                    className="text-custom-gray-800 hover:text-custom-black-900 transition"
-                                >
+                                <Link href="#" className="text-custom-gray-800 hover:text-custom-black-900 transition">
                                     Perfil
                                 </Link>
-                                <Link
-                                    href="/dashboard/client/reservations"
-                                    className="text-custom-gray-800 hover:text-custom-black-900 transition"
-                                >
+                                <Link href="/dashboard/client/reservations" className="text-custom-gray-800 hover:text-custom-black-900 transition">
                                     Reservas
                                 </Link>
-                                <Link
-                                    href="#"
-                                    className="text-custom-gray-800 hover:text-custom-black-900 transition"
-                                >
+                                <Link href="#" className="text-custom-gray-800 hover:text-custom-black-900 transition">
                                     Mis compras
                                 </Link>
-                                <button
-                                    onClick={() => signOut()}
-                                    className="text-custom-gray-800 hover:text-custom-black-900 transition"
-                                >
+                                <button onClick={() => signOut()} className="text-custom-gray-800 hover:text-custom-black-900 transition">
                                     Cerrar sesión
                                 </button>
                             </nav>
                         ) : (
                             !session && (
                                 <nav className="flex flex-col items-start space-y-4">
-                                    <Link
-                                        href="/auth/login"
-                                        className="text-custom-gray-800 hover:text-custom-black-900 transition"
-                                    >
+                                    <Link href="/auth/login" className="text-custom-gray-800 hover:text-custom-black-900 transition">
                                         Iniciar sesión
                                     </Link>
-                                    <Link
-                                        href="/auth/register"
-                                        className="text-custom-gray-800 hover:text-custom-black-900 transition"
-                                    >
+                                    <Link href="/auth/register" className="text-custom-gray-800 hover:text-custom-black-900 transition">
                                         Registrate
                                     </Link>
                                 </nav>

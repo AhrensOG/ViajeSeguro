@@ -15,6 +15,10 @@ export async function fetchUserData(id: string): Promise<UserProfile> {
 
 export async function updateProfile(values: UserProfile): Promise<void> {
     try {
+        if (values.referralCodeFrom) {
+            await updateReferred(values.referralCodeFrom);
+            return;
+        }
         await fetchWithAuth(`${BACKEND_URL}/user/update`, {
             method: "PUT",
             body: JSON.stringify({
@@ -23,6 +27,21 @@ export async function updateProfile(values: UserProfile): Promise<void> {
             }),
         });
     } catch (error) {
+        throw new Error(`Error al obtener el perfil del usuario: ${error instanceof Error ? error.message : String(error)}`);
+    }
+}
+
+export async function updateReferred(code: string): Promise<void> {
+    try {
+        await fetchWithAuth(`${BACKEND_URL}/user/update-referred`, {
+            method: "PUT",
+            body: JSON.stringify({
+                code: code,
+            }),
+        });
+    } catch (error) {
+        console.log(error);
+
         throw new Error(`Error al obtener el perfil del usuario: ${error instanceof Error ? error.message : String(error)}`);
     }
 }
