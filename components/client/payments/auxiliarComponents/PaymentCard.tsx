@@ -105,7 +105,7 @@ const PaymentCard = ({ payment }: Props) => {
 
                         <div className="flex justify-end">
                             <button
-                                onClick={(e) => {
+                                onClick={() => {
                                     toast.info("Pronto estara disponible la descarga de tu comprobante.");
                                 }}
                                 className="flex items-center gap-2 bg-custom-golden-500 hover:bg-custom-golden-600 text-white font-medium py-2 px-4 rounded-xl transition"

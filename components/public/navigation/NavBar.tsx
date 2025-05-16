@@ -19,7 +19,7 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
                 </Link>
 
                 <nav className="hidden md:flex items-center space-x-6">
-                    <Link href="#servicios" className="text-custom-black-900 font-medium hover:text-custom-golden-600 transition">
+                    <Link href="/services" className="text-custom-black-900 font-medium hover:text-custom-golden-600 transition">
                         Servicios
                     </Link>
                     <Link href="#rutas" className="text-custom-gray-800 hover:text-custom-black-900 transition">
@@ -109,7 +109,7 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
                         className="md:hidden bg-custom-white-100 shadow-md absolute top-full left-0 w-full p-4"
                     >
                         <nav className="flex flex-col items-start space-y-4">
-                            <Link href="#servicios" className="text-custom-black-900 font-medium hover:text-custom-golden-600 transition">
+                            <Link href="/services" className="text-custom-black-900 font-medium hover:text-custom-golden-600 transition">
                                 Servicios
                             </Link>
                             <Link href="#rutas" className="text-custom-gray-800 hover:text-custom-black-900 transition">

@@ -75,6 +75,7 @@ const ProfilePage = () => {
             await updateProfile(values);
             toast.success("Información actualizada exitosamente", { id: toastId });
         } catch (error) {
+            console.log(error)
             toast.info("Error al actualizar la información", { id: toastId });
         }
     };

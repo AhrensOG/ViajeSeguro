@@ -14,7 +14,7 @@ const Footer = () => {
 
           <nav className="flex flex-wrap gap-4 justify-center text-sm">
             <Link
-              href="#servicios"
+              href="/services"
               className="text-custom-gray-600 hover:text-custom-gray-800 transition-colors"
               aria-label="Ver servicios">
               Servicios

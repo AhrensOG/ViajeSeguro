@@ -3,7 +3,7 @@
 import { motion } from "framer-motion";
 import { Calendar1Icon, ChevronDown, ChevronRight } from "lucide-react";
 import TripRouteCompact from "../../../../lib/client/components/TripRouteCompact";
-import { TripDiscount, TripWithPriceDetails } from "@/lib/shared/types/trip-service-type.type";
+import { TripWithPriceDetails } from "@/lib/shared/types/trip-service-type.type";
 import { useEffect, useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import AuthRequiredModal from "./AuthRequiredModal";
