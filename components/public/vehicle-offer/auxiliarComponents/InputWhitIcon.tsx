@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Calendar as CalendarIcon } from "lucide-react";
 import { format } from "date-fns";
-import { DayPicker as Calendar, getDefaultClassNames } from "react-day-picker";
+import { DayPicker as Calendar } from "react-day-picker";
 import "react-day-picker/dist/style.css"; // Asegúrate de importar los estilos
 
 interface InputWithIconProps {
@@ -13,21 +13,20 @@ interface InputWithIconProps {
     placeholder: string;
     id: string;
     value?: string | number | Date;
-    onChange?: (value: any) => void;
+    onChange?: React.ChangeEventHandler<HTMLInputElement>;
+    onDateChange?: (date: Date | undefined) => void;
 }
 
-export default function InputWithIcon({ icon, type, label, placeholder, id, value, onChange }: InputWithIconProps) {
+export default function InputWithIcon({ icon, type, label, placeholder, id, value, onChange, onDateChange }: InputWithIconProps) {
     const [selectedDate, setSelectedDate] = useState<Date>();
+
     const [open, setOpen] = useState(false);
 
     const handleDateSelect = (date: Date | undefined) => {
         setSelectedDate(date);
-        onChange?.(date);
+        onDateChange?.(date);
         setOpen(false);
     };
-
-    const classNames = getDefaultClassNames();
-
     return (
         <div className="flex flex-col gap-2 w-full">
             <label htmlFor={id} className="font-medium text-custom-black-900 text-lg pl-1">
@@ -73,8 +72,8 @@ export default function InputWithIcon({ icon, type, label, placeholder, id, valu
                     <input
                         type={type}
                         id={id}
-                        value={type === "date" && value instanceof Date ? format(value, "yyyy-MM-dd") : value?.toString()}
-                        onChange={(e) => onChange?.(e.target.value)}
+                        value={value?.toString() || ""}
+                        onChange={onChange}
                         placeholder={placeholder}
                         className="w-full pl-8 pr-3 py-2 border border-gray-300 rounded-md 
                        focus:outline-none focus:ring-1 focus:ring-custom-golden-500 

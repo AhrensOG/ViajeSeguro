@@ -12,11 +12,12 @@ export default function PaymentsPage() {
 
     useEffect(() => {
         const fetchPayments = async () => {
+            setLoading(true);
             const res = await getAllPaymentsByUser();
             setPayments(res);
+            setLoading(false);
         };
         if (!session?.user?.id) fetchPayments();
-        return;
     }, [session?.user?.id]);
 
     return (

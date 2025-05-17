@@ -6,6 +6,7 @@ import Input from "./auxiliarComponents/Input";
 import InputWhitIcon from "./auxiliarComponents/InputWhitIcon";
 import Button from "./auxiliarComponents/Button";
 import DropdownField from "./auxiliarComponents/DropdownField";
+import { FormData } from "@/lib/api/vehicleOffer/vehicleOffers.types";
 
 export default function VehicleOfferPage() {
     const {
@@ -14,10 +15,10 @@ export default function VehicleOfferPage() {
         control,
         reset,
         formState: { errors },
-    } = useForm({
+    } = useForm<FormData>({
         defaultValues: {
-            price: "",
-            agency_fee: "",
+            price: 0,
+            agency_fee: 0,
             withdraw_location: "",
             return_location: "",
             start_date: "",
@@ -27,7 +28,7 @@ export default function VehicleOfferPage() {
         },
     });
 
-    const onSubmit = (data: any) => {
+    const onSubmit = (data: FormData) => {
         console.log("Datos enviados:", data);
         reset(); // Limpiar el formulario después del envío
     };

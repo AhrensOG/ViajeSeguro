@@ -1,10 +1,10 @@
 import { fetchWithOptionalAuth } from "@/lib/functions";
-import { PaymentCardData } from "./payments.type";
+import { PaymentCardData, PaymentResponse, SubscriptionPaymentResponse } from "./payments.type";
 import { BACKEND_URL } from "@/lib/constants";
 
 export const getAllPaymentsByUser = async (): Promise<PaymentCardData[]> => {
-    const payments: any[] = (await fetchWithOptionalAuth(`${BACKEND_URL}/payment/by_user`)) || [];
-    const subscriptionPayments: any[] = (await fetchWithOptionalAuth(`${BACKEND_URL}/payment-subscription/by_user`)) || [];
+    const payments: PaymentResponse[] = (await fetchWithOptionalAuth(`${BACKEND_URL}/payment/by_user`)) || [];
+    const subscriptionPayments: SubscriptionPaymentResponse[] = (await fetchWithOptionalAuth(`${BACKEND_URL}/payment-subscription/by_user`)) || [];
 
     const mappedPayments: PaymentCardData[] = payments.map((payment) => ({
         id: payment.id,
