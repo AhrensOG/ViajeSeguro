@@ -19,16 +19,16 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
                 </Link>
 
                 <nav className="hidden md:flex items-center space-x-6">
-                    <Link href="/services" className="text-custom-black-900 font-medium hover:text-custom-golden-600 transition">
-                        Servicios
+                    <Link href="/promotions" className="text-custom-black-900 hover:text-custom-golden-600 transition font-medium">
+                        Promociones
                     </Link>
-                    <Link href="#rutas" className="text-custom-gray-800 hover:text-custom-black-900 transition">
-                        Rutas
+                    <Link href="/services" className="text-custom-gray-800 hover:text-custom-black-900 transition">
+                        Servicios
                     </Link>
                     <Link href="#precios" className="text-custom-gray-800 hover:text-custom-black-900 transition">
                         Precios
                     </Link>
-                    <Link href="#contacto" className="text-custom-gray-800 hover:text-custom-black-900 transition">
+                    <Link href="/contact" className="text-custom-gray-800 hover:text-custom-black-900 transition">
                         Contacto
                     </Link>
                     {/* Dropdown para opciones de usuario en versión escritorio */}
@@ -109,16 +109,16 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
                         className="md:hidden bg-custom-white-100 shadow-md absolute top-full left-0 w-full p-4"
                     >
                         <nav className="flex flex-col items-start space-y-4">
-                            <Link href="/services" className="text-custom-black-900 font-medium hover:text-custom-golden-600 transition">
-                                Servicios
+                            <Link href="/promotions" className="text-custom-black-900 hover:text-custom-golden-600 transition font-medium">
+                                Promociones
                             </Link>
-                            <Link href="#rutas" className="text-custom-gray-800 hover:text-custom-black-900 transition">
-                                Rutas
+                            <Link href="/services" className="text-custom-gray-800 hover:text-custom-black-900 transition">
+                                Servicios
                             </Link>
                             <Link href="#precios" className="text-custom-gray-800 hover:text-custom-black-900 transition">
                                 Precios
                             </Link>
-                            <Link href="#contacto" className="text-custom-gray-800 hover:text-custom-black-900 transition">
+                            <Link href="/contact" className="text-custom-gray-800 hover:text-custom-black-900 transition">
                                 Contacto
                             </Link>
                         </nav>

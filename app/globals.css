@@ -3,9 +3,12 @@
 
 @theme {
   /* Black scale (de más oscuro a menos oscuro) */
-  --color-custom-black-900: #111827; /* negro absoluto */
+  /* --color-custom-black-900: #111827;
   --color-custom-black-800: #1f2937;
-  --color-custom-black-700: #374151;
+  --color-custom-black-700: #374151; */
+  --color-custom-black-900: #000000; /* negro absoluto */
+  --color-custom-black-800: #111111;
+  --color-custom-black-700: #1a1a1a;
 
   /* Golden scale (de más oscuro a más claro) */
   --color-custom-golden-700: #e17100; /* más oscuro */

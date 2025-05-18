@@ -3,57 +3,117 @@ import React from "react";
 
 const Footer = () => {
   return (
-    <footer className=" py-8 mt-auto border-t border-custom-gray-300">
-      <div className="container mx-auto px-6">
-        <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-          <div className="flex items-center">
-            <span className="text-lg font-bold text-custom-gray-800">
-              Viaje Seguro
-            </span>
+    <footer className="bg-custom-black-800 text-custom-gray-300 py-12 px-4">
+      <div className="max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+          <div>
+            <Link
+              href="/"
+              className="font-bold text-2xl flex items-center text-custom-white-100 mb-4">
+              <span>Viaje</span>
+              <span className="text-custom-golden-600">Seguro</span>
+            </Link>
+            <p className="text-custom-gray-500 mb-4">
+              Conectando viajeros, creando experiencias.
+            </p>
           </div>
 
-          <nav className="flex flex-wrap gap-4 justify-center text-sm">
-            <Link
-              href="/services"
-              className="text-custom-gray-600 hover:text-custom-gray-800 transition-colors"
-              aria-label="Ver servicios">
+          <div>
+            <h3 className="text-custom-white-100 font-medium mb-4">
               Servicios
-            </Link>
-            <Link
-              href="#rutas"
-              className="text-custom-gray-600 hover:text-custom-gray-800 transition-colors"
-              aria-label="Ver rutas">
-              Rutas
-            </Link>
-            <Link
-              href="#precios"
-              className="text-custom-gray-600 hover:text-custom-gray-800 transition-colors"
-              aria-label="Ver precios">
-              Precios
-            </Link>
-            <Link
-              href="#contacto"
-              className="text-custom-gray-600 hover:text-custom-gray-800 transition-colors"
-              aria-label="Ver contacto">
-              Contacto
-            </Link>
-            <Link
-              href="/terminos-y-condiciones"
-              className="text-custom-gray-600 hover:text-custom-gray-800 transition-colors"
-              aria-label="Ver términos y condiciones">
-              Términos y condiciones
-            </Link>
-            <Link
-              href="/politicas-de-privacidad"
-              className="text-custom-gray-600 hover:text-custom-gray-800 transition-colors"
-              aria-label="Ver términos y condiciones">
-              Politicas de privacidad
-            </Link>
-          </nav>
+            </h3>
+            <ul className="space-y-2">
+              <li>
+                <Link
+                  href="/services"
+                  className="text-custom-gray-500 hover:text-custom-golden-500">
+                  Venta de plazas
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/services"
+                  className="text-custom-gray-500 hover:text-custom-golden-500">
+                  Próximamente: Alquiler de vehículos
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/services"
+                  className="text-custom-gray-500 hover:text-custom-golden-500">
+                  Próximamente: Arma tu propio viaje
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-custom-white-100 font-medium mb-4">Empresa</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link
+                  href="#"
+                  className="text-custom-gray-500 hover:text-custom-golden-500">
+                  Sobre nosotros
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="#"
+                  className="text-custom-gray-500 hover:text-custom-golden-500">
+                  Cómo funciona
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="#"
+                  className="text-custom-gray-500 hover:text-custom-golden-500">
+                  Preguntas frecuentes
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/contact"
+                  className="text-custom-gray-500 hover:text-custom-golden-500">
+                  Contacto
+                </Link>
+              </li>
+            </ul>
+          </div>
+
+          <div>
+            <h3 className="text-custom-white-100 font-medium mb-4">Legal</h3>
+            <ul className="space-y-2">
+              <li>
+                <Link
+                  href="/terminos-y-condiciones"
+                  className="text-custom-gray-500 hover:text-custom-golden-500">
+                  Términos y condiciones
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/politicas-de-privacidad"
+                  className="text-custom-gray-500 hover:text-custom-golden-500">
+                  Política de privacidad
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/cookies"
+                  className="text-custom-gray-500 hover:text-custom-golden-500">
+                  Cookies
+                </Link>
+              </li>
+            </ul>
+          </div>
         </div>
 
-        <div className="mt-6 text-center text-gray-500 text-sm">
-          © 2025 Viaje Seguro. Todos los derechos reservados.
+        <div className="border-t border-custom-gray-800 mt-12 pt-8 text-center text-custom-gray-500">
+          <p>
+            © {new Date().getFullYear()} Viaje Seguro. Todos los derechos
+            reservados.
+          </p>
         </div>
       </div>
     </footer>
