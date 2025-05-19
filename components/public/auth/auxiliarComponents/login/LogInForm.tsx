@@ -129,7 +129,7 @@ const LogInForm = () => {
                     className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white duration-300 mt-3 gap-2 cursor-auto"
                 >
                     <span>
-                        <Image src="/google-logo.svg" alt="google" width={20} height={20} />
+                        <Image src="/google-logo.webp" alt="google" width={20} height={20} />
                     </span>{" "}
                     <span className="text-custom-gray-800">Iniciar Sesion con Google</span>
                 </button>
