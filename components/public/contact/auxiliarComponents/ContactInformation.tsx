@@ -86,11 +86,11 @@ const ContactInformation = () => {
       </motion.div>
 
       {/* Mapa */}
-      <motion.div
+      {/* <motion.div
         variants={item}
         className="bg-custom-gray-100 rounded-xl overflow-hidden h-64 flex items-center justify-center text-custom-gray-600">
         Mapa de ubicación
-      </motion.div>
+      </motion.div> */}
 
       {/* FAQ */}
       <motion.div
