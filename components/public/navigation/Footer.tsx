@@ -66,7 +66,7 @@ const Footer = () => {
               </li>
               <li>
                 <Link
-                  href="#"
+                  href="/faq"
                   className="text-custom-gray-500 hover:text-custom-golden-500">
                   Preguntas frecuentes
                 </Link>
