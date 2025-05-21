@@ -52,7 +52,7 @@ const handleSubscribe = async (data: CreateSubscriptionRequest, amount: number) 
     try {
         const response = (await createSubscription(data)) as { id: string };
         const stripeData = await createCheckoutSession({
-            amount: amount * 100,
+            amount: Math.round(amount * 100),
             metadata: { ...payload, subscriptionId: response.id },
         });
         if (stripeData.url) {

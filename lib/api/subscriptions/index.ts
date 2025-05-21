@@ -8,7 +8,6 @@ export async function createSubscription(data: CreateSubscriptionRequest) {
             method: "POST",
             body: JSON.stringify(data),
         });
-        console.log("Respuesta de la API:", res);
         return res;
     } catch (error) {
         console.error("Error al crear la suscripción:", error);
