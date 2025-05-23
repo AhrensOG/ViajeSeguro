@@ -10,14 +10,14 @@ const faqItems = [
   ],
   [
     "¿Cómo funciona el sistema de recomendaciones?",
-    "Con el Plan Premium, cada mes puedes invitar hasta 3 amigos a viajar. Por cada amigo que complete un viaje, obtendrás un descuento adicional en tu próximo trayecto.",
+    "Suscribiendote al Club Fidelidad, cada mes puedes invitar hasta 3 amigos a viajar. Por cada amigo que complete un viaje, obtendrás un descuento adicional en tu próximo trayecto.",
   ],
   [
     "¿Puedo cambiar de plan en cualquier momento?",
     "Sí, puedes actualizar tu plan en cualquier momento. Si cambias a un plan superior, el cambio será inmediato. Si bajas de categoría, se aplica al final del período actual.",
   ],
   [
-    "¿Qué son los beneficios aleatorios del Plan Premium?",
+    "¿Qué son los beneficios aleatorios del Club Fidelidad?",
     "Son sorpresas como descuentos especiales, acceso anticipado a rutas o viajes gratuitos que recibirás durante el año.",
   ],
 ];

@@ -9,7 +9,7 @@ import HeroSection from "./auxiliarComponents/HeroSection";
 
 const ContactPage = () => {
   return (
-    <div className="flex flex-col min-h-screen bg-[--color-custom-white-50] text-[--color-custom-black-900]">
+    <div className="flex flex-col min-h-screen bg-custom-white-50 text-custom-black-900">
       <NavBar />
       <HeroSection />
       {/* Main Content */}
