@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Ellipsis, User, X } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 
@@ -17,8 +16,14 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
         shadow ? "shadow-sm" : ""
       }`}>
       <div className="w-full h-full px-6 py-3 flex items-center justify-between">
-        <Link href="/" className="flex items-center">
+        {/* <Link href="/" className="flex items-center">
           <Image src="/main/logoNoBg.png" width={100} height={34} alt="Logo" />
+        </Link> */}
+        <Link
+          href="/"
+          className="font-bold text-2xl flex items-center text-custom-white-100">
+          <span className="text-custom-gray-800">Viaje</span>
+          <span className="text-custom-golden-600">Seguro</span>
         </Link>
 
         <nav className="hidden md:flex items-center space-x-6">
@@ -27,6 +32,11 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
             className="text-custom-black-900 hover:text-custom-golden-600 transition font-medium">
             Promociones
           </Link>
+          {/* <Link
+            href={"/"}
+            className="text-custom-black-800 hover:text-custom-black-900 transition">
+            Inicio
+          </Link> */}
           <Link
             href="/services"
             className="text-custom-gray-800 hover:text-custom-black-900 transition">

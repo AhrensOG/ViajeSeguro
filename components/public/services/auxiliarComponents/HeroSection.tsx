@@ -19,7 +19,7 @@ const HeroSection = () => {
       className="relative bg-custom-black-800 text-custom-white-100 py-20 px-4">
       <div className="absolute inset-0 opacity-20">
         <Image
-          src="/main/img_placeholder.webp?height=600&width=1600"
+          src="/main/img_placeholder.webp"
           alt="Viajeros felices"
           fill
           className="object-cover"
