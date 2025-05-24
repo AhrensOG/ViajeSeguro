@@ -46,7 +46,7 @@ const ComingSoonServices = () => {
           <ServiceCard
             title="Arma tu propio viaje"
             description="Planifica con anticipación y encuentra las mejores ofertas. Nuestro calendario inteligente te mostrará todos los viajes disponibles con los precios más bajos para cada día."
-            image="/main/img_placeholder.webp"
+            image="/services/create_your_own_trip.jpeg"
             points={[
               "Vista de calendario con precios",
               "Comparador de tarifas",
