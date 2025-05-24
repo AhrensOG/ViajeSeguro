@@ -48,14 +48,13 @@ export async function updateReferred(code: string): Promise<void> {
 
 export async function changePassword(values: ChangePasswordFormValues): Promise<void> {
     try {
-        const res = await fetchWithAuth(`${BACKEND_URL}/user/change-password`, {
+        await fetchWithAuth(`${BACKEND_URL}/user/change-password`, {
             method: "PUT",
             body: JSON.stringify({
                 currentPassword: values.currentPassword,
                 newPassword: values.newPassword,
             }),
         });
-        console.log("Respuesta del servidor:", res);
     } catch (error) {
         console.error("Error al cambiar la contraseña:", error);
     }

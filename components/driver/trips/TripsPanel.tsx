@@ -18,6 +18,7 @@ const TripsPanel = () => {
             if (!session?.user?.id) return;
             try {
                 const data = await getTripsByDriverId();
+
                 setTrips(Array.isArray(data) ? (data as TripResponse[]) : []);
             } catch (error) {
                 console.log("Error al obtener reservas:", error);

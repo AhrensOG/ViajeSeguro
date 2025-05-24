@@ -10,6 +10,8 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { data: session } = useSession();
+  const role = session?.user?.role;
+
   return (
     <header
       className={`h-[60px] sticky top-0 bg-custom-white-100 z-50 w-full ${
@@ -32,11 +34,6 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
             className="text-custom-black-900 hover:text-custom-golden-600 transition font-medium">
             Promociones
           </Link>
-          {/* <Link
-            href={"/"}
-            className="text-custom-black-800 hover:text-custom-black-900 transition">
-            Inicio
-          </Link> */}
           <Link
             href="/services"
             className="text-custom-gray-800 hover:text-custom-black-900 transition">
@@ -68,21 +65,49 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.3 }}
                   className="p-1 absolute right-0 w-44 text- bg-custom-white-100 shadow-lg rounded-md z-10">
-                  <Link
-                    href="/dashboard/client/profile"
-                    className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
-                    Perfil
-                  </Link>
-                  <Link
-                    href="/dashboard/client/reservations"
-                    className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
-                    Reservas
-                  </Link>
-                  <Link
-                    href="#"
-                    className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
-                    Mis compras
-                  </Link>
+                  {role === "ADMIN" && (
+                    <>
+                      {/* <Link
+                                                href="/admin/dashboard"
+                                                className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100"
+                                            >
+                                                Dashboard 
+                                            </Link> */}
+                    </>
+                  )}
+                  {role === "CLIENT" && (
+                    <>
+                      <Link
+                        href="/dashboard/client/profile"
+                        className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
+                        Perfil
+                      </Link>
+                      <Link
+                        href="/dashboard/client/reservations"
+                        className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
+                        Reservas
+                      </Link>
+                      <Link
+                        href="#"
+                        className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
+                        Mis compras
+                      </Link>
+                    </>
+                  )}
+                  {role === "DRIVER" && (
+                    <>
+                      <Link
+                        href="/dashboard/client/profile"
+                        className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
+                        Perfil
+                      </Link>
+                      <Link
+                        href="/dashboard/client/trips"
+                        className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
+                        Viajes
+                      </Link>
+                    </>
+                  )}
                   <button
                     onClick={() => signOut({ callbackUrl: "/" })}
                     className="w-full text-start block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">

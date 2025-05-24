@@ -67,3 +67,17 @@ export async function updatePayment(id: string, data: CreatePaymentFormData) {
         throw new Error("Error al actualizar el pago");
     }
 }
+
+export async function deletePay(id: string) {
+    try {
+        const res = await fetchWithAuth(`${BACKEND_URL}/payment/delete/${id}`, {
+            method: "DELETE",
+        });
+        if (!res) {
+            throw new Error("Error al eliminar el pago");
+        }
+        return res;
+    } catch {
+        throw new Error("Error al eliminar el pago");
+    }
+}

@@ -3,10 +3,12 @@ import { useEffect, useState } from "react";
 import SkeletonTable from "../SkeletonTable";
 import { ReservationResponse, TripOption, UserOption } from "@/lib/api/admin/reservation/reservation.types";
 import ReservationDetailModal from "./auxiliarComponents/ReservationDetailsModal";
-import { getAllReservations, getReduceTrip } from "@/lib/api/admin/reservation/intex";
+import { deleteRes, getAllReservations, getReduceTrip } from "@/lib/api/admin/reservation/intex";
 import CreateReservationModal from "./auxiliarComponents/CreateReservationModal";
 import EditReservationModal from "./auxiliarComponents/EditReservationModal";
 import { getReduceUser } from "@/lib/shared";
+import { toast } from "sonner";
+import DeleteToast from "../DeleteToast";
 
 const statusOptions = ["CONFIRMED", "PENDING", "CANCELLED"];
 const paymentOptions = ["STRIPE", "CASH", "OTHER"];
@@ -61,6 +63,17 @@ export default function ReservationPanel() {
         const matchesMethod = methodFilter === "ALL" || r.paymentMethod === methodFilter;
         return matchesSearch && matchesStatus && matchesMethod;
     });
+
+    const handleDelete = async (id: string): Promise<void> => {
+        try {
+            await deleteRes(id ?? "");
+            setReservations((prevReservations) => prevReservations.filter((reservation) => reservation.id !== id));
+            setSelectedReservation(null);
+            toast.success("Usuario eliminado exitosamente");
+        } catch {
+            toast.info("Error al eliminar el usuario");
+        }
+    };
 
     return (
         <div className="w-full h-full flex flex-col overflow-hidden pb-2">
@@ -164,7 +177,11 @@ export default function ReservationPanel() {
                                                 <Pencil className="h-4 w-4 inline-block" />
                                             </button>
                                             <button
-                                                onClick={() => console.log("Eliminar", r)}
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    setSelectedReservation(r);
+                                                    DeleteToast(r.id, handleDelete);
+                                                }}
                                                 className="text-red-500 hover:text-red-700"
                                                 aria-label="Eliminar"
                                             >

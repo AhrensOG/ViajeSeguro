@@ -35,3 +35,13 @@ export async function updateReservation(data: CreateReservationFormData): Promis
         throw new Error("Error al actualizar la reserva");
     }
 }
+
+export async function deleteRes(id: string) {
+    try {
+        await fetchWithAuth(`${BACKEND_URL}/reservation/delete/${id}`, {
+            method: "DELETE",
+        });
+    } catch {
+        throw new Error("Error al eliminar la reserva");
+    }
+}

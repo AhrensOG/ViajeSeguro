@@ -23,7 +23,7 @@ export default function PaymentsPage() {
     return (
         <div className="w-full flex flex-col items-center px-0 md:px-6 my-4 pb-10 bg-white">
             <div className="w-full flex flex-col justify-start items-start">
-                <h1 className="text-xl font-semibold text-gray-900 mb-2">Mis reservas</h1>
+                <h1 className="text-xl font-semibold text-gray-900 mb-2">Mis Pagos</h1>
             </div>
 
             {loading ? (
