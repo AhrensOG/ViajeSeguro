@@ -4,8 +4,10 @@ import SkeletonTable from "../SkeletonTable";
 import { PaymentResponse, UsersWithReservations } from "@/lib/api/admin/payments/payments.type";
 import PaymentDetailModal from "./auxliarComponents.tsx/PaymentsDetailsModal";
 import CreatePaymentModal from "./auxliarComponents.tsx/CreatePaymentModal";
-import { getPayments, getUserReduceWhitReservations } from "@/lib/api/admin/payments/intex";
+import { deletePay, getPayments, getUserReduceWhitReservations } from "@/lib/api/admin/payments/intex";
 import UpdatePaymentModal from "./auxliarComponents.tsx/UpdatePaymentModal";
+import { toast } from "sonner";
+import DeleteToast from "../DeleteToast";
 
 const paymentMethods = ["CASH", "OTHER", "STRIPE"];
 const paymentStatuses = ["PENDING", "PAID", "FAILED"];
@@ -28,7 +30,6 @@ export default function PaymentsPanel() {
                 const paym = await getPayments();
                 setPayments(paym as PaymentResponse[]);
                 const u = await getUserReduceWhitReservations();
-                console.log(u);
                 setUsers(u.map((u) => ({ id: u.id, email: u.email, reservations: u.reservations })));
             } catch (error) {
                 console.error("Error al cargar pagos:", error);
@@ -45,6 +46,17 @@ export default function PaymentsPanel() {
         const matchesStatus = statusFilter ? p.status === statusFilter : true;
         return matchesSearch && matchesMethod && matchesStatus;
     });
+
+    const handleDelete = async (id: string): Promise<void> => {
+        try {
+            await deletePay(id ?? "");
+            setPayments((prevPayments) => prevPayments.filter((payment) => payment.id !== id));
+            setSelectPayment(null);
+            toast.success("Pago eliminado exitosamente");
+        } catch {
+            toast.info("Error al eliminar el pago");
+        }
+    };
 
     return (
         <div className="w-full h-full flex flex-col overflow-hidden pb-2">
@@ -146,7 +158,11 @@ export default function PaymentsPanel() {
                                             <Pencil className="h-4 w-4 inline-block" />
                                         </button>
                                         <button
-                                            onClick={() => console.log("Eliminar", payment)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setSelectPayment(payment);
+                                                DeleteToast(payment.id, handleDelete);
+                                            }}
                                             className="text-red-500 hover:text-red-700"
                                             aria-label="Eliminar"
                                         >

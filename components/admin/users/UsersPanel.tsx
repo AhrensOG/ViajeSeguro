@@ -1,4 +1,4 @@
-import { fetchUsersData } from "@/lib/api/admin/user-panel";
+import { deleteUser, fetchUsersData } from "@/lib/api/admin/user-panel";
 import { SimpleUser, UserAdminResponse, UserResponse } from "@/lib/api/admin/user-panel/userPanel.types";
 import { useEffect, useState } from "react";
 import { Pencil, Trash2, Plus, Search } from "lucide-react";
@@ -6,6 +6,8 @@ import SkeletonTable from "../SkeletonTable";
 import UserCreateModal from "@/components/admin/users/auxiliarComponents/UserCreateModal";
 import UserEditModal from "@/components/admin/users/auxiliarComponents/UserEditModal";
 import UserDetailModal from "@/components/admin/users/auxiliarComponents/UserDetailModal";
+import { toast } from "sonner";
+import DeleteToast from "../DeleteToast";
 
 export default function UsersPanel() {
     const [users, setUsers] = useState<SimpleUser[]>([]);
@@ -69,6 +71,17 @@ export default function UsersPanel() {
 
     const handleUpdateUser = (updatedUser: SimpleUser) => {
         setUsers((prevUsers) => prevUsers.map((user) => (user.id === updatedUser.id ? { ...user, ...updatedUser } : user)));
+    };
+
+    const handleDelete = async (id: string): Promise<void> => {
+        try {
+            await deleteUser(id ?? "");
+            setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+            setSelectedUser(null);
+            toast.success("Usuario eliminado exitosamente");
+        } catch {
+            toast.info("Error al eliminar el usuario");
+        }
     };
 
     return (
@@ -145,7 +158,11 @@ export default function UsersPanel() {
                                             <Pencil className="h-4 w-4 inline-block" />
                                         </button>
                                         <button
-                                            onClick={() => console.log("Eliminar", user)}
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setSelectedUser(user);
+                                                DeleteToast(user.id as string, handleDelete);
+                                            }}
                                             className="text-red-500 hover:text-red-700"
                                             aria-label="Eliminar"
                                         >

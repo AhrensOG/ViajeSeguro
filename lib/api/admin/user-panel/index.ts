@@ -44,3 +44,13 @@ export async function createUser(data: UserFormData): Promise<boolean> {
         throw new Error(`Error al crear el usuario: ${error instanceof Error ? error.message : String(error)}`);
     }
 }
+
+export async function deleteUser(userId: string): Promise<void> {
+    try {
+        await fetchWithAuth(`${BACKEND_URL}/user/delete/${userId}`, {
+            method: "DELETE",
+        });
+    } catch (error) {
+        throw new Error(`Error al eliminar el usuario: ${error instanceof Error ? error.message : String(error)}`);
+    }
+}

@@ -28,7 +28,7 @@ const Sidebar = () => {
             name: "Pagos",
             href: "/dashboard/client/payments",
             icon: <CreditCard className="size-5" />,
-            roles: ["CLIENT", "DRIVER"], // visible para ambos
+            roles: ["CLIENT"], // visible para ambos
         },
         {
             name: "Viajes",
