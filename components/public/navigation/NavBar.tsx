@@ -12,15 +12,59 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
   const { data: session } = useSession();
   const role = session?.user?.role;
 
+  const renderRoleLinks = (isMobile = false) => {
+    if (!session?.user) return null;
+
+    const className = isMobile
+      ? "text-custom-gray-800 hover:text-custom-black-900 transition"
+      : "block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100";
+
+    if (role === "ADMIN") {
+      return (
+        <Link href="/admin" className={className}>
+          Dashboard
+        </Link>
+      );
+    }
+
+    if (role === "CLIENT") {
+      return (
+        <>
+          <Link href="/dashboard/client/profile" className={className}>
+            Perfil
+          </Link>
+          <Link href="/dashboard/client/reservations" className={className}>
+            Reservas
+          </Link>
+          <Link href="#" className={className}>
+            Mis compras
+          </Link>
+        </>
+      );
+    }
+
+    if (role === "DRIVER") {
+      return (
+        <>
+          <Link href="/dashboard/client/profile" className={className}>
+            Perfil
+          </Link>
+          <Link href="/dashboard/client/trips" className={className}>
+            Viajes
+          </Link>
+        </>
+      );
+    }
+
+    return null;
+  };
+
   return (
     <header
       className={`h-[60px] sticky top-0 bg-custom-white-100 z-50 w-full ${
         shadow ? "shadow-sm" : ""
       }`}>
       <div className="w-full h-full px-6 py-3 flex items-center justify-between">
-        {/* <Link href="/" className="flex items-center">
-          <Image src="/main/logoNoBg.png" width={100} height={34} alt="Logo" />
-        </Link> */}
         <Link
           href="/"
           className="font-bold text-2xl flex items-center text-custom-white-100">
@@ -44,7 +88,6 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
             className="text-custom-gray-800 hover:text-custom-black-900 transition">
             Contacto
           </Link>
-          {/* Dropdown para opciones de usuario en versión escritorio */}
           <div
             className="relative"
             onMouseEnter={() => setIsUserMenuOpen(true)}
@@ -58,83 +101,37 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
               />
             </button>
             <AnimatePresence>
-              {isUserMenuOpen && session && session?.user ? (
+              {isUserMenuOpen && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.3 }}
-                  className="p-1 absolute right-0 w-44 text- bg-custom-white-100 shadow-lg rounded-md z-10">
-                  {role === "ADMIN" && (
+                  className="p-1 absolute right-0 w-44 bg-custom-white-100 shadow-lg rounded-md z-10">
+                  {session?.user ? (
                     <>
-                      {/* <Link
-                                                href="/admin/dashboard"
-                                                className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100"
-                                            >
-                                                Dashboard 
-                                            </Link> */}
+                      {renderRoleLinks()}
+                      <button
+                        onClick={() => signOut({ callbackUrl: "/" })}
+                        className="w-full text-start block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
+                        Cerrar sesión
+                      </button>
                     </>
-                  )}
-                  {role === "CLIENT" && (
+                  ) : (
                     <>
                       <Link
-                        href="/dashboard/client/profile"
+                        href="/auth/login"
                         className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
-                        Perfil
+                        Iniciar sesión
                       </Link>
                       <Link
-                        href="/dashboard/client/reservations"
+                        href="/auth/register"
                         className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
-                        Reservas
-                      </Link>
-                      <Link
-                        href="#"
-                        className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
-                        Mis compras
+                        Registrate
                       </Link>
                     </>
                   )}
-                  {role === "DRIVER" && (
-                    <>
-                      <Link
-                        href="/dashboard/client/profile"
-                        className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
-                        Perfil
-                      </Link>
-                      <Link
-                        href="/dashboard/client/trips"
-                        className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
-                        Viajes
-                      </Link>
-                    </>
-                  )}
-                  <button
-                    onClick={() => signOut({ callbackUrl: "/" })}
-                    className="w-full text-start block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
-                    Cerrar sesión
-                  </button>
                 </motion.div>
-              ) : (
-                isUserMenuOpen &&
-                !session && (
-                  <motion.div
-                    initial={{ opacity: 0, y: -10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: -10 }}
-                    transition={{ duration: 0.3 }}
-                    className="p-1 absolute right-0 w-44 text-center bg-custom-white-100 shadow-lg rounded-md z-10">
-                    <Link
-                      href="/auth/login"
-                      className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
-                      Iniciar sesión
-                    </Link>
-                    <Link
-                      href="/auth/register"
-                      className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
-                      Registrate
-                    </Link>
-                  </motion.div>
-                )
               )}
             </AnimatePresence>
           </div>
@@ -178,44 +175,29 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
             </nav>
 
             <hr className="my-4 border-t border-gray-300" />
-            {session && session?.user ? (
+
+            {session?.user ? (
               <nav className="flex flex-col items-start space-y-4">
-                <Link
-                  href="#"
-                  className="text-custom-gray-800 hover:text-custom-black-900 transition">
-                  Perfil
-                </Link>
-                <Link
-                  href="/dashboard/client/reservations"
-                  className="text-custom-gray-800 hover:text-custom-black-900 transition">
-                  Reservas
-                </Link>
-                <Link
-                  href="#"
-                  className="text-custom-gray-800 hover:text-custom-black-900 transition">
-                  Mis compras
-                </Link>
+                {renderRoleLinks(true)}
                 <button
-                  onClick={() => signOut()}
+                  onClick={() => signOut({ callbackUrl: "/" })}
                   className="text-custom-gray-800 hover:text-custom-black-900 transition">
                   Cerrar sesión
                 </button>
               </nav>
             ) : (
-              !session && (
-                <nav className="flex flex-col items-start space-y-4">
-                  <Link
-                    href="/auth/login"
-                    className="text-custom-gray-800 hover:text-custom-black-900 transition">
-                    Iniciar sesión
-                  </Link>
-                  <Link
-                    href="/auth/register"
-                    className="text-custom-gray-800 hover:text-custom-black-900 transition">
-                    Registrate
-                  </Link>
-                </nav>
-              )
+              <nav className="flex flex-col items-start space-y-4">
+                <Link
+                  href="/auth/login"
+                  className="text-custom-gray-800 hover:text-custom-black-900 transition">
+                  Iniciar sesión
+                </Link>
+                <Link
+                  href="/auth/register"
+                  className="text-custom-gray-800 hover:text-custom-black-900 transition">
+                  Registrate
+                </Link>
+              </nav>
             )}
           </motion.div>
         )}
