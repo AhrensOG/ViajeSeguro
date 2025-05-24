@@ -34,9 +34,12 @@ const PurchaseTripSummary = ({
     priceDetails,
 }: Props) => {
     const [showDetails, setShowDetails] = useState(false);
-    const IVA = process.env.NEXT_PUBLIC_IVA || 0;
+    const IVA_RATE = Number(process.env.NEXT_PUBLIC_IVA || 0) / 100;
+
     const hasDiscounts = priceDetails && priceDetails.discounts.length > 0;
-    const finalPrice = (priceDetails?.finalPrice ?? price) * (1 + Number(IVA) / 100);
+    const totalWithIVA = (priceDetails?.finalPrice ?? price) * (1 + IVA_RATE);
+    const totalWithoutIVA = priceDetails?.finalPrice ?? price;
+    const ivaAmount = totalWithIVA - totalWithoutIVA;
 
     return (
         <motion.div
@@ -47,7 +50,7 @@ const PurchaseTripSummary = ({
         >
             <div className="flex justify-between items-start mb-4">
                 <h2 className="text-xl font-medium text-custom-black-800">Resumen de tu viaje</h2>
-                <div className="text-2xl font-bold text-custom-black-800">{finalPrice.toFixed(2).replace(".", ",")} €</div>
+                <div className="text-2xl font-bold text-custom-black-800">{totalWithIVA.toFixed(2).replace(".", ",")} €</div>
             </div>
 
             <div className="mb-4">
@@ -90,8 +93,8 @@ const PurchaseTripSummary = ({
                         className="overflow-hidden mt-2 text-sm text-custom-gray-600 space-y-1"
                     >
                         <div className="flex justify-between">
-                            <span>Precio base:</span>
-                            <span>{price.toFixed(2).replace(".", ",")} €</span>
+                            <span>Precio base (sin IVA):</span>
+                            <span>{totalWithoutIVA.toFixed(2).replace(".", ",")} €</span>
                         </div>
 
                         {hasDiscounts &&
@@ -108,12 +111,13 @@ const PurchaseTripSummary = ({
                             })}
 
                         <div className="flex justify-between">
-                            <span>Gastos de gestión:</span>
-                            <span>0,00 €</span>
+                            <span>IVA ({(IVA_RATE * 100).toFixed(0)}%):</span>
+                            <span>{ivaAmount.toFixed(2).replace(".", ",")} €</span>
                         </div>
+
                         <div className="flex justify-between font-medium">
                             <span>Total:</span>
-                            <span>{finalPrice.toFixed(2).replace(".", ",")} €</span>
+                            <span>{totalWithIVA.toFixed(2).replace(".", ",")} €</span>
                         </div>
                     </motion.div>
                 )}

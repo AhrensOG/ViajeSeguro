@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Ellipsis, User, X } from "lucide-react";
-import Image from "next/image";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 
@@ -11,14 +10,22 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { data: session } = useSession();
+  const role = session?.user?.role;
+
   return (
     <header
       className={`h-[60px] sticky top-0 bg-custom-white-100 z-50 w-full ${
         shadow ? "shadow-sm" : ""
       }`}>
       <div className="w-full h-full px-6 py-3 flex items-center justify-between">
-        <Link href="/" className="flex items-center">
+        {/* <Link href="/" className="flex items-center">
           <Image src="/main/logoNoBg.png" width={100} height={34} alt="Logo" />
+        </Link> */}
+        <Link
+          href="/"
+          className="font-bold text-2xl flex items-center text-custom-white-100">
+          <span className="text-custom-gray-800">Viaje</span>
+          <span className="text-custom-golden-600">Seguro</span>
         </Link>
 
         <nav className="hidden md:flex items-center space-x-6">
@@ -58,21 +65,49 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
                   exit={{ opacity: 0, y: -10 }}
                   transition={{ duration: 0.3 }}
                   className="p-1 absolute right-0 w-44 text- bg-custom-white-100 shadow-lg rounded-md z-10">
-                  <Link
-                    href="/dashboard/client/profile"
-                    className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
-                    Perfil
-                  </Link>
-                  <Link
-                    href="/dashboard/client/reservations"
-                    className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
-                    Reservas
-                  </Link>
-                  <Link
-                    href="#"
-                    className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
-                    Mis compras
-                  </Link>
+                  {role === "ADMIN" && (
+                    <>
+                      {/* <Link
+                                                href="/admin/dashboard"
+                                                className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100"
+                                            >
+                                                Dashboard 
+                                            </Link> */}
+                    </>
+                  )}
+                  {role === "CLIENT" && (
+                    <>
+                      <Link
+                        href="/dashboard/client/profile"
+                        className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
+                        Perfil
+                      </Link>
+                      <Link
+                        href="/dashboard/client/reservations"
+                        className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
+                        Reservas
+                      </Link>
+                      <Link
+                        href="#"
+                        className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
+                        Mis compras
+                      </Link>
+                    </>
+                  )}
+                  {role === "DRIVER" && (
+                    <>
+                      <Link
+                        href="/dashboard/client/profile"
+                        className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
+                        Perfil
+                      </Link>
+                      <Link
+                        href="/dashboard/client/trips"
+                        className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
+                        Viajes
+                      </Link>
+                    </>
+                  )}
                   <button
                     onClick={() => signOut({ callbackUrl: "/" })}
                     className="w-full text-start block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">

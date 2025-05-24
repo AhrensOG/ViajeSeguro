@@ -95,7 +95,7 @@ const CurrentService = () => {
 
           <div className="relative h-80 md:h-96 rounded-xl overflow-hidden shadow-lg">
             <Image
-              src="/main/img_placeholder.webp?height=500&width=500"
+              src="/main/plaza.jpeg?height=500&width=500"
               alt="Pasajeros compartiendo viaje"
               fill
               className="object-cover"

@@ -85,11 +85,17 @@ const ContactInformation = () => {
         </div>
       </motion.div>
 
-      {/* Mapa */}
       <motion.div
         variants={item}
-        className="bg-custom-gray-100 rounded-xl overflow-hidden h-64 flex items-center justify-center text-custom-gray-600">
-        Mapa de ubicación
+        className="rounded-xl overflow-hidden h-64 w-full border border-custom-gray-300 shadow-sm">
+        <iframe
+          src="https://www.google.com/maps?q=Calle+de+Castellón+16,+Valencia+46004,+España&output=embed"
+          width="100%"
+          height="100%"
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          className="w-full h-full"></iframe>
       </motion.div>
 
       {/* FAQ */}
