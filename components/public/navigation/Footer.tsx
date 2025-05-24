@@ -21,30 +21,30 @@ const Footer = () => {
 
             {/* Iconos sociales debajo del texto */}
             <div className="flex gap-7 mt-2">
-              <a
+              <Link
                 href="https://facebook.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-custom-golden-500 transition-colors"
                 aria-label="Facebook">
                 <Facebook size={32} />
-              </a>
-              <a
+              </Link>
+              <Link
                 href="https://instagram.com"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-custom-golden-500 transition-colors"
                 aria-label="Instagram">
                 <Instagram size={32} />
-              </a>
-              <a
+              </Link>
+              <Link
                 href="https://wa.me/1234567890"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-custom-golden-500 transition-colors"
                 aria-label="Mensaje directo">
                 <MessageCircle size={32} />
-              </a>
+              </Link>
             </div>
           </div>
 

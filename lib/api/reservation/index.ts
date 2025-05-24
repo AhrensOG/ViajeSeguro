@@ -26,3 +26,9 @@ export const getReservationById = async (
     `${BACKEND_URL}/reservation/by-id-for-qr-detail/${id}`
   );
 };
+
+export const cancellReservation = async (reservationId: string): Promise<void> => {
+  return fetchWithAuth<void>(`${BACKEND_URL}/reservation/cancell/${reservationId}`, {
+    method: "PUT",
+  });
+};

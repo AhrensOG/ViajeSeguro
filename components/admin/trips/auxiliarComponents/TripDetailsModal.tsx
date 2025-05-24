@@ -31,6 +31,8 @@ const TripDetailsModal = ({ trip, onClose }: TripDetailsModalProps) => {
     const departure = DateTime.fromISO(trip.departure).setZone(trip.originalTimeZone);
     const arrival = DateTime.fromISO(trip.arrival).setZone(trip.originalTimeZone);
 
+    console.log(trip)
+
     return (
         <div className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
             <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-3xl relative border border-custom-gray-300">
