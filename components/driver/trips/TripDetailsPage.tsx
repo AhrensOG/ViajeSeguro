@@ -21,6 +21,7 @@ const TripDetailsPage = () => {
     const fetchTrip = async () => {
       try {
         const raw = (await getTripById(id as string)) as TripDetailsResponse;
+
         const mapped: TripDetailsResponse = {
           id: raw.id,
           basePrice: raw.basePrice,
@@ -54,6 +55,7 @@ const TripDetailsPage = () => {
               email: res.user?.email ?? "Sin email",
               paymentMethod: res.paymentMethod,
               status,
+              qr: res.qr ?? null,
             };
           }),
           serviceType: raw.serviceType,
@@ -136,6 +138,7 @@ const TripDetailsPage = () => {
                   <th className="px-4 py-3">Correo</th>
                   <th className="px-4 py-3">Método de pago</th>
                   <th className="px-4 py-3">Estado</th>
+                  <th className="px-4 py-3">Abordaje</th>
                 </tr>
               </thead>
               <tbody>
@@ -157,6 +160,19 @@ const TripDetailsPage = () => {
                         }`}>
                         {passenger.status}
                       </span>
+                    </td>
+                    <td className="px-4 py-3">
+                      {passenger.qr && !passenger.qr.isDeleted ? (
+                        !passenger.qr.isValid && passenger.qr.usedAt ? (
+                          <span className="text-green-700 font-medium">
+                            Abordó
+                          </span>
+                        ) : (
+                          <span className="text-yellow-700">Pendiente</span>
+                        )
+                      ) : (
+                        <span className="text-red-600">QR inválido</span>
+                      )}
                     </td>
                   </tr>
                 ))}
