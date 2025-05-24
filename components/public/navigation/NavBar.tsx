@@ -79,6 +79,16 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
             Promociones
           </Link>
           <Link
+            href="/"
+            className="text-custom-gray-800 hover:text-custom-black-900 transition">
+            Inicio
+          </Link>
+          <Link
+            href="/about"
+            className="text-custom-gray-800 hover:text-custom-black-900 transition">
+            Nosotros
+          </Link>
+          <Link
             href="/services"
             className="text-custom-gray-800 hover:text-custom-black-900 transition">
             Servicios
@@ -161,6 +171,16 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
                 href="/promotions"
                 className="text-custom-black-900 hover:text-custom-golden-600 transition font-medium">
                 Promociones
+              </Link>
+              <Link
+                href="/"
+                className="text-custom-gray-800 hover:text-custom-black-900 transition">
+                Inicio
+              </Link>
+              <Link
+                href="/about"
+                className="text-custom-gray-800 hover:text-custom-black-900 transition">
+                Nosotros
               </Link>
               <Link
                 href="/services"

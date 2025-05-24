@@ -46,7 +46,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative bg-[url('/main/iniciovs.jpeg')] bg-no-repeat bg-[length:1440px_420px] bg-top sm:bg-right-top sm:bg-contain md:bg-cover py-16 w-full h-[420px] sm:h-[420px]">
+    <section className="relative bg-[url('/main/iniciovs.jpeg')] bg-no-repeat bg-top sm:bg-top sm:bg-contain md:bg-cover py-16 w-full h-[420px] sm:h-[480px]">
       <div className="w-full mx-auto px-4 text-center text-custom-white-100">
         <motion.h1
           initial={{ opacity: 0, y: 30 }}

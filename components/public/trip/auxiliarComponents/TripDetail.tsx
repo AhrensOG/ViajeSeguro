@@ -93,7 +93,7 @@ const TripDetail = ({ trip }: TripDetailProps) => {
           whileTap={{ scale: 0.97 }}
           className="mt-6 w-full flex items-center justify-center gap-2 text-custom-golden-600 border border-custom-golden-600 hover:bg-custom-golden-100 rounded-lg py-2 px-4">
           <MessageCircle size={18} />
-          <Link href={"https://wa.me/1234567890"} target="_blank">
+          <Link href={"https://wa.me/34624051168"} target="_blank">
             Contactar con Viaje Seguro
           </Link>
         </motion.button>

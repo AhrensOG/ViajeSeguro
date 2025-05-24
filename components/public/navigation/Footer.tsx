@@ -22,7 +22,7 @@ const Footer = () => {
             {/* Iconos sociales debajo del texto */}
             <div className="flex gap-7 mt-2">
               <Link
-                href="https://facebook.com"
+                href="https://www.facebook.com/share/19AbLyVubk/"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-custom-golden-500 transition-colors"
@@ -30,7 +30,7 @@ const Footer = () => {
                 <Facebook size={32} />
               </Link>
               <Link
-                href="https://instagram.com"
+                href="https://www.instagram.com/viaje_seguro_es?igsh=MXZhejhwMjR5b2c5eQ=="
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-custom-golden-500 transition-colors"
@@ -38,7 +38,7 @@ const Footer = () => {
                 <Instagram size={32} />
               </Link>
               <Link
-                href="https://wa.me/1234567890"
+                href="https://wa.me/34624051168"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="hover:text-custom-golden-500 transition-colors"
