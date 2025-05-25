@@ -22,7 +22,6 @@ const TripProcess = () => {
             try {
                 setLoading(true);
                 const tripData = await getTripForDetail(id);
-                console.log(tripData);
 
                 setTrip(tripData as Trip);
             } catch (err) {

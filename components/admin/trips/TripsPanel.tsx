@@ -206,8 +206,7 @@ export default function TripsPanel() {
                                             <Pencil className="h-4 w-4 inline-block" />
                                         </button>
                                         <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
+                                            onClick={() => {
                                                 setSelectedTrip(trip);
                                                 DeleteToast(trip.id, handleDelete);
                                             }}

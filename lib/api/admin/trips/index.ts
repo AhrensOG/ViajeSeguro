@@ -3,14 +3,11 @@ import { CreateTripRequest, UpdateTripRequest } from "./trips.type";
 import { BACKEND_URL } from "@/lib/constants";
 
 export async function createTrip(data: CreateTripRequest): Promise<void> {
-    console.log("Creating trip with data:", data);
-
     try {
-        const response = await fetchWithAuth(`${BACKEND_URL}/trip`, {
+        await fetchWithAuth(`${BACKEND_URL}/trip`, {
             method: "POST",
             body: JSON.stringify(data),
         });
-        console.log(response);
     } catch (error) {
         console.log(error);
         throw new Error("Failed to create trip");
@@ -33,6 +30,7 @@ export async function getPartners() {
         const response = await fetchWithAuth(`${BACKEND_URL}/user/owners`, {
             method: "GET",
         });
+
         return response;
     } catch {
         throw new Error("Failed to fetch owners");
@@ -40,14 +38,11 @@ export async function getPartners() {
 }
 
 export async function updateTrip(data: UpdateTripRequest) {
-    console.log("Updating trip with data:", data);
-
     try {
         const response = await fetchWithAuth(`${BACKEND_URL}/trip/${data.id}`, {
             method: "PATCH",
             body: JSON.stringify(data),
         });
-        console.log("Response from updateTrip:", response);
         return response;
     } catch {
         throw new Error("Failed to update trip");

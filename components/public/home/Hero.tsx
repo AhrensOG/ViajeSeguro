@@ -46,7 +46,7 @@ const Hero = () => {
   };
 
   return (
-    <section className="relative bg-[url('/main/main.webp')] bg-cover bg-bottom bg-no-repeat sm:bg-repeat sm:bg-auto py-16">
+    <section className="relative bg-[url('/main/iniciovs.jpeg')] bg-no-repeat bg-top sm:bg-top sm:bg-contain md:bg-cover py-16 w-full h-[420px] sm:h-[480px]">
       <div className="w-full mx-auto px-4 text-center text-custom-white-100">
         <motion.h1
           initial={{ opacity: 0, y: 30 }}
@@ -68,7 +68,7 @@ const Hero = () => {
         <div className="relative max-w-7xl mx-auto">
           <div className="absolute inset-0 -z-10 overflow-hidden">
             <Image
-              src="/main/main.webp"
+              src="/main/iniciovs.jpeg"
               alt="Ilustración de coches en carretera"
               fill
             />

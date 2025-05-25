@@ -129,7 +129,7 @@ const SearchProcess = () => {
 
       <div className="container mx-auto px-4 py-4 flex gap-2 grow h-[calc(100vh-316px)] sm:h-[calc(100vh-200px)] lg:h-[calc(100vh-160px)]">
         <div className="w-1/3 relative rounded-md overflow-hidden hidden lg:block">
-          <Image src="/main/main.webp" alt="Map" layout="fill" />
+          <Image src="/search/search.jpeg" alt="Map" fill />
         </div>
         <div className="w-full lg:w-2/3 space-y-4 overflow-y-auto scrollbar-none">
           {isLoading ? (

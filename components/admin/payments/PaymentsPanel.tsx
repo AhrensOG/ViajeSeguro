@@ -145,7 +145,10 @@ export default function PaymentsPanel() {
                                     <td className="px-4 py-2 border-b border-r border-custom-gray-200">€ {payment.amount.toFixed(2)}</td>
                                     <td className="px-4 py-2 border-b border-r border-custom-gray-200">{payment.method}</td>
                                     <td className="px-4 py-2 border-b border-r border-custom-gray-200">{payment.status}</td>
-                                    <td className="px-4 py-2 border-b border-custom-gray-200 text-center space-x-2">
+                                    <td
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="px-4 py-2 border-b border-custom-gray-200 text-center space-x-2"
+                                    >
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();

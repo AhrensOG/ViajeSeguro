@@ -1,5 +1,6 @@
 import { useState } from "react";
-import { ChevronDown, ChevronUp, Gift, Link } from "lucide-react";
+// import { ChevronDown, ChevronUp, Gift, Link } from "lucide-react";
+import { ChevronDown, ChevronUp } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ReservationResponse } from "@/lib/api/reservation/reservation.types";
 
@@ -73,7 +74,7 @@ const ReservationPriceInfo = ({ reservation }: Props) => {
       </div>
 
       {/* Promo referidos */}
-      <div className="flex items-start gap-3 text-sm text-custom-gray-700">
+      {/* <div className="flex items-start gap-3 text-sm text-custom-gray-700">
         <Gift className="h-5 w-5 text-custom-golden-700 flex-shrink-0" />
         <div>
           <p>
@@ -90,7 +91,7 @@ const ReservationPriceInfo = ({ reservation }: Props) => {
             Compartir con amigos
           </button>
         </div>
-      </div>
+      </div> */}
     </div>
   );
 };

@@ -8,6 +8,8 @@ export async function fetchUsersData(): Promise<User[]> {
         const res = await fetchWithAuth<User[]>(`${BACKEND_URL}/user/all`, {
             method: "GET",
         });
+        console.log(res);
+
         return res;
     } catch (error) {
         throw new Error(`Error al obtener el perfil del usuario: ${error instanceof Error ? error.message : String(error)}`);

@@ -18,7 +18,6 @@ const TripsPanel = () => {
             if (!session?.user?.id) return;
             try {
                 const data = await getTripsByDriverId();
-                console.log(data);
 
                 setTrips(Array.isArray(data) ? (data as TripResponse[]) : []);
             } catch (error) {

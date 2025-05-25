@@ -6,6 +6,7 @@ import { DateTime } from "luxon";
 import Image from "next/image";
 import { Trip } from "@/lib/shared/types/trip-service-type.type";
 import TripRouteCompact from "@/lib/client/components/TripRouteCompact";
+import Link from "next/link";
 
 type TripDetailProps = {
   trip: Trip;
@@ -92,7 +93,9 @@ const TripDetail = ({ trip }: TripDetailProps) => {
           whileTap={{ scale: 0.97 }}
           className="mt-6 w-full flex items-center justify-center gap-2 text-custom-golden-600 border border-custom-golden-600 hover:bg-custom-golden-100 rounded-lg py-2 px-4">
           <MessageCircle size={18} />
-          <span>Contactar con Viaje Seguro</span>
+          <Link href={"https://wa.me/34624051168"} target="_blank">
+            Contactar con Viaje Seguro
+          </Link>
         </motion.button>
       </motion.div>
     </div>

@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import { toast } from "sonner";
 import { updateTrip } from "@/lib/api/admin/trips";
 import { CreateTripRequest, Driver, Partner, TripServiceType, TripStatus, UpdateTripRequest } from "@/lib/api/admin/trips/trips.type";
+import { convertUtcToDatetimeLocalInput } from "@/lib/functions";
 
 interface Props {
     onClose: () => void;
@@ -16,13 +17,14 @@ const inputClass =
     "w-full border border-custom-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-custom-golden-400 transition";
 const labelClass = "block text-xs font-semibold text-custom-gray-500 mb-1 uppercase tracking-wide";
 
-const EditTripModal = ({ onClose, onSuccess, partners, drivers, trip }: Props) => {
+// const EditTripModal = ({ onClose, onSuccess, partners, drivers, trip }: Props) => {
+const EditTripModal = ({ onClose, onSuccess, drivers, trip }: Props) => {
     const initialForm: UpdateTripRequest = {
         id: trip.id!,
         origin: trip.origin,
         destination: trip.destination,
-        departure: trip.departure?.slice(0, 16) || "",
-        arrival: trip.arrival?.slice(0, 16) || "",
+        departure: convertUtcToDatetimeLocalInput(trip.departure, trip.originalTimeZone)|| "",
+        arrival: convertUtcToDatetimeLocalInput(trip.arrival, trip.originalTimeZone)|| "",
         originalTimeZone: trip.originalTimeZone,
         serviceType: trip.serviceType as TripServiceType,
         vehicleId: trip.vehicleId,
@@ -40,10 +42,10 @@ const EditTripModal = ({ onClose, onSuccess, partners, drivers, trip }: Props) =
 
     const [form, setForm] = useState<UpdateTripRequest>(initialForm);
 
-    const selectedPartner = partners.find((p) => p.id === form.partnerId);
+    // const selectedPartner = partners.find((p) => p.id === form.partnerId);
     const selectedDriver = drivers.find((d) => d.id === form.driverId);
-    const vehicles = selectedPartner?.Vehicle || [];
-    const selectedVehicle = vehicles.find((v) => v.id === form.vehicleId);
+    // const vehicles = selectedPartner?.Vehicle || [];
+    // const selectedVehicle = vehicles.find((v) => v.id === form.vehicleId);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, type, value } = e.target;
@@ -97,7 +99,7 @@ const EditTripModal = ({ onClose, onSuccess, partners, drivers, trip }: Props) =
                 <p className="text-sm text-custom-gray-500 mb-6">Modifica los datos necesarios del viaje.</p>
 
                 <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm text-custom-black-800">
-                    <div className="md:col-span-1">
+                    {/* <div className="md:col-span-1">
                         <label className={labelClass}>Partner (Dueño del viaje)</label>
                         <select name="partnerId" value={form.partnerId} onChange={handleChange} className={inputClass} required>
                             <option value="">-- Seleccionar --</option>
@@ -115,7 +117,7 @@ const EditTripModal = ({ onClose, onSuccess, partners, drivers, trip }: Props) =
                                 <p className="text-custom-gray-600">{selectedPartner.email}</p>
                             </div>
                         )}
-                    </div>
+                    </div> */}
 
                     <div className="md:col-span-1">
                         <label className={labelClass}>Conductor</label>
@@ -137,7 +139,7 @@ const EditTripModal = ({ onClose, onSuccess, partners, drivers, trip }: Props) =
                         )}
                     </div>
 
-                    <div className="col-span-full">
+                    {/* <div className="col-span-full">
                         <label className={labelClass}>Vehículo</label>
                         <select name="vehicleId" value={form.vehicleId} onChange={handleChange} className={inputClass}>
                             <option value="">{vehicles.length > 0 ? "-- Seleccionar --" : "No tiene vehículos disponibles"}</option>
@@ -155,7 +157,7 @@ const EditTripModal = ({ onClose, onSuccess, partners, drivers, trip }: Props) =
                                 <p>Selección de asientos: {selectedVehicle.allowSeatSelection ? "Sí" : "No"}</p>
                             </div>
                         )}
-                    </div>
+                    </div> */}
 
                     <div>
                         <label className={labelClass}>Origen</label>

@@ -146,13 +146,16 @@ export default function UsersPanel() {
                                     </td>
                                     <td className="px-4 py-2 border-b border-r border-custom-gray-200">{user.email}</td>
                                     <td className="px-4 py-2 border-b border-r border-custom-gray-200">{user.role}</td>
-                                    <td className="px-4 py-2 border-b border-custom-gray-200 text-center space-x-2">
+                                    <td
+                                        onClick={(e) => e.stopPropagation()}
+                                        className="px-4 py-2 border-b border-custom-gray-200 text-center space-x-2"
+                                    >
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 handleEditUser(user);
                                             }}
-                                            className="text-custom-golden-600 hover:text-custom-golden-700"
+                                            className="text-custom-golden-600 hover:text-custom-golden-700 cursor-pointer"
                                             aria-label="Editar"
                                         >
                                             <Pencil className="h-4 w-4 inline-block" />

@@ -86,6 +86,17 @@ function formatFullDate(date: string | Date | number, timeZone: string): string 
     return dt.toFormat("cccc, d 'de' LLLL");
 }
 
+export function convertUtcToDatetimeLocalInput(utcDate: string | Date, timeZone: string): string {
+    const dt = DateTime.fromISO(utcDate instanceof Date ? utcDate.toISOString() : utcDate, { zone: "utc" });
+
+    if (!dt.isValid) {
+        console.error("❌ Fecha inválida:", utcDate);
+        return "";
+    }
+
+    return dt.setZone(timeZone).toFormat("yyyy-MM-dd'T'HH:mm");
+}
+
 const fetcher = async <T = unknown>(input: RequestInfo, options?: RequestInit): Promise<T> => {
     const res = await fetch(input, {
         ...options,
@@ -123,7 +134,8 @@ const fetchWithAuth = async <T = unknown>(input: RequestInfo, options: RequestIn
     });
 
     if (!res.ok) {
-        const error = await res.json().catch(() => ({}));
+      const error = await res.json().catch(() => ({}));
+      console.log(error)
         throw new Error(error.message || "Error en la petición autenticada");
     }
 

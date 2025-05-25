@@ -13,6 +13,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import { ReservationResponse } from "@/lib/api/reservation/reservation.types";
 import ReservationPriceInfo from "./ReservationPriceInfo";
 import QrModal from "./QrModal";
+import { cancellReservation } from "@/lib/api/reservation";
+import { toast } from "sonner";
 
 type Props = {
   reservation: ReservationResponse;
@@ -32,6 +34,24 @@ const ReservationCard = ({ reservation }: Props) => {
   const formattedDate = departure.setLocale("es").toFormat("cccc, d 'de' LLLL");
   const departureTime = departure.toFormat("HH:mm");
   const arrivalTime = arrival.toFormat("HH:mm");
+
+  const now = DateTime.utc();
+  const departureDate = DateTime.fromISO(trip.departure, { zone: "utc" });
+
+  const canCancel = departureDate.diff(now, "hours").hours >= 24;
+
+  const handleCancell = async () => {
+    const toastId = toast.loading("Cancelando reserva...");
+    try {
+      await cancellReservation(reservation.id);
+      toast.success("Reserva cancelada con éxito", { id: toastId });
+      setShowCancelWarning(false);
+      reservation.status = "CANCELLED"; // actualización temporal si no usás refetch
+    } catch (error) {
+      console.error(error);
+      toast.info("Error al cancelar la reserva", { id: toastId });
+    }
+  };
 
   return (
     <div
@@ -187,22 +207,29 @@ const ReservationCard = ({ reservation }: Props) => {
               {/* Cancelar reserva */}
               {reservation.status !== "CANCELLED" && (
                 <div className="flex flex-col gap-2 items-center">
-                  <AnimatePresence>
-                    {!hideButton && (
-                      <motion.button
-                        initial={{ opacity: 1 }}
-                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                        transition={{ duration: 0.3 }}
-                        onClick={() => {
-                          setHideButton(true);
-                          setTimeout(() => setShowCancelWarning(true), 300);
-                        }}
-                        className="absolute top-0 left-0 max-w-52 text-gray-700 cursor-pointer font-medium rounded-lg text-sm flex items-center justify-center gap-2 transition">
-                        <XCircle className="size-4" />
-                        Cancelar reserva
-                      </motion.button>
-                    )}
-                  </AnimatePresence>
+                  {canCancel ? (
+                    <AnimatePresence>
+                      {!hideButton && (
+                        <motion.button
+                          initial={{ opacity: 1 }}
+                          exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                          transition={{ duration: 0.3 }}
+                          onClick={() => {
+                            setHideButton(true);
+                            setTimeout(() => setShowCancelWarning(true), 300);
+                          }}
+                          className="absolute top-0 left-0 max-w-52 text-gray-700 cursor-pointer font-medium rounded-lg text-sm flex items-center justify-center gap-2 transition">
+                          <XCircle className="size-4" />
+                          Cancelar reserva
+                        </motion.button>
+                      )}
+                    </AnimatePresence>
+                  ) : (
+                    <p className="text-sm text-custom-gray-500 italic">
+                      No se puede cancelar la reserva porque falta menos de 24
+                      horas para el viaje.
+                    </p>
+                  )}
 
                   <AnimatePresence>
                     {showCancelWarning && (
@@ -219,9 +246,7 @@ const ReservationCard = ({ reservation }: Props) => {
                         </p>
                         <div className="flex flex-col gap-2 mt-3">
                           <button
-                            onClick={() =>
-                              alert("Aquí se confirmaría la cancelación")
-                            }
+                            onClick={handleCancell}
                             className="w-full bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition">
                             Confirmar cancelación
                           </button>

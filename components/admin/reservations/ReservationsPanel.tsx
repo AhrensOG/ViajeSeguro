@@ -151,8 +151,6 @@ export default function ReservationPanel() {
                                 return (
                                     <tr
                                         onClick={(e) => {
-                                            e.stopPropagation();
-                                            setSelectedReservation(r);
                                             setIsViewModalOpen(true);
                                         }}
                                         key={r.id}
@@ -169,6 +167,7 @@ export default function ReservationPanel() {
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
+                                                    setSelectedReservation(r);
                                                     setIsEditingModalOpen(true);
                                                 }}
                                                 className="text-custom-golden-600 hover:text-custom-golden-700 cursor-pointer"

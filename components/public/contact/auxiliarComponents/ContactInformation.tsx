@@ -24,16 +24,16 @@ const ContactInformation = () => {
     {
       icon: <MapPin className="h-5 w-5 text-custom-golden-700" />,
       title: "Dirección",
-      content: "Calle Principal 123\n28001 Madrid, España",
+      content: "Calle de Castellón 16 \n46004 Valencia, España",
     },
     {
       icon: <Mail className="h-5 w-5 text-custom-golden-700" />,
       title: "Email",
       content: (
         <a
-          href="mailto:info@viajeseguro.com"
+          href="mailto:viajesseguros2025@gmail.com"
           className="hover:text-custom-golden-600">
-          info@viajeseguro.com
+          viajesseguros2025@gmail.com
         </a>
       ),
     },
@@ -41,9 +41,9 @@ const ContactInformation = () => {
       icon: <Phone className="h-5 w-5 text-custom-golden-700" />,
       title: "Teléfono",
       content: (
-        <a href="tel:+34912345678" className="hover:text-custom-golden-600">
-          +34 91 234 56 78
-        </a>
+        <Link href="tel:+34961043838" className="hover:text-custom-golden-600">
+          +34 96 104 38 38
+        </Link>
       ),
     },
     {
@@ -85,11 +85,17 @@ const ContactInformation = () => {
         </div>
       </motion.div>
 
-      {/* Mapa */}
       <motion.div
         variants={item}
-        className="bg-custom-gray-100 rounded-xl overflow-hidden h-64 flex items-center justify-center text-custom-gray-600">
-        Mapa de ubicación
+        className="rounded-xl overflow-hidden h-64 w-full border border-custom-gray-300 shadow-sm">
+        <iframe
+          src="https://www.google.com/maps?q=Calle+de+Castellón+16,+Valencia+46004,+España&output=embed"
+          width="100%"
+          height="100%"
+          allowFullScreen
+          loading="lazy"
+          referrerPolicy="no-referrer-when-downgrade"
+          className="w-full h-full"></iframe>
       </motion.div>
 
       {/* FAQ */}
