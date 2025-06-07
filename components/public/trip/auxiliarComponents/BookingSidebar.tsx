@@ -186,7 +186,7 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
                         className="w-full bg-custom-golden-600 hover:bg-custom-golden-700 text-custom-white-100 py-4 mt-4 rounded-lg flex items-center justify-center"
                     >
                         <Calendar1Icon size={16} className="mr-2" />
-                        Enviar solicitud
+                        Ir a pagar
                     </button>
                 </motion.div>
             </div>
