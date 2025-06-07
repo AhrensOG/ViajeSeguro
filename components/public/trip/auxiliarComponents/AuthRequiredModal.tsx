@@ -27,7 +27,7 @@ const AuthRequiredModal = ({
             transition={{ duration: 0.25 }}
             className="bg-white rounded-2xl shadow-xl p-6 w-full max-w-md mx-4">
             <h2 className="text-2xl font-semibold text-gray-900 mb-2">
-              Inicia sesión para continuar
+              Inicia sesión o registrate para continuar
             </h2>
             <p className="text-gray-600 mb-6">
               Crea tu cuenta o inicia sesión para acceder a{" "}
@@ -46,7 +46,7 @@ const AuthRequiredModal = ({
               <button
                 onClick={onConfirm}
                 className="px-4 py-2 rounded-lg bg-custom-golden-600 text-white hover:bg-custom-golden-700 transition">
-                Iniciar sesión
+                Iniciar sesión o registrate
               </button>
             </div>
           </motion.div>

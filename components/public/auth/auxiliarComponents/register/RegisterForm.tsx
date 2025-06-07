@@ -229,7 +229,7 @@ const RegisterForm = () => {
             <div>
                 <button
                     type="submit"
-                    className="w-full py-2 px-4 rounded-md text-sm font-medium text-white bg-custom-golden-600 hover:bg-custom-golden-700 duration-300"
+                    className="w-full py-2 px-4 rounded-md text-sm font-medium text-white bg-custom-golden-600 hover:bg-custom-golden-700 duration-300 cursor-pointer"
                 >
                     Crear cuenta
                 </button>
@@ -239,7 +239,7 @@ const RegisterForm = () => {
                         handleRef();
                         signIn("google", { callbackUrl });
                     }}
-                    className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm hover:shadow-md text-sm font-medium text-white duration-300 mt-3 gap-2 cursor-auto border border-custom-gray-200"
+                    className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm hover:shadow-md text-sm font-medium text-white duration-300 mt-3 gap-2 border border-custom-gray-300 hover:bg-custom-gray-100 cursor-pointer"
                 >
                     <span>
                         <Image src="/google-logo.webp" alt="google" width={20} height={20} />

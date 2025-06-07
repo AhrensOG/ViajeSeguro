@@ -119,14 +119,14 @@ const LogInForm = () => {
             <div>
                 <button
                     type="submit"
-                    className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white bg-custom-golden-600 hover:bg-custom-golden-700 duration-300"
+                    className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white bg-custom-golden-600 hover:bg-custom-golden-700 duration-300 cursor-pointer"
                 >
                     Iniciar sesión
                 </button>
                 <button
                     type="button"
                     onClick={() => signIn("google", { callbackUrl })}
-                    className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm text-sm font-medium text-white duration-300 mt-3 gap-2 cursor-auto"
+                    className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm hover:shadow-md text-sm font-medium border border-custom-gray-300 text-white duration-300 hover:bg-custom-gray-100 mt-3 gap-2 cursor-pointer"
                 >
                     <span>
                         <Image src="/google-logo.webp" alt="google" width={20} height={20} />
