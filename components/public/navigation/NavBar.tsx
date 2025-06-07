@@ -36,8 +36,8 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
           <Link href="/dashboard/client/reservations" className={className}>
             Reservas
           </Link>
-          <Link href="#" className={className}>
-            Mis compras
+          <Link href="/dashboard/client/payments" className={className}>
+            Mis pagos
           </Link>
         </>
       );
