@@ -2,7 +2,8 @@
 
 import { useState } from "react";
 import { MapPin } from "lucide-react";
-import { LOCATIONS, SERVICES } from "@/lib/constants";
+// import { LOCATIONS, SERVICES } from "@/lib/constants";
+import { LOCATIONS } from "@/lib/constants";
 import CustomSelect from "./CustomSelect";
 import CustomDatePicker from "./CustomDatePicker";
 import { TripServiceType } from "@/lib/shared/types/trip-service-type.type";
@@ -24,14 +25,11 @@ const SearchForm = ({
 }: SearchFormProps) => {
   const [origin, setOrigin] = useState(initialData.origin || "");
   const [destination, setDestination] = useState(initialData.destination || "");
-  const [serviceType, setServiceType] = useState<TripServiceType>(
-    initialData.serviceType || "SIMPLE_TRIP"
-  );
   const [departure, setDeparture] = useState<Date | undefined>(
     initialData.departure ? new Date(initialData.departure) : undefined
   );
 
-  const isFormValid = origin && destination && serviceType && departure;
+  const isFormValid = origin && destination && departure;
 
   const handleSearch = () => {
     if (!isFormValid) return;
@@ -39,7 +37,7 @@ const SearchForm = ({
     const searchData: ClientSearchFormData = {
       origin,
       destination,
-      serviceType: serviceType as TripServiceType,
+      serviceType: "SIMPLE_TRIP" as TripServiceType,
       departure,
     };
 
@@ -66,16 +64,7 @@ const SearchForm = ({
                 value={destination}
                 icon={<MapPin className="h-5 w-5 text-custom-gray-600" />}
               />
-            </div>
-            <div className="flex flex-col sm:flex-row gap-2 w-full">
               <CustomDatePicker onSelect={setDeparture} value={departure} />
-              <CustomSelect
-                options={SERVICES}
-                placeholder="Servicio"
-                onSelect={(value) => setServiceType(value as TripServiceType)}
-                value={serviceType}
-                icon={<MapPin className="h-5 w-5 text-custom-gray-600" />}
-              />
             </div>
           </div>
           <div className="flex justify-center">

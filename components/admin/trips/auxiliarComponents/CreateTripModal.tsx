@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import { toast } from "sonner";
 import { createTrip } from "@/lib/api/admin/trips";
 import { CreateTripRequest, Driver, Partner, TripServiceType, TripStatus } from "@/lib/api/admin/trips/trips.type";
+import { DateTime } from "luxon";
 
 interface Props {
     onClose: () => void;
@@ -50,19 +51,25 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        const toastId = toast.loading("Creando viaje...");
+        const departureUTC = DateTime.fromISO(form.departure, { zone: "Europe/Madrid" }).toUTC().toISO();
+        const arrivalUTC = DateTime.fromISO(form.arrival, { zone: "Europe/Madrid" }).toUTC().toISO();
+
 
         const payload = {
             ...form,
+            departure: departureUTC || form.departure,
+            arrival: arrivalUTC || form.departure,
             basePrice: parseFloat(form.basePrice as string),
         };
 
         try {
             await createTrip(payload);
-            toast.success("Viaje creado con éxito");
+            toast.success("Viaje creado con éxito", { id: toastId });
             onSuccess();
             onClose();
         } catch {
-            toast.error("Error al crear el viaje");
+            toast.info("Error al crear el viaje", { id: toastId });
         }
     };
 

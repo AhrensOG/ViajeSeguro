@@ -64,7 +64,7 @@ const OurStorySection = () => {
                 <CheckCircle className="h-5 w-5 text-custom-golden-700" />
               </div>
               <p className="text-custom-gray-800 font-medium">
-                Desde entonces, hemos conectado a más de 500.000 viajeros en
+                Desde entonces, hemos conectado a muchisimos viajeros en
                 toda España.
               </p>
             </motion.div>
