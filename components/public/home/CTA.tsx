@@ -49,10 +49,10 @@ const CTA = () => {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-gray-600 mb-6 leading-relaxed"
             >
-              Registra tus datos y accede a <strong>precios sin igual</strong>{" "}
-              en tu asiento. Viaja cómodamente entre{" "}
+              Registrando tus datos accederás a <strong>precios sin igual</strong>{" "}
+              en tu asiento. Viaja sin cancelaciones y cómodamente entre{" "}
               <strong>Valencia, Madrid y Barcelona</strong> con nuestro servicio
-              de transporte <strong>privado y flexible</strong>.
+              de transporte de pasajeros <strong>privado y flexible</strong>.
             </motion.p>
 
             <motion.div

@@ -20,20 +20,26 @@ const FoundersSection = () => {
 
         {/* Fundadores */}
         <div className="grid md:grid-cols-2 gap-8">
-          {[{
-            name: "Javier Albarracin Gené",
-            title: "Co-fundador y CEO",
-            quote: "Creemos que viajar no debería ser un lujo, sino un derecho accesible para todos. Y sobre todo, debería ser una experiencia segura y confiable.",
-            description: "Con más de 15 años de experiencia en el sector tecnológico y transporte, Javier identificó la oportunidad de mejorar la experiencia de viaje compartido en España. Su visión de crear una plataforma centrada en la seguridad y confiabilidad ha sido el motor impulsor de Viaje Seguro desde sus inicios.",
-            image: "/main/img_placeholder.webp",
-          },
-          {
-            name: "Chela Vargas E",
-            title: "Co-fundadora y COO",
-            quote: "Cada decisión que tomamos está guiada por una pregunta simple: ¿Cómo podemos hacer que este viaje sea mejor, más seguro y más accesible para nuestros usuarios?",
-            description: "Chela aporta su amplia experiencia en operaciones y servicio al cliente para garantizar que cada aspecto de Viaje Seguro funcione sin problemas. Su enfoque en la experiencia del usuario ha sido fundamental para crear una plataforma que realmente entiende las necesidades de los viajeros.",
-            image: "/main/img_placeholder.webp",
-          }].map((founder, index) => (
+          {[
+            {
+              name: "Javier Albarracin Gené",
+              title: "Co-fundador y CEO",
+              quote:
+                "Creemos que que viajar no es un lujo, sino un derecho accesible para todos, y sobre todo, ha de ser una experiencia agradable, segura y satisfactoria tanto para los usuarios como para conductores, es un ganar ganar para todos.",
+              description:
+                "Con más de 25 años de experiencia en logística y transportes, Javier identificó la oportunidad de mejorar la experiencia de los viajes compartidos en España. Su visión de crear una plataforma centrada en la seguridad de viajar sin cancelaciones y la confiabilidad ha sido determinante y el motor de VIAJE SEGURO desde sus inicios.",
+              image: "/main/img_placeholder.webp",
+            },
+            {
+              name: "Chela Vargas E",
+              title: "Co-fundadora y COO",
+              quote:
+                "Cada decisión que tomamos está guiada por una pregunta lógica… ¿Cómo podemos hacer para este viaje sea mejor, más seguro y accesible para nuestros usuarios?",
+              description:
+                "Chela es una empresaria con un enfoque de experiencia basada en mejorar la atención, ya que atraves de su actitud sus dones de intermediaria y cambio en la transformación de mejorar VIAJE SEGURO da una atención de calidad, seguridad a todas las personas que nos eligen en este proyecto de servicios y humanidad.",
+              image: "/main/img_placeholder.webp",
+            },
+          ].map((founder, index) => (
             <motion.div
               key={founder.name}
               className="bg-custom-white-100 rounded-xl overflow-hidden shadow-md"
@@ -59,7 +65,9 @@ const FoundersSection = () => {
                 <p className="text-custom-gray-700 mb-4">
                   {founder.description}
                 </p>
-                <p className="text-custom-gray-700">&quot;{founder.quote}&quot;</p>
+                <p className="text-custom-gray-700">
+                  &quot;{founder.quote}&quot;
+                </p>
               </div>
             </motion.div>
           ))}

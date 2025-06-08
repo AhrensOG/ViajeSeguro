@@ -16,19 +16,37 @@ const routes: Route[] = [
     from: "Valencia",
     to: "Madrid",
     duration: "Aprox. 3.5 horas",
-    price: "Desde 22€",
+    price: "Desde 27.50€",
   },
   {
     from: "Valencia",
     to: "Barcelona",
     duration: "Aprox. 3.5 horas",
-    price: "Desde 22€",
+    price: "Desde 27.50€",
   },
   {
     from: "Madrid",
     to: "Barcelona",
     duration: "Aprox. 6 horas",
-    price: "Desde 22€",
+    price: "Desde 55€",
+  },
+  {
+    from: "Madrid",
+    to: "Valencia",
+    duration: "Aprox. 3.5 horas",
+    price: "Desde 27.50€",
+  },
+  {
+    from: "Barcelona",
+    to: "Valencia",
+    duration: "Aprox. 3.5 horas",
+    price: "Desde 27.50€",
+  },
+  {
+    from: "Barcelona",
+    to: "Madrid",
+    duration: "Aprox. 6 horas",
+    price: "Desde 55€",
   },
 ];
 
@@ -43,15 +61,13 @@ const Routes = () => {
       animate={isInView && { opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
       id="rutas"
-      className="py-24 "
-    >
+      className="py-24 ">
       <div className="container mx-auto px-6">
         <motion.h2
           initial={{ opacity: 0, y: -20 }}
           animate={isInView && { opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-4xl font-extrabold text-center text-custom-black-800 mb-12"
-        >
+          className="text-4xl font-extrabold text-center text-custom-black-800 mb-12">
           Nuestras Rutas
         </motion.h2>
 
@@ -68,8 +84,7 @@ const Routes = () => {
                     index !== routes.length - 1
                       ? "border-b border-custom-gray-500"
                       : ""
-                  }`}
-                >
+                  }`}>
                   <div className="flex items-center">
                     <div className="w-12 h-12  rounded-full flex items-center justify-center mr-4">
                       <MapPin className="h-6 w-6 text-custom-black-800" />

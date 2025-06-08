@@ -13,30 +13,34 @@ const services: Service[] = [
   {
     title: "Viaje Exclusivo",
     features: [
-      "Contrata el vehículo completo (7 plazas)",
-      "Elige el lugar de recogida y destino",
+      "Contrata el vehículo completo (8 plazas)",
+      "Elige la calle y población de recogida y la calle y población de destino",
       "Elige el día y la hora del viaje",
-      "Reserva con 72h de anticipación",
-      "50% de pago 48h antes, resto el día del viaje",
+      "Reserva con una antelación mínima de 72h",
+      "Reserva con el 50% del valor del viaje y el resto antes de viajar.",
     ],
   },
   {
     title: "Viaje Semiexclusivo",
     features: [
-      "Contrata 4 plazas del vehículo",
-      "Comparte el viaje con mínimo 3 personas",
-      "Elige recogida y destino en Valencia, Madrid o Barcelona",
+      "Contrata la mitad del vehículo 4 plazas",
+      "Compartes el viaje con 3 o 4 personas más",
+      "Elige la calle y población de recogida y la calle y población de destino",
       "Elige el día y la hora del viaje",
-      "50% de pago 48h antes, resto el día del viaje",
+      "Permites hacer una parada o dos para recoger el resto de pasajeros",
+      "Reserva con una antelación mínima de 72h",
+      "Reserva con el 50% del valor del viaje y el resto antes de viajar",
     ],
   },
   {
     title: "Viaje Compartido",
     features: [
-      "Contrata la plaza o plazas que necesitas",
-      "Comparte con otras personas (hasta 9 plazas)",
-      "Punto de recogida en Valencia, Madrid o Barcelona",
-      "La empresa notifica día y hora de salida",
+      "Contrata la plaza o las plazas que necesitas (todos los pasajeros deberán registrarse para poder viajar)",
+      "Compartes el viaje con hasta 8 personas más",
+      "La calle y población de recogida y la calle y población de destino la indica la aplicación",
+      "El día y la hora del viaje la indica la aplicación",
+      "Permites hacer varias paradas para recoger el resto de pasajeros",
+      "Reserva con el 100% del valor del viaje por la aplicación o por bizum",
       "Pago total 24h antes por BIZUM",
     ],
   },
@@ -50,8 +54,7 @@ const Services = () => {
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-4xl font-extrabold text-center text-custom-black-800 mb-12"
-        >
+          className="text-4xl font-extrabold text-center text-custom-black-800 mb-12">
           Nuestros Servicios
         </motion.h2>
 
@@ -62,8 +65,7 @@ const Services = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.6, delay: index * 0.2 }}
-              className="bg-custom-white-100 rounded-lg shadow-lg overflow-hidden border border-custom-gray-100 flex flex-col justify-center items-center"
-            >
+              className="bg-custom-white-100 rounded-lg shadow-lg overflow-hidden border border-custom-gray-100 flex flex-col justify-center items-center">
               <div className="bg-gradient-to-r from-custom-black-800 to-custom-black-900 p-5 text-center w-full">
                 <h3 className="text-xl font-bold text-custom-white-100">
                   {service.title}
@@ -84,8 +86,7 @@ const Services = () => {
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                   className="w-full mt-6 bg-custom-golden-600 hover:bg-custom-golden-700 text-custom-white-100 font-medium py-3 px-6 rounded-lg transition"
-                  aria-label={`Reservar ${service.title}`}
-                >
+                  aria-label={`Reservar ${service.title}`}>
                   Reservar
                 </motion.button>
               </div>
