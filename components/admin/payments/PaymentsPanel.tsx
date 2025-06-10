@@ -116,7 +116,7 @@ export default function PaymentsPanel() {
             {loading ? (
                 <SkeletonTable rows={5} />
             ) : (
-                <div className="flex-1 w-full bg-custom-white-100 rounded-xl shadow-sm border border-custom-gray-200 overflow-hidden flex flex-col">
+                <div className="flex-1 w-full bg-custom-white-100 rounded-xl shadow-sm border border-custom-gray-200 overflow-auto flex flex-col">
                     <table className="min-w-full text-sm text-left table-fixed border-separate border-spacing-0">
                         <thead className="bg-custom-golden-100 text-custom-golden-700 uppercase text-xs">
                             <tr>
