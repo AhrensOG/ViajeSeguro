@@ -44,17 +44,17 @@ const plans: Plan[] = [
         highlight: false,
         features: [
             {
-                icon: <Tag size={18} className="mt-1 text-custom-golden-600" />,
-                title: "Descuento en cada viaje",
-                desc: "Viajes de 27.50€ pasan a valer 24.75€",
-                badge: "¡Ahorra 2.75€ por viaje!",
+                icon: <Tag size={18} className="min-w-[18px] mt-1 text-custom-golden-600" />,
+                title: "Descuento cada vez que decidas volver con nosotros",
+                desc: "el segundo trayecto de 27,50€ a 24,75€ de forma permanente y de por vida",
+                badge: "Ahorra 2,75 en cada trayecto (ida y vuelta 5,50 € menos )",
             },
             {
-                icon: <Check size={18} className="mt-1 text-custom-golden-600" />,
-                desc: "Acceso a todas las rutas disponibles",
+                icon: <Check size={18} className="min-w-[18px] mt-1 text-custom-golden-600" />,
+                desc: "Acceso ilimitado a todos los trayectos a Barcelona o Madrid desde valencia o viceversa",
             },
             {
-                icon: <Check size={18} className="mt-1 text-custom-golden-600" />,
+                icon: <Check size={18} className="min-w-[18px] mt-1 text-custom-golden-600" />,
                 desc: "Sin compromiso mensual",
             },
         ],
@@ -71,22 +71,22 @@ const plans: Plan[] = [
         highlightLabel: "Popular",
         features: [
             {
-                icon: <Tag size={18} className="mt-1 text-custom-golden-600" />,
+                icon: <Tag size={18} className="min-w-[18px] mt-1 text-custom-golden-600" />,
                 title: "Mayor descuento en viajes",
                 desc: "Viajes de 27.50€ pasan a valer 22€",
-                badge: "¡Ahorra 5.50€ por viaje!",
+                badge: "¡Ahorras 11€ en viajes de ida y vuelta!",
             },
             {
-                icon: <Clock size={18} className="mt-1 text-custom-golden-600" />,
+                icon: <Clock size={18} className="min-w-[18px] mt-1 text-custom-golden-600" />,
                 title: "Cancelaciones flexibles",
                 desc: "Hasta 48 horas antes con 100% reembolso",
             },
             {
-                icon: <Star size={18} className="mt-1 text-custom-golden-600" />,
+                icon: <Star size={18} className="min-w-[18px] mt-1 text-custom-golden-600" />,
                 desc: "Estatus de miembro Club Lealtad",
             },
             {
-                icon: <Check size={18} className="mt-1 text-custom-golden-600" />,
+                icon: <Check size={18} className="min-w-[18px] mt-1 text-custom-golden-600" />,
                 desc: "Todos los beneficios del plan básico",
             },
         ],
@@ -102,13 +102,13 @@ const plans: Plan[] = [
         highlight: false,
         features: [
             {
-                icon: <Tag size={18} className="mt-1 text-custom-golden-600" />,
+                icon: <Tag size={18} className="min-w-[18px] mt-1 text-custom-golden-600" />,
                 title: "Descuento base en viajes",
                 desc: "Viajes de 27.50€ pasan a valer 22€",
                 badge: "¡Ahorra hasta 12.10€ por viaje!",
             },
             {
-                icon: <UserPlus size={18} className="mt-1 text-custom-golden-600" />,
+                icon: <UserPlus size={18} className="min-w-[18px] mt-1 text-custom-golden-600" />,
                 title: "Sistema de recomendaciones",
                 desc: "Recomienda hasta 3 amigos por mes:",
                 points: [
@@ -118,17 +118,17 @@ const plans: Plan[] = [
                 ],
             },
             {
-                icon: <Clock size={18} className="mt-1 text-custom-golden-600" />,
+                icon: <Clock size={18} className="min-w-[18px] mt-1 text-custom-golden-600" />,
                 title: "Cancelaciones ultra flexibles",
                 desc: "Hasta 24 horas antes con 100% reembolso",
             },
             {
-                icon: <Shield size={18} className="mt-1 text-custom-golden-600" />,
+                icon: <Shield size={18} className="min-w-[18px] mt-1 text-custom-golden-600" />,
                 title: "Selección de asientos",
                 desc: "Elige tu asiento preferido en cada viaje",
             },
             {
-                icon: <Gift size={18} className="mt-1 text-custom-golden-600" />,
+                icon: <Gift size={18} className="min-w-[18px] mt-1 text-custom-golden-600" />,
                 title: "Beneficios aleatorios",
                 desc: "Sorpresas y descuentos exclusivos durante todo el año",
             },

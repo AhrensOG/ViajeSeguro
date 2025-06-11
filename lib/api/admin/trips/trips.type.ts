@@ -139,6 +139,7 @@ export enum TripStatus {
     PENDING = "PENDING",
     CONFIRMED = "CONFIRMED",
     CANCELLED = "CANCELLED",
+    FINISHED = "FINISHED",
 }
 
 export interface Vehicle {

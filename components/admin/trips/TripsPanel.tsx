@@ -81,46 +81,59 @@ export default function TripsPanel() {
     fetchPartners();
   }, []);
 
-  const filteredTrips = trips
-    .filter((trip) => {
-      const matchesSearch = `${trip.origin} ${trip.destination}`
-        .toLowerCase()
-        .includes(search.toLowerCase());
-      const matchesOrigin = filters.origin.toLowerCase()
-        ? trip.origin.toLowerCase().includes(filters.origin.toLowerCase())
-        : true;
-      const matchesDestination = filters.destination.toLowerCase()
-        ? trip.destination
-            .toLowerCase()
-            .includes(filters.destination.toLowerCase())
-        : true;
-      const matchesDeparture = filters.departure
-        ? trip.departure.startsWith(filters.departure)
-        : true;
-      const matchesArrival = filters.arrival
-        ? trip.arrival.startsWith(filters.arrival)
-        : true;
-      const matchesCapacity = filters.capacity
-        ? trip.capacity.toString() === filters.capacity
-        : true;
-      const matchesStatus = filters.status
-        ? trip.status === filters.status
-        : true;
+  const now = new Date();
 
-      return (
-        matchesSearch &&
-        matchesOrigin &&
-        matchesDestination &&
-        matchesDeparture &&
-        matchesArrival &&
-        matchesCapacity &&
-        matchesStatus
-      );
-    })
+  const filteredTrips = trips.filter((trip) => {
+    const matchesSearch = `${trip.origin} ${trip.destination}`
+      .toLowerCase()
+      .includes(search.toLowerCase());
+    const matchesOrigin = filters.origin.toLowerCase()
+      ? trip.origin.toLowerCase().includes(filters.origin.toLowerCase())
+      : true;
+    const matchesDestination = filters.destination.toLowerCase()
+      ? trip.destination
+          .toLowerCase()
+          .includes(filters.destination.toLowerCase())
+      : true;
+    const matchesDeparture = filters.departure
+      ? trip.departure.startsWith(filters.departure)
+      : true;
+    const matchesArrival = filters.arrival
+      ? trip.arrival.startsWith(filters.arrival)
+      : true;
+    const matchesCapacity = filters.capacity
+      ? trip.capacity.toString() === filters.capacity
+      : true;
+    const matchesStatus = filters.status
+      ? trip.status === filters.status
+      : true;
+
+    return (
+      matchesSearch &&
+      matchesOrigin &&
+      matchesDestination &&
+      matchesDeparture &&
+      matchesArrival &&
+      matchesCapacity &&
+      matchesStatus
+    );
+  });
+
+  const upcomingTrips = filteredTrips
+    .filter((trip) => new Date(trip.departure) >= now)
+    .sort(
+      (a, b) =>
+        new Date(a.departure).getTime() - new Date(b.departure).getTime()
+    );
+
+  const pastTrips = filteredTrips
+    .filter((trip) => new Date(trip.departure) < now)
     .sort(
       (a, b) =>
         new Date(b.departure).getTime() - new Date(a.departure).getTime()
     );
+
+  const orderedTrips = [...upcomingTrips, ...pastTrips];
 
   const handleDelete = async (id: string): Promise<void> => {
     try {
@@ -205,6 +218,7 @@ export default function TripsPanel() {
           <option value="PENDING">Pendiente</option>
           <option value="CONFIRMED">Confirmado</option>
           <option value="CANCELLED">Cancelado</option>
+          <option value="FINISHED">Finalizado</option>
         </select>
       </div>
 
@@ -243,7 +257,7 @@ export default function TripsPanel() {
               </tr>
             </thead>
             <tbody className="text-custom-black-800">
-              {filteredTrips.map((trip, index) => (
+              {orderedTrips.map((trip, index) => (
                 <tr
                   onClick={() => {
                     setSelectedTrip(trip);
