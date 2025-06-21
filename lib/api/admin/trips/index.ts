@@ -1,13 +1,14 @@
 import { fetchWithAuth } from "@/lib/functions";
-import { CreateTripRequest, UpdateTripRequest } from "./trips.type";
+import { CreateTripRequest, TripResponse, UpdateTripRequest } from "./trips.type";
 import { BACKEND_URL } from "@/lib/constants";
 
-export async function createTrip(data: CreateTripRequest): Promise<void> {
+export async function createTrip(data: CreateTripRequest): Promise<TripResponse> {
     try {
-        await fetchWithAuth(`${BACKEND_URL}/trip`, {
+        const res = await fetchWithAuth(`${BACKEND_URL}/trip`, {
             method: "POST",
             body: JSON.stringify(data),
         });
+        return res as TripResponse;
     } catch (error) {
         console.log(error);
         throw new Error("Failed to create trip");

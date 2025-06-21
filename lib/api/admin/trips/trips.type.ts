@@ -27,7 +27,7 @@ export interface TripResponse {
     destinationLocation: string;
     serviceType: "SIMPLE_TRIP" | "RENTAL_WITH_DRIVER" | "RENTAL_WITHOUT_DRIVER";
     vehicleId: string | null;
-    vehicle: {
+    vehicle?: {
         id: string;
         plate: string;
         capacity: number;
@@ -45,7 +45,7 @@ export interface TripResponse {
     visible: boolean;
     createdAt: string;
     userId: string;
-    reservations: TripReservation[];
+    reservations?: TripReservation[];
 }
 
 export interface Passengers {
@@ -53,19 +53,19 @@ export interface Passengers {
     paymentMethod: string;
     status: string;
     user?: {
-      id: string;
-      name: string;
-      lastName: string;
-      email: string;
+        id: string;
+        name: string;
+        lastName: string;
+        email: string;
     };
     qr?: {
-      id: string;
-      imageUrl: string;
-      usedAt: string | null;
-      isValid: boolean;
-      createdAt: string;
-      reservationId: string;
-      isDeleted: boolean;
+        id: string;
+        imageUrl: string;
+        usedAt: string | null;
+        isValid: boolean;
+        createdAt: string;
+        reservationId: string;
+        isDeleted: boolean;
     };
 }
 

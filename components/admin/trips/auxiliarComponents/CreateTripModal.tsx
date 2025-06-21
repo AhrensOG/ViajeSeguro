@@ -1,13 +1,13 @@
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useState } from "react";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 import { createTrip } from "@/lib/api/admin/trips";
-import { CreateTripRequest, Driver, Partner, TripServiceType, TripStatus } from "@/lib/api/admin/trips/trips.type";
+import { CreateTripRequest, Driver, Partner, TripResponse, TripServiceType, TripStatus } from "@/lib/api/admin/trips/trips.type";
 import { DateTime } from "luxon";
 
 interface Props {
     onClose: () => void;
-    onSuccess: () => void;
+    onSuccess: Dispatch<SetStateAction<TripResponse[]>>;
     partners: Partner[];
     drivers: Driver[];
 }
@@ -55,7 +55,6 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
         const departureUTC = DateTime.fromISO(form.departure, { zone: "Europe/Madrid" }).toUTC().toISO();
         const arrivalUTC = DateTime.fromISO(form.arrival, { zone: "Europe/Madrid" }).toUTC().toISO();
 
-
         const payload = {
             ...form,
             departure: departureUTC || form.departure,
@@ -64,9 +63,10 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
         };
 
         try {
-            await createTrip(payload);
+            const res = await createTrip(payload);
+
             toast.success("Viaje creado con éxito", { id: toastId });
-            onSuccess();
+            onSuccess((prevTrips) => [...prevTrips, res]);
             onClose();
         } catch {
             toast.info("Error al crear el viaje", { id: toastId });
