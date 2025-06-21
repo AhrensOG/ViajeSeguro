@@ -1,6 +1,6 @@
 import Link from "next/link";
 import React from "react";
-import { Facebook, Instagram, MessageCircle } from "lucide-react";
+import { Facebook, Instagram} from "lucide-react";
 import Image from "next/image";
 
 const Footer = () => {
