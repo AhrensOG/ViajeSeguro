@@ -7,12 +7,12 @@ import React from "react";
 const teamMembers = [
   {
     name: "Javier",
-    role: "Director de Tecnología",
+    role: "Fundador y Director de Logistica",
     image: "/main/img_placeholder.webp",
   },
   {
     name: "Chela",
-    role: "Directora de Administración y Control",
+    role: "Fundadora y Directora de Administración y Control",
     image: "/main/img_placeholder.webp",
   },
   {
@@ -21,8 +21,8 @@ const teamMembers = [
     image: "/main/img_placeholder.webp",
   },
   {
-    name: "Gabriel",
-    role: "Soporte Técnico",
+    name: "Francisco Javier ",
+    role: "Gefe de Trafico y Gestión de Viajes",
     image: "/main/img_placeholder.webp",
   },
 ];

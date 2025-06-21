@@ -1,6 +1,7 @@
 import Link from "next/link";
 import React from "react";
 import { Facebook, Instagram, MessageCircle } from "lucide-react";
+import Image from "next/image";
 
 const Footer = () => {
   return (
@@ -43,7 +44,25 @@ const Footer = () => {
                 rel="noopener noreferrer"
                 className="hover:text-custom-golden-500 transition-colors"
                 aria-label="Mensaje directo">
-                <MessageCircle size={32} />
+                <Image
+                  src="/main/whatsapp.png"
+                  alt="Telegram icon"
+                  width={32}
+                  height={32}
+                />
+              </Link>
+              <Link
+                href="https://t.me/+b1mCoIY5p54yMGE0"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="hover:text-custom-golden-500 transition-colors"
+                aria-label="Mensaje directo">
+                <Image
+                  src="/main/telegram.png"
+                  alt="Telegram icon"
+                  width={32}
+                  height={32}
+                />
               </Link>
             </div>
           </div>
