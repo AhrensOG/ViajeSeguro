@@ -6,9 +6,19 @@ import React from "react";
 
 const HeroSection = () => {
   return (
-    <section className="bg-gradient-to-r from-custom-golden-700 to-custom-golden-500 text-custom-white-100 py-20 px-4">
+    <section
+      className="relative text-custom-white-100 py-20 px-4"
+      style={{
+        backgroundImage: "url('/main/heroPromotion.jpg')",
+        backgroundSize: "cover",
+        backgroundPosition: "center",
+        backgroundRepeat: "no-repeat",
+      }}
+    >
+      {/* Capa oscura para mejorar la legibilidad del texto */}
+      <div className="absolute inset-0 bg-black/40 z-0" />
       <motion.div
-        className="max-w-5xl mx-auto text-center"
+        className="max-w-5xl mx-auto text-center relative z-10"
         initial={{ opacity: 0, y: 40 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.6, ease: "easeOut" }}>
