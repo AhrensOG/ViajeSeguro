@@ -11,10 +11,10 @@ const HeroSection = () => {
       <motion.div
         className="absolute inset-0 opacity-20"
         initial={{ scale: 1.1, opacity: 0 }}
-        animate={{ scale: 1, opacity: 0.2 }}
+        animate={{ scale: 1, opacity: 0.4 }}
         transition={{ duration: 1.2, ease: "easeOut" }}>
         <Image
-          src="/main/img_placeholder.webp"
+          src="/main/nosotros.jpg"
           alt="Equipo de Viaje Seguro"
           fill
           className="object-cover"
