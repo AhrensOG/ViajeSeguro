@@ -1,16 +1,16 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { X } from "lucide-react";
-import { CreatePaymentFormData, UsersWithReservations } from "@/lib/api/admin/payments/payments.type";
+import { CreatePaymentFormData, PaymentResponse, UsersWithReservations } from "@/lib/api/admin/payments/payments.type";
 import { toast } from "sonner";
 import { createPayment } from "@/lib/api/admin/payments/intex";
 
 interface Props {
     onClose: () => void;
     userOptions: UsersWithReservations[];
-    onSuccess: () => void;
+    onSuccess: Dispatch<SetStateAction<PaymentResponse[]>>;
 }
 
 const CreatePaymentModal = ({ onClose, userOptions, onSuccess }: Props) => {
@@ -26,10 +26,10 @@ const CreatePaymentModal = ({ onClose, userOptions, onSuccess }: Props) => {
 
     const onCreate = async (data: CreatePaymentFormData) => {
         try {
-            await createPayment({
+            const res = await createPayment({
                 ...data,
             });
-            onSuccess();
+            onSuccess((prev) => [...prev, res as PaymentResponse]);
             onClose();
             return toast.success("Pago creado con éxito");
         } catch (error) {
@@ -42,9 +42,25 @@ const CreatePaymentModal = ({ onClose, userOptions, onSuccess }: Props) => {
         onCreate(data);
     };
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                onClose(); // función que cierra el modal
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [onClose]);
+
     return (
-        <div className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
-            <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-xl relative border border-custom-gray-300">
+        <div onClick={onClose} className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
+            <div
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-xl shadow-lg p-6 w-full max-w-xl relative border border-custom-gray-300"
+            >
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 hover:text-black">
                     <X className="size-5" />
                 </button>

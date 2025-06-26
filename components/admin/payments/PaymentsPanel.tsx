@@ -180,7 +180,7 @@ export default function PaymentsPanel() {
                 <CreatePaymentModal
                     onClose={() => setIsCreateModalOpen(false)}
                     userOptions={users as UsersWithReservations[]}
-                    onSuccess={() => window.location.reload()}
+                    onSuccess={setPayments}
                 />
             )}
             {isEditModalOpen && selectPayment && (
@@ -195,7 +195,7 @@ export default function PaymentsPanel() {
                         reservationId: selectPayment.reservation?.id ?? "",
                     }}
                     userOptions={users as UsersWithReservations[]}
-                    onSuccess={() => window.location.reload()}
+                    onSuccess={setPayments}
                 />
             )}
         </div>

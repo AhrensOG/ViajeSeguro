@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 import { updateTrip } from "@/lib/api/admin/trips";
@@ -49,7 +49,27 @@ const EditTripModal = ({ onClose, onSuccess, drivers, trip }: Props) => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, type, value } = e.target;
-        const parsedValue = type === "checkbox" ? (e.target as HTMLInputElement).checked : type === "number" ? Number(value) : value;
+
+        const numericFields = ["capacity", "minPassengers"];
+        const decimalFields = ["basePrice"];
+        let parsedValue: any = value;
+
+        if (numericFields.includes(name)) {
+            if (/^\d*$/.test(value)) {
+                parsedValue = value === "" ? "" : Number(value);
+            } else {
+                return; // ignora letras o símbolos no numéricos
+            }
+        } else if (decimalFields.includes(name)) {
+            if (/^\d*\.?\d*$/.test(value)) {
+                parsedValue = value === "" ? "" : parseFloat(value);
+            } else {
+                return;
+            }
+        } else if (type === "checkbox") {
+            parsedValue = (e.target as HTMLInputElement).checked;
+        }
+
         setForm((prev) => ({ ...prev, [name]: parsedValue }));
     };
 
@@ -79,7 +99,6 @@ const EditTripModal = ({ onClose, onSuccess, drivers, trip }: Props) => {
 
         try {
             const res = (await updateTrip(cleanedForm)) as TripResponse;
-            console.log("Viaje actualizado:", res);
 
             toast.success("Viaje actualizado con éxito");
             onSuccess((prev) => prev.map((trip) => (trip.id === res.id ? res : trip)));
@@ -90,9 +109,25 @@ const EditTripModal = ({ onClose, onSuccess, drivers, trip }: Props) => {
         }
     };
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                onClose(); // función que cierra el modal
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [onClose]);
+
     return (
-        <div className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
-            <div className="bg-white rounded-xl shadow-2xl p-8 my-8 w-full max-w-4xl max-h-[95vh] overflow-y-auto relative border border-custom-gray-300">
+        <div onClick={onClose} className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
+            <div
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-xl shadow-2xl p-8 my-8 w-full max-w-4xl max-h-[95vh] overflow-y-auto relative border border-custom-gray-300"
+            >
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-black" aria-label="Cerrar">
                     <X className="size-5" />
                 </button>

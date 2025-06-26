@@ -1,7 +1,7 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { X } from "lucide-react";
 import { toast } from "sonner";
-import { CreateReservationFormData, TripOption, UserOption } from "@/lib/api/admin/reservation/reservation.types";
+import { CreateReservationFormData, TripOption, UserOption, ReservationResponse } from "@/lib/api/admin/reservation/reservation.types";
 import { updateReservation } from "@/lib/api/admin/reservation/intex";
 
 interface Props {
@@ -9,7 +9,7 @@ interface Props {
     trips: TripOption[];
     initialData: CreateReservationFormData;
     onClose: () => void;
-    onSuccess: () => void;
+    onSuccess: Dispatch<SetStateAction<ReservationResponse[]>>;
 }
 
 const EditReservationModal = ({ users, trips, initialData, onClose, onSuccess }: Props) => {
@@ -18,6 +18,19 @@ const EditReservationModal = ({ users, trips, initialData, onClose, onSuccess }:
     useEffect(() => {
         setForm({ ...initialData });
     }, [initialData]);
+
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                onClose(); // función que cierra el modal
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [onClose]);
 
     const formatDate = (str: string): string => {
         const [datePart, timePart] = str.split(" ");
@@ -36,7 +49,7 @@ const EditReservationModal = ({ users, trips, initialData, onClose, onSuccess }:
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         try {
-            await updateReservation({
+            const res = await updateReservation({
                 tripId: form.tripId,
                 price: Number(form.price),
                 status: form.status,
@@ -46,9 +59,11 @@ const EditReservationModal = ({ users, trips, initialData, onClose, onSuccess }:
                 userId: form.userId,
                 id: form.id,
             });
+            console.log("Reserva actualizada:", res);
+
+            onSuccess((prev) => prev.filter((r) => r.id !== res.id).concat(res));
             toast.success("Reserva actualizada con éxito");
             onClose();
-            onSuccess();
         } catch (error) {
             console.error(error);
             return toast.error("Error al actualizar la reserva");
@@ -56,8 +71,11 @@ const EditReservationModal = ({ users, trips, initialData, onClose, onSuccess }:
     };
 
     return (
-        <div className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
-            <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md relative border border-custom-gray-300">
+        <div onClick={onClose} className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
+            <div
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md relative border border-custom-gray-300"
+            >
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 hover:text-black" aria-label="Cerrar">
                     <X className="size-5" />
                 </button>

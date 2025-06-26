@@ -1,15 +1,15 @@
 "use client";
 
-import React from "react";
+import React, { Dispatch, SetStateAction, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { X } from "lucide-react";
 import { createUser } from "@/lib/api/admin/user-panel";
 import { toast } from "sonner";
-import { UserFormData } from "@/lib/api/admin/user-panel/userPanel.types";
+import { SimpleUser, UserFormData, UserResponse } from "@/lib/api/admin/user-panel/userPanel.types";
 
 interface Props {
     onClose: () => void;
-    onSuccess: () => void;
+    onSuccess: Dispatch<SetStateAction<SimpleUser[]>>;
 }
 
 const roles = ["CLIENT", "DRIVER", "ADMIN"];
@@ -31,17 +31,22 @@ const UserCreateModal = ({ onClose, onSuccess }: Props) => {
 
     const handleCreateUser = async (data: UserFormData) => {
         try {
-            const res = await createUser(data);
+            const res = (await createUser(data)) as SimpleUser;
             if (!res) {
                 toast.info("Error al crear el usuario");
                 return;
             }
             toast.success("Usuario creado con éxito");
-            onSuccess();
+            onSuccess((prev) => [...prev, res]);
             onClose();
         } catch (error) {
-            console.error(error);
-            return toast.info("Error al crear el usuario");
+            if (error instanceof Error) {
+                console.error(error.message);
+                return toast.info(error.message);
+            } else {
+                console.error(error);
+                return toast.info("Error al crear el usuario");
+            }
         }
     };
 
@@ -49,9 +54,25 @@ const UserCreateModal = ({ onClose, onSuccess }: Props) => {
         handleCreateUser(data);
     };
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                onClose(); // función que cierra el modal
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [onClose]);
+
     return (
-        <div className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
-            <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md relative border border-custom-gray-300">
+        <div onClick={onClose} className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
+            <div
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md relative border border-custom-gray-300"
+            >
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 hover:text-black">
                     <X className="size-5" />
                 </button>

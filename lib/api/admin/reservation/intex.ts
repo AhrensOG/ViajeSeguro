@@ -1,6 +1,6 @@
 import { BACKEND_URL } from "@/lib/constants";
-import { fetchWithAuth } from "@/lib/functions";
-import { CreateReservationFormData } from "./reservation.types";
+import { fetchWithAuth, fetchWithOptionalAuth } from "@/lib/functions";
+import { CreateReservationFormData, Discounts, ReservationResponse } from "./reservation.types";
 
 export async function getReduceTrip() {
     const res = await fetchWithAuth(`${BACKEND_URL}/trip/reduced-all`);
@@ -14,23 +14,25 @@ export async function getAllReservations() {
     return res;
 }
 
-export async function createReservation(data: CreateReservationFormData, id: string): Promise<void> {
+export async function createReservation(data: CreateReservationFormData, id: string): Promise<ReservationResponse> {
     try {
-        await fetchWithAuth(`${BACKEND_URL}/reservation/create-by-admin/${id}`, {
+        const res = await fetchWithAuth(`${BACKEND_URL}/reservation/create-by-admin/${id}`, {
             method: "POST",
             body: JSON.stringify(data),
         });
+        return res as ReservationResponse;
     } catch {
         throw new Error("Error al crear la reserva");
     }
 }
 
-export async function updateReservation(data: CreateReservationFormData): Promise<void> {
+export async function updateReservation(data: CreateReservationFormData): Promise<ReservationResponse> {
     try {
-        await fetchWithAuth(`${BACKEND_URL}/reservation/${data.id}`, {
+        const res = await fetchWithAuth(`${BACKEND_URL}/reservation/${data.id}`, {
             method: "PUT",
             body: JSON.stringify(data),
         });
+        return res as ReservationResponse;
     } catch {
         throw new Error("Error al actualizar la reserva");
     }
@@ -43,5 +45,14 @@ export async function deleteRes(id: string) {
         });
     } catch {
         throw new Error("Error al eliminar la reserva");
+    }
+}
+
+export async function getDiscounts(): Promise<Discounts[]> {
+    try {
+        const res = await fetchWithOptionalAuth(`${BACKEND_URL}/discount/all`);
+        return res as Discounts[];
+    } catch (error) {
+        throw new Error("Error al obtener los descuentos");
     }
 }

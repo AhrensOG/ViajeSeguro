@@ -1,6 +1,6 @@
-import React, { useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { X } from "lucide-react";
-import { CreateReservationFormData, TripOption, UserOption } from "@/lib/api/admin/reservation/reservation.types";
+import { CreateReservationFormData, TripOption, UserOption, ReservationResponse } from "@/lib/api/admin/reservation/reservation.types";
 import { toast } from "sonner";
 import { createReservation } from "@/lib/api/admin/reservation/intex";
 
@@ -8,28 +8,28 @@ interface Props {
     users: UserOption[];
     trips: TripOption[];
     onClose: () => void;
-    onSuccess: () => void;
+    onSuccess: Dispatch<SetStateAction<ReservationResponse[]>>;
 }
 
 type FormState = {
     userId: string;
     tripId: string;
-    price: number;
+    // price: number;
     status: "PENDING" | "CONFIRMED" | "CANCELLED";
     paymentMethod: "STRIPE" | "CASH" | "OTHER";
     seatCode?: string;
-    discountId?: string;
+    // discountId?: string;
 };
 
 const CreateReservationModal = ({ users, trips, onClose, onSuccess }: Props) => {
     const [form, setForm] = useState<FormState>({
         userId: "",
         tripId: "",
-        price: 0,
+        // price: 0,
         status: "PENDING",
         paymentMethod: "STRIPE",
         seatCode: "",
-        discountId: "",
+        // discountId: "",
     });
 
     const formatDate = (str: string): string => {
@@ -46,15 +46,17 @@ const CreateReservationModal = ({ users, trips, onClose, onSuccess }: Props) => 
         setForm({ ...form, [name]: value });
     };
 
-    const onSubmit = (data: CreateReservationFormData) => {
+    const onSubmit = async (data: CreateReservationFormData) => {
         try {
-            createReservation(data, form.userId);
+            const res = await createReservation(data, form.userId);
             toast.success("Reserva creada con éxito");
-            onSuccess();
+            console.log("Reserva creada:", res);
+
+            onSuccess((prev) => [...prev, res as ReservationResponse]);
             onClose();
         } catch (error) {
             console.error(error);
-            return toast.info("Reserva creada con éxito");
+            return toast.info("Error al crear la reserva");
         }
     };
 
@@ -62,17 +64,33 @@ const CreateReservationModal = ({ users, trips, onClose, onSuccess }: Props) => 
         e.preventDefault();
         onSubmit({
             tripId: form.tripId,
-            price: Number(form.price),
+            // price: Number(form.price),
             status: form.status,
             paymentMethod: form.paymentMethod,
             seatCode: form.seatCode || undefined,
-            discountId: form.discountId || undefined,
+            // discountId: form.discountId || undefined,
         });
     };
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                onClose(); // función que cierra el modal
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [onClose]);
+
     return (
-        <div className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
-            <div className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md relative border border-custom-gray-300">
+        <div onClick={onClose} className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
+            <div
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md relative border border-custom-gray-300"
+            >
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 hover:text-black" aria-label="Cerrar">
                     <X className="size-5" />
                 </button>
@@ -116,7 +134,7 @@ const CreateReservationModal = ({ users, trips, onClose, onSuccess }: Props) => 
                         </select>
                     </div>
 
-                    <div>
+                    {/* <div>
                         <label className="block text-xs font-semibold text-custom-gray-500 mb-1">Precio</label>
                         <input
                             name="price"
@@ -126,9 +144,9 @@ const CreateReservationModal = ({ users, trips, onClose, onSuccess }: Props) => 
                             className="w-full border border-custom-gray-300 rounded-md px-4 py-2"
                             required
                         />
-                    </div>
+                    </div> */}
 
-                    {(["seatCode", "discountId"] as const).map((name) => (
+                    {/* {(["seatCode", "discountId"] as const).map((name) => (
                         <div key={name}>
                             <label className="block text-xs font-semibold text-custom-gray-500 mb-1">
                                 {name === "seatCode" ? "Código de asiento (opcional)" : "ID de descuento (opcional)"}
@@ -141,7 +159,7 @@ const CreateReservationModal = ({ users, trips, onClose, onSuccess }: Props) => 
                                 className="w-full border border-custom-gray-300 rounded-md px-4 py-2"
                             />
                         </div>
-                    ))}
+                    ))} */}
 
                     <div>
                         <label className="block text-xs font-semibold text-custom-gray-500 mb-1">Estado</label>

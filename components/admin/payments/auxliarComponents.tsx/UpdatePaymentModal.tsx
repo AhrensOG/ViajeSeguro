@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Dispatch, SetStateAction } from "react";
 import { useForm } from "react-hook-form";
 import { X } from "lucide-react";
-import { CreatePaymentFormData, UsersWithReservations } from "@/lib/api/admin/payments/payments.type";
+import { CreatePaymentFormData, PaymentResponse, UsersWithReservations } from "@/lib/api/admin/payments/payments.type";
 import { toast } from "sonner";
 import { updatePayment } from "@/lib/api/admin/payments/intex";
 
@@ -11,11 +11,12 @@ interface Props {
     onClose: () => void;
     userOptions: UsersWithReservations[];
     initialData: CreatePaymentFormData;
-    onSuccess: () => void;
+    onSuccess: Dispatch<SetStateAction<PaymentResponse[]>>;
 }
 
 const UpdatePaymentModal = ({ onClose, userOptions, initialData, onSuccess }: Props) => {
     const [selectedUserId, setSelectedUserId] = useState<string>(initialData.userId);
+    console.log(initialData);
 
     const {
         register,
@@ -42,8 +43,10 @@ const UpdatePaymentModal = ({ onClose, userOptions, initialData, onSuccess }: Pr
             return;
         }
         try {
-            await updatePayment(initialData.id, data);
-            onSuccess();
+            const res = await updatePayment(initialData.id, data);
+            console.log(res);
+
+            onSuccess((prev) => prev.map((p) => (p.id === initialData.id ? { ...p, ...res } : p) as PaymentResponse));
             onClose();
             return toast.success("Pago actualizado con éxito");
         } catch (error) {
@@ -52,9 +55,25 @@ const UpdatePaymentModal = ({ onClose, userOptions, initialData, onSuccess }: Pr
         }
     };
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                onClose(); // función que cierra el modal
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [onClose]);
+
     return (
-        <div className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
-            <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-xl relative border border-custom-gray-300">
+        <div onClick={onClose} className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
+            <div
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-xl shadow-lg p-6 w-full max-w-xl relative border border-custom-gray-300"
+            >
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 hover:text-black">
                     <X className="size-5" />
                 </button>
@@ -111,7 +130,7 @@ const UpdatePaymentModal = ({ onClose, userOptions, initialData, onSuccess }: Pr
                         <label className="block mb-1 font-semibold">Método de pago</label>
                         <select {...register("method", { required: true })} className="w-full border border-custom-gray-300 rounded-md px-4 py-2">
                             <option value="">Selecciona un método</option>
-                            {(["STRIPE", "CASH", "OTHER"] as const).map((m) => (
+                            {(["STRIPE", "CASH"] as const).map((m) => (
                                 <option key={m} value={m}>
                                     {m}
                                 </option>

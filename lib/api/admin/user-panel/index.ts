@@ -1,7 +1,7 @@
 import { BACKEND_URL } from "@/lib/constants";
 import { fetchWithAuth } from "@/lib/functions";
 import { User } from "../../reservation/reservation.types";
-import { UserAdminResponse, UserFormData } from "./userPanel.types";
+import { SimpleUser, UserAdminResponse, UserFormData, UserResponse } from "./userPanel.types";
 
 export async function fetchUsersData(): Promise<User[]> {
     try {
@@ -26,22 +26,18 @@ export async function updateUserData(userId: string, data: Partial<UserAdminResp
     }
 }
 
-export async function createUser(data: UserFormData): Promise<boolean> {
+export async function createUser(data: UserFormData): Promise<SimpleUser> {
     try {
-        const res = await fetch(BACKEND_URL + "/auth/register", {
+        const res = await fetchWithAuth(BACKEND_URL + "/auth/register", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
             },
             body: JSON.stringify(data),
         });
-        if (!res.ok) {
-            const errorData = await res.json();
-            throw new Error(errorData.message || "Error al crear el usuario");
-        }
-        return true;
+        return res as SimpleUser;
     } catch (error) {
-        throw new Error(`Error al crear el usuario: ${error instanceof Error ? error.message : String(error)}`);
+        throw new Error(`${error instanceof Error ? error : String(error)}`);
     }
 }
 

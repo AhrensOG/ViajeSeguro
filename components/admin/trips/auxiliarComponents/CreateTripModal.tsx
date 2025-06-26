@@ -1,4 +1,4 @@
-import React, { Dispatch, SetStateAction, useState } from "react";
+import React, { Dispatch, SetStateAction, useEffect, useState } from "react";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 import { createTrip } from "@/lib/api/admin/trips";
@@ -45,7 +45,21 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, type, value } = e.target;
-        const parsedValue = type === "checkbox" ? (e.target as HTMLInputElement).checked : type === "number" ? Number(value) : value;
+
+        const numericFields = ["capacity", "minPassengers", "basePrice"];
+        let parsedValue: any = value;
+
+        if (numericFields.includes(name)) {
+            // Permitir solo números positivos o vacío
+            if (/^\d*$/.test(value)) {
+                parsedValue = value === "" ? "" : Number(value);
+            } else {
+                return; // ignorar si el input tiene letras o caracteres no numéricos
+            }
+        } else if (type === "checkbox") {
+            parsedValue = (e.target as HTMLInputElement).checked;
+        }
+
         setForm((prev) => ({ ...prev, [name]: parsedValue }));
     };
 
@@ -73,9 +87,25 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
         }
     };
 
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                onClose(); // función que cierra el modal
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [onClose]);
+
     return (
-        <div className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
-            <div className="bg-white rounded-xl shadow-2xl p-8 my-8 w-full max-w-4xl max-h-[95vh] overflow-y-auto relative border border-custom-gray-300">
+        <div onClick={onClose} className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
+            <div
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-xl shadow-2xl p-8 my-8 w-full max-w-4xl max-h-[95vh] overflow-y-auto relative border border-custom-gray-300"
+            >
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-black" aria-label="Cerrar">
                     <X className="size-5" />
                 </button>
@@ -201,12 +231,12 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
 
                     <div>
                         <label className={labelClass}>Capacidad</label>
-                        <input type="number" name="capacity" value={form.capacity ?? ""} onChange={handleChange} className={inputClass} />
+                        <input type="text" name="capacity" value={form.capacity ?? ""} onChange={handleChange} className={inputClass} />
                     </div>
 
                     <div>
                         <label className={labelClass}>Mín. pasajeros</label>
-                        <input type="number" name="minPassengers" value={form.minPassengers ?? ""} onChange={handleChange} className={inputClass} />
+                        <input type="text" name="minPassengers" value={form.minPassengers ?? ""} onChange={handleChange} className={inputClass} />
                     </div>
 
                     <div className="col-span-full flex flex-wrap items-center gap-6 mt-2">

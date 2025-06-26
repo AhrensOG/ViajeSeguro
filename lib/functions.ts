@@ -134,8 +134,7 @@ const fetchWithAuth = async <T = unknown>(input: RequestInfo, options: RequestIn
     });
 
     if (!res.ok) {
-      const error = await res.json().catch(() => ({}));
-      console.log(error)
+        const error = await res.json().catch(() => ({}));
         throw new Error(error.message || "Error en la petición autenticada");
     }
 

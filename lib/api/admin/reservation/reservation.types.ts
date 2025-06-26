@@ -43,7 +43,7 @@ export interface UserOption {
 
 export interface CreateReservationFormData {
     tripId: string;
-    price: number;
+    price?: number;
     status: "PENDING" | "CONFIRMED" | "CANCELLED";
     paymentMethod: "STRIPE" | "CASH" | "OTHER";
     seatCode?: string;
@@ -56,4 +56,8 @@ export interface TripOption {
     id: string;
     label: string;
     date: string;
+}
+
+export interface Discounts {
+    id: string;
 }

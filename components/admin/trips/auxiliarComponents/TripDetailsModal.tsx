@@ -3,6 +3,7 @@
 import { TripReservation } from "@/lib/api/admin/trips/trips.type";
 import { X } from "lucide-react";
 import { DateTime } from "luxon";
+import { useEffect } from "react";
 
 interface TripDetailsModalProps {
     trip: {
@@ -31,11 +32,25 @@ const TripDetailsModal = ({ trip, onClose }: TripDetailsModalProps) => {
     const departure = DateTime.fromISO(trip.departure).setZone(trip.originalTimeZone);
     const arrival = DateTime.fromISO(trip.arrival).setZone(trip.originalTimeZone);
 
-    console.log(trip)
+    useEffect(() => {
+        const handleKeyDown = (e: KeyboardEvent) => {
+            if (e.key === "Escape") {
+                onClose(); // función que cierra el modal
+            }
+        };
+
+        window.addEventListener("keydown", handleKeyDown);
+        return () => {
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [onClose]);
 
     return (
-        <div className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
-            <div className="bg-white rounded-xl shadow-lg p-6 w-full max-w-3xl relative border border-custom-gray-300">
+        <div onClick={onClose} className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
+            <div
+                onClick={(e) => e.stopPropagation()}
+                className="bg-white rounded-xl shadow-lg p-6 w-full max-w-3xl relative border border-custom-gray-300"
+            >
                 <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 hover:text-black">
                     <X className="size-5" />
                 </button>

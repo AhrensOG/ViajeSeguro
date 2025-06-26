@@ -9,6 +9,7 @@ import EditReservationModal from "./auxiliarComponents/EditReservationModal";
 import { getReduceUser } from "@/lib/shared";
 import { toast } from "sonner";
 import DeleteToast from "../DeleteToast";
+import { getDiscountByUserId } from "@/lib/api/trip";
 
 const statusOptions = ["CONFIRMED", "PENDING", "CANCELLED"];
 const paymentOptions = ["STRIPE", "CASH", "OTHER"];
@@ -44,6 +45,8 @@ export default function ReservationPanel() {
                         date: `${new Date(trip.departure).toLocaleDateString()} ${new Date(trip.departure).toLocaleTimeString()}`,
                     }))
                 );
+                // const discounts = await getDiscountByUserId();
+                // console.log(discounts);
             } catch (error) {
                 console.error("Error al cargar reservas:", error);
             } finally {
@@ -154,6 +157,7 @@ export default function ReservationPanel() {
                                             e.stopPropagation();
                                             setSelectedReservation(r);
                                             setIsViewModalOpen(true);
+                                            setIsEditingModalOpen(false); // <-- cerrar modal de edición si está abierto
                                         }}
                                         key={r.id}
                                         className={`$${
@@ -169,7 +173,9 @@ export default function ReservationPanel() {
                                             <button
                                                 onClick={(e) => {
                                                     e.stopPropagation();
+                                                    setIsViewModalOpen(false); // <-- cerrar modal de detalle si está abierto
                                                     setIsEditingModalOpen(true);
+                                                    setSelectedReservation(r);
                                                 }}
                                                 className="text-custom-golden-600 hover:text-custom-golden-700 cursor-pointer"
                                                 aria-label="Editar"
@@ -199,12 +205,7 @@ export default function ReservationPanel() {
                 <ReservationDetailModal reservation={selectedReservation} onClose={() => setIsViewModalOpen(false)} />
             )}
             {isCreateModalOpen && (
-                <CreateReservationModal
-                    users={users}
-                    trips={trips}
-                    onClose={() => setIsCreateModalOpen(false)}
-                    onSuccess={() => window.location.reload()}
-                />
+                <CreateReservationModal users={users} trips={trips} onClose={() => setIsCreateModalOpen(false)} onSuccess={setReservations} />
             )}
             {isEditingModalOpen && selectedReservation && (
                 <EditReservationModal
@@ -221,7 +222,7 @@ export default function ReservationPanel() {
                         id: selectedReservation.id,
                         userId: selectedReservation.user?.id,
                     }}
-                    onSuccess={() => window.location.reload()}
+                    onSuccess={setReservations}
                 />
             )}
         </div>

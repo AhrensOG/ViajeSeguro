@@ -175,7 +175,7 @@ export default function UsersPanel() {
                     </table>
                 </div>
             )}
-            {createModalIsOpen && <UserCreateModal onClose={() => setCreateModalIsOpen(false)} onSuccess={() => window.location.reload()} />}
+            {createModalIsOpen && <UserCreateModal onClose={() => setCreateModalIsOpen(false)} onSuccess={setUsers} />}
             {editModalIsOpen && selectedUser && (
                 <UserEditModal user={selectedUser as UserAdminResponse} onClose={() => setEditModalIsOpen(false)} onUpdateUser={handleUpdateUser} />
             )}
