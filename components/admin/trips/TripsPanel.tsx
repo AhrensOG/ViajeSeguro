@@ -206,6 +206,7 @@ export default function TripsPanel() {
                                 <th className="px-4 py-2 border-b border-r border-custom-gray-300">Precio</th>
                                 <th className="px-4 py-2 border-b border-r border-custom-gray-300">Capacidad</th>
                                 <th className="px-4 py-2 border-b border-r border-custom-gray-300">Estado</th>
+                                <th className="px-4 py-2 border-b border-custom-gray-300 text-center">Conductor</th>
                                 <th className="px-4 py-2 border-b border-custom-gray-300 text-center">Acciones</th>
                             </tr>
                         </thead>
@@ -233,6 +234,15 @@ export default function TripsPanel() {
                                         <td className="px-4 py-2 border-b border-r border-custom-gray-200">€ {trip.basePrice.toFixed(2)}</td>
                                         <td className="px-4 py-2 border-b border-r border-custom-gray-200">{trip.capacity}</td>
                                         <td className="px-4 py-2 border-b border-r border-custom-gray-200">{trip.status}</td>
+                                        <td className="px-4 py-2 border-b border-r border-custom-gray-200">
+                                            {trip.driver ? (
+                                                <span>
+                                                    {trip.driver.name} {trip.driver.lastName} - {trip.driver.email}
+                                                </span>
+                                            ) : (
+                                                <span className="text-custom-gray-500">Sin conductor asignado</span>
+                                            )}
+                                        </td>
                                         <td
                                             onClick={(e) => e.stopPropagation()}
                                             className="px-4 py-2 border-b border-custom-gray-200 text-center space-x-2"

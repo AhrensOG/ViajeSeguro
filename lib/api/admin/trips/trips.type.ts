@@ -47,6 +47,12 @@ export interface TripResponse {
     userId: string;
     reservations?: TripReservation[];
     driverId?: string;
+    driver?: {
+        id: string;
+        email: string;
+        name: string;
+        lastName: string;
+    } | null;
 }
 
 export interface Passengers {
