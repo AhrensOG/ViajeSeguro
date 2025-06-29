@@ -9,12 +9,12 @@ const HeroSection = () => {
     <section className="relative bg-custom-black-800 text-custom-white-100 py-20 px-4 overflow-hidden">
       {/* Imagen de fondo */}
       <motion.div
-        className="absolute inset-0 opacity-20"
+        className="absolute inset-0 opacity-10"
         initial={{ scale: 1.1, opacity: 0 }}
         animate={{ scale: 1, opacity: 0.4 }}
         transition={{ duration: 1.2, ease: "easeOut" }}>
         <Image
-          src="/main/nosotros.jpg"
+          src="/main/nosotros.png"
           alt="Equipo de Viaje Seguro"
           fill
           className="object-cover"

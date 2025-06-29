@@ -13,6 +13,22 @@ import { createCheckoutSession } from "@/lib/api/stripe";
 
 const pricingOptions = [
   {
+    title: "Plan Gratuito",
+    price: 0,
+    subtitle: "solo por registrarte",
+    recommended: "Básico",
+    premium: false,
+    benefits: [
+      "Descuento de 2,75€ en cada trayecto de forma permanente y de por vida",
+      "Acceso ilimitado a todos los trayectos a Barcelona o Madrid desde Valencia o viceversa",
+      "Sin compromiso mensual - ideal para nuevos usuarios",
+      "Ahorra 5,50€ en viajes de ida y vuelta",
+      "Registro completamente gratuito sin costes ocultos",
+    ],
+    buttonText: "Registrarme gratis",
+    type: "FREE",
+  },
+  {
     title: "Plan Mensual",
     price: 4.9,
     subtitle: "/mes",
@@ -84,20 +100,20 @@ const handleSubscribe = async (
 
 const Subscriptions = () => {
   const ref = useRef(null);
-  const isInView = useInView(ref, { amount: 0.3 });
+  const isInView = useInView(ref, { amount: 0.1 });
 
   return (
     <motion.section
       ref={ref}
       initial={{ opacity: 0, y: 50 }}
-      animate={isInView && { opacity: 1, y: 0 }}
+      animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
       id="precios"
-      className="py-24">
+      className="py-10">
       <div className="container mx-auto px-6">
         <motion.h2
           initial={{ opacity: 0, y: -20 }}
-          animate={isInView && { opacity: 1, y: 0 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-4xl font-extrabold text-center text-custom-black-900 mb-4">
           Nuestras Promociones
@@ -105,7 +121,7 @@ const Subscriptions = () => {
 
         <motion.p
           initial={{ opacity: 0, y: -10 }}
-          animate={isInView && { opacity: 1, y: 0 }}
+          animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, delay: 0.2 }}
           className="text-center text-custom-gray-600 mb-12 max-w-2xl mx-auto">
           No pagues por trayecto, paga por asiento. El asiento tiene un precio
@@ -113,7 +129,7 @@ const Subscriptions = () => {
           sistema de recomendación.
         </motion.p>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
           {pricingOptions.map((plan, index) => (
             <PricingCard
               key={index}

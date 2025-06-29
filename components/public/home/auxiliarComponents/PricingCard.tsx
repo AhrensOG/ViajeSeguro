@@ -17,6 +17,14 @@ const PricingCard = ({ plan, index, isInView, action }: PricingCardProps) => {
       return;
     }
 
+    // Si es plan gratuito, mostrar mensaje especial
+    if (plan.type === "FREE") {
+      toast.success("¡Bienvenido al plan gratuito!", {
+        description: "Ya tienes acceso a todos los beneficios básicos. ¡Disfruta de tus viajes!",
+      });
+      return;
+    }
+
     toast.custom((t) => (
       <div className="bg-white rounded-lg shadow-md p-4 w-[300px] border border-gray-200">
         <h4 className="font-semibold text-gray-900 mb-2">
@@ -69,7 +77,13 @@ const PricingCard = ({ plan, index, isInView, action }: PricingCardProps) => {
         boxShadow: "0px 10px 20px rgba(0,0,0,0.1)",
         transition: { duration: 0.3 },
       }}
-      className="flex flex-col justify-between items-center bg-custom-white-100 rounded-lg border border-custom-gray-300 shadow-lg overflow-hidden transition-all duration-300">
+      className={`flex flex-col justify-between items-center bg-custom-white-100 rounded-lg border shadow-lg overflow-hidden transition-all duration-300 ${
+        plan.type === "FREE"
+          ? "border-2 border-custom-golden-500 shadow-xl hover:shadow-2xl"
+          : plan.premium
+          ? "border-custom-golden-500"
+          : "border-custom-gray-300"
+      }`}>
       <div
         className={`p-5 text-center w-full transition-all duration-300 ${
           plan.premium
@@ -78,14 +92,22 @@ const PricingCard = ({ plan, index, isInView, action }: PricingCardProps) => {
         }`}>
         <h3 className="text-xl font-bold">{plan.title}</h3>
         {plan.recommended && (
-          <span className="inline-block mt-1 bg-custom-white-100 text-first-g text-custom-golden-600 px-3 py-1 rounded-full text-sm font-bold">
-            {plan.recommended}
+          <span className={`inline-block mt-1 px-3 py-1 rounded-full text-sm font-bold ${
+            plan.type === "FREE"
+              ? "bg-gradient-to-r from-custom-golden-400 to-custom-golden-500 text-white animate-pulse"
+              : "bg-custom-white-100 text-custom-golden-600"
+          }`}>
+            {plan.type === "FREE" ? "¡GRATIS!" : plan.recommended}
           </span>
         )}
       </div>
-      {plan.price && (
+      {plan.price !== undefined && (
         <div className="text-center my-4">
-          <span className="text-3xl font-bold">{plan.price.toFixed(2)} €</span>
+          {plan.price === 0 ? (
+            <span className="text-3xl font-bold text-custom-golden-600">GRATIS</span>
+          ) : (
+            <span className="text-3xl font-bold">{plan.price.toFixed(2)} €</span>
+          )}
           <span className="text-custom-gray-600"> {plan.subtitle}</span>
         </div>
       )}
@@ -105,7 +127,9 @@ const PricingCard = ({ plan, index, isInView, action }: PricingCardProps) => {
           whileTap={{ scale: 0.95 }}
           transition={{ duration: 0.2 }}
           className={`w-full mt-6 transition-all duration-300 ${
-            plan.premium
+            plan.type === "FREE"
+              ? "bg-gradient-to-r from-custom-golden-500 to-custom-golden-600 hover:from-custom-golden-600 hover:to-custom-golden-700 text-white font-bold"
+              : plan.premium
               ? "bg-custom-golden-600 hover:bg-custom-golden-700"
               : "bg-custom-black-900 hover:bg-custom-gray-800"
           } text-custom-white-100 font-medium py-3 px-6 rounded-lg`}
