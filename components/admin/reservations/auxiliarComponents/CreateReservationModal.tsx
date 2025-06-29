@@ -16,7 +16,7 @@ type FormState = {
     tripId: string;
     // price: number;
     status: "PENDING" | "CONFIRMED" | "CANCELLED";
-    paymentMethod: "STRIPE" | "CASH" | "OTHER";
+    paymentMethod: "STRIPE" | "CASH";
     seatCode?: string;
     // discountId?: string;
 };
@@ -50,13 +50,17 @@ const CreateReservationModal = ({ users, trips, onClose, onSuccess }: Props) => 
         try {
             const res = await createReservation(data, form.userId);
             toast.success("Reserva creada con éxito");
-            console.log("Reserva creada:", res);
-
             onSuccess((prev) => [...prev, res as ReservationResponse]);
             onClose();
         } catch (error) {
             console.error(error);
-            return toast.info("Error al crear la reserva");
+            return toast.info(
+                error instanceof Error
+                    ? error.message === "Trip is already full"
+                        ? "Viaje lleno"
+                        : "Error al crear la reserva"
+                    : "Error al crear la reserva"
+            );
         }
     };
 

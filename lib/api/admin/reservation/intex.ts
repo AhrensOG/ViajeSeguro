@@ -21,8 +21,8 @@ export async function createReservation(data: CreateReservationFormData, id: str
             body: JSON.stringify(data),
         });
         return res as ReservationResponse;
-    } catch {
-        throw new Error("Error al crear la reserva");
+    } catch (error) {
+        throw new Error(error instanceof Error ? error.message : "Error al crear la reserva");
     }
 }
 

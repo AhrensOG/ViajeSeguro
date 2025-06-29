@@ -57,7 +57,7 @@ const OurMissionSection = () => {
             viewport={{ once: true, amount: 0.3 }}
             className="relative h-96 rounded-xl overflow-hidden shadow-lg">
             <Image
-              src="/main/img_placeholder.webp"
+              src="/main/mision.png"
               alt="Equipo de Viaje Seguro trabajando"
               fill
               className="object-cover"

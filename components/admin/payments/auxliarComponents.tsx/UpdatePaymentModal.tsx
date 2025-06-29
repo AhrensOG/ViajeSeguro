@@ -16,7 +16,6 @@ interface Props {
 
 const UpdatePaymentModal = ({ onClose, userOptions, initialData, onSuccess }: Props) => {
     const [selectedUserId, setSelectedUserId] = useState<string>(initialData.userId);
-    console.log(initialData);
 
     const {
         register,

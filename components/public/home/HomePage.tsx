@@ -13,9 +13,9 @@ const HomePage = () => {
         <div className="bg-custom-gray-100">
             <NavBar />
             <Hero />
-            <Services />
-            <Routes />
             <Subscriptions />
+            <Routes />
+            <Services />
             <CTA />
             <Contact />
             <Footer />

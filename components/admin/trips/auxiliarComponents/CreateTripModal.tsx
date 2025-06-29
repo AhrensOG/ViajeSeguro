@@ -46,15 +46,21 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
         const { name, type, value } = e.target;
 
-        const numericFields = ["capacity", "minPassengers", "basePrice"];
+        const integerFields = ["capacity", "minPassengers"];
+        const decimalFields = ["basePrice"];
         let parsedValue: any = value;
 
-        if (numericFields.includes(name)) {
-            // Permitir solo números positivos o vacío
+        if (integerFields.includes(name)) {
             if (/^\d*$/.test(value)) {
                 parsedValue = value === "" ? "" : Number(value);
             } else {
-                return; // ignorar si el input tiene letras o caracteres no numéricos
+                return; // ignorar input inválido
+            }
+        } else if (decimalFields.includes(name)) {
+            if (/^\d*\.?\d*$/.test(value)) {
+                parsedValue = value;
+            } else {
+                return; // ignorar input inválido
             }
         } else if (type === "checkbox") {
             parsedValue = (e.target as HTMLInputElement).checked;
@@ -78,6 +84,7 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
 
         try {
             const res = await createTrip(payload);
+            console.log("Viaje creado:", res);
 
             toast.success("Viaje creado con éxito", { id: toastId });
             onSuccess((prevTrips) => [...prevTrips, res]);

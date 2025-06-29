@@ -16,13 +16,13 @@ const teamMembers = [
     image: "/main/img_placeholder.webp",
   },
   {
-    name: "Frankie",
-    role: "Directora de Marketing y Tecnología",
+    name: "Francisco Javier ",
+    role: "Gefe de Trafico y Gestión de Viajes",
     image: "/main/img_placeholder.webp",
   },
   {
-    name: "Francisco Javier ",
-    role: "Gefe de Trafico y Gestión de Viajes",
+    name: "Frankie",
+    role: "Director de Marketing y Tecnología",
     image: "/main/img_placeholder.webp",
   },
 ];

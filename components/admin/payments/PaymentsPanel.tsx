@@ -9,7 +9,7 @@ import UpdatePaymentModal from "./auxliarComponents.tsx/UpdatePaymentModal";
 import { toast } from "sonner";
 import DeleteToast from "../DeleteToast";
 
-const paymentMethods = ["CASH", "OTHER", "STRIPE"];
+const paymentMethods = ["CASH", "STRIPE"];
 const paymentStatuses = ["PENDING", "PAID", "FAILED"];
 
 export default function PaymentsPanel() {

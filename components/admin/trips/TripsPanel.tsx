@@ -29,12 +29,15 @@ export default function TripsPanel() {
         arrival: "",
         capacity: "",
         status: "",
+        driver: "",
     });
 
     useEffect(() => {
         const fetchTrips = async () => {
             try {
                 const res = await getAllTrips();
+                console.log(res);
+
                 setTrips(res);
             } catch {
                 toast.info("Error al cargar los viajes");
@@ -75,10 +78,20 @@ export default function TripsPanel() {
             : true;
         const matchesDeparture = filters.departure ? trip.departure.startsWith(filters.departure) : true;
         const matchesArrival = filters.arrival ? trip.arrival.startsWith(filters.arrival) : true;
-        const matchesCapacity = filters.capacity ? trip.capacity.toString() === filters.capacity : true;
+        const matchesCapacity = filters.capacity ? trip.capacity.toString() === filters.capacity || trip.capacity > parseInt(filters.capacity) : true;
         const matchesStatus = filters.status ? trip.status === filters.status : true;
+        const matchesDriver = filters.driver ? trip.driverId === filters.driver : true;
 
-        return matchesSearch && matchesOrigin && matchesDestination && matchesDeparture && matchesArrival && matchesCapacity && matchesStatus;
+        return (
+            matchesSearch &&
+            matchesOrigin &&
+            matchesDestination &&
+            matchesDeparture &&
+            matchesArrival &&
+            matchesCapacity &&
+            matchesStatus &&
+            matchesDriver
+        );
     });
 
     const upcomingTrips = filteredTrips
@@ -158,11 +171,23 @@ export default function TripsPanel() {
                     className="w-full border border-custom-gray-300 rounded-md px-4 py-2"
                     onChange={(e) => setFilters((f) => ({ ...f, status: e.target.value }))}
                 >
-                    <option value="">Todos</option>
+                    <option value="">Todos los estados</option>
                     <option value="PENDING">Pendiente</option>
                     <option value="CONFIRMED">Confirmado</option>
                     <option value="CANCELLED">Cancelado</option>
                     <option value="FINISHED">Finalizado</option>
+                </select>
+                <select
+                    className="w-full border border-custom-gray-300 rounded-md px-4 py-2"
+                    value={filters.driver}
+                    onChange={(e) => setFilters((f) => ({ ...f, driver: e.target.value }))}
+                >
+                    <option value="">Todos los conductores</option>
+                    {drivers.map((driver) => (
+                        <option key={driver.id} value={driver.id}>
+                            {driver.name} {driver.lastName} - {driver.email}
+                        </option>
+                    ))}
                 </select>
             </div>
 
@@ -185,53 +210,63 @@ export default function TripsPanel() {
                             </tr>
                         </thead>
                         <tbody className="text-custom-black-800">
-                            {orderedTrips.map((trip, index) => (
-                                <tr
-                                    onClick={() => {
-                                        setSelectedTrip(trip);
-                                        setIsViewModalOpen(true);
-                                    }}
-                                    key={trip.id}
-                                    className={`$${
-                                        index % 2 === 0 ? "bg-custom-white-50" : "bg-custom-gray-100"
-                                    } hover:bg-custom-golden-100 transition cursor-pointer`}
-                                >
-                                    <td className="px-4 py-2 font-medium border-b border-r border-custom-gray-200">{trip.origin}</td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">{trip.destination}</td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">
-                                        {new Date(trip.departure).toLocaleString()}
-                                    </td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">{new Date(trip.arrival).toLocaleString()}</td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">€ {trip.basePrice.toFixed(2)}</td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">{trip.capacity}</td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">{trip.status}</td>
-                                    <td
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="px-4 py-2 border-b border-custom-gray-200 text-center space-x-2"
+                            {orderedTrips.length > 0 ? (
+                                orderedTrips.map((trip, index) => (
+                                    <tr
+                                        onClick={() => {
+                                            setSelectedTrip(trip);
+                                            setIsViewModalOpen(true);
+                                        }}
+                                        key={trip.id}
+                                        className={`$${
+                                            index % 2 === 0 ? "bg-custom-white-50" : "bg-custom-gray-100"
+                                        } hover:bg-custom-golden-100 transition cursor-pointer`}
                                     >
-                                        <button
-                                            onClick={() => {
-                                                setSelectedTrip(trip);
-                                                setIsEditModalOpen(true);
-                                            }}
-                                            className="text-custom-golden-600 hover:text-custom-golden-700"
-                                            aria-label="Editar"
+                                        <td className="px-4 py-2 font-medium border-b border-r border-custom-gray-200">{trip.origin} </td>
+                                        <td className="px-4 py-2 border-b border-r border-custom-gray-200">{trip.destination}</td>
+                                        <td className="px-4 py-2 border-b border-r border-custom-gray-200">
+                                            {new Date(trip.departure).toLocaleString()}
+                                        </td>
+                                        <td className="px-4 py-2 border-b border-r border-custom-gray-200">
+                                            {new Date(trip.arrival).toLocaleString()}
+                                        </td>
+                                        <td className="px-4 py-2 border-b border-r border-custom-gray-200">€ {trip.basePrice.toFixed(2)}</td>
+                                        <td className="px-4 py-2 border-b border-r border-custom-gray-200">{trip.capacity}</td>
+                                        <td className="px-4 py-2 border-b border-r border-custom-gray-200">{trip.status}</td>
+                                        <td
+                                            onClick={(e) => e.stopPropagation()}
+                                            className="px-4 py-2 border-b border-custom-gray-200 text-center space-x-2"
                                         >
-                                            <Pencil className="h-4 w-4 inline-block" />
-                                        </button>
-                                        <button
-                                            onClick={() => {
-                                                setSelectedTrip(trip);
-                                                DeleteToast(trip.id, handleDelete);
-                                            }}
-                                            className="text-red-500 hover:text-red-700"
-                                            aria-label="Eliminar"
-                                        >
-                                            <Trash2 className="h-4 w-4 inline-block" />
-                                        </button>
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedTrip(trip);
+                                                    setIsEditModalOpen(true);
+                                                }}
+                                                className="text-custom-golden-600 hover:text-custom-golden-700"
+                                                aria-label="Editar"
+                                            >
+                                                <Pencil className="h-4 w-4 inline-block" />
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedTrip(trip);
+                                                    DeleteToast(trip.id, handleDelete);
+                                                }}
+                                                className="text-red-500 hover:text-red-700"
+                                                aria-label="Eliminar"
+                                            >
+                                                <Trash2 className="h-4 w-4 inline-block" />
+                                            </button>
+                                        </td>
+                                    </tr>
+                                ))
+                            ) : (
+                                <tr>
+                                    <td colSpan={8} className="text-center py-4 text-custom-gray-500">
+                                        No se encontraron viajes que coincidan con los filtros.
                                     </td>
                                 </tr>
-                            ))}
+                            )}
                         </tbody>
                     </table>
                 </div>

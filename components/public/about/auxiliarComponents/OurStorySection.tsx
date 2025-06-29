@@ -18,7 +18,7 @@ const OurStorySection = () => {
             viewport={{ once: true, amount: 0.4 }}
             transition={{ duration: 0.7, ease: "easeOut" }}>
             <Image
-              src="/main/img_placeholder.webp"
+              src="/main/nuestrahistoria.png"
               alt="Fundadores de viaje seguro"
               fill
               className="object-cover"

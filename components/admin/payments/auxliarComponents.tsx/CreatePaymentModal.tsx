@@ -117,7 +117,7 @@ const CreatePaymentModal = ({ onClose, userOptions, onSuccess }: Props) => {
                         <label className="block mb-1 font-semibold">Método de pago</label>
                         <select {...register("method", { required: true })} className="w-full border border-custom-gray-300 rounded-md px-4 py-2">
                             <option value="">Selecciona un método</option>
-                            {(["STRIPE", "CASH", "OTHER"] as const).map((m) => (
+                            {(["STRIPE", "CASH"] as const).map((m) => (
                                 <option key={m} value={m}>
                                     {m}
                                 </option>

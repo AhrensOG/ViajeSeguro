@@ -9,10 +9,10 @@ import EditReservationModal from "./auxiliarComponents/EditReservationModal";
 import { getReduceUser } from "@/lib/shared";
 import { toast } from "sonner";
 import DeleteToast from "../DeleteToast";
-import { getDiscountByUserId } from "@/lib/api/trip";
+// import { getDiscountByUserId } from "@/lib/api/trip";
 
 const statusOptions = ["CONFIRMED", "PENDING", "CANCELLED"];
-const paymentOptions = ["STRIPE", "CASH", "OTHER"];
+const paymentOptions = ["STRIPE", "CASH"];
 
 export default function ReservationPanel() {
     const [reservations, setReservations] = useState<ReservationResponse[]>([]);
@@ -31,6 +31,8 @@ export default function ReservationPanel() {
         const fetchReservations = async () => {
             try {
                 const reservations = await getAllReservations();
+                console.log("Reservas obtenidas:", reservations);
+
                 if (!Array.isArray(reservations)) throw new Error("La respuesta de reservas no es un array");
                 setReservations(reservations);
                 const users = await getReduceUser();
