@@ -1,7 +1,7 @@
 import { BACKEND_URL } from "@/lib/constants";
 import { fetchWithAuth } from "@/lib/functions";
 import { User } from "../../reservation/reservation.types";
-import { SimpleUser, UserAdminResponse, UserFormData, UserResponse } from "./userPanel.types";
+import { SimpleUser, UserAdminResponse, UserFormData } from "./userPanel.types";
 
 export async function fetchUsersData(): Promise<User[]> {
     try {

@@ -52,7 +52,7 @@ const EditTripModal = ({ onClose, onSuccess, drivers, trip }: Props) => {
 
         const numericFields = ["capacity", "minPassengers"];
         const decimalFields = ["basePrice"];
-        let parsedValue: any = value;
+        let parsedValue: string | number | boolean = value;
 
         if (numericFields.includes(name)) {
             if (/^\d*$/.test(value)) {

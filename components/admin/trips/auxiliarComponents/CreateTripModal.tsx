@@ -48,7 +48,7 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
 
         const integerFields = ["capacity", "minPassengers"];
         const decimalFields = ["basePrice"];
-        let parsedValue: any = value;
+        let parsedValue: string | number | boolean = value;
 
         if (integerFields.includes(name)) {
             if (/^\d*$/.test(value)) {
