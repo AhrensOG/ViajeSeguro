@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form";
 import { X } from "lucide-react";
 import { createUser } from "@/lib/api/admin/user-panel";
 import { toast } from "sonner";
-import { SimpleUser, UserFormData, UserResponse } from "@/lib/api/admin/user-panel/userPanel.types";
+import { SimpleUser, UserFormData } from "@/lib/api/admin/user-panel/userPanel.types";
 
 interface Props {
     onClose: () => void;

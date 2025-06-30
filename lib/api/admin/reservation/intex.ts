@@ -52,7 +52,7 @@ export async function getDiscounts(): Promise<Discounts[]> {
     try {
         const res = await fetchWithOptionalAuth(`${BACKEND_URL}/discount/all`);
         return res as Discounts[];
-    } catch (error) {
+    } catch {
         throw new Error("Error al obtener los descuentos");
     }
 }
