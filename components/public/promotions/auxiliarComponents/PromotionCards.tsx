@@ -1,7 +1,7 @@
 "use client";
 
 import { Check, Clock, Gift, Shield, Star, Tag, UserPlus, X } from "lucide-react";
-import type React from "react";
+import React from "react";
 import type { JSX } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
@@ -72,8 +72,8 @@ const plans: Plan[] = [
         features: [
             {
                 icon: <Tag size={18} className="min-w-[18px] mt-1 text-custom-golden-600" />,
-                title: "Mayor descuento en viajes",
-                desc: "Viajes de 27.50€ pasan a valer 22€",
+                title: "Mayor descuento en cada trayecto",
+                desc: "Viajes de 27.50€ pasan a valer 22€ (desde el 2º trayecto)",
                 badge: "¡Ahorras 11€ en viajes de ida y vuelta!",
             },
             {
@@ -132,6 +132,11 @@ const plans: Plan[] = [
                 title: "Beneficios aleatorios",
                 desc: "Sorpresas y descuentos exclusivos durante todo el año",
             },
+            {
+                icon: <Check size={18} className="min-w-[18px] mt-1 text-custom-golden-600" />,
+                title: "Beneficio exclusivo",
+                desc: "Si has recomendado a 10 personas y viajaron con nosotros gracias a ti, tu tienes un trayecto GRATIS de Valencia a Madrid o Barcelona y viceversa",
+            },
         ],
     },
 ];
@@ -141,7 +146,7 @@ const missingFeatureItems = [
         key: "recommendations",
         icon: <X size={18} className="mt-1 text-custom-gray-400" />,
         title: "Sistema de recomendaciones",
-        desc: "Recomienda amigos y obtén descuentos",
+        desc: "Recomienda  a tus amigos a viajar con nosotros y obtén mas descuentos. ellos viajan y tu pagas menos",
     },
     {
         key: "seat-selection",
@@ -166,6 +171,73 @@ const labelToPlanType = {
 const PromotionCards: React.FC = () => {
     const { data: session } = useSession();
     const router = useRouter();
+
+    const handleDirectSubscription = React.useCallback(async (plan: Plan) => {
+        const planType = labelToPlanType[plan.label as keyof typeof labelToPlanType];
+        const now = new Date();
+        const endDate = new Date(now);
+        if (planType === "ANNUAL") {
+            endDate.setFullYear(now.getFullYear() + 1);
+        } else if (planType === "MONTHLY") {
+            endDate.setMonth(now.getMonth() + 1);
+        }
+        const requestData: CreateSubscriptionRequest = {
+            userId: session?.user?.id || '',
+            plan: planType,
+            startDate: now,
+            endDate,
+        };
+        const priceValue = parseFloat(plan.price.replace(",", "."));
+        try {
+            const response = (await createSubscription(requestData)) as { id: string };
+            const payload: CreateSubscriptionPayload = {
+                amount: priceValue,
+                paymentMethod: "STRIPE",
+                subscriptionPlan: planType,
+                type: "SUBSCRIPTION",
+                subscriptionId: response.id,
+            };
+            const stripeData = await createCheckoutSession({
+                amount: Math.round(priceValue * 100),
+                metadata: payload,
+            });
+            if (stripeData.url) {
+                window.location.href = stripeData.url;
+            } else {
+                toast.info("No se pudo crear la sesión de pago");
+            }
+        } catch (error) {
+            console.error("Error al crear la suscripción:", error);
+            toast.info("Error al procesar la suscripción");
+        }
+    }, [session]);
+
+    React.useEffect(() => {
+        if (session?.user?.id && typeof window !== 'undefined') {
+            const pendingPlan = localStorage.getItem('pendingPlan');
+            if (pendingPlan) {
+                const plan = JSON.parse(pendingPlan);
+                localStorage.removeItem('pendingPlan');
+                handleDirectSubscription(plan);
+            }
+        }
+    }, [session, handleDirectSubscription]);
+
+    const handleSession = (plan: Plan) => {
+        const planType = labelToPlanType[plan.label as keyof typeof labelToPlanType];
+        if (!session?.user?.id) {
+            if (typeof window !== 'undefined') {
+                localStorage.setItem('pendingPlan', JSON.stringify(plan));
+            }
+            router.push("/auth/login");
+            return;
+        }
+        if (planType === "BASIC") {
+            toast.info("Ya estás suscripto a este plan.");
+            return;
+        }
+        handleDirectSubscription(plan);
+    };
 
     const getMissingFeatures = (features: Feature[], index: number) => {
         if (index === 2) return null;
@@ -204,79 +276,6 @@ const PromotionCards: React.FC = () => {
         });
 
         return missing;
-    };
-
-    const handleSession = (plan: Plan) => {
-        const planType = labelToPlanType[plan.label as keyof typeof labelToPlanType];
-
-        if (!session?.user?.id) {
-            router.push("/auth/login");
-            return;
-        }
-
-        if (planType === "BASIC") {
-            toast.info("Ya estás suscripto a este plan.");
-            return;
-        }
-
-        const now = new Date();
-        const endDate = new Date(now);
-        if (planType === "ANNUAL") {
-            endDate.setFullYear(now.getFullYear() + 1);
-        } else if (planType === "MONTHLY") {
-            endDate.setMonth(now.getMonth() + 1);
-        }
-
-        const requestData: CreateSubscriptionRequest = {
-            userId: session.user.id,
-            plan: planType,
-            startDate: now,
-            endDate,
-        };
-
-        const priceValue = parseFloat(plan.price.replace(",", "."));
-
-        toast.custom((t) => (
-            <div className="bg-white rounded-lg shadow-md p-4 w-[300px] border border-gray-200">
-                <h4 className="font-semibold text-gray-900 mb-2">¿Confirmás tu elección?</h4>
-                <p className="text-sm text-gray-600 mb-4">Serás redirigido a otra página para completar el pago de tu suscripción.</p>
-                <div className="flex justify-end gap-2">
-                    <button onClick={() => toast.dismiss(t)} className="px-3 py-1 text-sm rounded-md bg-gray-200 hover:bg-gray-300">
-                        Cancelar
-                    </button>
-                    <button
-                        onClick={async () => {
-                            toast.dismiss(t);
-                            try {
-                                const response = (await createSubscription(requestData)) as { id: string };
-                                const payload: CreateSubscriptionPayload = {
-                                    amount: priceValue,
-                                    paymentMethod: "STRIPE",
-                                    subscriptionPlan: planType,
-                                    type: "SUBSCRIPTION",
-                                    subscriptionId: response.id,
-                                };
-                                const stripeData = await createCheckoutSession({
-                                    amount: Math.round(priceValue * 100),
-                                    metadata: payload,
-                                });
-                                if (stripeData.url) {
-                                    window.location.href = stripeData.url;
-                                } else {
-                                    toast.info("No se pudo crear la sesión de pago");
-                                }
-                            } catch (error) {
-                                console.error("Error al crear la suscripción:", error);
-                                toast.info("Error al procesar la suscripción");
-                            }
-                        }}
-                        className="px-3 py-1 text-sm rounded-md bg-custom-golden-600 text-white hover:bg-custom-golden-700"
-                    >
-                        Confirmar
-                    </button>
-                </div>
-            </div>
-        ));
     };
 
     return (
