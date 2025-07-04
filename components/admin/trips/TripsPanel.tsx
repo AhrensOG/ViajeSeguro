@@ -115,6 +115,17 @@ export default function TripsPanel() {
         }
     };
 
+    // Solución 1: Mantener el objeto driver después de editar un viaje
+    const handleUpdateTrip: React.Dispatch<React.SetStateAction<TripResponse[]>> = (updater) => {
+        setTrips(prevTrips => {
+            const updated = typeof updater === 'function' ? updater(prevTrips) : updater;
+            return updated.map(trip => {
+                const driver = drivers.find(d => d.id === trip.driverId);
+                return { ...trip, driver: driver || null };
+            });
+        });
+    };
+
     return (
         <div className="w-full h-full flex flex-col overflow-hidden pb-2">
             <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
@@ -294,7 +305,7 @@ export default function TripsPanel() {
             {isEditModalOpen && selectedTrip && (
                 <EditTripModal
                     onClose={() => setIsEditModalOpen(false)}
-                    onSuccess={setTrips}
+                    onSuccess={handleUpdateTrip}
                     partners={partners}
                     drivers={drivers}
                     trip={selectedTrip as CreateTripRequest}
