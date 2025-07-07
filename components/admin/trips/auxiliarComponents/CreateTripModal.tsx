@@ -77,6 +77,8 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
 
         const payload = {
             ...form,
+            origin: form.origin.trim(),
+            destination: form.destination.trim(),
             departure: departureUTC || form.departure,
             arrival: arrivalUTC || form.departure,
             basePrice: parseFloat(form.basePrice as string),
