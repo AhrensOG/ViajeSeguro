@@ -33,10 +33,21 @@ const ContactForm = () => {
         resolver: yupResolver(schema),
     });
 
-    const onSubmit = (data: ContactFormData) => {
-        // Aquí iría la lógica de envío real
-        console.log("Enviado:", data);
-        setIsSubmitted(true);
+    const onSubmit = async (data: ContactFormData) => {
+        try {
+            const res = await fetch("http://localhost:8000/contact", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify(data),
+            });
+            if (res.ok) {
+                setIsSubmitted(true);
+            } else {
+                alert("Ocurrió un error al enviar el mensaje. Intenta nuevamente.");
+            }
+        } catch {
+            alert("Ocurrió un error inesperado. Intenta nuevamente.");
+        }
     };
 
     return (

@@ -7,6 +7,32 @@ const Contact = () => {
   const ref = useRef(null);
   const isInView = useInView(ref, { amount: 0.3, once: true });
 
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    const form = e.currentTarget;
+    const data = {
+      name: (form.elements.namedItem("name") as HTMLInputElement).value,
+      email: (form.elements.namedItem("email") as HTMLInputElement).value,
+      phone: (form.elements.namedItem("phone") as HTMLInputElement).value,
+      message: (form.elements.namedItem("message") as HTMLInputElement).value,
+    };
+    try {
+      const res = await fetch("http://localhost:8000/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      });
+      if (res.ok) {
+        alert("¡Mensaje enviado correctamente!");
+        form.reset();
+      } else {
+        alert("Ocurrió un error al enviar el mensaje. Intenta nuevamente.");
+      }
+    } catch {
+      alert("Ocurrió un error inesperado. Intenta nuevamente.");
+    }
+  };
+
   return (
     <motion.section
       ref={ref}
@@ -32,7 +58,7 @@ const Contact = () => {
           transition={{ duration: 0.8, ease: "easeOut" }}
           className="max-w-xl mx-auto bg-custom-white-50 p-8 rounded-lg shadow-lg border border-custom-gray-300"
         >
-          <form className="space-y-6">
+          <form className="space-y-6" onSubmit={handleSubmit}>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
               <motion.div
                 whileFocus={{ scale: 1.02 }}

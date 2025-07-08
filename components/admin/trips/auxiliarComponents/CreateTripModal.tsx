@@ -57,8 +57,10 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
                 return; // ignorar input inválido
             }
         } else if (decimalFields.includes(name)) {
-            if (/^\d*\.?\d*$/.test(value)) {
-                parsedValue = value;
+            // Permitir tanto punto como coma como separador decimal
+            const normalizedValue = value.replace(/,/g, ".");
+            if (/^\d*\.?\d*$/.test(normalizedValue)) {
+                parsedValue = normalizedValue;
             } else {
                 return; // ignorar input inválido
             }
