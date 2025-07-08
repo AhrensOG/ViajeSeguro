@@ -61,8 +61,10 @@ const EditTripModal = ({ onClose, onSuccess, drivers, trip }: Props) => {
                 return; // ignora letras o símbolos no numéricos
             }
         } else if (decimalFields.includes(name)) {
-            if (/^\d*\.?\d*$/.test(value)) {
-                parsedValue = value === "" ? "" : parseFloat(value);
+            // Permitir tanto punto como coma como separador decimal
+            const normalizedValue = value.replace(/,/g, ".");
+            if (/^\d*\.?\d*$/.test(normalizedValue)) {
+                parsedValue = normalizedValue;
             } else {
                 return;
             }
