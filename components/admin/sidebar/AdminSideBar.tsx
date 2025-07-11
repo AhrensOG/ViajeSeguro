@@ -2,10 +2,12 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Coins, FileText, Users, CalendarDays, LogOut } from "lucide-react";
+import { Coins, FileText, Users, CalendarDays, LogOut, Home } from "lucide-react";
 import { signOut } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 const menuItems = [
+  { name: "Inicio", icon: <Home size={20} />, isHome: true },
   { name: "Usuarios", icon: <Users size={20} /> },
   { name: "Reservas", icon: <FileText size={20} /> },
   { name: "Pagos", icon: <Coins size={20} /> },
@@ -18,13 +20,14 @@ const AdminSideBar = ({
   onSelect: (itemName: string) => void;
 }) => {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter();
 
   return (
     <AnimatePresence>
       <motion.nav
-        className="h-screen pb-3 bg-custom-white-50 shadow-md flex flex-col overflow-hidden border-r border-custom-gray-200 rounded-r-xl relative min-w-14 max-w-[200px]"
+        className="h-screen pb-3 bg-custom-white-50 shadow-md flex flex-col overflow-y-auto border-r border-custom-gray-200 rounded-r-xl relative min-w-14 max-w-[250px]"
         initial={{ width: 56 }}
-        animate={{ width: isOpen ? 160 : 56 }}
+        animate={{ width: isOpen ? 250 : 56 }}
         exit={{ width: 56 }}
         transition={{ duration: 0.3, ease: "easeInOut" }}
         onMouseEnter={() => setIsOpen(true)}
@@ -33,12 +36,13 @@ const AdminSideBar = ({
         aria-label="Sidebar de administración">
         {/* Logo */}
         <div className="relative w-full pb-4 px-3 pt-3">
-          <p
-            className="pl-0.5 font-bold text-custom-black-900 text-2xl"
+          <button
+            className="pl-0.5 font-bold text-custom-black-900 text-2xl focus:outline-none"
+            style={{ background: "none", border: "none", cursor: "pointer" }}
+            onClick={() => router.push("/")}
             onMouseEnter={(e) => e.stopPropagation()}>
-            {/* <Image src="/main/logoNoBg.png" alt="viaje-seguro-logo" fill priority sizes="128px" style={{ objectFit: "contain" }} /> */}
             V<span className="text-custom-golden-600">S</span>
-          </p>
+          </button>
         </div>
 
         {/* Menu Items */}
@@ -46,11 +50,17 @@ const AdminSideBar = ({
           {menuItems.map((item, index) => (
             <motion.button
               key={item.name}
-              className="flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer hover:bg-custom-golden-100 transition-all duration-200 group focus:outline-none"
+              className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer hover:bg-custom-golden-100 transition-all duration-200 group focus:outline-none ${item.isHome ? "mb-2 mt-1" : ""}`}
               initial={{ opacity: 0, x: -20 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{ delay: index * 0.05 }}
-              onClick={() => onSelect(item.name)}
+              onClick={() => {
+                if (item.isHome) {
+                  router.push("/");
+                } else {
+                  onSelect(item.name);
+                }
+              }}
               type="button"
               aria-label={item.name}>
               <span className="text-custom-golden-600">{item.icon}</span>

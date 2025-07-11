@@ -57,8 +57,10 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
                 return; // ignorar input inválido
             }
         } else if (decimalFields.includes(name)) {
-            if (/^\d*\.?\d*$/.test(value)) {
-                parsedValue = value;
+            // Permitir tanto punto como coma como separador decimal
+            const normalizedValue = value.replace(/,/g, ".");
+            if (/^\d*\.?\d*$/.test(normalizedValue)) {
+                parsedValue = normalizedValue;
             } else {
                 return; // ignorar input inválido
             }
@@ -77,6 +79,8 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
 
         const payload = {
             ...form,
+            origin: form.origin.trim(),
+            destination: form.destination.trim(),
             departure: departureUTC || form.departure,
             arrival: arrivalUTC || form.departure,
             basePrice: parseFloat(form.basePrice as string),
@@ -108,7 +112,7 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
     }, [onClose]);
 
     return (
-        <div onClick={onClose} className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
+        <div  className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
             <div
                 onClick={(e) => e.stopPropagation()}
                 className="bg-white rounded-xl shadow-2xl p-8 my-8 w-full max-w-4xl max-h-[95vh] overflow-y-auto relative border border-custom-gray-300"

@@ -14,7 +14,7 @@ const HeroSection = () => {
         animate={{ scale: 1, opacity: 0.4 }}
         transition={{ duration: 1.2, ease: "easeOut" }}>
         <Image
-          src="/main/nosotros.png"
+          src="/main/nosotros2.png"
           alt="Equipo de Viaje Seguro"
           fill
           className="object-cover"
