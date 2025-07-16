@@ -76,7 +76,11 @@ const Services = () => {
                 <ul className="space-y-3">
                   {service.features.map((feature, idx) => (
                     <li key={idx} className="flex items-start">
-                      <Check className="h-5 w-5 text-custom-golden-600 mr-2 flex-shrink-0" />
+                      <Check
+                        className="h-5 w-5 text-custom-golden-600 mr-2 flex-shrink-0"
+                        aria-hidden="true"
+                        focusable="false"
+                      />
                       <span className="text-gray-700">{feature}</span>
                     </li>
                   ))}

@@ -17,11 +17,9 @@ const Hero = () => {
     departure,
   }: ClientSearchFormData) => {
     const userTimeZone = DateTime.local().zoneName;
-
     const selectedDate = DateTime.fromJSDate(departure).setZone(userTimeZone);
     const now = DateTime.local().setZone(userTimeZone);
 
-    // Combinamos fecha seleccionada con hora actual
     const dateTimeWithTime = selectedDate.set({
       hour: now.hour,
       minute: now.minute,
@@ -52,8 +50,8 @@ const Hero = () => {
           initial={{ opacity: 0, y: 30 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-3xl md:text-5xl font-extrabold mb-4">
-          Transporte Privado Confiable
+          className="text-3xl md:text-5xl font-extrabold mb-4 max-w-4xl mx-auto">
+          ViajeSeguro – Tu plataforma de coche compartido en España
         </motion.h1>
 
         <motion.p
@@ -61,16 +59,17 @@ const Hero = () => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
           className="text-xl mb-8 font-bold max-w-2xl mx-auto">
-          Ofrecemos un servicio de transporte entre Valencia, Barcelona y
-          Madrid, cómodo y flexible para ti.
+          Comparte tu viaje entre Madrid, Barcelona y Valencia. Ahorra gastos y
+          viaja cómodo con nuestra red de transporte privado.
         </motion.p>
 
         <div className="relative max-w-7xl mx-auto">
           <div className="absolute inset-0 -z-10 overflow-hidden">
             <Image
               src="/main/iniciovs.jpeg"
-              alt="Ilustración de coches en carretera"
+              alt="Grupo de pasajeros disfrutando de un coche compartido ViajeSeguro"
               fill
+              priority
             />
           </div>
 

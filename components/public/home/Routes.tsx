@@ -68,7 +68,7 @@ const Routes = () => {
           animate={isInView && { opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
           className="text-4xl font-extrabold text-center text-custom-black-800 mb-12">
-          Nuestras Rutas
+          Rutas de viaje compartido disponibles
         </motion.h2>
 
         <div className="max-w-3xl mx-auto bg-custom-white-100 rounded-lg shadow-lg overflow-hidden border border-custom-gray-300">
@@ -87,12 +87,15 @@ const Routes = () => {
                   }`}>
                   <div className="flex items-center">
                     <div className="w-12 h-12  rounded-full flex items-center justify-center mr-4">
-                      <MapPin className="h-6 w-6 text-custom-black-800" />
+                      <MapPin
+                        className="h-6 w-6 text-custom-black-800"
+                        aria-hidden="true"
+                      />
                     </div>
                     <div>
-                      <h4 className="font-semibold text-lg">
+                      <h3 className="font-semibold text-lg">
                         {route.from} - {route.to}
-                      </h4>
+                      </h3>
                       <p className="text-custom-gray-500">{route.duration}</p>
                     </div>
                   </div>
