@@ -42,6 +42,7 @@ interface Plan {
   highlight?: boolean;
   highlightLabel?: string;
   features: Feature[];
+  originalPrice?: string;
 }
 
 const plans: Plan[] = [
@@ -87,9 +88,10 @@ const plans: Plan[] = [
     title: "Club Lealtad",
     label: "Mensual",
     subtitle: "Para viajeros regulares",
-    price: "4,90€",
+    price: "0,00€",
+    originalPrice: "4,90€",
     suffix: "/mes",
-    extraNote: "Ahorra más con beneficios mensuales",
+    extraNote: "¡Gratis solo por 45 días!",
     button: "Unirme al Club Lealtad",
     highlight: true,
     highlightLabel: "Popular",
@@ -289,11 +291,13 @@ const Subscriptions = () => {
 
   React.useEffect(() => {
     if (session?.user?.id && typeof window !== "undefined") {
-      const pendingPlan = localStorage.getItem("pendingPlan");
-      if (pendingPlan) {
-        const plan = JSON.parse(pendingPlan);
+      const pendingLabel = localStorage.getItem("pendingPlan");
+      if (pendingLabel) {
+        const plan = plans.find((p) => p.label === pendingLabel);
+        if (plan) {
+          handleDirectSubscription(plan);
+        }
         localStorage.removeItem("pendingPlan");
-        handleDirectSubscription(plan);
       }
     }
   }, [session, handleDirectSubscription]);
@@ -303,7 +307,7 @@ const Subscriptions = () => {
       labelToPlanType[plan.label as keyof typeof labelToPlanType];
     if (!session?.user?.id) {
       if (typeof window !== "undefined") {
-        localStorage.setItem("pendingPlan", JSON.stringify(plan));
+        localStorage.setItem("pendingPlan", JSON.stringify(plan.label));
       }
       router.push("/auth/login");
       return;
@@ -408,14 +412,30 @@ const Subscriptions = () => {
                 <h3 className="text-2xl font-bold">{plan.title}</h3>
                 <p className="text-custom-gray-600">{plan.subtitle}</p>
                 <div className="mt-4">
-                  <span className="text-4xl font-bold text-custom-black-800">
-                    {plan.price}
-                  </span>
-                  {plan.suffix && (
-                    <span className="text-custom-gray-600 ml-2">
-                      {plan.suffix}
-                    </span>
-                  )}
+                  <div className="flex flex-col items-baseline gap-2">
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-4xl font-bold text-custom-black-800">
+                        {plan.price}
+                      </span>
+                      {plan.suffix && (
+                        <span className="text-custom-gray-600">
+                          {plan.suffix}
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex items-baseline gap-2">
+                      {plan.originalPrice && (
+                        <div className="flex items-baseline gap-2">
+                          <span className="text-lg line-through text-custom-gray-500">
+                            {plan.originalPrice}
+                          </span>
+                          <span className="text-custom-gray-600">
+                            {plan.suffix}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
                   <div
                     className={`${
                       plan.extraNote
