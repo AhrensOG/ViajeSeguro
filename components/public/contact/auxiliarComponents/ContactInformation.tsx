@@ -41,8 +41,8 @@ const ContactInformation = () => {
       icon: <Phone className="h-5 w-5 text-custom-golden-700" />,
       title: "Teléfono",
       content: (
-        <Link href="tel:+34961043838" className="hover:text-custom-golden-600">
-          +34 96 104 38 38
+        <Link href="tel:+34624051168" className="hover:text-custom-golden-600">
+          +34 624 05 11 68
         </Link>
       ),
     },
