@@ -16,14 +16,32 @@ const TripsPanel = () => {
   useEffect(() => {
     const fetchReservations = async () => {
       if (!session?.user?.id) return;
+      setLoading(true);
       try {
         const data = await getTripsByDriverId();
+        if (!Array.isArray(data)) return setTrips([]);
 
-        setTrips(Array.isArray(data) ? (data as TripResponse[]) : []);
+        const now = new Date();
+
+        const futureOrTodayTrips = data
+          .filter((trip) => new Date(trip.departure) >= now)
+          .sort(
+            (a, b) =>
+              new Date(a.departure).getTime() - new Date(b.departure).getTime()
+          );
+
+        const pastTrips = data
+          .filter((trip) => new Date(trip.departure) < now)
+          .sort(
+            (a, b) =>
+              new Date(b.departure).getTime() - new Date(a.departure).getTime()
+          );
+
+        setTrips([...futureOrTodayTrips, ...pastTrips]);
       } catch (error) {
         console.log("Error al obtener reservas:", error);
-        toast.info("¡Ups! Ocurrió un error al obtener tus reservas.", {
-          description: "Intenta recargando la pagina o contacta con el soporte",
+        toast.info("¡Ups! Ocurrió un error al obtener tus reservas.", {
+          description: "Intenta recargando la página o contacta con el soporte",
         });
       } finally {
         setLoading(false);
