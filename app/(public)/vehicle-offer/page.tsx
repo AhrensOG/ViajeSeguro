@@ -1,5 +1,5 @@
-import VehicleOfferPage from "@/components/public/vehicle-offer/VehicleOfferPage";
+import VehicleOfferSearchPage from "@/components/public/vehicle-offer/VehicleOfferSearchPage";
 
 export default function VehicleOffer() {
-    return <VehicleOfferPage />;
+    return <VehicleOfferSearchPage />;
 }

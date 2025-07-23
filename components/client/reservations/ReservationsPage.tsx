@@ -7,6 +7,7 @@ import { ReservationResponse } from "@/lib/api/reservation/reservation.types";
 import ReservationCard from "./auxiliarComponents/ReservationCard";
 import { toast } from "sonner";
 import ReservationCardFallback from "@/lib/client/components/reservations/ReservationCardFallback";
+import ReservationVehicleCard from "./auxiliarComponents/ReservationVehicleCard";
 
 const ReservationsPage = () => {
     const { data: session } = useSession();
@@ -59,6 +60,7 @@ const ReservationsPage = () => {
                     {reservations.map((reservation) => (
                         <ReservationCard key={reservation.id} reservation={reservation} />
                     ))}
+                    <ReservationVehicleCard />
                 </div>
             )}
         </div>

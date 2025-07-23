@@ -2,10 +2,10 @@
 
 import { useForm, Controller } from "react-hook-form";
 import { DollarSign } from "lucide-react";
-import Input from "./auxiliarComponents/Input";
-import InputWhitIcon from "./auxiliarComponents/InputWhitIcon";
-import Button from "./auxiliarComponents/Button";
-import DropdownField from "./auxiliarComponents/DropdownField";
+import Input from "./Input";
+import InputWhitIcon from "./InputWhitIcon";
+import Button from "./Button";
+import DropdownField from "./DropdownField";
 import { FormData } from "@/lib/api/vehicleOffer/vehicleOffers.types";
 
 export default function VehicleOfferPage() {

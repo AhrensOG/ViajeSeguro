@@ -22,6 +22,7 @@ const QrPage = () => {
         const fetchReservation = async (): Promise<void> => {
             try {
                 const data = await getReservationById(reservationId as string);
+                console.log(data);
                 setReservation(data);
             } catch (err) {
                 console.log(err);
