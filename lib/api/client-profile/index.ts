@@ -24,6 +24,7 @@ export async function updateProfile(values: UserProfile): Promise<void> {
             body: JSON.stringify({
                 name: values.name,
                 lastName: values.lastName,
+                phone: values.phone,
             }),
         });
     } catch (error) {
