@@ -3,7 +3,7 @@ import React, { useEffect, useState } from "react";
 import PurchaseTripSummary from "./PurchaseTripSummary";
 import PaymentOption from "./PaymentOption";
 import PaymentTrustInfo from "./PaymentTrustInfo";
-import { CheckCircle, CreditCard } from "lucide-react";
+import { AlertCircle, Banknote, CheckCircle, Clock, CreditCard } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { TripWithPriceDetails } from "@/lib/shared/types/trip-service-type.type";
 import { getTripForPurchase } from "@/lib/api/trip";
@@ -48,6 +48,18 @@ const PurchaseProcess = () => {
         };
         fetchTrip();
     }, [id]);
+
+    const handleCashPayment = async () => {
+        if (!session) {
+            const current = `${BASE_URL}${pathname}?${searchParams.toString()}`;
+            const encoded = encodeURIComponent(current);
+            toast.info("Debes iniciar sesión para realizar la reserva");
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            router.push(`/auth/login?callbackUrl=${encoded}`);
+            return;
+        }
+        setShowCashModal(true);
+    };
 
     const confirmCashPayment = async () => {
         if (!trip || !session) return;
@@ -144,7 +156,7 @@ const PurchaseProcess = () => {
                         onClick={handleStripeRedirect}
                     />
 
-                    {/* <PaymentOption
+                    <PaymentOption
                         icon={<Banknote className="h-6 w-6 text-custom-gray-600" />}
                         title="Pagar en efectivo"
                         description="Paga directamente al conductor el día del viaje"
@@ -161,7 +173,7 @@ const PurchaseProcess = () => {
                         buttonLabel="Pagar con efectivo"
                         secure
                         onClick={handleCashPayment}
-                    /> */}
+                    />
 
                     <PaymentTrustInfo />
                 </div>
