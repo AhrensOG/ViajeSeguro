@@ -7,7 +7,7 @@ const ReservationVehicleCard = () => {
     const [showCancelWarning, setShowCancelWarning] = useState(false);
     const [hideButton, setHideButton] = useState(false);
     const [openCard, setOpenCard] = useState(false);
-    const [showQrModal, setShowQrModal] = useState(false);
+    // const [showQrModal, setShowQrModal] = useState(false);
 
     return (
         <div
@@ -188,7 +188,7 @@ const ReservationVehicleCard = () => {
                             </button> */}
                             {true && (
                                 <button
-                                    onClick={() => setShowQrModal(true)}
+                                    // onClick={() => setShowQrModal(true)}
                                     className="cursor-pointer text-sm font-medium text-custom-golden-700 hover:underline transition flex justify-center items-center gap-2"
                                 >
                                     <QrCode className="size-6" />

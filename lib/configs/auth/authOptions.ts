@@ -89,8 +89,8 @@ export const authOptions: NextAuthOptions = {
               "Content-Type": "application/json",
             },
             body: JSON.stringify({
-              name: user.name?.split(" ")[0],
-              lastName: user.name?.split(" ")[1],
+              name: user.name?.split(" ")[0] || "Google",
+              lastName: user.name?.split(" ")[1] || "User",
               email: user.email,
               password: account.providerAccountId,
               googleId: user.id,
