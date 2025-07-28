@@ -4,7 +4,7 @@ import { BACKEND_URL } from "@/lib/constants";
 
 export async function fetchUserData(id: string): Promise<UserProfile> {
     try {
-        const res = await fetchWithAuth<UserProfile>(`${BACKEND_URL}/user/${id}`, {
+        const res = await fetchWithAuth<UserProfile>(`${BACKEND_URL}/user/profile-page/${id}`, {
             method: "GET",
         });
         return res;
