@@ -50,15 +50,15 @@ const PurchaseProcess = () => {
     }, [id]);
 
     const handleCashPayment = async () => {
-        if (!session) {
-            const current = `${BASE_URL}${pathname}?${searchParams.toString()}`;
-            const encoded = encodeURIComponent(current);
-            toast.info("Debes iniciar sesión para realizar la reserva");
-            await new Promise((resolve) => setTimeout(resolve, 2000));
-            router.push(`/auth/login?callbackUrl=${encoded}`);
-            return;
-        }
-        setShowCashModal(true);
+         if (!session) {
+      const current = `${BASE_URL}${pathname}?${searchParams.toString()}`;
+      const encoded = encodeURIComponent(current);
+      toast.info("Debes iniciar sesión para realizar la reserva");
+      await new Promise((resolve) => setTimeout(resolve, 2000));
+      router.push(`/auth/login?callbackUrl=${encoded}`);
+      return;
+    }
+    setShowCashModal(true);
     };
 
     const confirmCashPayment = async () => {

@@ -6,78 +6,70 @@ import SearchForm from "../../../lib/client/components/SearchForm";
 import { useRouter } from "next/navigation";
 import { DateTime } from "luxon";
 import { ClientSearchFormData } from "@/lib/client/trip/types/search-form.type";
+import SearchFormV1 from "@/lib/client/components/SearchFormV1";
 
 const Hero = () => {
-  const router = useRouter();
+    const router = useRouter();
 
-  const handleSearch = ({
-    origin,
-    destination,
-    serviceType,
-    departure,
-  }: ClientSearchFormData) => {
-    const userTimeZone = DateTime.local().zoneName;
-    const selectedDate = DateTime.fromJSDate(departure).setZone(userTimeZone);
-    const now = DateTime.local().setZone(userTimeZone);
+    const handleSearch = ({ origin, destination, serviceType, departure }: ClientSearchFormData) => {
+        const userTimeZone = DateTime.local().zoneName;
+        const selectedDate = DateTime.fromJSDate(departure).setZone(userTimeZone);
+        const now = DateTime.local().setZone(userTimeZone);
 
-    const dateTimeWithTime = selectedDate.set({
-      hour: now.hour,
-      minute: now.minute,
-      second: now.second,
-    });
+        const dateTimeWithTime = selectedDate.set({
+            hour: now.hour,
+            minute: now.minute,
+            second: now.second,
+        });
 
-    const isoStringWithTZ = dateTimeWithTime.toISO();
+        const isoStringWithTZ = dateTimeWithTime.toISO();
 
-    if (!isoStringWithTZ) {
-      console.warn("Fecha inválida para búsqueda:", departure);
-      return;
-    }
+        if (!isoStringWithTZ) {
+            console.warn("Fecha inválida para búsqueda:", departure);
+            return;
+        }
 
-    const params = new URLSearchParams({
-      origin,
-      destination,
-      departure: isoStringWithTZ,
-      serviceType,
-    });
+        const params = new URLSearchParams({
+            origin,
+            destination,
+            departure: isoStringWithTZ,
+            serviceType,
+        });
 
-    router.push(`/search?${params.toString()}`);
-  };
+        router.push(`/search?${params.toString()}`);
+    };
 
-  return (
-    <section className="relative bg-[url('/main/iniciovs.jpeg')] bg-no-repeat bg-top sm:bg-top sm:bg-contain md:bg-cover py-16 w-full h-[420px] sm:h-[480px]">
-      <div className="w-full mx-auto px-4 text-center text-custom-white-100">
-        <motion.h1
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.8, ease: "easeOut" }}
-          className="text-3xl md:text-5xl font-extrabold mb-4 max-w-4xl mx-auto">
-          ViajeSeguro – Tu plataforma de coche compartido en España
-        </motion.h1>
+    return (
+        <section className="relative bg-[url('/main/iniciovs.jpeg')] bg-no-repeat bg-top sm:bg-top sm:bg-contain md:bg-cover py-16 w-full sm:h-[480px]">
+            <div className="w-full mx-auto px-4 text-center text-custom-white-100">
+                <motion.h1
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.8, ease: "easeOut" }}
+                    className="text-3xl md:text-5xl font-extrabold mb-4 max-w-4xl mx-auto"
+                >
+                    ViajeSeguro – Tu plataforma de coche compartido en España
+                </motion.h1>
 
-        <motion.p
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
-          className="text-xl mb-8 font-bold max-w-2xl mx-auto">
-          Comparte tu viaje entre Madrid, Barcelona y Valencia. Ahorra gastos y
-          viaja cómodo con nuestra red de transporte privado.
-        </motion.p>
+                <motion.p
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 1, ease: "easeOut", delay: 0.2 }}
+                    className="text-xl mb-8 font-bold max-w-2xl mx-auto"
+                >
+                    Comparte tu viaje entre Madrid, Barcelona y Valencia. Ahorra gastos y viaja cómodo con nuestra red de transporte privado.
+                </motion.p>
 
-        <div className="relative max-w-7xl mx-auto">
-          <div className="absolute inset-0 -z-10 overflow-hidden">
-            <Image
-              src="/main/iniciovs.jpeg"
-              alt="Grupo de pasajeros disfrutando de un coche compartido ViajeSeguro"
-              fill
-              priority
-            />
-          </div>
+                <div className="relative max-w-7xl mx-auto">
+                    <div className="absolute inset-0 -z-10 overflow-hidden">
+                        <Image src="/main/iniciovs.jpeg" alt="Grupo de pasajeros disfrutando de un coche compartido ViajeSeguro" fill priority />
+                    </div>
 
-          <SearchForm onSearch={handleSearch} />
-        </div>
-      </div>
-    </section>
-  );
+                    {/* <SearchForm onSearch={handleSearch} /> */}
+                </div>
+            </div>
+        </section>
+    );
 };
 
 export default Hero;
