@@ -46,8 +46,6 @@ const ProfilePage = () => {
             }
             try {
                 const res = await fetchUserData(session.user.id);
-                console.log(res);
-
                 if (res) {
                     setValue("email", res.email);
                     setValue("name", res.name);
@@ -75,8 +73,6 @@ const ProfilePage = () => {
     const onSubmit = async (values: UserProfile) => {
         const toastId = toast.loading("Actualizando información...");
         try {
-            console.log(values);
-
             await updateProfile(values);
             toast.success("Información actualizada exitosamente", { id: toastId });
         } catch (error) {
