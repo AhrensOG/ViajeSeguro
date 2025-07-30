@@ -1,9 +1,8 @@
 import { Suspense } from "react";
 import NavBar from "../navigation/NavBar";
-import SearchProcess from "./auxiliarComponents/SearchProcess";
 import SearchProcessFallback from "@/lib/client/components/fallbacks/search/SearchProcessFallback";
 import SearchWrapper from "./auxiliarComponents/SearchWrapper";
-import FiltersBar from "../vehicle-offer/auxiliarComponents/FiltersBar";
+import FiltersBar from "./auxiliarComponents/FiltersBar";
 
 export default function SearchPage() {
     return (

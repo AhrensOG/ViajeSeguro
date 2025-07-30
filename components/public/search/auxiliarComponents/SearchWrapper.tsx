@@ -1,6 +1,6 @@
 "use client";
 import { useSearchParams } from "next/navigation";
-import SearchOfferProcess from "../../vehicle-offer/auxiliarComponents/SearchOfferProcess";
+import SearchOfferProcess from "./SearchOfferProcess";
 import SearchProcess from "./SearchProcess";
 
 export default function SearchWrapper() {

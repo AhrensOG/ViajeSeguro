@@ -1,7 +1,7 @@
 "use client";
 import { Suspense } from "react";
-import NavBar from "../navigation/NavBar";
-import SearchOfferProcess from "./auxiliarComponents/SearchOfferProcess";
+import NavBar from "../../navigation/NavBar";
+import SearchOfferProcess from "./SearchOfferProcess";
 
 export default function VehicleOfferSearchPage() {
     return (

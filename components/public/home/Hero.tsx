@@ -2,43 +2,8 @@
 
 import { motion } from "framer-motion";
 import Image from "next/image";
-import SearchForm from "../../../lib/client/components/SearchForm";
-import { useRouter } from "next/navigation";
-import { DateTime } from "luxon";
-import { ClientSearchFormData } from "@/lib/client/trip/types/search-form.type";
-import SearchFormV1 from "@/lib/client/components/SearchFormV1";
 
 const Hero = () => {
-    const router = useRouter();
-
-    const handleSearch = ({ origin, destination, serviceType, departure }: ClientSearchFormData) => {
-        const userTimeZone = DateTime.local().zoneName;
-        const selectedDate = DateTime.fromJSDate(departure).setZone(userTimeZone);
-        const now = DateTime.local().setZone(userTimeZone);
-
-        const dateTimeWithTime = selectedDate.set({
-            hour: now.hour,
-            minute: now.minute,
-            second: now.second,
-        });
-
-        const isoStringWithTZ = dateTimeWithTime.toISO();
-
-        if (!isoStringWithTZ) {
-            console.warn("Fecha inválida para búsqueda:", departure);
-            return;
-        }
-
-        const params = new URLSearchParams({
-            origin,
-            destination,
-            departure: isoStringWithTZ,
-            serviceType,
-        });
-
-        router.push(`/search?${params.toString()}`);
-    };
-
     return (
         <section className="relative bg-[url('/main/iniciovs.jpeg')] bg-no-repeat bg-top sm:bg-top sm:bg-contain md:bg-cover py-16 w-full sm:h-[480px]">
             <div className="w-full mx-auto px-4 text-center text-custom-white-100">
@@ -64,8 +29,6 @@ const Hero = () => {
                     <div className="absolute inset-0 -z-10 overflow-hidden">
                         <Image src="/main/iniciovs.jpeg" alt="Grupo de pasajeros disfrutando de un coche compartido ViajeSeguro" fill priority />
                     </div>
-
-                    {/* <SearchForm onSearch={handleSearch} /> */}
                 </div>
             </div>
         </section>

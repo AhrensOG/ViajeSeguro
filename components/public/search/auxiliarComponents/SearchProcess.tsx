@@ -1,58 +1,57 @@
 "use client";
 
 import React, { useState, useEffect } from "react";
-import { usePathname, useRouter, useSearchParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { SearchTrip, TripCardType, TripServiceType } from "@/lib/shared/types/trip-service-type.type";
 import Image from "next/image";
 import { toast } from "sonner";
 import TripCard from "./TripCard";
 import { convertUTCToLocalTime } from "@/lib/functions";
 import TripCardFallback from "@/lib/client/components/fallbacks/shared/TripCardFallback";
-import { DateTime } from "luxon";
+// import { DateTime } from "luxon";
 import { searchTrips } from "@/lib/api/trip";
-import { ClientSearchFormData } from "@/lib/client/trip/types/search-form.type";
+// import { ClientSearchFormData } from "@/lib/client/trip/types/search-form.type";
 
 const SearchProcess = () => {
-    const router = useRouter();
-    const pathname = usePathname();
+    // const router = useRouter();
+    // const pathname = usePathname();
     const searchParams = useSearchParams();
     const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const mode = searchParams.get("mode");
 
     const [trips, setTrips] = useState<TripCardType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [invalidParams, setInvalidParams] = useState(false);
 
-    const updateSearchParams = (formData: ClientSearchFormData) => {
-        const params = new URLSearchParams(searchParams.toString());
+    // const updateSearchParams = (formData: ClientSearchFormData) => {
+    //     const params = new URLSearchParams(searchParams.toString());
 
-        Object.entries(formData).forEach(([key, value]) => {
-            if (value) {
-                if (value instanceof Date) {
-                    const selectedDate = DateTime.fromJSDate(value).setZone(userTimeZone);
-                    const now = DateTime.local().setZone(userTimeZone);
+    //     Object.entries(formData).forEach(([key, value]) => {
+    //         if (value) {
+    //             if (value instanceof Date) {
+    //                 const selectedDate = DateTime.fromJSDate(value).setZone(userTimeZone);
+    //                 const now = DateTime.local().setZone(userTimeZone);
 
-                    const dateTimeWithTime = selectedDate.set({
-                        hour: now.hour,
-                        minute: now.minute,
-                        second: now.second,
-                    });
+    //                 const dateTimeWithTime = selectedDate.set({
+    //                     hour: now.hour,
+    //                     minute: now.minute,
+    //                     second: now.second,
+    //                 });
 
-                    const isoStringWithTZ = dateTimeWithTime.toISO();
+    //                 const isoStringWithTZ = dateTimeWithTime.toISO();
 
-                    if (isoStringWithTZ) {
-                        params.set(key, isoStringWithTZ);
-                    }
-                } else {
-                    params.set(key, value);
-                }
-            } else {
-                params.delete(key);
-            }
-        });
+    //                 if (isoStringWithTZ) {
+    //                     params.set(key, isoStringWithTZ);
+    //                 }
+    //             } else {
+    //                 params.set(key, value);
+    //             }
+    //         } else {
+    //             params.delete(key);
+    //         }
+    //     });
 
-        router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-    };
+    //     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    // };
 
     const departureParam = searchParams.get("departure");
     const departureDate = departureParam ? new Date(departureParam) : new Date();

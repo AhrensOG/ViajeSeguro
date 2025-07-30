@@ -1,14 +1,17 @@
+import { CardReservationVehicleOfferProps } from "@/lib/api/vehicleOffer/vehicleOffers.types";
+import { calculateTotalDays } from "@/lib/functions";
 import { CalendarDays, Car, MapPin, Users } from "lucide-react";
 import Image from "next/image";
 
-export default function CardInformationLeft() {
+export default function CardInformationLeft(props: CardReservationVehicleOfferProps) {
+    const { capacity, whitdrawLocation, dateStart, dateEnd, imageUrl, vehicleOfferType } = props;
     return (
         <section className="flex flex-col items-center justify-between gap-5 xl:w-[25rem] rounded-md mt-5 sticky top-[100px]">
             {/* Imagen */}
             <div className="flex items-center justify-center xl:h-[25rem] w-full rounded-md shadow-md">
                 <Image
                     className="rounded-md object-cover w-full h-full"
-                    src="/main/img_placeholder.webp"
+                    src={`${imageUrl.length > 0 ? imageUrl[0] : "/main/img_placeholder.webp"}`}
                     alt="Imagen alquiler"
                     width={900}
                     height={900}
@@ -21,19 +24,19 @@ export default function CardInformationLeft() {
                 <div className="space-y-1 text-custom-gray-600 text-sm">
                     <p className="flex items-center gap-2">
                         <MapPin className="size-4 text-custom-gray-500" />
-                        Recogida: Local Valencia Centro
+                        Recogida: {whitdrawLocation}
                     </p>
                     <p className="flex items-center gap-2">
                         <CalendarDays className="size-4 text-custom-gray-500" />
-                        Duración: 3 días.
+                        Duración: {calculateTotalDays(dateStart, dateEnd)} días.
                     </p>
                     <p className="flex items-center gap-2">
                         <Car className="size-4 text-custom-gray-500" />
-                        Tipo: Sin conductor
+                        Tipo: {vehicleOfferType === "WITH_DRIVER" ? "Con conductor" : "Sin conductor"}
                     </p>
                     <p className="flex items-center gap-2">
                         <Users className="size-4 text-custom-gray-500" />
-                        Hasta 6 personas
+                        Hasta {capacity} personas
                     </p>
                 </div>
             </div>

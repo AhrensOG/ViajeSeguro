@@ -7,8 +7,8 @@ import { AnimatePresence, motion } from "framer-motion";
 import { DateTime } from "luxon";
 
 import SearchForm from "./SearchForm";
-import SearchFormV1 from "./SearchFormV1";
 import { ClientSearchFormData } from "@/lib/client/trip/types/search-form.type";
+import SearchFormVehicle from "./SearchFormVehicle";
 
 export default function SearchSelectorWrapper() {
     const [activeMode, setActiveMode] = useState<"car" | "van">("car");
@@ -93,7 +93,7 @@ export default function SearchSelectorWrapper() {
                         transition={{ duration: 0.4 }}
                         className="w-full"
                     >
-                        <SearchFormV1 />
+                        <SearchFormVehicle />
                     </motion.div>
                 )}
             </AnimatePresence>
