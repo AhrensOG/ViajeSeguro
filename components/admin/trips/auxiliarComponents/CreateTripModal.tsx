@@ -88,7 +88,6 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
 
         try {
             const res = await createTrip(payload);
-            console.log("Viaje creado:", res);
 
             toast.success("Viaje creado con éxito", { id: toastId });
             onSuccess((prevTrips) => [...prevTrips, res]);
@@ -112,7 +111,7 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
     }, [onClose]);
 
     return (
-        <div  className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
+        <div className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
             <div
                 onClick={(e) => e.stopPropagation()}
                 className="bg-white rounded-xl shadow-2xl p-8 my-8 w-full max-w-4xl max-h-[95vh] overflow-y-auto relative border border-custom-gray-300"
