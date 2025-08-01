@@ -8,6 +8,7 @@ import { User } from "@/lib/api/reservation/reservation.types";
 import { CreateVehicleDto, Vehicle } from "@/lib/api/admin/vehicles/vehicles.type";
 import { createVehicle } from "@/lib/api/admin/vehicles";
 import { FeatureEnum } from "@/lib/api/admin/vehicles/vehicles.type";
+import { uploadFiles } from "@/lib/firebase/uploadFiles";
 
 interface Props {
     onClose: () => void;
@@ -37,13 +38,10 @@ const CreateVehicleModal = ({ onClose, owners, onSuccess }: Props) => {
 
     const submit = async (data: CreateVehicleDto) => {
         try {
-            const uploadedUrls: string[] = [];
-
-            if (imageFiles) {
-                for (const file of Array.from(imageFiles)) {
-                    const url = await simulateFirebaseUpload(file);
-                    uploadedUrls.push(url);
-                }
+            let uploadedUrls: string[] = [];
+            if (imageFiles && imageFiles?.length > 0) {
+                const filesArray = Array.from(imageFiles);
+                uploadedUrls = await uploadFiles(filesArray);
             }
 
             const vehicle = await createVehicle({
@@ -60,8 +58,6 @@ const CreateVehicleModal = ({ onClose, owners, onSuccess }: Props) => {
             onClose();
             toast.success("Vehículo creado exitosamente");
         } catch (error) {
-            console.log(error);
-
             toast.info(error instanceof Error ? error.message : "Error al crear el vehículo");
         }
     };
@@ -223,13 +219,6 @@ const CreateVehicleModal = ({ onClose, owners, onSuccess }: Props) => {
             </div>
         </div>
     );
-};
-
-// Simulador de subida a Firebase
-const simulateFirebaseUpload = async (file: File): Promise<string> => {
-    return new Promise((resolve) => {
-        setTimeout(() => resolve(URL.createObjectURL(file)), 1000);
-    });
 };
 
 export default CreateVehicleModal;

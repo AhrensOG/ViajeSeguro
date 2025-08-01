@@ -8,50 +8,15 @@ import { toast } from "sonner";
 import TripCard from "./TripCard";
 import { convertUTCToLocalTime } from "@/lib/functions";
 import TripCardFallback from "@/lib/client/components/fallbacks/shared/TripCardFallback";
-// import { DateTime } from "luxon";
 import { searchTrips } from "@/lib/api/trip";
-// import { ClientSearchFormData } from "@/lib/client/trip/types/search-form.type";
 
 const SearchProcess = () => {
-    // const router = useRouter();
-    // const pathname = usePathname();
     const searchParams = useSearchParams();
     const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
     const [trips, setTrips] = useState<TripCardType[]>([]);
     const [isLoading, setIsLoading] = useState(false);
     const [invalidParams, setInvalidParams] = useState(false);
-
-    // const updateSearchParams = (formData: ClientSearchFormData) => {
-    //     const params = new URLSearchParams(searchParams.toString());
-
-    //     Object.entries(formData).forEach(([key, value]) => {
-    //         if (value) {
-    //             if (value instanceof Date) {
-    //                 const selectedDate = DateTime.fromJSDate(value).setZone(userTimeZone);
-    //                 const now = DateTime.local().setZone(userTimeZone);
-
-    //                 const dateTimeWithTime = selectedDate.set({
-    //                     hour: now.hour,
-    //                     minute: now.minute,
-    //                     second: now.second,
-    //                 });
-
-    //                 const isoStringWithTZ = dateTimeWithTime.toISO();
-
-    //                 if (isoStringWithTZ) {
-    //                     params.set(key, isoStringWithTZ);
-    //                 }
-    //             } else {
-    //                 params.set(key, value);
-    //             }
-    //         } else {
-    //             params.delete(key);
-    //         }
-    //     });
-
-    //     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
-    // };
 
     const departureParam = searchParams.get("departure");
     const departureDate = departureParam ? new Date(departureParam) : new Date();

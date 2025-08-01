@@ -1,6 +1,6 @@
 import { BACKEND_URL } from "@/lib/constants";
 import { fetcher, fetchWithAuth } from "@/lib/functions";
-import { CreateVehicleBookingPayload, VehicleOfferWithVehicle } from "./vehicleBooking.types";
+import { CreateVehicleBookingPayload, ResponseForQrPage, VehicleOfferWithVehicle } from "./vehicleBooking.types";
 
 const fetchOffer = async (id: string) => {
     const res = await fetcher<VehicleOfferWithVehicle>(`${BACKEND_URL}/vehicle-offer/${id}`);
@@ -49,4 +49,16 @@ const createVehicleBooking = async (payload: CreateVehicleBookingPayload) => {
     }
 };
 
-export { fetchOffer, fetchVehicleBooking, createVehicleBooking };
+const fetchVehicleBookingWhitDetails = async (id: string) => {
+    const res = await fetcher<ResponseForQrPage>(`${BACKEND_URL}/vehicle-booking/details/${id}`);
+    return res;
+};
+
+const markBookingAsPaid = async (id: string) => {
+    const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-booking/${id}/paid`, {
+        method: "PATCH",
+    });
+    return res;
+};
+
+export { fetchOffer, fetchVehicleBooking, createVehicleBooking, fetchVehicleBookingWhitDetails, markBookingAsPaid };

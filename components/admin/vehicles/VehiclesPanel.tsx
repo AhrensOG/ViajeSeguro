@@ -176,6 +176,7 @@ export default function VehiclesPanel() {
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
+                                                setSelectedVehicle(vehicle);
                                                 DeleteToast(vehicle.id, handleDelete);
                                             }}
                                             className="text-red-500 hover:text-red-700"

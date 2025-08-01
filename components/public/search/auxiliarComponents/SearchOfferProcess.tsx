@@ -13,28 +13,22 @@ export default function SearchOfferProcess() {
     const [offers, setOffers] = useState<CardReservationVehicleOfferProps[]>([]);
     const [offerSelected, setOfferSelected] = useState<CardReservationVehicleOfferProps | null>(null);
     const [loading, setLoading] = useState(true);
-    // const withdrawLocation = searchParams.get("origin") || "";
     const capacity = Number(searchParams.get("capacity") || 1);
     const vehicleOfferType = searchParams.get("serviceType") || "WITH_DRIVER";
     const availableFrom = searchParams.get("departure") || "";
     const availableTo = searchParams.get("return") || "";
+    const [invalidParams, setInvalidParams] = useState(false);
 
     useEffect(() => {
         const fetchData = async () => {
-            if (!availableFrom || !availableTo) return;
-
-            setLoading(true);
-            console.log("Buscando ofertas:", {
-                // withdrawLocation,
-                capacity,
-                vehicleOfferType,
-                availableFrom,
-                availableTo,
-            });
+            if (!availableFrom || !availableTo || !capacity) {
+                setInvalidParams(true);
+                setLoading(false);
+                return;
+            }
 
             try {
                 const data = await searchVehicleOffers({
-                    // withdrawLocation,
                     capacity,
                     vehicleOfferType,
                     availableFrom,
@@ -94,23 +88,29 @@ export default function SearchOfferProcess() {
 
     return (
         <div className="grow flex flex-col bg-custom-white-100 relative px-4 lg:px-20 py-10">
-            {/* Contenedor principal responsive */}
             <div className="flex flex-col lg:flex-row justify-between lg:justify-center gap-8">
-                {/* Columna izquierda con info del alquiler */}
                 <div className="w-full lg:w-[40%] xl:w-[25rem] hidden lg:block">{offerSelected && <CardInformationLeft {...offerSelected} />}</div>
 
-                {/* Columna derecha con resultados */}
                 <section className="flex flex-col items-start gap-4 w-full lg:w-[60%] xl:w-[60rem]">
                     <div className="flex flex-col gap-2 w-full">
                         <h1 className="text-custom-gray-800 text-2xl xl:text-4xl font-bold">Furgonetas disponibles en Valencia</h1>
-                        <p className="text-custom-gray-600 text-md lg:text-lg">Encontramos {offers.length} furgonetas para tus fechas</p>
-                    </div>
-                    <div className="w-full mx-auto px-4 space-y-4">
-                        {offers.length > 0 ? (
-                            offers.map((offer) => <CardReservation key={offer.id} {...offer} onClick={() => setOfferSelected(offer)} />)
+                        {invalidParams ? (
+                            <p className="text-custom-red-600 text-sm mt-6">
+                                Faltan datos para realizar la búsqueda. Verifica que hayas seleccionado fecha de recogida, devolución y capacidad.
+                            </p>
+                        ) : loading ? (
+                            <p className="text-custom-gray-600 text-sm">Buscando ofertas...</p>
+                        ) : offers.length > 0 ? (
+                            <p className="text-custom-gray-600 text-sm">Encontramos {offers.length} furgonetas para tus fechas</p>
                         ) : (
-                            <p className="text-custom-gray-600 text-md lg:text-lg text-center mt-12">No se encontraron ofertas</p>
+                            <p className="text-custom-gray-600 text-sm">No se encontraron coincidencias con los filtros actuales.</p>
                         )}
+                    </div>
+
+                    <div className="w-full mx-auto px-4 space-y-4">
+                        {!invalidParams &&
+                            !loading &&
+                            offers.map((offer) => <CardReservation key={offer.id} {...offer} onClick={() => setOfferSelected(offer)} />)}
                     </div>
                 </section>
             </div>

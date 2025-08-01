@@ -94,12 +94,10 @@ export default function VehicleBookingPanel() {
         });
     };
 
-    const handleDelete = async (): Promise<void> => {
-        if (!selectedBooking) return;
-
+    const handleDelete = async (id: string): Promise<void> => {
         try {
-            await deleteVehicleBooking(selectedBooking.id);
-            setBookings((prev) => prev.filter((b) => b.id !== selectedBooking.id));
+            await deleteVehicleBooking(id);
+            setBookings((prev) => prev.filter((b) => b.id !== id));
             setSelectedBooking(null);
             toast.success("Reserva eliminada exitosamente");
         } catch {
@@ -217,14 +215,14 @@ export default function VehicleBookingPanel() {
                             </tr>
                         </thead>
                         <tbody className="text-custom-black-800">
-                            {filtered.map((b) => (
+                            {filtered.map((b, index) => (
                                 <tr
                                     onClick={() => {
                                         setSelectedBooking(b);
                                         setShowDetails(true);
                                     }}
                                     key={b.id}
-                                    className={`$ {
+                                    className={`${
                                         index % 2 === 0 ? "bg-custom-white-50" : "bg-custom-gray-100"
                                     } hover:bg-custom-golden-100 transition cursor-pointer`}
                                 >
@@ -261,7 +259,8 @@ export default function VehicleBookingPanel() {
                                             <Pencil className="h-4 w-4 inline-block" />
                                         </button>
                                         <button
-                                            onClick={() => {
+                                            onClick={(e) => {
+                                                e.stopPropagation();
                                                 setSelectedBooking(b);
                                                 DeleteToast(b.id, handleDelete);
                                             }}

@@ -54,7 +54,6 @@ const PurchaseProcess = () => {
                 }
                 if (type === "vehicle") {
                     const vehicleBookingData = await fetchVehicleOffer(id);
-                    console.log(vehicleBookingData);
 
                     setVehicleBooking(vehicleBookingData as VehicleOfferWithVehicle);
                 }
@@ -84,8 +83,6 @@ const PurchaseProcess = () => {
         if ((!trip && !vehicleBooking) || !session) return;
 
         if (trip) {
-            console.log("aca");
-
             const payload: CreateReservationPayload = {
                 tripId: trip.id,
                 price: trip.priceDetails?.finalPrice ?? trip.basePrice,
@@ -110,8 +107,6 @@ const PurchaseProcess = () => {
             }
         }
         if (vehicleBooking) {
-            console.log("aqui");
-
             const totalPrice = vehicleBooking.pricePerDay * calculateTotalDays(vehicleBooking.availableFrom, vehicleBooking.availableTo);
             const createVehicleBookingPayload = {
                 renterId: session.user.id,
@@ -122,7 +117,6 @@ const PurchaseProcess = () => {
                 paymentMethod: "CASH",
                 referralId: referralId || undefined,
                 totalPrice: totalPrice,
-                type: "VEHICLE_BOOKING",
             };
 
             try {
@@ -192,7 +186,6 @@ const PurchaseProcess = () => {
                     amount: Math.round(finalPrice * (1 + Number(IVA) / 100) * 100),
                     metadata: createVehicleBookingPayload,
                 });
-                console.log(data);
 
                 if (data.url) {
                     window.location.href = data.url;

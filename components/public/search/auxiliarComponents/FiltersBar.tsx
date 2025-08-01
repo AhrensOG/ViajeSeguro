@@ -49,6 +49,56 @@ export default function FiltersBar() {
         router.replace(`${pathname}?${sp.toString()}`, { scroll: false });
     };
 
+    // const updateSearchParams = (formData: ClientSearchFormData) => {
+    //     const params = new URLSearchParams(searchParams.toString());
+
+    //     Object.entries(formData).forEach(([key, value]) => {
+    //         if (value) {
+    //             if (value instanceof Date) {
+    //                 const selectedDate = DateTime.fromJSDate(value).setZone(userTimeZone);
+    //                 const now = DateTime.local().setZone(userTimeZone);
+
+    //                 const dateTimeWithTime = selectedDate.set({
+    //                     hour: now.hour,
+    //                     minute: now.minute,
+    //                     second: now.second,
+    //                 });
+
+    //                 const isoStringWithTZ = dateTimeWithTime.toISO();
+
+    //                 if (isoStringWithTZ) {
+    //                     params.set(key, isoStringWithTZ);
+    //                 }
+    //             } else {
+    //                 params.set(key, value);
+    //             }
+    //         } else {
+    //             params.delete(key);
+    //         }
+    //     });
+
+    //     router.replace(`${pathname}?${params.toString()}`, { scroll: false });
+    // };
+
+    const updateSearchParams = (formData: ClientSearchFormData) => {
+        const sp = new URLSearchParams();
+
+        Object.entries(formData).forEach(([key, value]) => {
+            if (value) {
+                if (value instanceof Date) {
+                    const now = new Date();
+                    const adjustedDate = new Date(value);
+                    adjustedDate.setHours(now.getHours(), now.getMinutes(), now.getSeconds());
+                    sp.set(key, adjustedDate.toISOString());
+                } else {
+                    sp.set(key, value.toString());
+                }
+            }
+        });
+
+        router.replace(`${pathname}?${sp.toString()}`, { scroll: false });
+    };
+
     const handleSearch = (data: ClientSearchFormData) => {
         if (!data.origin || !data.destination || !data.departure) {
             toast.warning("Por favor, completa todos los campos obligatorios para buscar.");
@@ -66,20 +116,19 @@ export default function FiltersBar() {
     };
 
     const handleSearchVan = () => {
-        if (!pickupDate || !returnDate || !capacity || !origin || !serviceType) {
+        if (!pickupDate || !returnDate || !capacity || !serviceType) {
             toast.warning("Completa todos los filtros antes de buscar.");
             return;
         }
 
-        const sp = new URLSearchParams();
-        sp.set("mode", "van");
-        sp.set("departure", pickupDate.toISOString());
-        sp.set("return", returnDate.toISOString());
-        sp.set("capacity", capacity);
-        sp.set("origin", origin);
-        sp.set("serviceType", serviceType);
-
-        router.replace(`${pathname}?${sp.toString()}`, { scroll: false });
+        updateSearchParams({
+            mode: "van",
+            departure: pickupDate,
+            return: returnDate,
+            capacity,
+            origin: pickupDate.toISOString(), // ahora origin es fecha
+            serviceType,
+        } as unknown as ClientSearchFormData);
     };
 
     return (

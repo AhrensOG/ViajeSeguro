@@ -1,15 +1,14 @@
 "use client";
 
-import { ReservationResponse } from "@/lib/api/reservation/reservation.types";
 import { AlertTriangle } from "lucide-react";
 import { formatDateTime } from "@/lib/functions";
 
 type Props = {
-    reservation: ReservationResponse | { qr: [{ id: string; isValid: boolean; usedAt: Date }] };
+    booking: { qrCode: { id: string; isValid: boolean; usedAt: Date | null }[] };
 };
 
-const QrStatusInfo = ({ reservation }: Props) => {
-    const qr = reservation.qr[0];
+const BookingQrStatusInfo = ({ booking }: Props) => {
+    const qr = booking.qrCode[0];
 
     return (
         <section className="bg-custom-gray-100 p-4 rounded-lg text-sm">
@@ -29,7 +28,7 @@ const QrStatusInfo = ({ reservation }: Props) => {
                     {qr?.usedAt ? (
                         <span className="text-red-500 font-medium">Ya fue escaneado el {formatDateTime(qr.usedAt)}</span>
                     ) : (
-                        <span className="text-red-500 font-medium">El código QR no esta activo.</span>
+                        <span className="text-red-500 font-medium">El código QR no está activo.</span>
                     )}
                 </div>
             )}
@@ -37,4 +36,4 @@ const QrStatusInfo = ({ reservation }: Props) => {
     );
 };
 
-export default QrStatusInfo;
+export default BookingQrStatusInfo;

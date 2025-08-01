@@ -11,18 +11,25 @@ import StatusInfo from "./auxiliarComponents.tsx/StatusInfo";
 import QrStatusInfo from "./auxiliarComponents.tsx/QrStatusInfo";
 import PriceInfo from "./auxiliarComponents.tsx/PriceInfo";
 import PaymentInfo from "./auxiliarComponents.tsx/PaymentInfo";
+import { fetchVehicleBookingWhitDetails } from "@/lib/api/vehicle-booking";
+import OfferInfo from "./auxiliarComponents.tsx/OfferInfo";
+import BookingStatusInfo from "./auxiliarComponents.tsx/BookingStatusInfo";
+import BookingPriceInfo from "./auxiliarComponents.tsx/BookingPriceInfo";
+import BookingPaymentInfo from "./auxiliarComponents.tsx/BookingPaymentInfo";
+import { ResponseForQrPage } from "@/lib/api/vehicle-booking/vehicleBooking.types";
+import BookingQrStatusInfo from "./auxiliarComponents.tsx/BookingQrStatusInfo";
 
 const QrPage = () => {
-    const { reservationId } = useParams();
+    const { refId, type } = useParams();
     const [reservation, setReservation] = useState<ReservationResponse | null>(null);
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
+    const [booking, setBooking] = useState<ResponseForQrPage | null>(null);
 
     useEffect(() => {
         const fetchReservation = async (): Promise<void> => {
             try {
-                const data = await getReservationById(reservationId as string);
-                console.log(data);
+                const data = await getReservationById(refId as string);
                 setReservation(data);
             } catch (err) {
                 console.log(err);
@@ -32,8 +39,21 @@ const QrPage = () => {
             }
         };
 
-        if (reservationId) fetchReservation();
-    }, [reservationId]);
+        const getVehicleBooking = async (): Promise<void> => {
+            try {
+                const data = await fetchVehicleBookingWhitDetails(refId as string);
+                setBooking(data);
+            } catch (err) {
+                console.log(err);
+                setError("No se pudo cargar la información de la reserva.");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (refId && type === "reservation") fetchReservation();
+        if (refId && type === "vehicle") getVehicleBooking();
+    }, [refId, type]);
 
     if (loading) {
         return (
@@ -43,7 +63,7 @@ const QrPage = () => {
         );
     }
 
-    if (error || !reservation) {
+    if (error || (!reservation && !booking)) {
         return (
             <div className="flex flex-col items-center justify-center h-screen text-center text-red-500">
                 <AlertTriangle className="w-8 h-8 mb-2" />
@@ -56,12 +76,27 @@ const QrPage = () => {
         <main className="max-w-md sm:mx-auto p-6 bg-white rounded-xl shadow-lg my-8 mx-2 border border-gray-200 flex flex-col gap-6">
             <h1 className="text-2xl font-bold text-custom-black-900 text-center">Verificación de Reserva</h1>
 
-            <TripInfo reservation={reservation} />
-            <UserInfo reservation={reservation} />
-            <StatusInfo reservation={reservation} />
-            <QrStatusInfo reservation={reservation} />
-            <PriceInfo reservation={reservation} />
-            <PaymentInfo reservation={reservation} setReservation={setReservation} />
+            {booking && (
+                <>
+                    <OfferInfo booking={booking} />
+                    <UserInfo reservation={{ user: { ...booking?.renter } }} />
+                    <BookingStatusInfo booking={booking} />
+                    <BookingQrStatusInfo booking={booking} />
+                    <BookingPriceInfo booking={booking} />
+                    <BookingPaymentInfo booking={booking} setBooking={setBooking} />
+                </>
+            )}
+
+            {reservation && (
+                <>
+                    <TripInfo reservation={reservation} />
+                    <UserInfo reservation={reservation} />
+                    <StatusInfo reservation={reservation} />
+                    <QrStatusInfo reservation={reservation} />
+                    <PriceInfo reservation={reservation} />
+                    <PaymentInfo reservation={reservation} setReservation={setReservation} />
+                </>
+            )}
         </main>
     );
 };

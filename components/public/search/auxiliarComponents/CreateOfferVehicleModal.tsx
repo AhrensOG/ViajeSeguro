@@ -29,8 +29,8 @@ export default function VehicleOfferPage() {
     });
 
     const onSubmit = (data: FormData) => {
-        console.log("Datos enviados:", data);
         reset(); // Limpiar el formulario después del envío
+        return data;
     };
 
     return (

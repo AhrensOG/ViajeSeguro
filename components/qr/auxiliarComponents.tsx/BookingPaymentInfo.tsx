@@ -1,51 +1,51 @@
 "use client";
 
 import { useState } from "react";
-import { ReservationResponse } from "@/lib/api/reservation/reservation.types";
-import { toast } from "sonner";
 import { markQrAsUsed } from "@/lib/api/qr";
-import { getReservationById, markReservationAsPaid } from "@/lib/api/reservation";
+import { toast } from "sonner";
+import { fetchVehicleBookingWhitDetails, markBookingAsPaid } from "@/lib/api/vehicle-booking";
+import { ResponseForQrPage } from "@/lib/api/vehicle-booking/vehicleBooking.types";
 
 type Props = {
-    reservation: ReservationResponse;
-    setReservation: React.Dispatch<React.SetStateAction<ReservationResponse | null>>;
+    booking: ResponseForQrPage;
+    setBooking: React.Dispatch<React.SetStateAction<ResponseForQrPage | null>>;
 };
 
-const PaymentInfo = ({ reservation, setReservation }: Props) => {
+const BookingPaymentInfo = ({ booking, setBooking }: Props) => {
     const [paid, setPaid] = useState(false);
     const [loading, setLoading] = useState(false);
-    const isCash = reservation.paymentMethod === "CASH";
-    const qrValid = reservation.qr[0]?.isValid;
-    const qrUsed = reservation.qr[0]?.usedAt;
 
-    const handleConfirmBoarding = async () => {
+    const isCash = booking.paymentMethod === "CASH";
+    const qrValid = booking.qrCode[0]?.isValid;
+    const qrUsed = booking.qrCode[0]?.usedAt;
+
+    const handleConfirmDelivery = async () => {
         try {
             setLoading(true);
 
-            if (!reservation.qr[0]?.id) {
+            if (!booking.qrCode[0]?.id) {
                 toast.info("No se pudo actualizar el estado del QR.", {
-                    description: "El ID del QR es requerido. Intenta nuevamente o contacta con el soporte.",
+                    description: "El ID del QR es requerido. Intenta nuevamente o contacta con soporte.",
                 });
                 return;
             }
 
             if (isCash && !paid) {
-                toast.info("Debes marcar que el pasajero abonó antes de subir.");
+                toast.info("Debes marcar que el cliente abonó antes de entregar el vehículo.");
                 return;
             }
-            if (isCash && paid) {
-                await markReservationAsPaid(reservation.id);
-            }
-            await markQrAsUsed(reservation.qr[0].id);
-            const updatedReservation = await getReservationById(reservation.id);
-            setReservation(updatedReservation);
 
-            toast.success("QR marcado como usado. Abordaje confirmado.");
+            if (isCash && paid) {
+                await markBookingAsPaid(booking.id);
+            }
+
+            await markQrAsUsed(booking.qrCode[0].id);
+            const updated = await fetchVehicleBookingWhitDetails(booking.id);
+            setBooking(updated as ResponseForQrPage);
+            toast.success("QR marcado como usado. Vehículo entregado.");
         } catch (err) {
-            console.log(err);
-            toast.info("No se pudo actualizar el estado del QR.", {
-                description: "Intenta nuevamente o contacta con el soporte.",
-            });
+            console.error(err);
+            toast.error("No se pudo actualizar el estado del QR.");
         } finally {
             setLoading(false);
         }
@@ -59,11 +59,11 @@ const PaymentInfo = ({ reservation, setReservation }: Props) => {
                 <span className="font-medium text-custom-black-900">{isCash ? "Efectivo" : "Stripe"}</span>
             </div>
 
-            {/* Checkbox solo para efectivo */}
+            {/* Checkbox solo si es efectivo y aún no fue usado */}
             {isCash && qrValid && !qrUsed && (
                 <label className="flex items-center gap-2 text-custom-gray-700 mt-2">
                     <input type="checkbox" checked={paid} onChange={() => setPaid(!paid)} className="w-4 h-4" />
-                    El pasajero abonó antes de subir
+                    El cliente abonó antes de retirar el vehículo
                 </label>
             )}
 
@@ -71,16 +71,16 @@ const PaymentInfo = ({ reservation, setReservation }: Props) => {
             {qrValid && !qrUsed && (
                 <button
                     disabled={loading || (isCash && !paid)}
-                    onClick={handleConfirmBoarding}
+                    onClick={handleConfirmDelivery}
                     className={`w-full text-sm font-semibold py-2 px-4 rounded-lg transition ${
                         !isCash || paid ? "bg-green-600 text-white hover:bg-green-700" : "bg-gray-300 text-gray-600 cursor-not-allowed"
                     }`}
                 >
-                    {loading ? "Confirmando..." : "Confirmar abordaje"}
+                    {loading ? "Confirmando..." : "Confirmar entrega del vehículo"}
                 </button>
             )}
         </section>
     );
 };
 
-export default PaymentInfo;
+export default BookingPaymentInfo;

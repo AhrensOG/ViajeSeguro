@@ -74,7 +74,7 @@ export default function ReservationPanel() {
             await deleteRes(id ?? "");
             setReservations((prevReservations) => prevReservations.filter((reservation) => reservation.id !== id));
             setSelectedReservation(null);
-            toast.success("Usuario eliminado exitosamente");
+            toast.success("Reserva eliminada exitosamente");
         } catch {
             toast.info("Error al eliminar el usuario");
         }
