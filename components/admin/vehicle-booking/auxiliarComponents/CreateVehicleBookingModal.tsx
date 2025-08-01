@@ -45,6 +45,7 @@ export default function CreateVehicleBookingModal({ onClose, onSuccess, offers, 
     const selectedRenter = selectedOffer ? renters.find((u) => u.id === selectedOffer.ownerId) : undefined;
 
     const [calculatedTotal, setCalculatedTotal] = useState<number>(0);
+    const IVA = Number(process.env.NEXT_PUBLIC_IVA || 21);
 
     useEffect(() => {
         if (selectedOffer) {
@@ -169,19 +170,39 @@ export default function CreateVehicleBookingModal({ onClose, onSuccess, offers, 
 
                     <div>
                         <label className={labelClass}>Fecha de inicio *</label>
-                        <input type="date" {...register("startDate", { required: true })} className={inputClass} readOnly />
-                        {errors.startDate && <p className="text-red-500 text-xs">Campo obligatorio</p>}
+                        <input
+                            type="date"
+                            value={selectedOffer ? new Date(selectedOffer.availableFrom).toISOString().slice(0, 10) : ""}
+                            disabled
+                            className={inputClass}
+                        />
                     </div>
 
                     <div>
                         <label className={labelClass}>Fecha de fin *</label>
-                        <input type="date" {...register("endDate", { required: true })} className={inputClass} readOnly />
-                        {errors.endDate && <p className="text-red-500 text-xs">Campo obligatorio</p>}
+                        <input
+                            type="date"
+                            value={selectedOffer ? new Date(selectedOffer.availableTo).toISOString().slice(0, 10) : ""}
+                            disabled
+                            className={inputClass}
+                        />
                     </div>
 
-                    <div>
-                        <label className={labelClass}>Total estimado (€)</label>
-                        <input type="text" value={calculatedTotal.toFixed(2)} readOnly className={`${inputClass} bg-gray-100`} />
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+                        <div>
+                            <label className={labelClass}>Total sin IVA (€)</label>
+                            <input type="text" value={calculatedTotal.toFixed(2)} readOnly className={`${inputClass} bg-gray-100`} />
+                        </div>
+
+                        <div>
+                            <label className={labelClass}>Total con IVA ({IVA}%) (€)</label>
+                            <input
+                                type="text"
+                                value={(calculatedTotal * (1 + IVA / 100)).toFixed(2)}
+                                readOnly
+                                className={`${inputClass} bg-gray-100`}
+                            />
+                        </div>
                     </div>
 
                     <div>

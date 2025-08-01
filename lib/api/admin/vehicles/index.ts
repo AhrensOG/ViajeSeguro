@@ -16,10 +16,12 @@ export async function getVehicleById(id: string): Promise<Vehicle> {
 }
 
 export async function createVehicle(vehicleData: CreateVehicleDto): Promise<Vehicle> {
-    return await fetchWithAuth(`${BACKEND_URL}/vehicle`, {
+    const res = await fetchWithAuth(`${BACKEND_URL}/vehicle`, {
         method: "POST",
         body: JSON.stringify(vehicleData),
     });
+    console.log(res);
+    return res as Vehicle;
 }
 
 export async function updateVehicle(id: string, vehicleData: CreateVehicleDto): Promise<Vehicle> {

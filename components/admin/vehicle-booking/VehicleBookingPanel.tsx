@@ -13,6 +13,15 @@ import DeleteToast from "../DeleteToast";
 import { fetchSimpleVehicles } from "@/lib/api/admin/vehicle-offers";
 import CustomSelect from "./auxiliarComponents/CustomSelect";
 
+const statusMap = {
+    PENDING: "Pendiente",
+    APPROVED: "Aprobada",
+    DECLINED: "Declinada",
+    CANCELLED: "Cancelada",
+    FINISHED: "Finalizada",
+    COMPLETED: "Completada",
+};
+
 export default function VehicleBookingPanel() {
     const [search, setSearch] = useState("");
     const [loading, setLoading] = useState(false);
@@ -234,8 +243,10 @@ export default function VehicleBookingPanel() {
                                     <td className="px-4 py-2 border-b border-r border-custom-gray-200">
                                         {new Date(b.endDate).toLocaleDateString("es-ES")}
                                     </td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">{b.status}</td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">€{b.totalPrice}</td>
+                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">
+                                        {statusMap[b.status as keyof typeof statusMap]}
+                                    </td>
+                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">€{b.totalPrice.toFixed(2)}</td>
                                     <td
                                         onClick={(e) => e.stopPropagation()}
                                         className="px-4 py-2 border-b border-custom-gray-200 text-center space-x-2"

@@ -53,4 +53,19 @@ async function getSimpleVehicles() {
     }
 }
 
-export { fetchVehicleBookingsAdmin, fetchSimpleUsers, fetchSimpleOffers, createVehicleBooking, deleteVehicleBooking, getSimpleVehicles };
+async function updateStatus(id: string, status: string) {
+    const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-booking/${id}/${status}`, {
+        method: "PATCH",
+    });
+    return res;
+}
+
+export {
+    fetchVehicleBookingsAdmin,
+    fetchSimpleUsers,
+    fetchSimpleOffers,
+    createVehicleBooking,
+    deleteVehicleBooking,
+    getSimpleVehicles,
+    updateStatus,
+};
