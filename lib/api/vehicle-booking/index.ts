@@ -61,4 +61,11 @@ const markBookingAsPaid = async (id: string) => {
     return res;
 };
 
-export { fetchOffer, fetchVehicleBooking, createVehicleBooking, fetchVehicleBookingWhitDetails, markBookingAsPaid };
+const getVehicleBookingsForProfile = async (id: string) => {
+    const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-booking/by-user/${id}`, {
+        method: "GET",
+    });
+    return res;
+};
+
+export { fetchOffer, fetchVehicleBooking, createVehicleBooking, fetchVehicleBookingWhitDetails, markBookingAsPaid, getVehicleBookingsForProfile };

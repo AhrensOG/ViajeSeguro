@@ -66,3 +66,50 @@ export interface ResponseForQrPage {
         createdAt: Date;
     };
 }
+
+export interface ResponseForProfilePage {
+    id: string;
+    startDate: Date;
+    endDate: Date;
+    status: "PENDING" | "APPROVED" | "COMPLETED" | "FINISHED" | "DECLINED" | "CANCELLED";
+    isDeleted: boolean;
+    paymentMethod: "CASH" | "STRIPE";
+    totalPrice: number;
+    offer: {
+        id: string;
+        withdrawLocation: string;
+        returnLocation: string;
+        pricePerDay: number;
+        vehicleOfferType: "WITH_DRIVER" | "WITHOUT_DRIVER";
+        originalTimeZone: string;
+        availableFrom: Date;
+        availableTo: Date;
+        vehicle: {
+            id: string;
+            capacity: number;
+            model: string;
+            brand: string;
+            year: number;
+            fuelType: "DIESEL" | "GASOLINE" | "ELECTRIC" | "HYBRID";
+            transmissionType: "MANUAL" | "AUTOMATIC";
+            features: string[];
+            images: string[];
+            plate: string;
+        };
+    };
+    qrCode: {
+        id: string;
+        isValid: boolean;
+        imageUrl: string;
+    }[];
+    renter: {
+        id: string;
+        name: string;
+        lastName: string;
+        email: string;
+    };
+    payments: {
+        id: string;
+        paymentStatus: "PENDING" | "COMPLETED" | "FAILED";
+    };
+}

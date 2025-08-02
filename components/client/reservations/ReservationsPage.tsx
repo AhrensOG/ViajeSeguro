@@ -8,10 +8,13 @@ import ReservationCard from "./auxiliarComponents/ReservationCard";
 import { toast } from "sonner";
 import ReservationCardFallback from "@/lib/client/components/reservations/ReservationCardFallback";
 import ReservationVehicleCard from "./auxiliarComponents/ReservationVehicleCard";
+import { getVehicleBookingsForProfile } from "@/lib/api/vehicle-booking";
+import { ResponseForProfilePage } from "@/lib/api/vehicle-booking/vehicleBooking.types";
 
 const ReservationsPage = () => {
     const { data: session } = useSession();
     const [reservations, setReservations] = useState<ReservationResponse[]>([]);
+    const [vehicleBookings, setVehicleBookings] = useState<ResponseForProfilePage[]>([]);
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
@@ -19,6 +22,9 @@ const ReservationsPage = () => {
             if (!session?.user?.id) return;
             try {
                 const data = await getReservationsByUser(session.user.id);
+                const vehicleBookings = await getVehicleBookingsForProfile(session.user.id);
+
+                setVehicleBookings(vehicleBookings as ResponseForProfilePage[]);
                 setReservations(data);
             } catch (error) {
                 console.log("Error al obtener reservas:", error);
@@ -60,7 +66,9 @@ const ReservationsPage = () => {
                     {reservations.map((reservation) => (
                         <ReservationCard key={reservation.id} reservation={reservation} />
                     ))}
-                    <ReservationVehicleCard />
+                    {vehicleBookings.map((vehicleBooking) => (
+                        <ReservationVehicleCard key={vehicleBooking.id} vehicleBooking={vehicleBooking} />
+                    ))}
                 </div>
             )}
         </div>

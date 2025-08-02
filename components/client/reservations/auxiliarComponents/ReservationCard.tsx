@@ -238,7 +238,7 @@ const ReservationCard = ({ reservation }: Props) => {
                 )}
             </AnimatePresence>
 
-            {reservation.qr && (
+            {reservation.qr[0] && (
                 <QrModal
                     isOpen={showQrModal}
                     onClose={() => setShowQrModal(false)}
