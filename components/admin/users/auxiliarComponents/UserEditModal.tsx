@@ -13,7 +13,7 @@ interface Props {
     onUpdateUser: (user: SimpleUser) => void;
 }
 
-const roles = ["CLIENT", "DRIVER", "ADMIN"];
+const roles = ["CLIENT", "DRIVER", "ADMIN", "PARTNER"];
 
 const UserEditModal = ({ user, onClose, onUpdateUser }: Props) => {
     const {

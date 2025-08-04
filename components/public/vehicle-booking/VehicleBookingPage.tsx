@@ -1,9 +1,9 @@
 "use client";
 import { Suspense } from "react";
 import NavBar from "../navigation/NavBar";
-import { Footer } from "react-day-picker";
 import TripProcessFallback from "@/lib/client/components/fallbacks/trip/TripProcessFallback";
 import VehicleBookingProcess from "./auxiliarComponents/VehicleBookingProcess";
+import Footer from "../navigation/Footer";
 
 export default function VehicleBookingPage() {
     return (

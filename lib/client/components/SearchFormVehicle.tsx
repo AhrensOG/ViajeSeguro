@@ -41,10 +41,10 @@ export default function SearchFormVehicle() {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
             transition={{ duration: 0.5 }}
-            className="flex flex-col items-center justify-center gap-5 bg-custom-white-100 p-8 rounded-lg w-full m-auto"
+            className="flex flex-col items-center justify-center gap-5 bg-custom-white-100 p-2 md:p-8 rounded-lg w-full md:m-auto"
         >
             {/* Fechas y capacidad */}
-            <div className="grid grid-cols-3 gap-6 w-full text-custom-black-800">
+            <div className="flex flex-col md:grid md:grid-cols-3 gap-6 w-full text-custom-black-800">
                 <div className="flex flex-col gap-2 p-2 w-full items-center">
                     <label className="text-custom-black-800 py-2">Recogida</label>
                     <CustomDatePicker value={departureDate} onSelect={setDepartureDate} />
@@ -103,7 +103,7 @@ export default function SearchFormVehicle() {
             {/* Tipo de servicio */}
             <div className="flex items-center flex-col justify-center gap-2 p-2 w-full">
                 <h5 className="text-custom-gray-500 py-2 text-lg">Tipo de Servicio</h5>
-                <div className="grid grid-cols-2 gap-4 w-full">
+                <div className="flex flex-col md:grid md:grid-cols-2 gap-4 w-full">
                     <button
                         onClick={() => setHasDriver(false)}
                         className={`flex flex-col p-5 rounded-md border cursor-pointer transition ${

@@ -137,7 +137,7 @@ const CreateVehicleModal = ({ onClose, owners, onSuccess }: Props) => {
                     </div>
 
                     <div>
-                        <label className={labelClass}>Patente</label>
+                        <label className={labelClass}>Matricula</label>
                         <input type="text" {...register("plate", { required: true })} className={inputClass} />
                         {errors.plate && <p className="text-red-500 text-xs">Campo obligatorio</p>}
                     </div>
@@ -156,7 +156,6 @@ const CreateVehicleModal = ({ onClose, owners, onSuccess }: Props) => {
                         <label className={labelClass}>Tipo de servicio</label>
                         <select {...register("serviceType", { required: true })} className={inputClass}>
                             <option value="">Selecciona una opción</option>
-                            <option value="SIMPLE_TRIP">Viajes simple</option>
                             <option value="RENTAL_WITH_DRIVER">Viaje con conductor</option>
                             <option value="RENTAL_WITHOUT_DRIVER">Viaje sin conductor</option>
                         </select>

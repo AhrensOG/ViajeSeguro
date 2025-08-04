@@ -106,9 +106,10 @@ export default function UsersPanel() {
                         className="border border-custom-gray-300 rounded-md px-3 py-2 outline-none focus:border-custom-golden-600 focus:ring-1 focus:ring-custom-golden-100"
                     >
                         <option value="ALL">Todos los roles</option>
-                        <option value="CLIENT">CLIENT</option>
-                        <option value="DRIVER">DRIVER</option>
-                        <option value="ADMIN">ADMIN</option>
+                        <option value="CLIENT">Cliente</option>
+                        <option value="DRIVER">Conductor</option>
+                        <option value="ADMIN">Admin</option>
+                        <option value="PARTNER">Partner</option>
                     </select>
                 </div>
                 <button

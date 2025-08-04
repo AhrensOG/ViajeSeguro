@@ -12,7 +12,7 @@ interface Props {
     onSuccess: Dispatch<SetStateAction<SimpleUser[]>>;
 }
 
-const roles = ["CLIENT", "DRIVER", "ADMIN"];
+const roles = ["CLIENT", "DRIVER", "ADMIN", "PARTNER"];
 
 const UserCreateModal = ({ onClose, onSuccess }: Props) => {
     const {

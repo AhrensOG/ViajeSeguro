@@ -34,17 +34,17 @@ export default function VehicleBookingProcess() {
     }, [id]);
 
     return (
-        <main>
+        <main className="flex-1 w-full mx-auto py-8">
             {vehicleOffer && vehicleOffer.vehicle ? (
-                <>
+                <div className="flex flex-col  items-center justify-center w-full">
                     <Header
                         subTitle={`${vehicleOffer.vehicle.brand} ${vehicleOffer.vehicle.model} ${vehicleOffer.vehicle.year} - ${convertUTCToLocalDate(
                             vehicleOffer.availableFrom,
                             vehicleOffer.originalTimeZone
                         )} - ${convertUTCToLocalDate(vehicleOffer.availableTo, vehicleOffer.originalTimeZone)}`}
                     />
-                    <div className="flex justify-center gap-8">
-                        <section className="flex flex-col items-center justify-center gap-3 m-8 mt-5 w-[55rem]">
+                    <div className="flex flex-col md:flex-row w-full justify-center gap-8 grow-1">
+                        <section className="flex flex-col items-center justify-center gap-3 m-8 mt-5 md:w-[55rem]">
                             <VehicleDetails {...vehicleOffer.vehicle} />
                             <ReservationDetails
                                 serviceType={vehicleOffer.vehicleOfferType}
@@ -64,7 +64,7 @@ export default function VehicleBookingProcess() {
                         </section>
                         <RentalSidebar vehicleOffer={vehicleOffer} />
                     </div>{" "}
-                </>
+                </div>
             ) : (
                 <div>
                     <h2 className="text-2xl font-bold text-custom-black-800">No se pudo cargar la información del vehículo</h2>

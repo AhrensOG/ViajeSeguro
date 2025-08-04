@@ -37,7 +37,7 @@ export default function SearchSelectorWrapper() {
             destination,
             departure: isoStringWithTZ,
             serviceType,
-            mode: "car", // Si estás usando esta distinción
+            mode: "car",
         });
 
         router.push(`/search?${params.toString()}`);
@@ -48,12 +48,12 @@ export default function SearchSelectorWrapper() {
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.6, ease: "easeOut" }}
-            className="flex flex-col items-center justify-center gap-5 bg-custom-white-100 p-8 rounded-lg shadow-md w-[75vw] border border-custom-gray-300 m-auto mt-10"
+            className="flex flex-col items-center justify-center gap-5 bg-custom-white-100 p-4 md:p-8 rounded-lg shadow-md w-[75vw] border border-custom-gray-300 m-auto mt-10"
         >
             {/* Selector visual */}
-            <div className="flex justify-between items-center gap-4 bg-custom-gray-200 p-2 border border-custom-gray-200 rounded-md w-full">
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 bg-custom-gray-200 p-2 border border-custom-gray-200 rounded-md w-full">
                 <p
-                    className={`text-custom-gray-800 flex w-[45%] justify-center items-center gap-2 cursor-pointer ${
+                    className={`text-custom-gray-800 flex w-full md:w-[45%] justify-center items-center gap-2 cursor-pointer ${
                         activeMode === "car" ? "bg-custom-white-100 p-2 px-3 rounded-md" : ""
                     }`}
                     onClick={() => setActiveMode("car")}
@@ -62,7 +62,7 @@ export default function SearchSelectorWrapper() {
                     Transporte
                 </p>
                 <p
-                    className={`text-custom-gray-800 flex w-[45%] justify-center items-center gap-2 cursor-pointer ${
+                    className={`text-custom-gray-800 flex w-full md:w-[45%] justify-center items-center gap-2 cursor-pointer ${
                         activeMode === "van" ? "bg-custom-white-100 p-2 px-3 rounded-md" : ""
                     }`}
                     onClick={() => setActiveMode("van")}
