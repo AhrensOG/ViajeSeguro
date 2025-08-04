@@ -76,7 +76,7 @@ const CreateVehicleModal = ({ onClose, owners, onSuccess }: Props) => {
                 onClick={(e) => e.stopPropagation()}
                 className="bg-white rounded-2xl shadow-xl ring-1 ring-custom-gray-200 p-8 my-8 w-full max-w-4xl max-h-[95vh] overflow-y-auto relative"
             >
-                <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-black" aria-label="Cerrar">
+                <button onClick={onClose} className="cursor-pointer absolute top-4 right-4 text-gray-500 hover:text-black" aria-label="Cerrar">
                     <X className="size-5" />
                 </button>
 
@@ -203,13 +203,13 @@ const CreateVehicleModal = ({ onClose, owners, onSuccess }: Props) => {
                         <button
                             type="button"
                             onClick={onClose}
-                            className="border border-custom-gray-300 text-custom-black-800 hover:bg-custom-gray-100 font-medium py-2.5 px-6 rounded-md transition"
+                            className="cursor-pointer border border-custom-gray-300 text-custom-black-800 hover:bg-custom-gray-100 font-medium py-2.5 px-6 rounded-md transition"
                         >
                             Cancelar
                         </button>
                         <button
                             type="submit"
-                            className="bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold py-2.5 px-6 rounded-md transition shadow"
+                            className="cursor-pointer bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold py-2.5 px-6 rounded-md transition shadow"
                         >
                             Crear vehículo
                         </button>

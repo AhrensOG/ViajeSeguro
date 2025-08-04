@@ -94,7 +94,7 @@ export default function VehiclesPanel() {
                 <h1 className="text-2xl font-bold text-custom-golden-600">Panel de Vehículos</h1>
                 <button
                     onClick={() => setIsCreateModalOpen(true)}
-                    className="flex items-center gap-2 bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold px-4 py-2 rounded-md shadow-sm"
+                    className="cursor-pointer flex items-center gap-2 bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold px-4 py-2 rounded-md shadow-sm"
                 >
                     <Plus className="h-4 w-4" /> Añadir vehículo
                 </button>
@@ -140,7 +140,7 @@ export default function VehiclesPanel() {
                                     key={vehicle.id}
                                     className={`${
                                         index % 2 === 0 ? "bg-custom-white-50" : "bg-custom-gray-100"
-                                    } hover:bg-custom-golden-100 transition`}
+                                    } hover:bg-custom-golden-100 transition cursor-pointer`}
                                     onClick={() => {
                                         setSelectedVehicle(vehicle);
                                         setIsViewModalOpen(true);
@@ -169,7 +169,7 @@ export default function VehiclesPanel() {
                                                 setSelectedVehicle(vehicle);
                                                 setIsEditModalOpen(true);
                                             }}
-                                            className="text-custom-golden-600 hover:text-custom-golden-700"
+                                            className="cursor-pointer text-custom-golden-600 hover:text-custom-golden-700"
                                         >
                                             <Pencil className="h-4 w-4 inline-block" />
                                         </button>
@@ -179,7 +179,7 @@ export default function VehiclesPanel() {
                                                 setSelectedVehicle(vehicle);
                                                 DeleteToast(vehicle.id, handleDelete);
                                             }}
-                                            className="text-red-500 hover:text-red-700"
+                                            className="cursor-pointer text-red-500 hover:text-red-700"
                                         >
                                             <Trash2 className="h-4 w-4 inline-block" />
                                         </button>

@@ -6,7 +6,7 @@ import FiltersBar from "./auxiliarComponents/FiltersBar";
 
 export default function SearchPage() {
     return (
-        <div className="min-h-screen flex flex-col bg-custom-white-50">
+        <div className="min-h-screen flex flex-col bg-custom-white-50 relative">
             <NavBar shadow={false} />
             <Suspense fallback={<SearchProcessFallback />}>
                 <FiltersBar />

@@ -1,12 +1,15 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
-import { X } from "lucide-react";
+import { Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { User } from "@/lib/api/reservation/reservation.types";
 import { CreateVehicleDto, FeatureEnum, Vehicle } from "@/lib/api/admin/vehicles/vehicles.type";
 import { updateVehicle } from "@/lib/api/admin/vehicles";
+import Image from "next/image";
+import ImagePreviewModal from "./ImagePreviewModal";
+import { uploadFiles } from "@/lib/firebase/uploadFiles";
 
 interface Props {
     vehicle: Vehicle;
@@ -34,6 +37,12 @@ const EditVehicleModal = ({ vehicle, owners, onClose, onSuccess }: Props) => {
         setValue,
     } = useForm<CreateVehicleDto>();
 
+    const [imagesWithIds, setImagesWithIds] = useState<{ id: number; image: string }[]>(
+        vehicle.images?.map((image, index) => ({ id: index, image })) || []
+    );
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
+    const [newImageFiles, setNewImageFiles] = useState<FileList | null>(null);
+
     useEffect(() => {
         if (vehicle) {
             setValue("plate", vehicle.plate);
@@ -54,15 +63,28 @@ const EditVehicleModal = ({ vehicle, owners, onClose, onSuccess }: Props) => {
 
     const onSubmit = async (data: CreateVehicleDto) => {
         try {
-            const updated = await updateVehicle(vehicle.id, {
+            let uploadedUrls: string[] = [];
+
+            if (newImageFiles && newImageFiles.length > 0) {
+                const filesArray = Array.from(newImageFiles);
+                uploadedUrls = await uploadFiles(filesArray);
+            }
+
+            const existingUrls = imagesWithIds.map((img) => img.image);
+
+            const imagesChanged = uploadedUrls.length > 0 || existingUrls.length !== vehicle.images.length;
+
+            const updateData: CreateVehicleDto = {
                 ...data,
+                images: imagesChanged ? [...existingUrls, ...uploadedUrls] : vehicle.images,
                 year: Number(data.year),
                 capacity: Number(data.capacity),
                 features: data.features?.map((f) => f as FeatureEnum),
                 allowSeatSelection:
                     typeof data.allowSeatSelection === "string" ? data.allowSeatSelection === "true" : Boolean(data.allowSeatSelection),
-            });
+            };
 
+            const updated = await updateVehicle(vehicle.id, updateData);
             onSuccess(updated);
             onClose();
             toast.success("Vehículo actualizado");
@@ -79,13 +101,17 @@ const EditVehicleModal = ({ vehicle, owners, onClose, onSuccess }: Props) => {
         return () => window.removeEventListener("keydown", handleKeyDown);
     }, [onClose]);
 
+    const removeImageById = (id: number) => {
+        setImagesWithIds((prev) => prev.filter((img) => img.id !== id));
+    };
+
     return (
         <div className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
             <div
                 onClick={(e) => e.stopPropagation()}
                 className="bg-white rounded-2xl shadow-xl ring-1 ring-custom-gray-200 p-8 my-8 w-full max-w-4xl max-h-[95vh] overflow-y-auto relative"
             >
-                <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-black" aria-label="Cerrar">
+                <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-black cursor-pointer" aria-label="Cerrar">
                     <X className="size-5" />
                 </button>
 
@@ -211,18 +237,62 @@ const EditVehicleModal = ({ vehicle, owners, onClose, onSuccess }: Props) => {
                             ))}
                         </div>
                     </div>
+                    <div className="col-span-full mt-6">
+                        <h3 className="text-base font-semibold text-custom-golden-600 mb-3">Imágenes actuales</h3>
+
+                        {imagesWithIds.length > 0 ? (
+                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                                {imagesWithIds.map(({ id, image }) => (
+                                    <div key={id} className="relative group w-full h-48 overflow-hidden rounded border border-custom-gray-300">
+                                        <Image
+                                            src={image}
+                                            alt={`Imagen ${id}`}
+                                            className="w-full h-full object-cover cursor-pointer"
+                                            width={400}
+                                            height={300}
+                                            onClick={() => setPreviewImage(image)}
+                                        />
+                                        <button
+                                            type="button"
+                                            className="absolute top-1.5 right-1.5 bg-white text-red-500 hover:text-red-700 rounded-full p-1 shadow-sm z-10 cursor-pointer"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                removeImageById(id);
+                                            }}
+                                        >
+                                            <Trash2 className="size-4 hover:size-5 hover:ease-in duration-200" />
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+                        ) : (
+                            <p className="text-sm text-custom-gray-500 italic">No se encontraron imágenes cargadas para este vehículo.</p>
+                        )}
+
+                        {previewImage && <ImagePreviewModal src={previewImage} onClose={() => setPreviewImage(null)} />}
+                    </div>
+                    <div className="col-span-full mt-6">
+                        <label className={labelClass}>Agregar nuevas imágenes</label>
+                        <input
+                            type="file"
+                            multiple
+                            accept="image/*"
+                            className="block w-full text-sm text-custom-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-custom-golden-600 file:text-white hover:file:bg-custom-golden-700"
+                            onChange={(e) => setNewImageFiles(e.target.files)}
+                        />
+                    </div>
 
                     <div className="col-span-full flex justify-end gap-3 mt-10">
                         <button
                             type="button"
                             onClick={onClose}
-                            className="border border-custom-gray-300 text-custom-black-800 hover:bg-custom-gray-100 font-medium py-2.5 px-6 rounded-md transition"
+                            className="cursor-pointer border border-custom-gray-300 text-custom-black-800 hover:bg-custom-gray-100 font-medium py-2.5 px-6 rounded-md transition"
                         >
                             Cancelar
                         </button>
                         <button
                             type="submit"
-                            className="bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold py-2.5 px-6 rounded-md transition shadow"
+                            className="cursor-pointer bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold py-2.5 px-6 rounded-md transition shadow"
                         >
                             Guardar cambios
                         </button>

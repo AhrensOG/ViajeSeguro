@@ -61,8 +61,8 @@ const EditVehicleOfferModal = ({ onClose, offer, afterEdit, vehicles, owners }: 
             agencyFee: offer.agencyFee.toString(),
             withdrawLocation: offer.withdrawLocation,
             returnLocation: offer.returnLocation,
-            availableFrom: offer.availableFrom.toISOString().split("T")[0],
-            availableTo: offer.availableTo.toISOString().split("T")[0],
+            availableFrom: new Date(offer.availableFrom).toISOString().split("T")[0],
+            availableTo: new Date(offer.availableTo).toISOString().split("T")[0],
             vehicleOfferType: offer.vehicleOfferType as "WITH_DRIVER" | "WITHOUT_DRIVER",
             vehicleId: offer.vehicle.id,
             ownerId: offer.owner.id,
@@ -121,7 +121,7 @@ const EditVehicleOfferModal = ({ onClose, offer, afterEdit, vehicles, owners }: 
                 onClick={(e) => e.stopPropagation()}
                 className="bg-white rounded-xl shadow-2xl p-8 my-8 w-full max-w-4xl max-h-[95vh] overflow-y-auto relative border border-custom-gray-300"
             >
-                <button onClick={onClose} className="absolute top-4 right-4 text-gray-500 hover:text-black" aria-label="Cerrar">
+                <button onClick={onClose} className="cursor-pointer absolute top-4 right-4 text-gray-500 hover:text-black" aria-label="Cerrar">
                     <X className="size-5" />
                 </button>
 
@@ -267,13 +267,13 @@ const EditVehicleOfferModal = ({ onClose, offer, afterEdit, vehicles, owners }: 
                         <button
                             type="button"
                             onClick={onClose}
-                            className="border border-custom-gray-300 text-custom-black-800 hover:bg-custom-gray-100 font-medium py-2 px-5 rounded-md"
+                            className="cursor-pointer border border-custom-gray-300 text-custom-black-800 hover:bg-custom-gray-100 font-medium py-2 px-5 rounded-md"
                         >
                             Cancelar
                         </button>
                         <button
                             type="submit"
-                            className="bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold py-2 px-5 rounded-md"
+                            className="cursor-pointer bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold py-2 px-5 rounded-md"
                         >
                             Guardar cambios
                         </button>

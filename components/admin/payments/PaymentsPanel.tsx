@@ -107,7 +107,7 @@ export default function PaymentsPanel() {
                     onClick={() => {
                         setIsCreateModalOpen(true);
                     }}
-                    className="bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold px-4 py-2 rounded-md flex items-center gap-2"
+                    className="cursor-pointer bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold px-4 py-2 rounded-md flex items-center gap-2"
                 >
                     <Plus className="w-4 h-4" /> Crear nuevo pago
                 </button>
@@ -138,7 +138,7 @@ export default function PaymentsPanel() {
                                     key={payment.id}
                                     className={`$${
                                         index % 2 === 0 ? "bg-custom-white-50" : "bg-custom-gray-100"
-                                    } hover:bg-custom-golden-100 transition`}
+                                    } cursor-pointer hover:bg-custom-golden-100 transition`}
                                 >
                                     <td className="px-4 py-2 font-medium border-b border-r border-custom-gray-200">{payment.user?.name}</td>
                                     <td className="px-4 py-2 border-b border-r border-custom-gray-200">{payment?.user?.email}</td>
@@ -163,7 +163,7 @@ export default function PaymentsPanel() {
                                                 setSelectPayment(payment);
                                                 DeleteToast(payment.id, handleDelete);
                                             }}
-                                            className="text-red-500 hover:text-red-700"
+                                            className="cursor-pointer text-red-500 hover:text-red-700"
                                             aria-label="Eliminar"
                                         >
                                             <Trash2 className="h-4 w-4 inline-block" />

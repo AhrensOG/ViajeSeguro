@@ -3,8 +3,9 @@
 import { X } from "lucide-react";
 import { format } from "date-fns";
 import { Vehicle } from "@/lib/api/admin/vehicles/vehicles.type";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import Image from "next/image";
+import ImagePreviewModal from "./ImagePreviewModal";
 
 interface Props {
     vehicle: Vehicle;
@@ -44,6 +45,8 @@ const providerMap = {
 } as const;
 
 const VehicleDetailsModal = ({ vehicle, onClose }: Props) => {
+    const [previewImage, setPreviewImage] = useState<string | null>(null);
+
     useEffect(() => {
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "Escape") onClose();
@@ -58,7 +61,7 @@ const VehicleDetailsModal = ({ vehicle, onClose }: Props) => {
                 onClick={(e) => e.stopPropagation()}
                 className="bg-white rounded-xl shadow-lg p-6 w-full max-w-3xl relative border border-custom-gray-300 overflow-y-auto max-h-[90vh]"
             >
-                <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 hover:text-black">
+                <button onClick={onClose} className="cursor-pointer absolute top-4 right-4 text-gray-600 hover:text-black">
                     <X className="size-5" />
                 </button>
 
@@ -154,7 +157,30 @@ const VehicleDetailsModal = ({ vehicle, onClose }: Props) => {
                         )}
                     </ul>
                 </div>
+
+                <div className="mt-6">
+                    <h3 className="text-lg font-semibold text-custom-golden-600 mb-2">Galería de imágenes</h3>
+
+                    {vehicle.images?.length > 0 ? (
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                            {vehicle.images.map((img, idx) => (
+                                <div key={idx} className="cursor-pointer" onClick={() => setPreviewImage(img)}>
+                                    <Image
+                                        src={img}
+                                        alt={`Imagen ${idx + 1}`}
+                                        className="w-full h-48 object-cover rounded border border-custom-gray-300"
+                                        width={400}
+                                        height={300}
+                                    />
+                                </div>
+                            ))}
+                        </div>
+                    ) : (
+                        <p className="text-sm text-custom-gray-600">No se encontraron imágenes para el vehículo seleccionado.</p>
+                    )}
+                </div>
             </div>
+            {previewImage && <ImagePreviewModal src={previewImage} onClose={() => setPreviewImage(null)} />}
         </div>
     );
 };

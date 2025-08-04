@@ -53,7 +53,7 @@ const VehicleOfferDetailsModal = ({ onClose, offer }: Props) => {
                 onClick={(e) => e.stopPropagation()}
                 className="bg-white rounded-xl shadow-lg p-6 w-full max-w-3xl relative border border-custom-gray-300 overflow-y-auto max-h-[90vh]"
             >
-                <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 hover:text-black">
+                <button onClick={onClose} className="cursor-pointer absolute top-4 right-4 text-gray-600 hover:text-black">
                     <X className="size-5" />
                 </button>
 

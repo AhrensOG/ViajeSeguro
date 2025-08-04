@@ -27,7 +27,7 @@ const ReservationDetailModal = ({ reservation, onClose }: Props) => {
                 onClick={(e) => e.stopPropagation()}
                 className="bg-white rounded-xl shadow-xl p-6 w-full max-w-2xl relative border border-custom-gray-300"
             >
-                <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 hover:text-black" aria-label="Cerrar">
+                <button onClick={onClose} className="cursor-pointer absolute top-4 right-4 text-gray-600 hover:text-black" aria-label="Cerrar">
                     <X className="size-5" />
                 </button>
 

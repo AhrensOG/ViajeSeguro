@@ -122,7 +122,7 @@ export default function VehicleOfferPanel() {
                 <h1 className="text-2xl font-bold text-custom-golden-600">Panel de Ofertas de Vehículos</h1>
                 <button
                     onClick={() => setShowCreate(true)}
-                    className="flex items-center gap-2 bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold px-4 py-2 rounded-md shadow-sm"
+                    className="cursor-pointer flex items-center gap-2 bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold px-4 py-2 rounded-md shadow-sm"
                 >
                     <Plus className="h-4 w-4" /> Nueva oferta
                 </button>
@@ -197,7 +197,7 @@ export default function VehicleOfferPanel() {
                 </select>
                 <button
                     onClick={clearFilters}
-                    className="col-span-2 md:col-span-1 bg-custom-gray-300 hover:bg-custom-gray-400 text-black px-4 py-2 rounded-md shadow-sm"
+                    className="cursor-pointer col-span-2 md:col-span-1 bg-custom-gray-300 hover:bg-custom-gray-400 text-black px-4 py-2 rounded-md shadow-sm"
                 >
                     Limpiar filtros
                 </button>
