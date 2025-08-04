@@ -6,11 +6,9 @@ import { CardReservationVehicleOfferProps } from "@/lib/api/vehicleOffer/vehicle
 import { calculateTotalDays } from "@/lib/functions";
 import { CalendarDays, Car, MapPin, Users, ChevronLeft, ChevronRight } from "lucide-react";
 import Image from "next/image";
-import ImagePreviewModal from "@/components/admin/vehicles/auxiliarComponents/ImagePreviewModal";
 
 export default function CardInformationLeft(props: CardReservationVehicleOfferProps) {
     const { capacity, whitdrawLocation, dateStart, dateEnd, imageUrl, vehicleOfferType } = props;
-    const [previewImage, setPreviewImage] = useState<string | null>(null);
 
     const [currentIndex, setCurrentIndex] = useState(0);
     const images = imageUrl.length > 0 ? imageUrl : ["/main/img_placeholder.webp"];
@@ -37,7 +35,6 @@ export default function CardInformationLeft(props: CardReservationVehicleOfferPr
                             alt={`Imagen ${currentIndex + 1}`}
                             width={900}
                             height={900}
-                            onClick={() => setPreviewImage(images[currentIndex])}
                         />
                     </motion.div>
                 </AnimatePresence>

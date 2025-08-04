@@ -2,6 +2,7 @@
 
 import { useEffect } from "react";
 import { X } from "lucide-react";
+import Image from "next/image";
 
 interface Props {
     src: string;
@@ -22,7 +23,7 @@ const ImagePreviewModal = ({ src, onClose }: Props) => {
             <button onClick={onClose} className="absolute top-6 right-6 text-white hover:text-gray-300 z-50">
                 <X className="size-6" />
             </button>
-            <img src={src} alt="Vista previa" className="max-w-[90vw] max-h-[90vh] rounded shadow-lg" />
+            <Image src={src} alt="Vista previa" className="max-w-[90vw] max-h-[90vh] rounded shadow-lg" />
         </div>
     );
 };
