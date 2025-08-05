@@ -41,7 +41,7 @@ const CreateVehicleModal = ({ onClose, owners, onSuccess }: Props) => {
             let uploadedUrls: string[] = [];
             if (imageFiles && imageFiles?.length > 0) {
                 const filesArray = Array.from(imageFiles);
-                uploadedUrls = await uploadFiles(filesArray);
+                uploadedUrls = await uploadFiles(filesArray, "Vehiculos");
             }
 
             const vehicle = await createVehicle({
@@ -51,8 +51,6 @@ const CreateVehicleModal = ({ onClose, owners, onSuccess }: Props) => {
                 features: ([] as string[]).concat(data.features || []).map((f) => f as FeatureEnum),
                 images: uploadedUrls,
             });
-
-            console.log(vehicle);
 
             onSuccess((prev) => [...prev, vehicle]);
             onClose();

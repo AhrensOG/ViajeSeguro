@@ -118,7 +118,9 @@ const VehicleDetailsModal = ({ vehicle, onClose }: Props) => {
                                     key={idx}
                                     src={img}
                                     alt={`Imagen ${idx + 1}`}
-                                    className="w-32 h-32 object-cover rounded border border-custom-gray-300"
+                                    className="object-cover rounded border border-custom-gray-300"
+                                    width={200}
+                                    height={200}
                                 />
                             ))}
                         </div>
@@ -164,11 +166,11 @@ const VehicleDetailsModal = ({ vehicle, onClose }: Props) => {
                     {vehicle.images?.length > 0 ? (
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             {vehicle.images.map((img, idx) => (
-                                <div key={idx} className="cursor-pointer" onClick={() => setPreviewImage(img)}>
+                                <div key={idx + img} className="cursor-pointer" onClick={() => setPreviewImage(img)}>
                                     <Image
                                         src={img}
                                         alt={`Imagen ${idx + 1}`}
-                                        className="w-full h-48 object-cover rounded border border-custom-gray-300"
+                                        className="object-cover rounded border border-custom-gray-300"
                                         width={400}
                                         height={300}
                                     />
