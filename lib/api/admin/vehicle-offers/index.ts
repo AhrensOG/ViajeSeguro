@@ -35,8 +35,6 @@ async function createVehicleOffer(data: CreateVehicleOfferRequest): Promise<Vehi
             method: "POST",
             body: JSON.stringify(data),
         });
-        console.log(res);
-
         return res as VehicleOffersAdminResponse;
     } catch {
         throw new Error("Error creating vehicle offer");
