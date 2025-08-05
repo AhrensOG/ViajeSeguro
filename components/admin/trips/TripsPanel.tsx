@@ -36,8 +36,6 @@ export default function TripsPanel() {
         const fetchTrips = async () => {
             try {
                 const res = await getAllTrips();
-                console.log(res);
-
                 setTrips(res);
             } catch {
                 toast.info("Error al cargar los viajes");

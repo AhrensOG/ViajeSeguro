@@ -44,8 +44,6 @@ async function createVehicleOffer(data: CreateVehicleOfferRequest): Promise<Vehi
 }
 
 async function updateVehicleOffer(id: string, data: CreateVehicleOfferRequest) {
-    console.log(data, id);
-
     try {
         const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-offer/update`, {
             method: "PUT",

@@ -59,8 +59,6 @@ const EditReservationModal = ({ users, trips, initialData, onClose, onSuccess }:
                 userId: form.userId,
                 id: form.id,
             });
-            console.log("Reserva actualizada:", res);
-
             onSuccess((prev) => prev.filter((r) => r.id !== res.id).concat(res));
             toast.success("Reserva actualizada con éxito");
             onClose();

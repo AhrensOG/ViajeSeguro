@@ -20,7 +20,6 @@ export async function createVehicle(vehicleData: CreateVehicleDto): Promise<Vehi
         method: "POST",
         body: JSON.stringify(vehicleData),
     });
-    console.log(res);
     return res as Vehicle;
 }
 

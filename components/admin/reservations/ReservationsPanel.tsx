@@ -31,8 +31,6 @@ export default function ReservationPanel() {
         const fetchReservations = async () => {
             try {
                 const reservations = await getAllReservations();
-                console.log("Reservas obtenidas:", reservations);
-
                 if (!Array.isArray(reservations)) throw new Error("La respuesta de reservas no es un array");
                 setReservations(reservations);
                 const users = await getReduceUser();
@@ -48,7 +46,6 @@ export default function ReservationPanel() {
                     }))
                 );
                 // const discounts = await getDiscountByUserId();
-                // console.log(discounts);
             } catch (error) {
                 console.error("Error al cargar reservas:", error);
             } finally {
