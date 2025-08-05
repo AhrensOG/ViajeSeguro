@@ -13,7 +13,7 @@ interface Props {
     onUpdateUser: (user: SimpleUser) => void;
 }
 
-const roles = ["CLIENT", "DRIVER", "ADMIN"];
+const roles = ["CLIENT", "DRIVER", "ADMIN", "PARTNER"];
 
 const UserEditModal = ({ user, onClose, onUpdateUser }: Props) => {
     const {
@@ -63,7 +63,7 @@ const UserEditModal = ({ user, onClose, onUpdateUser }: Props) => {
                 onClick={(e) => e.stopPropagation()}
                 className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md relative border border-custom-gray-300"
             >
-                <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 hover:text-black">
+                <button onClick={onClose} className="cursor-pointer absolute top-4 right-4 text-gray-600 hover:text-black">
                     <X className="size-5" />
                 </button>
                 <h2 className="text-2xl font-bold mb-6 text-custom-golden-700">Editar usuario</h2>
@@ -104,13 +104,13 @@ const UserEditModal = ({ user, onClose, onUpdateUser }: Props) => {
                         <button
                             type="button"
                             onClick={onClose}
-                            className="border border-custom-gray-300 text-custom-black-800 hover:bg-custom-gray-100 font-medium py-2 px-4 rounded-md"
+                            className="cursor-pointer border border-custom-gray-300 text-custom-black-800 hover:bg-custom-gray-100 font-medium py-2 px-4 rounded-md"
                         >
                             Cancelar
                         </button>
                         <button
                             type="submit"
-                            className="bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold py-2 px-4 rounded-md"
+                            className="cursor-pointer bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold py-2 px-4 rounded-md"
                         >
                             Guardar
                         </button>

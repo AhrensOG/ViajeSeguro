@@ -106,14 +106,15 @@ export default function UsersPanel() {
                         className="border border-custom-gray-300 rounded-md px-3 py-2 outline-none focus:border-custom-golden-600 focus:ring-1 focus:ring-custom-golden-100"
                     >
                         <option value="ALL">Todos los roles</option>
-                        <option value="CLIENT">CLIENT</option>
-                        <option value="DRIVER">DRIVER</option>
-                        <option value="ADMIN">ADMIN</option>
+                        <option value="CLIENT">Cliente</option>
+                        <option value="DRIVER">Conductor</option>
+                        <option value="ADMIN">Admin</option>
+                        <option value="PARTNER">Partner</option>
                     </select>
                 </div>
                 <button
                     onClick={() => setCreateModalIsOpen(true)}
-                    className="flex items-center gap-2 bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold px-4 py-2 rounded-md shadow-sm"
+                    className="cursor-pointer flex items-center gap-2 bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold px-4 py-2 rounded-md shadow-sm"
                 >
                     <Plus className="h-4 w-4" /> Crear nuevo
                 </button>
@@ -138,7 +139,7 @@ export default function UsersPanel() {
                                     key={index}
                                     className={`${
                                         index % 2 === 0 ? "bg-custom-white-50" : "bg-custom-gray-100"
-                                    } hover:bg-custom-golden-100 transition`}
+                                    } cursor-pointer hover:bg-custom-golden-100 transition`}
                                     onClick={() => handleViewUser(user)}
                                 >
                                     <td className="px-4 py-2 font-medium border-b border-r border-custom-gray-200">
@@ -152,7 +153,7 @@ export default function UsersPanel() {
                                                 e.stopPropagation();
                                                 handleEditUser(user);
                                             }}
-                                            className="text-custom-golden-600 hover:text-custom-golden-700"
+                                            className="cursor-pointer text-custom-golden-600 hover:text-custom-golden-700"
                                             aria-label="Editar"
                                         >
                                             <Pencil className="h-4 w-4 inline-block" />
@@ -163,7 +164,7 @@ export default function UsersPanel() {
                                                 setSelectedUser(user);
                                                 DeleteToast(user.id as string, handleDelete);
                                             }}
-                                            className="text-red-500 hover:text-red-700"
+                                            className="cursor-pointer text-red-500 hover:text-red-700"
                                             aria-label="Eliminar"
                                         >
                                             <Trash2 className="h-4 w-4 inline-block" />

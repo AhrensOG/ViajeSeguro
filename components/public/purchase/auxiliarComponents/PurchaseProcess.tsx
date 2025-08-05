@@ -1,9 +1,10 @@
-// PurchaseProcess.tsx
+"use client";
+
 import React, { useEffect, useState } from "react";
 import PurchaseTripSummary from "./PurchaseTripSummary";
 import PaymentOption from "./PaymentOption";
 import PaymentTrustInfo from "./PaymentTrustInfo";
-import { CheckCircle, CreditCard } from "lucide-react";
+import { AlertCircle, Banknote, CheckCircle, Clock, CreditCard } from "lucide-react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { TripWithPriceDetails } from "@/lib/shared/types/trip-service-type.type";
 import { getTripForPurchase } from "@/lib/api/trip";
@@ -17,16 +18,25 @@ import { BASE_URL } from "@/lib/constants";
 import { createCheckoutSession } from "@/lib/api/stripe";
 import PurchaseProcessFallback from "@/lib/client/components/fallbacks/purchase/PurchaseProcessFallback";
 import CashConfirmationModal from "./CashConfirmationModal";
+import { VehicleOfferWithVehicle } from "@/lib/api/vehicle-booking/vehicleBooking.types";
+import { createVehicleBooking } from "@/lib/api/vehicle-booking";
+import { fetchVehicleOffer } from "@/lib/api/vehicleOffer";
+import { calculateTotalDays } from "@/lib/functions";
+import PurchaseVehicleSummary from "./PurchaseVehicleSummary";
 
 const PurchaseProcess = () => {
     const searchParams = useSearchParams();
     const router = useRouter();
     const pathname = usePathname();
+    const type = searchParams.get("type");
+    const isVehicle = type === "vehicle";
+
     const IVA = process.env.NEXT_PUBLIC_IVA || 0;
     const referralId = searchParams.get("referral");
-
     const id = searchParams.get("id");
+
     const [trip, setTrip] = useState<TripWithPriceDetails | null>(null);
+    const [vehicleBooking, setVehicleBooking] = useState<VehicleOfferWithVehicle | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const { data: session } = useSession();
@@ -37,47 +47,97 @@ const PurchaseProcess = () => {
             if (!id) return;
             try {
                 setLoading(true);
-                const tripData = await getTripForPurchase(id);
-                setTrip(tripData as TripWithPriceDetails);
+
+                if (type === "trip") {
+                    const tripData = await getTripForPurchase(id);
+                    setTrip(tripData as TripWithPriceDetails);
+                }
+                if (type === "vehicle") {
+                    const vehicleBookingData = await fetchVehicleOffer(id);
+
+                    setVehicleBooking(vehicleBookingData as VehicleOfferWithVehicle);
+                }
             } catch (err) {
                 console.log("Error al cargar el viaje:", err);
-                setError("Error al obtener el viaje");
+                setError("Error al obtener la información");
             } finally {
                 setLoading(false);
             }
         };
         fetchTrip();
-    }, [id]);
+    }, [id, type]);
+
+    const handleCashPayment = async () => {
+        if (!session) {
+            const current = `${BASE_URL}${pathname}?${searchParams.toString()}`;
+            const encoded = encodeURIComponent(current);
+            toast.info("Debes iniciar sesión para realizar la reserva");
+            await new Promise((resolve) => setTimeout(resolve, 2000));
+            router.push(`/auth/login?callbackUrl=${encoded}`);
+            return;
+        }
+        setShowCashModal(true);
+    };
 
     const confirmCashPayment = async () => {
-        if (!trip || !session) return;
+        if ((!trip && !vehicleBooking) || !session) return;
 
-        const payload: CreateReservationPayload = {
-            tripId: trip.id,
-            price: trip.priceDetails?.finalPrice ?? trip.basePrice,
-            status: "PENDING",
-            paymentMethod: "CASH",
-            referralId: referralId || undefined,
-        };
+        if (trip) {
+            const payload: CreateReservationPayload = {
+                tripId: trip.id,
+                price: trip.priceDetails?.finalPrice ?? trip.basePrice,
+                status: "PENDING",
+                paymentMethod: "CASH",
+                referralId: referralId || undefined,
+            };
 
-        try {
-            await createReservation(payload);
-            toast.success("Reserva generada correctamente.", {
-                description: "Puedes ver el estado de la misma en tu perfil.",
-            });
-            router.push("/dashboard/client/reservations");
-        } catch (error) {
-            console.log("Error al crear la reserva:", error);
-            toast.info("Hubo un error al crear la reserva", {
-                description: "Intenta nuevamente o contacta con el soporte",
-            });
-        } finally {
-            setShowCashModal(false);
+            try {
+                await createReservation(payload);
+                toast.success("Reserva generada correctamente.", {
+                    description: "Puedes ver el estado de la misma en tu perfil.",
+                });
+                router.push("/dashboard/client/reservations");
+            } catch (error) {
+                console.log("Error al crear la reserva:", error);
+                toast.info("Hubo un error al crear la reserva", {
+                    description: "Intenta nuevamente o contacta con el soporte",
+                });
+            } finally {
+                setShowCashModal(false);
+            }
+        }
+        if (vehicleBooking) {
+            const totalPrice = vehicleBooking.pricePerDay * calculateTotalDays(vehicleBooking.availableFrom, vehicleBooking.availableTo);
+            const createVehicleBookingPayload = {
+                renterId: session.user.id,
+                offerId: vehicleBooking.id,
+                startDate: new Date(vehicleBooking.availableFrom),
+                endDate: new Date(vehicleBooking.availableTo),
+                status: "PENDING",
+                paymentMethod: "CASH",
+                referralId: referralId || undefined,
+                totalPrice: totalPrice,
+            };
+
+            try {
+                await createVehicleBooking(createVehicleBookingPayload);
+                toast.success("Reserva generada correctamente.", {
+                    description: "Puedes ver el estado de la misma en tu perfil.",
+                });
+                router.push("/dashboard/client/reservations");
+            } catch (error) {
+                console.log("Error al crear la reserva:", error);
+                toast.info("Hubo un error al crear la reserva", {
+                    description: "Intenta nuevamente o contacta con el soporte",
+                });
+            } finally {
+                setShowCashModal(false);
+            }
         }
     };
 
     const handleStripeRedirect = async () => {
-        if (!trip || !id) return;
+        if ((!trip && !vehicleBooking) || !id) return;
         if (!session) {
             const current = `${BASE_URL}${pathname}?${searchParams.toString()}`;
             const encoded = encodeURIComponent(current);
@@ -87,45 +147,96 @@ const PurchaseProcess = () => {
             return;
         }
 
-        const payload: CreateReservationPayload = {
-            tripId: trip.id,
-            price: (trip.priceDetails?.finalPrice ?? trip.basePrice) * (1 + Number(IVA) / 100),
-            status: "PENDING",
-            paymentMethod: "STRIPE",
-            referralId: referralId || undefined,
-        };
-        try {
-            const data = await createCheckoutSession({
-                amount: Math.round((trip.priceDetails?.finalPrice ?? trip.basePrice) * (1 + Number(IVA) / 100) * 100),
-                metadata: payload,
-            });
-            if (data.url) {
-                window.location.href = data.url;
+        if (trip) {
+            const payload: CreateReservationPayload = {
+                tripId: trip.id,
+                price: (trip.priceDetails?.finalPrice ?? trip.basePrice) * (1 + Number(IVA) / 100),
+                status: "PENDING",
+                paymentMethod: "STRIPE",
+                referralId: referralId || undefined,
+            };
+            try {
+                const data = await createCheckoutSession({
+                    amount: Math.round((trip.priceDetails?.finalPrice ?? trip.basePrice) * (1 + Number(IVA) / 100) * 100),
+                    metadata: payload,
+                });
+                if (data.url) {
+                    window.location.href = data.url;
+                }
+            } catch (err) {
+                console.log("Error al iniciar el checkout:", err);
+                toast.info("No se pudo redirigir al pago");
             }
-        } catch (err) {
-            console.log("Error al iniciar el checkout:", err);
-            toast.info("No se pudo redirigir al pago");
+        }
+        if (vehicleBooking) {
+            const finalPrice = vehicleBooking.pricePerDay * calculateTotalDays(vehicleBooking.availableFrom, vehicleBooking.availableTo);
+            const createVehicleBookingPayload = {
+                renterId: session.user.id,
+                offerId: vehicleBooking.id,
+                startDate: new Date(vehicleBooking.availableFrom),
+                endDate: new Date(vehicleBooking.availableTo),
+                status: "PENDING",
+                paymentMethod: "STRIPE",
+                referralId: referralId || undefined,
+                totalPrice: finalPrice,
+                type: "VEHICLE_BOOKING",
+            };
+            try {
+                const data = await createCheckoutSession({
+                    amount: Math.round(finalPrice * (1 + Number(IVA) / 100) * 100),
+                    metadata: createVehicleBookingPayload,
+                });
+
+                if (data.url) {
+                    window.location.href = data.url;
+                }
+            } catch (err) {
+                console.log("Error al iniciar el checkout:", err);
+                toast.info("No se pudo redirigir al pago");
+            }
         }
     };
 
     if (loading) return <PurchaseProcessFallback />;
     if (error) return <NotFoundMessage />;
-    if (!trip) return null;
+    if (!trip && !vehicleBooking) return null;
 
-    const tripSummary = getSummaryFromTrip(trip);
-    const priceFormatted = ((trip.priceDetails?.finalPrice ?? trip.basePrice) * (1 + Number(IVA) / 100)).toFixed(2).replace(".", ",");
+    const tripSummary = trip ? getSummaryFromTrip(trip) : null;
+
+    const priceFormatted = (finalPrice: number | undefined, basePrice: number, IVA: number) => {
+        const price = finalPrice !== undefined ? finalPrice : basePrice;
+        return (price * (1 + Number(IVA) / 100)).toFixed(2).replace(".", ",");
+    };
+
+    let price: string = "0,00";
+
+    if (trip) {
+        price = priceFormatted(trip.priceDetails?.finalPrice, trip.basePrice, Number(IVA));
+    } else if (vehicleBooking?.pricePerDay !== undefined && vehicleBooking.availableFrom && vehicleBooking.availableTo) {
+        const totalDays = calculateTotalDays(vehicleBooking.availableFrom, vehicleBooking.availableTo);
+        const totalPrice = vehicleBooking.pricePerDay * totalDays;
+        price = priceFormatted(totalPrice, vehicleBooking.pricePerDay, Number(IVA));
+    }
+
+    //Logica para vehicle
 
     return (
         <main className="container mx-auto p-8 grow">
             <h1 className="text-3xl font-bold text-custom-black-800 text-center mb-2">Elige tu método de pago</h1>
-            <p className="text-custom-gray-600 text-center mb-8">Estás a un paso de asegurar tu viaje</p>
+            <p className="text-custom-gray-600 text-center mb-8">
+                {isVehicle ? "Estás a un paso de asegurar tu reserva" : "Estás a un paso de asegurar tu viaje"}
+            </p>
 
             <div className="flex flex-col-reverse lg:flex-row lg:items-start lg:gap-8 w-full">
                 <div className="flex-1 space-y-6">
                     <PaymentOption
                         icon={<CreditCard className="h-6 w-6 text-custom-golden-700" />}
                         title="Pagar ahora"
-                        description="Asegura tu plaza al instante y viaja con total tranquilidad"
+                        description={
+                            type === "trip"
+                                ? "Asegura tu plaza al instante y viaja con total tranquilidad"
+                                : "Asegura tu reserva al instante y viaja con total tranquilidad"
+                        }
                         features={[
                             <>
                                 <CheckCircle className="h-5 w-5 text-custom-golden-600" />
@@ -139,37 +250,51 @@ const PurchaseProcess = () => {
                         highlighted
                         recommended
                         badgeLabel="Recomendado"
-                        buttonLabel={`Pagar ${priceFormatted} €`}
+                        buttonLabel={`Pagar ${price} €`}
                         secure
                         onClick={handleStripeRedirect}
                     />
 
-                    {/* <PaymentOption
+                    <PaymentOption
                         icon={<Banknote className="h-6 w-6 text-custom-gray-600" />}
                         title="Pagar en efectivo"
-                        description="Paga directamente al conductor el día del viaje"
+                        description={
+                            type === "trip" ? "Paga directamente al conductor el día del viaje" : "Paga directamente al encargado el dia del viaje"
+                        }
                         features={[
                             <>
                                 <Clock className="h-5 w-5 text-custom-gray-500" />
-                                <span>Tu plaza queda reservada temporalmente</span>
+                                <span>
+                                    {type === "trip" ? "Tu plaza queda reservada temporalmente" : "El vehículo queda reservado temporalmente"}
+                                </span>
                             </>,
                             <>
                                 <AlertCircle className="h-5 w-5 text-custom-gray-500" />
-                                <span>El conductor puede rechazar tu solicitud</span>
+                                <span>
+                                    {type === "trip" ? "El conductor puede rechazar tu solicitud" : "El conductor puede rechazar tu solicitud"}
+                                </span>
                             </>,
                         ]}
                         buttonLabel="Pagar con efectivo"
                         secure
                         onClick={handleCashPayment}
-                    /> */}
+                    />
 
                     <PaymentTrustInfo />
                 </div>
 
                 <div className="lg:w-lg mb-6 lg:mb-0">
-                    <PurchaseTripSummary {...tripSummary} priceDetails={trip.priceDetails} />
+                    {trip && tripSummary && (
+                        <PurchaseTripSummary
+                            {...tripSummary}
+                            priceDetails={trip.priceDetails}
+                            // title={isVehicle ? "Resumen de tu reserva" : "Resumen de tu viaje"}
+                        />
+                    )}
+                    {vehicleBooking && <PurchaseVehicleSummary vehicleBooking={vehicleBooking} />}
                 </div>
             </div>
+
             <CashConfirmationModal show={showCashModal} onClose={() => setShowCashModal(false)} onConfirm={confirmCashPayment} />
         </main>
     );

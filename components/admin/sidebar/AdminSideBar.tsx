@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Coins, FileText, Users, CalendarDays, LogOut, Home, Car } from "lucide-react";
+import { Coins, FileText, Users, CalendarDays, LogOut, Home, Car, Truck } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -13,6 +13,8 @@ const menuItems = [
     { name: "Pagos", icon: <Coins size={20} /> },
     { name: "Viajes", icon: <CalendarDays size={20} /> },
     { name: "Vehiculos", icon: <Car size={20} /> },
+    { name: "Ofertas Furgonetas", icon: <Truck size={20} /> },
+    { name: "Reservas Furgonetas", icon: <CalendarDays size={20} /> },
 ];
 
 const AdminSideBar = ({ onSelect }: { onSelect: (itemName: string) => void }) => {
@@ -59,7 +61,8 @@ const AdminSideBar = ({ onSelect }: { onSelect: (itemName: string) => void }) =>
                                 if (item.isHome) {
                                     router.push("/");
                                 } else {
-                                    onSelect(item.name);
+                                    const slug = item.name.toLowerCase().replace(/\s+/g, "-");
+                                    onSelect(slug);
                                 }
                             }}
                             type="button"

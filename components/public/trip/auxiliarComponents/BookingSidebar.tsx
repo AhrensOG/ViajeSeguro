@@ -61,7 +61,7 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
         if (!trip.priceDetails) {
             setShowModal(true);
         } else {
-            router.push(`/purchase?id=${trip.id}&&referral=${referral}`);
+            router.push(`/purchase?id=${trip.id}&&referral=${referral}&&type=trip`);
         }
     };
 

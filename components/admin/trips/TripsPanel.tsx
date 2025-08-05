@@ -117,10 +117,10 @@ export default function TripsPanel() {
 
     // Solución 1: Mantener el objeto driver después de editar un viaje
     const handleUpdateTrip: React.Dispatch<React.SetStateAction<TripResponse[]>> = (updater) => {
-        setTrips(prevTrips => {
-            const updated = typeof updater === 'function' ? updater(prevTrips) : updater;
-            return updated.map(trip => {
-                const driver = drivers.find(d => d.id === trip.driverId);
+        setTrips((prevTrips) => {
+            const updated = typeof updater === "function" ? updater(prevTrips) : updater;
+            return updated.map((trip) => {
+                const driver = drivers.find((d) => d.id === trip.driverId);
                 return { ...trip, driver: driver || null };
             });
         });
@@ -132,7 +132,7 @@ export default function TripsPanel() {
                 <h1 className="text-2xl font-bold text-custom-golden-600">Panel de Viajes</h1>
                 <button
                     onClick={() => setIsCreateModalOpen(true)}
-                    className="flex items-center gap-2 bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold px-4 py-2 rounded-md shadow-sm"
+                    className="cursor-pointer flex items-center gap-2 bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold px-4 py-2 rounded-md shadow-sm"
                 >
                     <Plus className="h-4 w-4" /> Crear viaje
                 </button>
@@ -263,7 +263,7 @@ export default function TripsPanel() {
                                                     setSelectedTrip(trip);
                                                     setIsEditModalOpen(true);
                                                 }}
-                                                className="text-custom-golden-600 hover:text-custom-golden-700"
+                                                className="cursor-pointer text-custom-golden-600 hover:text-custom-golden-700"
                                                 aria-label="Editar"
                                             >
                                                 <Pencil className="h-4 w-4 inline-block" />
@@ -273,7 +273,7 @@ export default function TripsPanel() {
                                                     setSelectedTrip(trip);
                                                     DeleteToast(trip.id, handleDelete);
                                                 }}
-                                                className="text-red-500 hover:text-red-700"
+                                                className="cursor-pointer text-red-500 hover:text-red-700"
                                                 aria-label="Eliminar"
                                             >
                                                 <Trash2 className="h-4 w-4 inline-block" />

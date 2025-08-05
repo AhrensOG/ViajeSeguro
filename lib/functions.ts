@@ -173,6 +173,22 @@ const fetchWithOptionalAuth = async <T = unknown>(input: RequestInfo, options: R
     return JSON.parse(text);
 };
 
+function calculateTotalDays(startDate: string, endDate: string): number {
+    const start = new Date(startDate);
+    const end = new Date(endDate);
+
+    // Normalizamos las horas para evitar errores de zonas horarias
+    start.setHours(0, 0, 0, 0);
+    end.setHours(0, 0, 0, 0);
+
+    // Calculamos la diferencia en milisegundos y la convertimos a días
+    const msPerDay = 1000 * 60 * 60 * 24;
+    const diffInMs = end.getTime() - start.getTime();
+    const days = Math.max(1, Math.round(diffInMs / msPerDay) + 1); // incluye ambos días
+
+    return days;
+}
+
 export {
     formatDateToDDMMYYYY,
     formatDateToYYYYMMDD,
@@ -184,4 +200,5 @@ export {
     fetchWithAuth,
     fetchWithOptionalAuth,
     formatFullDate,
+    calculateTotalDays,
 };

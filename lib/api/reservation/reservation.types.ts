@@ -66,6 +66,6 @@ export type ReservationResponse = {
     status: ReservationStatus;
     trip: TripSummary;
     priceDetails: PriceDetails;
-    qr: Qr | null;
+    qr: Qr[] | [];
     user: User;
 };

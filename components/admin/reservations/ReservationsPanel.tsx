@@ -74,7 +74,7 @@ export default function ReservationPanel() {
             await deleteRes(id ?? "");
             setReservations((prevReservations) => prevReservations.filter((reservation) => reservation.id !== id));
             setSelectedReservation(null);
-            toast.success("Usuario eliminado exitosamente");
+            toast.success("Reserva eliminada exitosamente");
         } catch {
             toast.info("Error al eliminar el usuario");
         }
@@ -127,7 +127,7 @@ export default function ReservationPanel() {
 
                 <button
                     onClick={() => setIsCreateModalOpen(true)}
-                    className="flex items-center gap-2 bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold px-4 py-2 rounded-md shadow-sm"
+                    className="cursor-pointer flex items-center gap-2 bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold px-4 py-2 rounded-md shadow-sm"
                 >
                     <Plus className="h-4 w-4" /> Crear reserva
                 </button>
@@ -164,7 +164,7 @@ export default function ReservationPanel() {
                                         key={r.id}
                                         className={`$${
                                             index % 2 === 0 ? "bg-custom-white-50" : "bg-custom-gray-100"
-                                        } hover:bg-custom-golden-100 transition`}
+                                        } cursor-pointer hover:bg-custom-golden-100 transition`}
                                     >
                                         <td className="px-4 py-2 font-medium border-b border-r border-custom-gray-200">{guestName}</td>
                                         <td className="px-4 py-2 border-b border-r border-custom-gray-200">{guestEmail}</td>
@@ -190,7 +190,7 @@ export default function ReservationPanel() {
                                                     setSelectedReservation(r);
                                                     DeleteToast(r.id, handleDelete);
                                                 }}
-                                                className="text-red-500 hover:text-red-700"
+                                                className="cursor-pointer text-red-500 hover:text-red-700"
                                                 aria-label="Eliminar"
                                             >
                                                 <Trash2 className="h-4 w-4 inline-block" />

@@ -2,11 +2,11 @@
 
 import { Clock, Shield, TrendingUp } from "lucide-react";
 import React from "react";
-import { motion } from "framer-motion";
+import { motion, Variants } from "framer-motion";
 
-const itemVariant = {
+const itemVariant: Variants = {
   hidden: { opacity: 0, y: 30 },
-  visible: (i: number) => ({
+  visible: (i: number = 0) => ({
     opacity: 1,
     y: 0,
     transition: {
@@ -41,30 +41,32 @@ const ProblemWeSolveSection = () => {
 
         {/* Tarjetas */}
         <div className="grid md:grid-cols-3 gap-8">
-          {[{
-            icon: <Clock className="h-6 w-6 text-custom-golden-700" />,
-            title: "Cancelaciones sin aviso",
-            description:
-              "Muchos usuarios han experimentado cancelaciones de última hora sin explicación ni alternativas, dejándolos varados y sin opciones.",
-            solution:
-              "Política de cancelación estricta con penalizaciones para conductores que cancelen sin motivo justificado, y reembolso garantizado para los pasajeros afectados.",
-          },
-          {
-            icon: <TrendingUp className="h-6 w-6 text-custom-golden-700" />,
-            title: "Comisiones excesivas",
-            description:
-              "Las plataformas existentes cobran comisiones de hasta el 25%, encareciendo los viajes para los pasajeros y reduciendo los ingresos de los conductores.",
-            solution:
-              "Modelo de comisiones transparente y justo, con tarifas significativamente más bajas que la competencia, beneficiando tanto a conductores como a pasajeros.",
-          },
-          {
-            icon: <Shield className="h-6 w-6 text-custom-golden-700" />,
-            title: "Falta de seguridad",
-            description:
-              "Muchos usuarios se sienten inseguros al viajar con desconocidos, y las plataformas actuales ofrecen pocas garantías de seguridad y verificación.",
-            solution:
-              "Verificación rigurosa de identidad, sistema de valoraciones detallado, seguimiento GPS opcional y seguro de viaje incluido en cada trayecto.",
-          }].map((card, i) => (
+          {[
+            {
+              icon: <Clock className="h-6 w-6 text-custom-golden-700" />,
+              title: "Cancelaciones sin aviso",
+              description:
+                "Muchos usuarios han experimentado cancelaciones de última hora sin explicación ni alternativas, dejándolos varados y sin opciones.",
+              solution:
+                "Política de cancelación estricta con penalizaciones para conductores que cancelen sin motivo justificado, y reembolso garantizado para los pasajeros afectados.",
+            },
+            {
+              icon: <TrendingUp className="h-6 w-6 text-custom-golden-700" />,
+              title: "Comisiones excesivas",
+              description:
+                "Las plataformas existentes cobran comisiones de hasta el 25%, encareciendo los viajes para los pasajeros y reduciendo los ingresos de los conductores.",
+              solution:
+                "Modelo de comisiones transparente y justo, con tarifas significativamente más bajas que la competencia, beneficiando tanto a conductores como a pasajeros.",
+            },
+            {
+              icon: <Shield className="h-6 w-6 text-custom-golden-700" />,
+              title: "Falta de seguridad",
+              description:
+                "Muchos usuarios se sienten inseguros al viajar con desconocidos, y las plataformas actuales ofrecen pocas garantías de seguridad y verificación.",
+              solution:
+                "Verificación rigurosa de identidad, sistema de valoraciones detallado, seguimiento GPS opcional y seguro de viaje incluido en cada trayecto.",
+            },
+          ].map((card, i) => (
             <motion.div
               key={card.title}
               custom={i}

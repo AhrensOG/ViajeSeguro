@@ -95,7 +95,7 @@ const CreateReservationModal = ({ users, trips, onClose, onSuccess }: Props) => 
                 onClick={(e) => e.stopPropagation()}
                 className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md relative border border-custom-gray-300"
             >
-                <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 hover:text-black" aria-label="Cerrar">
+                <button onClick={onClose} className="cursor-pointer absolute top-4 right-4 text-gray-600 hover:text-black" aria-label="Cerrar">
                     <X className="size-5" />
                 </button>
 
@@ -201,13 +201,13 @@ const CreateReservationModal = ({ users, trips, onClose, onSuccess }: Props) => 
                         <button
                             type="button"
                             onClick={onClose}
-                            className="border border-custom-gray-300 text-custom-black-800 hover:bg-custom-gray-100 font-medium py-2 px-4 rounded-md"
+                            className="cursor-pointer border border-custom-gray-300 text-custom-black-800 hover:bg-custom-gray-100 font-medium py-2 px-4 rounded-md"
                         >
                             Cancelar
                         </button>
                         <button
                             type="submit"
-                            className="bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold py-2 px-4 rounded-md"
+                            className="cursor-pointer bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold py-2 px-4 rounded-md"
                         >
                             Crear
                         </button>

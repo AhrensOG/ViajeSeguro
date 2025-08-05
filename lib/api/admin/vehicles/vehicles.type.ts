@@ -5,6 +5,13 @@ export interface Vehicle {
     serviceType: ServiceType;
     provider: Provider;
     allowSeatSelection: boolean;
+    model: string;
+    brand: string;
+    year: number;
+    fuelType: "DIESEL" | "GASOLINE" | "ELECTRIC" | "HYBRID";
+    transmissionType: "MANUAL" | "AUTOMATIC";
+    features: string[];
+    images: string[];
     ownerId: string;
     owner?: {
         id: string;
@@ -31,25 +38,34 @@ export interface Vehicle {
 
 export interface CreateVehicleDto {
     plate: string;
-
     capacity: number;
-
     serviceType: ServiceType;
-
     provider: Provider;
-
     allowSeatSelection: boolean;
-
     ownerId: string;
+    model: string;
+    brand: string;
+    year: number;
+    fuelType: "DIESEL" | "GASOLINE" | "ELECTRIC" | "HYBRID";
+    transmissionType: "MANUAL" | "AUTOMATIC";
+    features?: FeatureEnum[];
+    images?: string[];
 }
 
-export interface ServiceType {
-    SIMPLE_TRIP: "SIMPLE_TRIP";
-    RENTAL_WITH_DRIVER: "RENTAL_WITH_DRIVER";
-    RENTAL_WITHOUT_DRIVER: "RENTAL_WITHOUT_DRIVER";
+export enum ServiceType {
+    SIMPLE_TRIP,
+    RENTAL_WITH_DRIVER,
+    RENTAL_WITHOUT_DRIVER,
 }
 
-export interface Provider {
-    VS: "VS";
-    PRIVATE: "PRIVATE";
+export enum Provider {
+    VS = "VS",
+    PRIVATE = "PRIVATE",
+}
+
+export enum FeatureEnum {
+    GPS = "GPS",
+    AIR_CONDITIONING = "AIR_CONDITIONING",
+    BLUETOOTH = "BLUETOOTH",
+    REAR_CAMERA = "REAR_CAMERA",
 }

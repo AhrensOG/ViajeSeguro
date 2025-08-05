@@ -29,7 +29,7 @@ const UserDetailModal = ({ user, onClose }: Props) => {
                 onClick={(e) => e.stopPropagation()}
                 className="bg-white rounded-xl shadow-xl p-6 w-full max-w-md relative border border-custom-gray-300"
             >
-                <button onClick={onClose} className="absolute top-4 right-4 text-gray-600 hover:text-black">
+                <button onClick={onClose} className="cursor-pointer absolute top-4 right-4 text-gray-600 hover:text-black">
                     <X className="size-5" />
                 </button>
                 <h2 className="text-2xl font-bold mb-6 text-custom-golden-700">Detalles del usuario</h2>
