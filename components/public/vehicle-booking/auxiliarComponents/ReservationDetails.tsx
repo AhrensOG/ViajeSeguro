@@ -23,7 +23,7 @@ export default function ReservationDetails(props: ReservationDetailsProps) {
             <div className="flex gap-2 items-center w-full md:w-[45%]">
                 <Calendar className="size-6 text-custom-golden-600" />
                 <p className="text-custom-gray-600 text-lg flex flex-col">
-                    <span>Recodiga:</span> {convertUTCToLocalDate(dateEnd, originalTimeZone)}
+                    <span>Entrega:</span> {convertUTCToLocalDate(dateEnd, originalTimeZone)}
                 </p>
             </div>
             <div className="flex gap-2 items-center w-full md:w-[45%]">

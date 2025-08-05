@@ -184,7 +184,7 @@ function calculateTotalDays(startDate: string, endDate: string): number {
     // Calculamos la diferencia en milisegundos y la convertimos a días
     const msPerDay = 1000 * 60 * 60 * 24;
     const diffInMs = end.getTime() - start.getTime();
-    const days = Math.max(1, Math.round(diffInMs / msPerDay) + 1); // incluye ambos días
+    const days = Math.max(1, Math.round(diffInMs / msPerDay)); // incluye ambos días
 
     return days;
 }
