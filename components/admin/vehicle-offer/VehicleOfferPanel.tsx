@@ -60,8 +60,6 @@ export default function VehicleOfferPanel() {
                 const offers = await fetchVehicleOffers();
                 const users = await fetchSimpleUsers();
                 const vehicles = await fetchSimpleVehicles();
-                console.log(vehicles);
-
                 setOffers(offers as VehicleOffersAdminResponse[]);
                 setUsers(users as SimpleUser[]);
                 setVehicles(vehicles as SimpleVehicle[]);

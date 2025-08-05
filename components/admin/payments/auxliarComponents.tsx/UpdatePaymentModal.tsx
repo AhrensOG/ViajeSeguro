@@ -43,8 +43,6 @@ const UpdatePaymentModal = ({ onClose, userOptions, initialData, onSuccess }: Pr
         }
         try {
             const res = await updatePayment(initialData.id, data);
-            console.log(res);
-
             onSuccess((prev) => prev.map((p) => (p.id === initialData.id ? { ...p, ...res } : p) as PaymentResponse));
             onClose();
             return toast.success("Pago actualizado con éxito");

@@ -14,6 +14,7 @@ export async function uploadFiles(files: File[], folder = "Documentos", name = f
     }
     return uploadedUrls;
   } catch (error) {
+    console.log(error)
     throw new Error("Error al subir las imagenes", { cause: error });
   }
 }
