@@ -137,14 +137,44 @@ const CreateVehicleOfferModal = ({ onClose, onSuccess, vehicles, owners }: Props
 
                     <div>
                         <label className={labelClass}>Precio por día (€)</label>
-                        <input type="number" step="0.01" {...register("pricePerDay", { required: true, min: 1 })} className={inputClass} />
-                        {errors.pricePerDay && <p className="text-red-500 text-xs">Campo obligatorio</p>}
+                        <input
+                            type="text"
+                            inputMode="decimal"
+                            {...register("pricePerDay", {
+                                required: true,
+                                validate: (value) => /^[0-9]*[.,]?[0-9]{0,2}$/.test(value) || "Formato inválido (usa solo números)",
+                            })}
+                            onInput={(e) => {
+                                const input = e.target as HTMLInputElement;
+                                input.value = input.value
+                                    .replace(",", ".") // convierte coma en punto
+                                    .replace(/[^0-9.]/g, "") // bloquea letras y símbolos
+                                    .replace(/(\..*?)\..*/g, "$1"); // solo un punto
+                            }}
+                            className={inputClass}
+                        />
+                        {errors.pricePerDay && <p className="text-red-500 text-xs">{errors.pricePerDay.message || "Campo obligatorio"}</p>}
                     </div>
 
                     <div>
                         <label className={labelClass}>Tarifa de agencia (€)</label>
-                        <input type="number" step="0.01" {...register("agencyFee", { required: true, min: 0 })} className={inputClass} />
-                        {errors.agencyFee && <p className="text-red-500 text-xs">Campo obligatorio</p>}
+                        <input
+                            type="text"
+                            inputMode="decimal"
+                            {...register("agencyFee", {
+                                required: true,
+                                validate: (value) => /^[0-9]*[.,]?[0-9]{0,2}$/.test(value) || "Formato inválido (usa solo números)",
+                            })}
+                            onInput={(e) => {
+                                const input = e.target as HTMLInputElement;
+                                input.value = input.value
+                                    .replace(",", ".")
+                                    .replace(/[^0-9.]/g, "")
+                                    .replace(/(\..*?)\..*/g, "$1");
+                            }}
+                            className={inputClass}
+                        />
+                        {errors.agencyFee && <p className="text-red-500 text-xs">{errors.agencyFee.message || "Campo obligatorio"}</p>}
                     </div>
 
                     <div>

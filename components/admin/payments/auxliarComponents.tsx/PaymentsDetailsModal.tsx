@@ -8,6 +8,17 @@ interface Props {
     payment: PaymentResponse;
     onClose: () => void;
 }
+const statusMap = {
+    COMPLETED: "Pagado",
+    PENDING: "Pendiente",
+    CANCELLED: "Cancelado",
+    FAILED: "Fallido",
+} as const;
+
+const paymentMethodMap: Record<string, string> = {
+    CASH: "Efectivo",
+    STRIPE: "Tarjeta",
+} as const;
 
 const PaymentDetailModal = ({ payment, onClose }: Props) => {
     const user = payment.user;
@@ -57,12 +68,12 @@ const PaymentDetailModal = ({ payment, onClose }: Props) => {
 
                     <div className="bg-custom-white-50 p-3 rounded-md border border-custom-gray-200">
                         <label className="block text-xs font-semibold text-custom-gray-500 mb-1">Método de pago</label>
-                        <p>{payment.method}</p>
+                        <p>{paymentMethodMap[payment.method]}</p>
                     </div>
 
                     <div className="bg-custom-white-50 p-3 rounded-md border border-custom-gray-200">
                         <label className="block text-xs font-semibold text-custom-gray-500 mb-1">Estado</label>
-                        <p>{payment.status}</p>
+                        <p>{statusMap[payment.status]}</p>
                     </div>
 
                     <div className="bg-custom-white-50 p-3 rounded-md border border-custom-gray-200">

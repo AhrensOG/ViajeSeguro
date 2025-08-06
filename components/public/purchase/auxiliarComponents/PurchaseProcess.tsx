@@ -255,30 +255,34 @@ const PurchaseProcess = () => {
                         onClick={handleStripeRedirect}
                     />
 
-                    <PaymentOption
-                        icon={<Banknote className="h-6 w-6 text-custom-gray-600" />}
-                        title="Pagar en efectivo"
-                        description={
-                            type === "trip" ? "Paga directamente al conductor el día del viaje" : "Paga directamente al encargado el dia del viaje"
-                        }
-                        features={[
-                            <>
-                                <Clock className="h-5 w-5 text-custom-gray-500" />
-                                <span>
-                                    {type === "trip" ? "Tu plaza queda reservada temporalmente" : "El vehículo queda reservado temporalmente"}
-                                </span>
-                            </>,
-                            <>
-                                <AlertCircle className="h-5 w-5 text-custom-gray-500" />
-                                <span>
-                                    {type === "trip" ? "El conductor puede rechazar tu solicitud" : "El conductor puede rechazar tu solicitud"}
-                                </span>
-                            </>,
-                        ]}
-                        buttonLabel="Pagar con efectivo"
-                        secure
-                        onClick={handleCashPayment}
-                    />
+                    {type === "trip" && (
+                        <PaymentOption
+                            icon={<Banknote className="h-6 w-6 text-custom-gray-600" />}
+                            title="Pagar en efectivo"
+                            description={
+                                type === "trip"
+                                    ? "Paga directamente al conductor el día del viaje"
+                                    : "Paga directamente al encargado el dia del viaje"
+                            }
+                            features={[
+                                <>
+                                    <Clock className="h-5 w-5 text-custom-gray-500" />
+                                    <span>
+                                        {type === "trip" ? "Tu plaza queda reservada temporalmente" : "El vehículo queda reservado temporalmente"}
+                                    </span>
+                                </>,
+                                <>
+                                    <AlertCircle className="h-5 w-5 text-custom-gray-500" />
+                                    <span>
+                                        {type === "trip" ? "El conductor puede rechazar tu solicitud" : "El conductor puede rechazar tu solicitud"}
+                                    </span>
+                                </>,
+                            ]}
+                            buttonLabel="Pagar con efectivo"
+                            secure
+                            onClick={handleCashPayment}
+                        />
+                    )}
 
                     <PaymentTrustInfo />
                 </div>

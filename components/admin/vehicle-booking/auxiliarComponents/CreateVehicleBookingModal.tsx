@@ -209,7 +209,6 @@ export default function CreateVehicleBookingModal({ onClose, onSuccess, offers, 
                         <label className={labelClass}>Método de pago *</label>
                         <select {...register("paymentMethod", { required: true })} className={inputClass}>
                             <option value="">Selecciona...</option>
-                            <option value="CASH">Efectivo</option>
                             <option value="STRIPE">Tarjeta</option>
                         </select>
                         {errors.paymentMethod && <p className="text-red-500 text-xs">Campo obligatorio</p>}
