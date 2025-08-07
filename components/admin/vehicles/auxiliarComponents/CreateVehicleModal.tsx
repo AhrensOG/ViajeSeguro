@@ -37,6 +37,7 @@ const CreateVehicleModal = ({ onClose, owners, onSuccess }: Props) => {
     } = useForm<CreateVehicleDto>();
 
     const submit = async (data: CreateVehicleDto) => {
+      const toastId = toast.loading("Creando vehiculo...");
         try {
             let uploadedUrls: string[] = [];
             if (imageFiles && imageFiles?.length > 0) {
@@ -54,9 +55,9 @@ const CreateVehicleModal = ({ onClose, owners, onSuccess }: Props) => {
 
             onSuccess((prev) => [...prev, vehicle]);
             onClose();
-            toast.success("Vehículo creado exitosamente");
+            toast.success("Vehículo creado exitosamente", {  id: toastId });
         } catch (error) {
-            toast.info(error instanceof Error ? error.message : "Error al crear el vehículo");
+            toast.info(error instanceof Error ? error.message : "Error al crear el vehículo", { id: toastId });
         }
     };
 
@@ -103,8 +104,20 @@ const CreateVehicleModal = ({ onClose, owners, onSuccess }: Props) => {
 
                     <div>
                         <label className={labelClass}>Año</label>
-                        <input type="number" {...register("year", { required: true, min: 1950, max: 2099 })} className={inputClass} />
-                        {errors.year && <p className="text-red-500 text-xs">Campo obligatorio</p>}
+                        <input
+                            type="text"
+                            inputMode="numeric"
+                            {...register("year", {
+                                required: true,
+                                validate: (value) => /^[0-9]+$/.test(String(value)) || "Solo se permiten números enteros positivos",
+                            })}
+                            onInput={(e) => {
+                                const input = e.target as HTMLInputElement;
+                                input.value = input.value.replace(/[^0-9]/g, ""); // solo dígitos positivos
+                            }}
+                            className={inputClass}
+                        />
+                        {errors.year && <p className="text-red-500 text-xs">{errors.year.message || "Campo obligatorio"}</p>}
                     </div>
 
                     <div>
@@ -130,8 +143,20 @@ const CreateVehicleModal = ({ onClose, owners, onSuccess }: Props) => {
                     </div>
                     <div>
                         <label className={labelClass}>Capacidad</label>
-                        <input type="number" {...register("capacity", { required: true, min: 1 })} className={inputClass} />
-                        {errors.capacity && <p className="text-red-500 text-xs">Campo obligatorio</p>}
+                        <input
+                            type="text"
+                            inputMode="numeric"
+                            {...register("capacity", {
+                                required: true,
+                                validate: (value) => /^[0-9]+$/.test(String(value)) || "Solo se permiten números enteros positivos",
+                            })}
+                            onInput={(e) => {
+                                const input = e.target as HTMLInputElement;
+                                input.value = input.value.replace(/[^0-9]/g, "");
+                            }}
+                            className={inputClass}
+                        />
+                        {errors.capacity && <p className="text-red-500 text-xs">{errors.capacity.message || "Campo obligatorio"}</p>}
                     </div>
 
                     <div>

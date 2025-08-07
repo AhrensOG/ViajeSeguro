@@ -10,7 +10,19 @@ import { toast } from "sonner";
 import DeleteToast from "../DeleteToast";
 
 const paymentMethods = ["CASH", "STRIPE"];
-const paymentStatuses = ["PENDING", "PAID", "FAILED"];
+const paymentStatuses = ["PENDING", "COMPLETED", "CANCELLED", "FAILED"];
+
+const statusMap: Record<string, string> = {
+    COMPLETED: "Pagado",
+    PENDING: "Pendiente",
+    CANCELLED: "Cancelado",
+    FAILED: "Fallido",
+} as const;
+
+const paymentMethodMap: Record<string, string> = {
+    CASH: "Efectivo",
+    STRIPE: "Tarjeta",
+} as const;
 
 export default function PaymentsPanel() {
     const [payments, setPayments] = useState<PaymentResponse[]>([]);
@@ -84,7 +96,7 @@ export default function PaymentsPanel() {
                         <option value="">Todos los estados</option>
                         {paymentStatuses.map((status) => (
                             <option key={status} value={status}>
-                                {status}
+                                {statusMap[status]}
                             </option>
                         ))}
                     </select>
@@ -97,7 +109,7 @@ export default function PaymentsPanel() {
                         <option value="">Todos los métodos</option>
                         {paymentMethods.map((method) => (
                             <option key={method} value={method}>
-                                {method}
+                                {paymentMethodMap[method]}
                             </option>
                         ))}
                     </select>
@@ -115,6 +127,10 @@ export default function PaymentsPanel() {
 
             {loading ? (
                 <SkeletonTable rows={5} />
+            ) : filteredPayments.length === 0 ? (
+                <div className="flex-1 flex items-center justify-center text-center text-custom-gray-500 text-sm py-20 border border-dashed border-custom-gray-300 rounded-xl">
+                    No se encontraron resultados para los filtros aplicados.
+                </div>
             ) : (
                 <div className="flex-1 w-full bg-custom-white-100 rounded-xl shadow-sm border border-custom-gray-200 overflow-auto flex flex-col">
                     <table className="min-w-full text-sm text-left table-fixed border-separate border-spacing-0">
@@ -143,8 +159,8 @@ export default function PaymentsPanel() {
                                     <td className="px-4 py-2 font-medium border-b border-r border-custom-gray-200">{payment.user?.name}</td>
                                     <td className="px-4 py-2 border-b border-r border-custom-gray-200">{payment?.user?.email}</td>
                                     <td className="px-4 py-2 border-b border-r border-custom-gray-200">€ {payment.amount.toFixed(2)}</td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">{payment.method}</td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">{payment.status}</td>
+                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">{paymentMethodMap[payment.method]}</td>
+                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">{statusMap[payment.status]}</td>
                                     <td className="px-4 py-2 border-b border-custom-gray-200 text-center space-x-2">
                                         <button
                                             onClick={(e) => {

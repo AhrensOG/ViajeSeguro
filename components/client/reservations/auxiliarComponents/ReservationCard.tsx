@@ -1,12 +1,12 @@
 import { useState } from "react";
 import { DateTime } from "luxon";
-import { CalendarDays, Clock, AlertTriangle, CheckCircle2, XCircle, ChevronDown, QrCode } from "lucide-react";
+import { CalendarDays, Clock, AlertTriangle, CheckCircle2, XCircle, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ReservationResponse } from "@/lib/api/reservation/reservation.types";
 import ReservationPriceInfo from "./ReservationPriceInfo";
-import QrModal from "./QrModal";
 import { cancellReservation } from "@/lib/api/reservation";
 import { toast } from "sonner";
+import Image from "next/image";
 
 type Props = {
     reservation: ReservationResponse;
@@ -17,7 +17,6 @@ const ReservationCard = ({ reservation }: Props) => {
     const [showCancelWarning, setShowCancelWarning] = useState(false);
     const [hideButton, setHideButton] = useState(false);
     const [openCard, setOpenCard] = useState(false);
-    const [showQrModal, setShowQrModal] = useState(false);
 
     const departure = DateTime.fromISO(trip.departure).setZone(trip.originalTimeZone);
     const arrival = DateTime.fromISO(trip.arrival).setZone(trip.originalTimeZone);
@@ -159,18 +158,20 @@ const ReservationCard = ({ reservation }: Props) => {
 
                         {/* Precio + Info de referidos */}
                         <ReservationPriceInfo reservation={reservation} />
+                        {reservation.qr && (
+                            <div className="flex flex-col justify-center items-center w-full">
+                                <h2 className="text-lg font-semibold mb-4 text-center text-custom-black-900">Código QR de tu viaje</h2>
+
+                                <p className="text-sm text-center text-custom-gray-600">Muestra este código al conductor al momento del embarque.</p>
+                                <Image src={reservation.qr[0].imageUrl} alt="QR Code" width={200} height={200} className="w-48 h-48" />
+                                <p className="text-xs text-center text-custom-gray-400 mt-1">
+                                    Si el QR falla, proporciona este ID al conductor:{" "}
+                                    <span className="font-semibold text-custom-black-700">{reservation.id}</span>
+                                </p>
+                            </div>
+                        )}
 
                         <div className="flex flex-col justify-center items-end gap-4 relative">
-                            {reservation.qr && (
-                                <button
-                                    onClick={() => setShowQrModal(true)}
-                                    className="cursor-pointer text-sm font-medium text-custom-golden-700 hover:underline transition flex justify-center items-center gap-2"
-                                >
-                                    <QrCode className="size-6" />
-                                    Ver QR del viaje
-                                </button>
-                            )}
-
                             {/* Cancelar reserva */}
                             {reservation.status !== "CANCELLED" && (
                                 <div className="flex flex-col gap-2 items-center">
@@ -237,15 +238,6 @@ const ReservationCard = ({ reservation }: Props) => {
                     </motion.div>
                 )}
             </AnimatePresence>
-
-            {reservation.qr[0] && (
-                <QrModal
-                    isOpen={showQrModal}
-                    onClose={() => setShowQrModal(false)}
-                    qrUrl={reservation.qr[0].imageUrl}
-                    reservationId={reservation.id}
-                />
-            )}
         </div>
     );
 };

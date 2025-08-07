@@ -13,6 +13,17 @@ interface Props {
     onSuccess: Dispatch<SetStateAction<PaymentResponse[]>>;
 }
 
+const statusMap = {
+    COMPLETED: "Pagado",
+    PENDING: "Pendiente",
+    FAILED: "Fallido",
+} as const;
+
+const paymentMethodMap: Record<string, string> = {
+    CASH: "Efectivo",
+    STRIPE: "Tarjeta",
+} as const;
+
 const CreatePaymentModal = ({ onClose, userOptions, onSuccess }: Props) => {
     const [selectedUserId, setSelectedUserId] = useState<string>("");
 
@@ -28,6 +39,7 @@ const CreatePaymentModal = ({ onClose, userOptions, onSuccess }: Props) => {
         try {
             const res = await createPayment({
                 ...data,
+                amount: Number(data.amount),
             });
             onSuccess((prev) => [...prev, res as PaymentResponse]);
             onClose();
@@ -104,13 +116,28 @@ const CreatePaymentModal = ({ onClose, userOptions, onSuccess }: Props) => {
                     <div>
                         <label className="block mb-1 font-semibold">Monto</label>
                         <input
-                            type="number"
-                            step="0.01"
-                            {...register("amount", { required: true, min: 0.01 })}
-                            className="w-full border border-custom-gray-300 rounded-md px-4 py-2"
+                            type="text"
+                            inputMode="decimal"
                             placeholder="Ej: 25.00"
+                            {...register("amount", {
+                                required: "Ingrese un monto",
+                                validate: (value) => {
+                                    const normalized = String(value).replace(",", ".");
+                                    return /^[0-9]+([.,][0-9]{1,2})?$/.test(String(value)) && Number(normalized) > 0
+                                        ? true
+                                        : "Ingrese un número válido mayor a 0 (hasta 2 decimales)";
+                                },
+                            })}
+                            onInput={(e) => {
+                                const input = e.target as HTMLInputElement;
+                                input.value = input.value
+                                    .replace(",", ".") // Coma a punto
+                                    .replace(/[^0-9.]/g, "") // Elimina letras y símbolos raros
+                                    .replace(/(\..*?)\..*/g, "$1"); // Solo un punto decimal
+                            }}
+                            className="w-full border border-custom-gray-300 rounded-md px-4 py-2"
                         />
-                        {errors.amount && <p className="text-red-500 text-xs">Ingrese un monto válido</p>}
+                        {errors.amount && <p className="text-red-500 text-xs">{errors.amount.message}</p>}
                     </div>
 
                     <div>
@@ -119,7 +146,7 @@ const CreatePaymentModal = ({ onClose, userOptions, onSuccess }: Props) => {
                             <option value="">Selecciona un método</option>
                             {(["STRIPE", "CASH"] as const).map((m) => (
                                 <option key={m} value={m}>
-                                    {m}
+                                    {paymentMethodMap[m]}
                                 </option>
                             ))}
                         </select>
@@ -132,7 +159,7 @@ const CreatePaymentModal = ({ onClose, userOptions, onSuccess }: Props) => {
                             <option value="">Selecciona un estado</option>
                             {(["PENDING", "COMPLETED", "FAILED"] as const).map((s) => (
                                 <option key={s} value={s}>
-                                    {s}
+                                    {statusMap[s]}
                                 </option>
                             ))}
                         </select>

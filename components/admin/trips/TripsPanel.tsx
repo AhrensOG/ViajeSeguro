@@ -11,6 +11,13 @@ import { deleteTrip, getAllTrips, getDrivers, getPartners } from "@/lib/api/admi
 import EditTripModal from "./auxiliarComponents/EditTripModal";
 import DeleteToast from "../DeleteToast";
 
+const statusMap = {
+    PENDING: "Pendiente",
+    CONFIRMED: "Confirmado",
+    CANCELLED: "Cancelado",
+    FINISHED: "Finalizado",
+} as const;
+
 export default function TripsPanel() {
     const [trips, setTrips] = useState<TripResponse[]>([]);
     const [drivers, setDrivers] = useState<Driver[]>([]); // Assuming you have a Driver type defined
@@ -211,9 +218,9 @@ export default function TripsPanel() {
                                 <th className="px-4 py-2 border-b border-r border-custom-gray-300">Origen</th>
                                 <th className="px-4 py-2 border-b border-r border-custom-gray-300">Destino</th>
                                 <th className="px-4 py-2 border-b border-r border-custom-gray-300">Salida</th>
-                                <th className="px-4 py-2 border-b border-r border-custom-gray-300">Llegada</th>
                                 <th className="px-4 py-2 border-b border-r border-custom-gray-300">Precio</th>
                                 <th className="px-4 py-2 border-b border-r border-custom-gray-300">Capacidad</th>
+                                <th className="px-4 py-2 border-b border-r border-custom-gray-300">Reservas</th>
                                 <th className="px-4 py-2 border-b border-r border-custom-gray-300">Estado</th>
                                 <th className="px-4 py-2 border-b border-custom-gray-300 text-center">Conductor</th>
                                 <th className="px-4 py-2 border-b border-custom-gray-300 text-center">Acciones</th>
@@ -237,12 +244,12 @@ export default function TripsPanel() {
                                         <td className="px-4 py-2 border-b border-r border-custom-gray-200">
                                             {new Date(trip.departure).toLocaleString()}
                                         </td>
-                                        <td className="px-4 py-2 border-b border-r border-custom-gray-200">
-                                            {new Date(trip.arrival).toLocaleString()}
-                                        </td>
                                         <td className="px-4 py-2 border-b border-r border-custom-gray-200">€ {trip.basePrice.toFixed(2)}</td>
                                         <td className="px-4 py-2 border-b border-r border-custom-gray-200">{trip.capacity}</td>
-                                        <td className="px-4 py-2 border-b border-r border-custom-gray-200">{trip.status}</td>
+                                        <td className="px-4 py-2 font-medium border-b border-r border-custom-gray-200">
+                                            {trip.reservations?.filter((r) => r.status === "CONFIRMED" || r.status === "PENDING").length}
+                                        </td>
+                                        <td className="px-4 py-2 border-b border-r border-custom-gray-200">{statusMap[trip.status]}</td>
                                         <td className="px-4 py-2 border-b border-r border-custom-gray-200">
                                             {trip.driver ? (
                                                 <span>

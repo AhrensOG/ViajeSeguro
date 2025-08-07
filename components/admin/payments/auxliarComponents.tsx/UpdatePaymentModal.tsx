@@ -14,6 +14,18 @@ interface Props {
     onSuccess: Dispatch<SetStateAction<PaymentResponse[]>>;
 }
 
+const statusMap = {
+    COMPLETED: "Pagado",
+    PENDING: "Pendiente",
+    CANCELLED: "Cancelado",
+    FAILED: "Fallido",
+} as const;
+
+const paymentMethodMap: Record<string, string> = {
+    CASH: "Efectivo",
+    STRIPE: "Tarjeta",
+} as const;
+
 const UpdatePaymentModal = ({ onClose, userOptions, initialData, onSuccess }: Props) => {
     const [selectedUserId, setSelectedUserId] = useState<string>(initialData.userId);
 
@@ -129,7 +141,7 @@ const UpdatePaymentModal = ({ onClose, userOptions, initialData, onSuccess }: Pr
                             <option value="">Selecciona un método</option>
                             {(["STRIPE", "CASH"] as const).map((m) => (
                                 <option key={m} value={m}>
-                                    {m}
+                                    {paymentMethodMap[m]}
                                 </option>
                             ))}
                         </select>
@@ -142,7 +154,7 @@ const UpdatePaymentModal = ({ onClose, userOptions, initialData, onSuccess }: Pr
                             <option value="">Selecciona un estado</option>
                             {(["PENDING", "COMPLETED", "FAILED"] as const).map((s) => (
                                 <option key={s} value={s}>
-                                    {s}
+                                    {statusMap[s]}
                                 </option>
                             ))}
                         </select>
