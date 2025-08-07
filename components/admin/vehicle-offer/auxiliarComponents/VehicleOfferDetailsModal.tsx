@@ -123,7 +123,9 @@ const VehicleOfferDetailsModal = ({ onClose, offer }: Props) => {
                                     key={i}
                                     src={url}
                                     alt={`Imagen ${i + 1}`}
-                                    className="rounded-md w-full h-32 object-cover border border-custom-gray-200"
+                                    className="rounded-md object-cover border border-custom-gray-200"
+                                    width={200}
+                                    height={150}
                                 />
                             ))}
                         </div>

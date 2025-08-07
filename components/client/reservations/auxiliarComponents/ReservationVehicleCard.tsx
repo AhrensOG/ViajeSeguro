@@ -1,10 +1,9 @@
 import { useState } from "react";
-import { CalendarDays, ChevronDown, QrCode, Truck, Fuel, Settings, Users, MapIcon, X } from "lucide-react";
+import { CalendarDays, ChevronDown, Truck, Fuel, Settings, Users, MapIcon, X } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ResponseForProfilePage } from "@/lib/api/vehicle-booking/vehicleBooking.types";
 import { calculateTotalDays } from "@/lib/functions";
-import QrModal from "./QrModal";
 const transmissionTypeMap = {
     MANUAL: "Manual",
     AUTOMATIC: "Automática",
@@ -29,7 +28,6 @@ const ReservationVehicleCard = ({ vehicleBooking }: { vehicleBooking: ResponseFo
     const [hideButton, setHideButton] = useState(false);
     const [openCard, setOpenCard] = useState(false);
     const IVA = process.env.NEXT_PUBLIC_IVA || 0;
-    const [showQrModal, setShowQrModal] = useState(false);
 
     const { id, startDate, endDate, totalPrice, paymentMethod, offer, qrCode, status } = vehicleBooking || {};
     const { vehicle, returnLocation, pricePerDay, vehicleOfferType } = offer || {};
@@ -51,7 +49,7 @@ const ReservationVehicleCard = ({ vehicleBooking }: { vehicleBooking: ResponseFo
             className="w-full rounded-2xl border border-custom-gray-200 shadow-md bg-custom-white-100 p-6 flex flex-col gap-4 cursor-pointer transition hover:shadow-lg"
         >
             {/* Cabecera */}
-            <div className="flex items-center justify-between">
+            <div className="flex flex-col md:flex-row items-center justify-between">
                 <div className="flex items-center gap-2 text-custom-golden-700">
                     <Truck className="size-5" />
                     <span className="font-semibold text-sm">Alquiler de Furgoneta</span>
@@ -67,36 +65,36 @@ const ReservationVehicleCard = ({ vehicleBooking }: { vehicleBooking: ResponseFo
             </div>
 
             {/* Info principal */}
-            <div className="flex items-center gap-4">
-                <div className="flex items-center justify-center h-[10rem] w-[20rem] relative">
+            <div className="flex flex-col md:flex-row items-center gap-4">
+                <div className="flex items-center justify-center w-full h-[15rem] md:h-[10rem] md:w-[20rem] relative">
                     <Image className="rounded-md" src={images?.[0] || "/main/img_placeholder.webp"} alt="placeholder" fill />
                 </div>
-                <div className="flex flex-col justify-between h-[10rem] grow-1 ">
-                    <h3 className="text-2xl font-bold text-custom-black-800 w-full h-[3rem]">
+                <div className="flex flex-col justify-between h-[15rem] md:h-[10rem] grow-1 ">
+                    <h3 className="text-2xl font-bold text-custom-black-800 w-full h-[4rem] md:h-[3rem]">
                         {brand} {model} {year}
                     </h3>
-                    <div className="flex flex-wrap grow-1 justify-between">
-                        <p className="text-sm text-custom-gray-700 flex items-center gap-1 w-[49%]">
+                    <div className="flex gap-4 md:gap-0 flex-wrap grow-1 md:justify-between">
+                        <p className="text-sm text-custom-gray-700 flex items-center gap-1 md:w-[49%]">
                             <CalendarDays className="size-4" /> {formattedStart} - {formattedEnd} ({days} días)
                         </p>
-                        <p className="text-sm text-custom-gray-700 flex items-center gap-1 w-[49%]">
+                        <p className="text-sm text-custom-gray-700 flex items-center gap-1 md:w-[49%]">
                             <MapIcon className="size-4" /> Local {returnLocation}
                         </p>
-                        <p className="text-sm text-custom-gray-700 flex items-center gap-1 w-[49%]">
+                        <p className="text-sm text-custom-gray-700 flex items-center gap-1 md:w-[49%]">
                             <Users className="size-4" /> {capacity} personas
                         </p>
-                        <p className="text-sm text-custom-gray-700 flex items-center gap-1 w-[49%]">
+                        <p className="text-sm text-custom-gray-700 flex items-center gap-1 md:w-[49%]">
                             <Fuel className="size-4" /> {fuelTypeMap[fuelType]}
                         </p>
-                        <p className="text-sm text-custom-gray-700 flex items-center gap-1 w-[49%]">
+                        <p className="text-sm text-custom-gray-700 flex items-center gap-1 md:w-[49%]">
                             <Settings className="size-4" /> {transmissionTypeMap[transmissionType]}
                         </p>
-                        <p className="text-sm text-custom-gray-700 flex items-center gap-1 w-[49%]">
+                        <p className="text-sm text-custom-gray-700 flex items-center gap-1 md:w-[49%]">
                             <Truck className="size-4" /> {vehicleOfferType === "WITH_DRIVER" ? "Con conductor" : "Sin conductor"}
                         </p>
                     </div>
                 </div>
-                <div className="flex flex-col gap-2 w-[10rem] h-full justify-end">
+                <div className="flex flex-row-reverse md:flex-col gap-4 md:gap-2 md:w-[10rem] md:h-full justify-center md:justify-end items-center md:items-start ">
                     <h3 className="text-2xl font-bold text-custom-black-800">{formattedTotal}</h3>
                     <p className="text-sm text-custom-gray-600">Precio total</p>
                 </div>
@@ -165,17 +163,22 @@ const ReservationVehicleCard = ({ vehicleBooking }: { vehicleBooking: ResponseFo
 
                         <div className="border-b border-custom-gray-200"></div>
 
-                        <div className="flex flex-col justify-center items-end gap-4 relative">
-                            {imageUrl && (
-                                <button
-                                    onClick={() => setShowQrModal(true)}
-                                    className="cursor-pointer text-sm font-medium text-custom-golden-700 hover:underline transition flex justify-center items-center gap-2"
-                                >
-                                    <QrCode className="size-6" />
-                                    Ver QR del viaje
-                                </button>
-                            )}
+                        {imageUrl && (
+                            <div className="flex flex-col justify-center items-center w-full">
+                                <h2 className="text-lg font-semibold mb-4 text-center text-custom-black-900">Código QR de tu viaje</h2>
 
+                                <p className="text-sm text-center text-custom-gray-600">Muestra este código al conductor al momento del embarque.</p>
+                                <Image src={imageUrl} alt="QR Code" width={200} height={200} className="w-48 h-48" />
+                                <p className="text-xs text-center text-custom-gray-400 mt-1">
+                                    Si el QR falla, proporciona este ID al conductor:{" "}
+                                    <span className="font-semibold text-custom-black-700">{vehicleBooking.id}</span>
+                                </p>
+                            </div>
+                        )}
+
+                        <div className="border-b border-custom-gray-200"></div>
+
+                        <div className="flex flex-col justify-center items-end gap-4 relative">
                             {status === "COMPLETED" ||
                                 status === "PENDING" ||
                                 (status === "APPROVED" && (
@@ -233,7 +236,6 @@ const ReservationVehicleCard = ({ vehicleBooking }: { vehicleBooking: ResponseFo
                         </div>
                     </motion.div>
                 )}
-                {imageUrl && <QrModal isOpen={showQrModal} onClose={() => setShowQrModal(false)} qrUrl={imageUrl} reservationId={id} />}
             </AnimatePresence>
         </div>
     );

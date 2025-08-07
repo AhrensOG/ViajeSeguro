@@ -19,7 +19,7 @@ const transmissionTypeMap = {
 
 const fuelTypeMap = {
     DIESEL: "Diésel",
-    GASOLINE: "Nafta",
+    GASOLINE: "Gasolina",
     ELECTRIC: "Eléctrico",
     HYBRID: "Híbrido",
 } as const;

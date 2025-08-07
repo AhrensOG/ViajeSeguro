@@ -54,7 +54,7 @@ const EditVehicleOfferModal = ({ onClose, offer, afterEdit, vehicles, owners }: 
         handleSubmit,
         setValue,
         watch,
-        formState: {},
+        formState: { errors },
     } = useForm({
         defaultValues: {
             pricePerDay: offer.pricePerDay.toString(),
@@ -143,6 +143,7 @@ const EditVehicleOfferModal = ({ onClose, offer, afterEdit, vehicles, owners }: 
                                 </option>
                             ))}
                         </select>
+                        {errors.vehicleId && <p className="text-red-500 text-xs">{"El vehículo es requerido"}</p>}
                     </div>
 
                     <div>
@@ -190,12 +191,44 @@ const EditVehicleOfferModal = ({ onClose, offer, afterEdit, vehicles, owners }: 
 
                     <div>
                         <label className={labelClass}>Precio por día (€)</label>
-                        <input type="number" step="0.01" {...register("pricePerDay", { required: true })} className={inputClass} />
+                        <input
+                            type="text"
+                            inputMode="decimal"
+                            {...register("pricePerDay", {
+                                required: true,
+                                validate: (value) => /^[0-9]*[.,]?[0-9]{0,2}$/.test(value) || "Formato inválido (usa solo números)",
+                            })}
+                            onInput={(e) => {
+                                const input = e.target as HTMLInputElement;
+                                input.value = input.value
+                                    .replace(",", ".") // convierte coma en punto
+                                    .replace(/[^0-9.]/g, "") // bloquea letras y símbolos
+                                    .replace(/(\..*?)\..*/g, "$1"); // solo un punto
+                            }}
+                            className={inputClass}
+                        />
+                        {errors.pricePerDay && <p className="text-red-500 text-xs">{errors.pricePerDay.message || "Campo obligatorio"}</p>}
                     </div>
 
                     <div>
                         <label className={labelClass}>Tarifa de agencia (€)</label>
-                        <input type="number" step="0.01" {...register("agencyFee", { required: true })} className={inputClass} />
+                        <input
+                            type="text"
+                            inputMode="decimal"
+                            {...register("agencyFee", {
+                                required: true,
+                                validate: (value) => /^[0-9]*[.,]?[0-9]{0,2}$/.test(value) || "Formato inválido (usa solo números)",
+                            })}
+                            onInput={(e) => {
+                                const input = e.target as HTMLInputElement;
+                                input.value = input.value
+                                    .replace(",", ".")
+                                    .replace(/[^0-9.]/g, "")
+                                    .replace(/(\..*?)\..*/g, "$1");
+                            }}
+                            className={inputClass}
+                        />
+                        {errors.agencyFee && <p className="text-red-500 text-xs">{errors.agencyFee.message || "Campo obligatorio"}</p>}
                     </div>
 
                     <div>
@@ -204,6 +237,7 @@ const EditVehicleOfferModal = ({ onClose, offer, afterEdit, vehicles, owners }: 
                             <option value="WITH_DRIVER">Con conductor</option>
                             <option value="WITHOUT_DRIVER">Sin conductor</option>
                         </select>
+                        {errors.vehicleOfferType && <p className="text-red-500 text-xs">{"Campo obligatorio"}</p>}
                     </div>
 
                     <div>
@@ -215,6 +249,7 @@ const EditVehicleOfferModal = ({ onClose, offer, afterEdit, vehicles, owners }: 
                             min={"2023-01-01"}
                             max={"2099-12-31"}
                         />
+                        {errors.availableFrom && <p className="text-red-500 text-xs">{"Campo obligatorio"}</p>}
                     </div>
 
                     <div>
@@ -226,16 +261,19 @@ const EditVehicleOfferModal = ({ onClose, offer, afterEdit, vehicles, owners }: 
                             min={watch("availableFrom")}
                             max={"2099-12-31"}
                         />
+                        {errors.availableTo && <p className="text-red-500 text-xs">{"Campo obligatorio"}</p>}
                     </div>
 
                     <div>
                         <label className={labelClass}>Ubicación de retiro</label>
                         <input type="text" {...register("withdrawLocation", { required: true })} className={inputClass} />
+                        {errors.withdrawLocation && <p className="text-red-500 text-xs">{"Campo obligatorio"}</p>}
                     </div>
 
                     <div>
                         <label className={labelClass}>Ubicación de devolución</label>
                         <input type="text" {...register("returnLocation", { required: true })} className={inputClass} />
+                        {errors.returnLocation && <p className="text-red-500 text-xs">{"Campo obligatorio"}</p>}
                     </div>
 
                     <div className="md:col-span-2">

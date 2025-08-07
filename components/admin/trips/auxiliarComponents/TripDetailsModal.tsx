@@ -5,6 +5,18 @@ import { X } from "lucide-react";
 import { DateTime } from "luxon";
 import { useEffect } from "react";
 
+const statusMap = {
+    PENDING: "Pendiente",
+    CONFIRMED: "Confirmado",
+    CANCELLED: "Cancelado",
+    FINISHED: "Finalizado",
+} as const;
+
+const paymentMethodMap: Record<string, string> = {
+    CASH: "Efectivo",
+    STRIPE: "Tarjeta",
+} as const;
+
 interface TripDetailsModalProps {
     trip: {
         id: string;
@@ -107,7 +119,7 @@ const TripDetailsModal = ({ trip, onClose }: TripDetailsModalProps) => {
                                     <tr key={res.id} className="border-t border-custom-gray-100 hover:bg-custom-golden-50">
                                         <td className="px-4 py-3">{`${res.user?.name ?? ""} ${res.user?.lastName ?? ""}`.trim()}</td>
                                         <td className="px-4 py-3">{res.user?.email ?? "-"}</td>
-                                        <td className="px-4 py-3">{res.paymentMethod}</td>
+                                        <td className="px-4 py-3">{paymentMethodMap[res.paymentMethod]}</td>
                                         <td className="px-4 py-3">
                                             <span
                                                 className={`px-2 py-1 rounded-full text-xs font-semibold ${
@@ -118,7 +130,7 @@ const TripDetailsModal = ({ trip, onClose }: TripDetailsModalProps) => {
                                                         : "bg-red-100 text-red-700"
                                                 }`}
                                             >
-                                                {res.status}
+                                                {statusMap[res.status]}
                                             </span>
                                         </td>
                                     </tr>
