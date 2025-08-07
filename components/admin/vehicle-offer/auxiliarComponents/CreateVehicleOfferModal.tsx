@@ -103,15 +103,17 @@ const CreateVehicleOfferModal = ({
     return () => window.removeEventListener("keydown", handler);
   }, [onClose]);
 
+  const pricePerDay = watch("pricePerDay");
+
   useEffect(() => {
-    const price = parseFloat(watch("pricePerDay")?.replace(",", "."));
+    const price = parseFloat(pricePerDay?.replace(",", "."));
     if (!isNaN(price)) {
       const fee = (price * 0.15).toFixed(2);
       setValue("agencyFee", fee);
     } else {
       setValue("agencyFee", "");
     }
-  }, [watch("pricePerDay"), setValue]);
+  }, [pricePerDay, setValue]);
 
   return (
     <div className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
