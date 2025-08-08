@@ -5,7 +5,6 @@ import {
   Clock,
   Gift,
   Shield,
-  Star,
   Tag,
   UserPlus,
   X,
@@ -95,14 +94,67 @@ const plans: Plan[] = [
     button: "Unirme al Club Lealtad",
     highlight: true,
     highlightLabel: "Popular",
+    // features: [
+    //   {
+    //     icon: (
+    //       <Tag size={18} className="min-w-[18px] mt-1 text-custom-golden-600" />
+    //     ),
+    //     title: "Mayor descuento en cada trayecto",
+    //     desc: "Viajes de 27.50€ pasan a valer 22€ (desde el 2º trayecto)",
+    //     badge: "¡Ahorras 11€ en viajes de ida y vuelta!",
+    //   },
+    //   {
+    //     icon: (
+    //       <Clock
+    //         size={18}
+    //         className="min-w-[18px] mt-1 text-custom-golden-600"
+    //       />
+    //     ),
+    //     title: "Cancelaciones flexibles",
+    //     desc: "Hasta 48 horas antes con 100% reembolso",
+    //   },
+    //   {
+    //     icon: (
+    //       <Star
+    //         size={18}
+    //         className="min-w-[18px] mt-1 text-custom-golden-600"
+    //       />
+    //     ),
+    //     desc: "Estatus de miembro Club Lealtad",
+    //   },
+    //   {
+    //     icon: (
+    //       <Check
+    //         size={18}
+    //         className="min-w-[18px] mt-1 text-custom-golden-600"
+    //       />
+    //     ),
+    //     desc: "Todos los beneficios del plan básico",
+    //   },
+    // ],
     features: [
       {
         icon: (
           <Tag size={18} className="min-w-[18px] mt-1 text-custom-golden-600" />
         ),
-        title: "Mayor descuento en cada trayecto",
-        desc: "Viajes de 27.50€ pasan a valer 22€ (desde el 2º trayecto)",
-        badge: "¡Ahorras 11€ en viajes de ida y vuelta!",
+        title: "Descuento base en viajes",
+        desc: "Viajes de 27.50€ pasan a valer 22€",
+        badge: "¡Ahorra hasta 12.10€ por viaje!",
+      },
+      {
+        icon: (
+          <UserPlus
+            size={18}
+            className="min-w-[18px] mt-1 text-custom-golden-600"
+          />
+        ),
+        title: "Sistema de recomendaciones",
+        desc: "Recomienda hasta 3 amigos por mes:",
+        points: [
+          "1 amigo: viaje a 19,80€ (ahorro de 7,70€)",
+          "2 amigos: viaje a 17,60€ (ahorro de 9,90€)",
+          "3 amigos: viaje a 15,40€ (ahorro de 12,10€)",
+        ],
       },
       {
         icon: (
@@ -111,17 +163,28 @@ const plans: Plan[] = [
             className="min-w-[18px] mt-1 text-custom-golden-600"
           />
         ),
-        title: "Cancelaciones flexibles",
-        desc: "Hasta 48 horas antes con 100% reembolso",
+        title: "Cancelaciones ultra flexibles",
+        desc: "Hasta 24 horas antes con 100% reembolso",
       },
       {
         icon: (
-          <Star
+          <Shield
             size={18}
             className="min-w-[18px] mt-1 text-custom-golden-600"
           />
         ),
-        desc: "Estatus de miembro Club Lealtad",
+        title: "Selección de asientos",
+        desc: "Elige tu asiento preferido en cada viaje",
+      },
+      {
+        icon: (
+          <Gift
+            size={18}
+            className="min-w-[18px] mt-1 text-custom-golden-600"
+          />
+        ),
+        title: "Beneficios aleatorios",
+        desc: "Sorpresas y descuentos exclusivos durante todo el año",
       },
       {
         icon: (
@@ -130,7 +193,8 @@ const plans: Plan[] = [
             className="min-w-[18px] mt-1 text-custom-golden-600"
           />
         ),
-        desc: "Todos los beneficios del plan básico",
+        title: "Beneficio exclusivo",
+        desc: "Si has recomendado a 10 personas y viajaron con nosotros gracias a ti, tu tienes un trayecto GRATIS de Valencia a Madrid o Barcelona y viceversa",
       },
     ],
   },
@@ -402,7 +466,7 @@ const PromotionCards: React.FC = () => {
                   )}
                 </div>
                 <div className="flex items-baseline gap-2">
-                  {plan.originalPrice && (
+                  {plan.originalPrice ? (
                     <div className="flex items-baseline gap-2">
                       <span className="text-lg line-through text-custom-gray-500">
                         {plan.originalPrice}
@@ -411,13 +475,20 @@ const PromotionCards: React.FC = () => {
                         {plan.suffix}
                       </span>
                     </div>
+                  ) : (
+                    <div className="flex items-baseline gap-2">
+                      <span className="text-lg line-through text-transparent">
+                        {plan.originalPrice}
+                      </span>
+                      <span className="text-transparent">{plan.suffix}</span>
+                    </div>
                   )}
                 </div>
               </div>
               <div
                 className={`${
                   plan.extraNote ? "text-custom-golden-700" : "text-transparent"
-                } text-sm font-medium mt-1`}>
+                } text-lg font-medium mt-1`}>
                 {plan.extraNote ? plan.extraNote : "-"}
               </div>
             </div>
