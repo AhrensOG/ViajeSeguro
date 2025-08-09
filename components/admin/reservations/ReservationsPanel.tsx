@@ -185,7 +185,7 @@ export default function ReservationPanel() {
                 const guestEmail = r.user?.email ?? "";
                 const departure = r.trip?.departure;
                 const formattedDeparture = departure
-                  ? DateTime.fromISO(departure, { zone: "utc" })
+                  ? DateTime.fromISO(departure)
                       .setLocale("es")
                       .toFormat("cccc, dd LLL yyyy - HH:mm'hs'")
                   : "Fecha no disponible";
