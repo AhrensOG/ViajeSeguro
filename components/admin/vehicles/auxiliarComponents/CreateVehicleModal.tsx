@@ -37,6 +37,7 @@ const CreateVehicleModal = ({ onClose, owners, onSuccess }: Props) => {
     } = useForm<CreateVehicleDto>();
 
     const submit = async (data: CreateVehicleDto) => {
+      const toastId = toast.loading("Creando vehiculo...");
         try {
             let uploadedUrls: string[] = [];
             if (imageFiles && imageFiles?.length > 0) {
@@ -54,9 +55,9 @@ const CreateVehicleModal = ({ onClose, owners, onSuccess }: Props) => {
 
             onSuccess((prev) => [...prev, vehicle]);
             onClose();
-            toast.success("Vehículo creado exitosamente");
+            toast.success("Vehículo creado exitosamente", {  id: toastId });
         } catch (error) {
-            toast.info(error instanceof Error ? error.message : "Error al crear el vehículo");
+            toast.info(error instanceof Error ? error.message : "Error al crear el vehículo", { id: toastId });
         }
     };
 

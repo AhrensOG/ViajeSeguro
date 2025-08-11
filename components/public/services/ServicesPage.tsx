@@ -7,6 +7,7 @@ import HeroSection from "./auxiliarComponents/HeroSection";
 import CurrentService from "./auxiliarComponents/CurrentService";
 import CTASection from "./auxiliarComponents/CTASection";
 import ComingSoonServices from "./auxiliarComponents/ComingSoonServices";
+import VehicleBookingService from "./auxiliarComponents/VehicleBookingService";
 
 const ServicesPage = () => {
   return (
@@ -14,6 +15,7 @@ const ServicesPage = () => {
       <NavBar />
       <HeroSection />
       <CurrentService />
+      <VehicleBookingService />
       <ComingSoonServices />
       <CTASection />
       <Footer />

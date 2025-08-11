@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Bell, Calendar, Car } from "lucide-react";
+import { Bell, Calendar } from "lucide-react";
 import ServiceCard from "./ServiceCard";
 
 const fadeIn = {
@@ -31,18 +31,6 @@ const ComingSoonServices = () => {
         </p>
 
         <div className="grid md:grid-cols-2 gap-8">
-          <ServiceCard
-            title="Alquiler de vehículos"
-            description="Alquila el vehículo perfecto para cada ocasión. Desde coches económicos hasta vehículos de lujo, con o sin chófer, por días o semanas. Tú decides cómo quieres moverte."
-            image="/main/img_placeholder.webp"
-            points={[
-              "Amplia flota de vehículos",
-              "Opción con o sin conductor",
-              "Tarifas flexibles por día",
-            ]}
-            icon={<Car className="h-8 w-8 text-custom-golden-600" />}
-          />
-
           <ServiceCard
             title="Arma tu propio viaje"
             description="Planifica con anticipación y encuentra las mejores ofertas. Nuestro calendario inteligente te mostrará todos los viajes disponibles con los precios más bajos para cada día."
