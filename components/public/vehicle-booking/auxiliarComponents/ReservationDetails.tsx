@@ -1,8 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { Calendar, MapPin, Truck } from "lucide-react";
-import { convertUTCToLocalDate } from "@/lib/functions";
+import { MapPin, Truck } from "lucide-react";
 import type { Matcher } from "react-day-picker";
 import { computeFreeSegments, normalizeBooked, Interval, findSegmentForDate } from "@/lib/client/utils/dateSegment";
 import CustomDatePickerVehicle from "@/lib/client/components/CustomDatePickerVehicle";
@@ -29,18 +28,7 @@ const startOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDat
 const endOfDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate(), 23, 59, 59, 999);
 
 export default function ReservationDetails(props: ReservationDetailsProps) {
-    const {
-        serviceType,
-        withdrawLocation,
-        dateStart,
-        dateEnd,
-        originalTimeZone,
-        availabilityStart,
-        availabilityEnd,
-        bookings,
-        onChangeStart,
-        onChangeEnd,
-    } = props;
+    const { serviceType, withdrawLocation, dateStart, dateEnd, availabilityStart, availabilityEnd, bookings, onChangeStart, onChangeEnd } = props;
 
     const availability: Interval = useMemo(
         () => ({
