@@ -92,7 +92,7 @@ export default function CardReservation(props: CardProps) {
                 <p className="text-custom-gray-600 text-lg">
                     {formatDate(dateStart)} - {formatDate(dateEnd)}
                 </p>
-                <p className="text-custom-gray-700 text-3xl font-bold">{"€ " + calculateTotalDays(dateStart, dateEnd) * pricePerDay}</p>
+                <p className="text-custom-gray-700 text-3xl font-bold">{"€ " + pricePerDay}</p>
                 <p className="text-custom-black-700 text-lg">{`${pricePerDay}€/dia x ${calculateTotalDays(dateStart, dateEnd)} dias`}</p>
                 <Link
                     href={`/vehicle-booking?id=${props.id}`}

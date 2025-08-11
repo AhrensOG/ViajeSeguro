@@ -20,6 +20,11 @@ export interface VehicleOfferWithVehicle {
     withdrawLocation: string;
     returnLocation: string;
     vehicleOfferType: string;
+    bookings?: {
+        id: string;
+        startDate: string;
+        endDate: string;
+    }[];
 }
 
 export interface CreateVehicleBookingPayload {

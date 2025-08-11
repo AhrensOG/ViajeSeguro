@@ -30,13 +30,15 @@ const PurchaseProcess = () => {
     const pathname = usePathname();
     const type = searchParams.get("type");
     const isVehicle = type === "vehicle";
+    const start = searchParams.get("start");
+    const end = searchParams.get("end");
 
     const IVA = process.env.NEXT_PUBLIC_IVA || 0;
     const referralId = searchParams.get("referral");
     const id = searchParams.get("id");
 
     const [trip, setTrip] = useState<TripWithPriceDetails | null>(null);
-    const [vehicleBooking, setVehicleBooking] = useState<VehicleOfferWithVehicle | null>(null);
+    const [vehicleOffer, setVehicleOffer] = useState<VehicleOfferWithVehicle | null>(null);
     const [loading, setLoading] = useState<boolean>(false);
     const [error, setError] = useState<string | null>(null);
     const { data: session } = useSession();
@@ -53,9 +55,9 @@ const PurchaseProcess = () => {
                     setTrip(tripData as TripWithPriceDetails);
                 }
                 if (type === "vehicle") {
-                    const vehicleBookingData = await fetchVehicleOffer(id);
+                    const vehicleOfferData = await fetchVehicleOffer(id);
 
-                    setVehicleBooking(vehicleBookingData as VehicleOfferWithVehicle);
+                    setVehicleOffer(vehicleOfferData as VehicleOfferWithVehicle);
                 }
             } catch (err) {
                 console.log("Error al cargar el viaje:", err);
@@ -80,7 +82,7 @@ const PurchaseProcess = () => {
     };
 
     const confirmCashPayment = async () => {
-        if ((!trip && !vehicleBooking) || !session) return;
+        if ((!trip && !vehicleOffer) || !session) return;
 
         if (trip) {
             const payload: CreateReservationPayload = {
@@ -106,13 +108,13 @@ const PurchaseProcess = () => {
                 setShowCashModal(false);
             }
         }
-        if (vehicleBooking) {
-            const totalPrice = vehicleBooking.pricePerDay * calculateTotalDays(vehicleBooking.availableFrom, vehicleBooking.availableTo);
+        if (vehicleOffer) {
+            const totalPrice = vehicleOffer.pricePerDay * calculateTotalDays(start || vehicleOffer.availableFrom, end || vehicleOffer.availableTo);
             const createVehicleBookingPayload = {
                 renterId: session.user.id,
-                offerId: vehicleBooking.id,
-                startDate: new Date(vehicleBooking.availableFrom),
-                endDate: new Date(vehicleBooking.availableTo),
+                offerId: vehicleOffer.id,
+                startDate: new Date(start || vehicleOffer.availableFrom),
+                endDate: new Date(end || vehicleOffer.availableTo),
                 status: "PENDING",
                 paymentMethod: "CASH",
                 referralId: referralId || undefined,
@@ -137,7 +139,7 @@ const PurchaseProcess = () => {
     };
 
     const handleStripeRedirect = async () => {
-        if ((!trip && !vehicleBooking) || !id) return;
+        if ((!trip && !vehicleOffer) || !id) return;
         if (!session) {
             const current = `${BASE_URL}${pathname}?${searchParams.toString()}`;
             const encoded = encodeURIComponent(current);
@@ -168,13 +170,13 @@ const PurchaseProcess = () => {
                 toast.info("No se pudo redirigir al pago");
             }
         }
-        if (vehicleBooking) {
-            const finalPrice = vehicleBooking.pricePerDay * calculateTotalDays(vehicleBooking.availableFrom, vehicleBooking.availableTo);
+        if (vehicleOffer) {
+            const finalPrice = vehicleOffer.pricePerDay * calculateTotalDays(start || vehicleOffer.availableFrom, end || vehicleOffer.availableTo);
             const createVehicleBookingPayload = {
                 renterId: session.user.id,
-                offerId: vehicleBooking.id,
-                startDate: new Date(vehicleBooking.availableFrom),
-                endDate: new Date(vehicleBooking.availableTo),
+                offerId: vehicleOffer.id,
+                startDate: new Date(start || vehicleOffer.availableFrom),
+                endDate: new Date(end || vehicleOffer.availableTo),
                 status: "PENDING",
                 paymentMethod: "STRIPE",
                 referralId: referralId || undefined,
@@ -199,7 +201,7 @@ const PurchaseProcess = () => {
 
     if (loading) return <PurchaseProcessFallback />;
     if (error) return <NotFoundMessage />;
-    if (!trip && !vehicleBooking) return null;
+    if (!trip && !vehicleOffer) return null;
 
     const tripSummary = trip ? getSummaryFromTrip(trip) : null;
 
@@ -212,10 +214,10 @@ const PurchaseProcess = () => {
 
     if (trip) {
         price = priceFormatted(trip.priceDetails?.finalPrice, trip.basePrice, Number(IVA));
-    } else if (vehicleBooking?.pricePerDay !== undefined && vehicleBooking.availableFrom && vehicleBooking.availableTo) {
-        const totalDays = calculateTotalDays(vehicleBooking.availableFrom, vehicleBooking.availableTo);
-        const totalPrice = vehicleBooking.pricePerDay * totalDays;
-        price = priceFormatted(totalPrice, vehicleBooking.pricePerDay, Number(IVA));
+    } else if (vehicleOffer?.pricePerDay !== undefined && (start || vehicleOffer.availableFrom) && (end || vehicleOffer.availableTo)) {
+        const totalDays = calculateTotalDays(start || vehicleOffer.availableFrom, end || vehicleOffer.availableTo);
+        const totalPrice = vehicleOffer.pricePerDay * totalDays;
+        price = priceFormatted(totalPrice, vehicleOffer.pricePerDay, Number(IVA));
     }
 
     //Logica para vehicle
@@ -295,7 +297,14 @@ const PurchaseProcess = () => {
                             // title={isVehicle ? "Resumen de tu reserva" : "Resumen de tu viaje"}
                         />
                     )}
-                    {vehicleBooking && <PurchaseVehicleSummary vehicleBooking={vehicleBooking} />}
+                    {vehicleOffer && (
+                        <PurchaseVehicleSummary
+                            vehicleOffer={vehicleOffer}
+                            start={start || vehicleOffer.availableFrom}
+                            end={end || vehicleOffer.availableTo}
+                            originalTimeZone={vehicleOffer.originalTimeZone}
+                        />
+                    )}
                 </div>
             </div>
 
