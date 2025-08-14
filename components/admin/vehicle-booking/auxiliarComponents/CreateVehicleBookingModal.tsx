@@ -1,7 +1,7 @@
 "use client";
 
 import { useForm } from "react-hook-form";
-import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
 import {
     CreateVehicleBookingRequest,
@@ -12,19 +12,39 @@ import {
 import { calculateTotalDays } from "@/lib/functions";
 import { createVehicleBooking } from "@/lib/api/admin/vehicle-bookings";
 import { toast } from "sonner";
+import CustomDatePickerVehicle from "@/lib/client/components/CustomDatePickerVehicle";
+import { Matcher } from "react-day-picker";
 
 interface Props {
     onClose: () => void;
     onSuccess: Dispatch<SetStateAction<VehicleBookingResponseAdmin[]>>;
     offers: SimpleOffer[];
     renters: SimpleUser[];
+    bookings: VehicleBookingResponseAdmin[];
 }
 
 const inputClass =
     "w-full border border-custom-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-custom-golden-400 transition";
 const labelClass = "block text-xs font-semibold text-custom-gray-500 mb-1 uppercase tracking-wide";
 
-export default function CreateVehicleBookingModal({ onClose, onSuccess, offers, renters }: Props) {
+// ===== Helpers en hora LOCAL (no UTC) =====
+const toLocalDay = (d: Date) => new Date(d.getFullYear(), d.getMonth(), d.getDate());
+const clampToLocalDay = (iso: string | Date) => {
+    const d = new Date(iso);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+};
+const addDays = (d: Date, n: number) => new Date(d.getFullYear(), d.getMonth(), d.getDate() + n);
+
+const ACTIVE_BOOKING_STATUSES = new Set([
+    "PENDING",
+    "APPROVED",
+    "COMPLETED",
+    // si no querés bloquear FINISHED, quítalo:
+    "FINISHED",
+]);
+type DateRange = { from: Date; to: Date };
+
+export default function CreateVehicleBookingModal({ onClose, onSuccess, offers, renters, bookings }: Props) {
     const {
         register,
         handleSubmit,
@@ -38,44 +58,121 @@ export default function CreateVehicleBookingModal({ onClose, onSuccess, offers, 
     });
 
     const selectedOfferId = watch("offerId");
-    const startDate = watch("startDate");
-    const endDate = watch("endDate");
+    const selectedOffer = useMemo(() => offers.find((o) => o.id === selectedOfferId), [offers, selectedOfferId]);
 
-    const selectedOffer = offers.find((o) => o.id === selectedOfferId);
     const selectedRenter = selectedOffer ? renters.find((u) => u.id === selectedOffer.ownerId) : undefined;
+
+    // estados locales para los pickers
+    const [startDate, setStartDate] = useState<Date | undefined>(undefined);
+    const [endDate, setEndDate] = useState<Date | undefined>(undefined);
 
     const [calculatedTotal, setCalculatedTotal] = useState<number>(0);
     const IVA = Number(process.env.NEXT_PUBLIC_IVA || 21);
 
-    useEffect(() => {
-        if (selectedOffer) {
-            const start = new Date(selectedOffer.availableFrom).toISOString().slice(0, 10);
-            const end = new Date(selectedOffer.availableTo).toISOString().slice(0, 10);
-            setValue("startDate", new Date(start));
-            setValue("endDate", new Date(end));
-        }
-    }, [selectedOffer, setValue]);
+    // Bordes de la oferta (LOCAL)
+    const offerFromDate = useMemo(() => (selectedOffer ? clampToLocalDay(selectedOffer.availableFrom) : undefined), [selectedOffer]);
+    const offerToDate = useMemo(() => (selectedOffer ? clampToLocalDay(selectedOffer.availableTo) : undefined), [selectedOffer]);
 
+    // RANGOS OCUPADOS por reservas de ESTA oferta (LOCAL)
+    const occupiedRanges: DateRange[] = useMemo(() => {
+        if (!selectedOffer) return [];
+        const related = bookings.filter((b) => b.offer.id === selectedOffer.id && ACTIVE_BOOKING_STATUSES.has(b.status));
+        return related.map((b) => ({
+            from: clampToLocalDay(b.startDate),
+            to: clampToLocalDay(b.endDate), // inclusivo
+        }));
+    }, [bookings, selectedOffer]);
+
+    // Disabled base por bordes de oferta
+    const borderDisabled: Matcher[] = useMemo(() => {
+        const out: Matcher[] = [];
+        if (offerFromDate) out.push({ before: offerFromDate });
+        if (offerToDate) out.push({ after: offerToDate });
+        return out;
+    }, [offerFromDate, offerToDate]);
+
+    // ===== Buffers de 1 día para evitar back-to-back =====
+    // Si una booking termina el 21, el próximo inicio permitido será el 22 (no 20/21).
+    const disabledForStart: Matcher[] = useMemo(() => {
+        const buffers: DateRange[] = occupiedRanges.map((r) => {
+            const dayBeforeEnd = addDays(r.to, -1);
+            return { from: dayBeforeEnd, to: dayBeforeEnd };
+        });
+        const result: Matcher[] = [...occupiedRanges, ...buffers, ...borderDisabled];
+        return result;
+    }, [occupiedRanges, borderDisabled]);
+
+    const disabledForEnd: Matcher[] = useMemo(() => {
+        const buffers: DateRange[] = occupiedRanges.map((r) => {
+            const dayBeforeStart = addDays(r.from, -1);
+            return { from: dayBeforeStart, to: dayBeforeStart };
+        });
+        const out: Matcher[] = [...occupiedRanges, ...buffers, ...borderDisabled];
+        if (startDate) out.push({ before: toLocalDay(startDate) }); // fin >= inicio
+        return out;
+    }, [occupiedRanges, borderDisabled, startDate]);
+
+    // Reset al cambiar oferta
+    useEffect(() => {
+        setStartDate(undefined);
+        setEndDate(undefined);
+        setCalculatedTotal(0);
+        setValue("startDate", undefined as unknown as Date);
+        setValue("endDate", undefined as unknown as Date);
+        setValue("totalPrice", undefined as unknown as number);
+    }, [selectedOfferId, setValue]);
+
+    // Si FIN queda inválida, limpiarla (comparaciones en LOCAL)
+    useEffect(() => {
+        if (!endDate) return;
+
+        if (startDate && toLocalDay(endDate) < toLocalDay(startDate)) {
+            setEndDate(undefined);
+            setValue("endDate", undefined as unknown as Date);
+            return;
+        }
+        if ((offerFromDate && toLocalDay(endDate) < offerFromDate) || (offerToDate && toLocalDay(endDate) > offerToDate)) {
+            setEndDate(undefined);
+            setValue("endDate", undefined as unknown as Date);
+            return;
+        }
+        // cae dentro de un rango ocupado (inclusive)
+        const hitDisabled = occupiedRanges.some((r: DateRange) => {
+            const ed = toLocalDay(endDate);
+            return ed >= toLocalDay(r.from) && ed <= toLocalDay(r.to);
+        });
+        if (hitDisabled) {
+            setEndDate(undefined);
+            setValue("endDate", undefined as unknown as Date);
+        }
+    }, [startDate, endDate, offerFromDate, offerToDate, occupiedRanges, setValue]);
+
+    // Recalcular total (usar las fechas locales)
     useEffect(() => {
         if (startDate && endDate && selectedOffer) {
             const days = calculateTotalDays(String(startDate), String(endDate));
             const total = Math.round(days * selectedOffer.pricePerDay);
             setValue("totalPrice", total);
             setCalculatedTotal(days * selectedOffer.pricePerDay);
+            setValue("startDate", startDate);
+            setValue("endDate", endDate);
         } else {
             setCalculatedTotal(0);
+            setValue("totalPrice", undefined as unknown as number);
         }
     }, [startDate, endDate, selectedOffer, setValue]);
+
+    const canSubmit = Boolean(selectedOfferId && startDate && endDate);
 
     const submit = async (data: CreateVehicleBookingRequest) => {
         const toastId = toast.loading("Creando reserva...");
         try {
             const res = (await createVehicleBooking(data)) as VehicleBookingResponseAdmin;
-            toast.success("Viaje creado con éxito", { id: toastId });
+            toast.success("Reserva creada con éxito", { id: toastId });
             onSuccess((prev) => [...prev, res]);
             onClose();
         } catch {
-            toast.info("Error al crear el viaje intente nuevamente", { id: toastId });
+            toast.info("Error al crear la reserva, intenta nuevamente", { id: toastId });
         }
     };
 
@@ -98,6 +195,7 @@ export default function CreateVehicleBookingModal({ onClose, onSuccess, offers, 
                         <hr className="mb-4" />
                     </div>
 
+                    {/* Oferta */}
                     <div className="md:col-span-2">
                         <label className={labelClass}>Oferta *</label>
                         <select {...register("offerId", { required: true })} className={inputClass}>
@@ -110,7 +208,8 @@ export default function CreateVehicleBookingModal({ onClose, onSuccess, offers, 
                         </select>
                         {errors.offerId && <p className="text-red-500 text-xs">Campo obligatorio</p>}
                     </div>
-                    {/* Selector de cliente */}
+
+                    {/* Cliente */}
                     <div className="md:col-span-2">
                         <label className={labelClass}>Cliente *</label>
                         <select {...register("renterId", { required: true })} className={inputClass}>
@@ -124,6 +223,7 @@ export default function CreateVehicleBookingModal({ onClose, onSuccess, offers, 
                         {errors.renterId && <p className="text-red-500 text-xs">Campo obligatorio</p>}
                     </div>
 
+                    {/* INFO de oferta */}
                     {selectedOffer && (
                         <div className="col-span-full bg-custom-gray-50 border border-custom-gray-300 rounded-lg p-4 text-sm">
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
@@ -160,6 +260,7 @@ export default function CreateVehicleBookingModal({ onClose, onSuccess, offers, 
                         </div>
                     )}
 
+                    {/* (Opcional) info propietario */}
                     {selectedRenter && (
                         <div className="col-span-full bg-custom-gray-50 border border-custom-gray-300 rounded-lg p-4 text-sm">
                             <p>
@@ -168,26 +269,34 @@ export default function CreateVehicleBookingModal({ onClose, onSuccess, offers, 
                         </div>
                     )}
 
+                    {/* DatePickers */}
                     <div>
                         <label className={labelClass}>Fecha de inicio *</label>
-                        <input
-                            type="date"
-                            value={selectedOffer ? new Date(selectedOffer.availableFrom).toISOString().slice(0, 10) : ""}
-                            disabled
-                            className={inputClass}
+                        <CustomDatePickerVehicle
+                            value={startDate}
+                            onSelect={(d) => setStartDate(d ? toLocalDay(d) : undefined)}
+                            fromDate={offerFromDate}
+                            toDate={offerToDate}
+                            disabled={disabledForStart}
+                            placeholder="Elige fecha de inicio"
                         />
+                        {errors.startDate && <p className="text-red-500 text-xs mt-1">Campo obligatorio</p>}
                     </div>
 
                     <div>
                         <label className={labelClass}>Fecha de fin *</label>
-                        <input
-                            type="date"
-                            value={selectedOffer ? new Date(selectedOffer.availableTo).toISOString().slice(0, 10) : ""}
-                            disabled
-                            className={inputClass}
+                        <CustomDatePickerVehicle
+                            value={endDate}
+                            onSelect={(d) => setEndDate(d ? toLocalDay(d) : undefined)}
+                            fromDate={offerFromDate}
+                            toDate={offerToDate}
+                            disabled={disabledForEnd}
+                            placeholder="Elige fecha de fin"
                         />
+                        {errors.endDate && <p className="text-red-500 text-xs mt-1">Campo obligatorio</p>}
                     </div>
 
+                    {/* Totales */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
                         <div>
                             <label className={labelClass}>Total sin IVA (€)</label>
@@ -205,6 +314,7 @@ export default function CreateVehicleBookingModal({ onClose, onSuccess, offers, 
                         </div>
                     </div>
 
+                    {/* Método de pago */}
                     <div>
                         <label className={labelClass}>Método de pago *</label>
                         <select {...register("paymentMethod", { required: true })} className={inputClass}>
@@ -224,7 +334,12 @@ export default function CreateVehicleBookingModal({ onClose, onSuccess, offers, 
                         </button>
                         <button
                             type="submit"
-                            className="cursor-pointer bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold py-2 px-5 rounded-md"
+                            disabled={!canSubmit}
+                            className={`cursor-pointer font-semibold py-2 px-5 rounded-md ${
+                                canSubmit
+                                    ? "bg-custom-golden-600 hover:bg-custom-golden-700 text-white"
+                                    : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                            }`}
                         >
                             Crear reserva
                         </button>

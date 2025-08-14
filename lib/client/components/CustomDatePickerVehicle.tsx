@@ -30,6 +30,7 @@ const CustomDatePickerVehicle = ({ onSelect, value, placeholder, disabled, fromD
     return (
         <div className="relative w-full">
             <button
+                type="button"
                 onClick={() => setIsOpen(!isOpen)}
                 className="w-full flex items-center justify-between border border-custom-gray-300 bg-custom-white-100 px-4 py-3 rounded-lg shadow-sm text-custom-gray-500 focus:ring-1 focus:ring-custom-golden-600 transition"
             >

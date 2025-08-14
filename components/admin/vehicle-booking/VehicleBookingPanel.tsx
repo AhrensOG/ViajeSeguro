@@ -306,7 +306,15 @@ export default function VehicleBookingPanel() {
                 />
             )}
 
-            {showCreate && <CreateVehicleBookingModal onClose={() => setShowCreate(false)} onSuccess={setBookings} renters={users} offers={offers} />}
+            {showCreate && (
+                <CreateVehicleBookingModal
+                    onClose={() => setShowCreate(false)}
+                    onSuccess={setBookings}
+                    renters={users}
+                    offers={offers}
+                    bookings={bookings} // 👈 nuevo
+                />
+            )}
         </div>
     );
 }
