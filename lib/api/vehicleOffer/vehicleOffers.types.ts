@@ -48,4 +48,8 @@ export interface CardReservationVehicleOfferProps {
     // totalPrice: string;
     pricePerDay: number;
     vehicleOfferType: string;
+    requestedStartDate: string;
+    requestedEndDate: string;
+    requestedOfferType: string;
+    requestedCapacity: number;
 }

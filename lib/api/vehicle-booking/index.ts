@@ -28,6 +28,7 @@ const fetchOffer = async (id: string) => {
             features: res.vehicle.features,
             images: res.vehicle.images,
         },
+        bookings: res.bookings,
     };
 
     return formatedOffer;

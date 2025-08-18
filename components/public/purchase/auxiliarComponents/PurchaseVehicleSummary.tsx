@@ -6,14 +6,21 @@ import { motion, AnimatePresence } from "framer-motion";
 import { DateTime } from "luxon";
 import { VehicleOfferWithVehicle } from "@/lib/api/vehicle-booking/vehicleBooking.types";
 
-const PurchaseVehicleSummary = ({ vehicleBooking }: { vehicleBooking: VehicleOfferWithVehicle }) => {
+interface PurchaseVehicleSummaryProps {
+    vehicleOffer: VehicleOfferWithVehicle;
+    start: string;
+    end: string;
+    originalTimeZone: string;
+}
+
+const PurchaseVehicleSummary = ({ vehicleOffer, start, end, originalTimeZone }: PurchaseVehicleSummaryProps) => {
     const [showDetails, setShowDetails] = useState(false);
     const IVA_RATE = Number(process.env.NEXT_PUBLIC_IVA || 0) / 100;
 
-    const from = DateTime.fromISO(vehicleBooking.availableFrom).setZone("Europe/Madrid");
-    const to = DateTime.fromISO(vehicleBooking.availableTo).setZone("Europe/Madrid");
+    const from = DateTime.fromISO(start || vehicleOffer.availableFrom).setZone(originalTimeZone);
+    const to = DateTime.fromISO(end || vehicleOffer.availableTo).setZone(originalTimeZone);
     const totalDays = Math.max(1, Math.ceil(to.diff(from, "days").days));
-    const basePrice = vehicleBooking.pricePerDay * totalDays;
+    const basePrice = vehicleOffer.pricePerDay * totalDays;
     const totalWithIVA = basePrice * (1 + IVA_RATE);
     const ivaAmount = totalWithIVA - basePrice;
 
@@ -45,16 +52,16 @@ const PurchaseVehicleSummary = ({ vehicleBooking }: { vehicleBooking: VehicleOff
 
             <div className="space-y-1 text-custom-gray-700">
                 <p>
-                    <strong>Retiro:</strong> {vehicleBooking.withdrawLocation} — {departureTime}
+                    <strong>Retiro:</strong> {vehicleOffer.withdrawLocation} — {departureTime}
                 </p>
                 <p>
-                    <strong>Devolución:</strong> {vehicleBooking.returnLocation} — {arrivalTime}
+                    <strong>Devolución:</strong> {vehicleOffer.returnLocation} — {arrivalTime}
                 </p>
                 <p>
                     <strong>Duración:</strong> {duration}
                 </p>
                 <p>
-                    <strong>Vehículo:</strong> {vehicleBooking?.vehicle?.brand || ""} {vehicleBooking?.vehicle?.model || ""}
+                    <strong>Vehículo:</strong> {vehicleOffer?.vehicle?.brand || ""} {vehicleOffer?.vehicle?.model || ""}
                 </p>
             </div>
 
@@ -82,7 +89,7 @@ const PurchaseVehicleSummary = ({ vehicleBooking }: { vehicleBooking: VehicleOff
                     >
                         <div className="flex justify-between">
                             <span>Precio por día:</span>
-                            <span>{vehicleBooking.pricePerDay.toFixed(2).replace(".", ",")} €</span>
+                            <span>{vehicleOffer.pricePerDay.toFixed(2).replace(".", ",")} €</span>
                         </div>
 
                         <div className="flex justify-between">

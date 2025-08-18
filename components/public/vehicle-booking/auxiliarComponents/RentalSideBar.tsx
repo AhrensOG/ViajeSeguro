@@ -1,10 +1,9 @@
 "use client";
 
 import { Calendar1Icon, ChevronRight } from "lucide-react";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
-import { calculateTotalDays } from "@/lib/functions";
 import AuthRequiredModal from "./AuthRequireModal";
 import { VehicleOfferWithVehicle } from "@/lib/api/vehicle-booking/vehicleBooking.types";
 import { useSession } from "next-auth/react";
@@ -14,39 +13,65 @@ const IVA = Number(process.env.NEXT_PUBLIC_IVA || 21);
 
 interface RentalSidebarProps {
     vehicleOffer: VehicleOfferWithVehicle;
+    selectedStart?: Date;
+    selectedEnd?: Date;
 }
 
-const RentalSidebar = ({ vehicleOffer }: RentalSidebarProps) => {
+const toUTCDay = (d: Date) => new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+
+const diffDaysInclusive = (start: Date, end: Date) => {
+    const s = toUTCDay(start).getTime();
+    const e = toUTCDay(end).getTime();
+    const ms = e - s;
+    if (ms < 0) return 0;
+    return Math.floor(ms / 86_400_000);
+};
+
+const RentalSidebar = ({ vehicleOffer, selectedStart, selectedEnd }: RentalSidebarProps) => {
     const [referral, setReferral] = useState("");
     const { data: session } = useSession();
-
     const [showModal, setShowModal] = useState(false);
     const router = useRouter();
 
     const basePrice = vehicleOffer.pricePerDay;
-    const days = calculateTotalDays(vehicleOffer.availableFrom, vehicleOffer.availableTo);
-    const total = basePrice * days;
-    const iva = total * (IVA / 100);
-    const final = total + iva;
+
+    const days = useMemo(() => {
+        if (!selectedStart || !selectedEnd) return 0;
+        return diffDaysInclusive(selectedStart, selectedEnd);
+    }, [selectedStart, selectedEnd]);
+
+    const total = useMemo(() => basePrice * days, [basePrice, days]);
+    const iva = useMemo(() => total * (IVA / 100), [total]);
+    const final = useMemo(() => total + iva, [total, iva]);
 
     useEffect(() => {
         const fetchDiscounts = async () => {
             if (!session) return;
             const res = await getDiscountByUserId();
-            if (res) {
-                setReferral(res?.id);
-            }
+            if (res) setReferral(res.id);
         };
         fetchDiscounts();
     }, [session]);
 
     const handleBookingClick = () => {
+        if (!selectedStart || !selectedEnd) return; // safety
         if (!vehicleOffer || !vehicleOffer.id) {
             setShowModal(true);
-        } else {
-            router.push(`/purchase?id=${vehicleOffer.id}/&referral=${referral}&&type=vehicle`);
+            return;
         }
+        const startISO = selectedStart.toISOString();
+        const endISO = selectedEnd.toISOString();
+
+        router.push(
+            `/purchase?id=${vehicleOffer.id}` +
+                `&type=vehicle` +
+                `${referral ? `&referral=${referral}` : ""}` +
+                `&start=${encodeURIComponent(startISO)}` +
+                `&end=${encodeURIComponent(endISO)}`
+        );
     };
+
+    const canPay = selectedStart && selectedEnd && days > 0;
 
     return (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }} className="space-y-4">
@@ -61,7 +86,7 @@ const RentalSidebar = ({ vehicleOffer }: RentalSidebarProps) => {
                         Marca:<span>{vehicleOffer.vehicle?.brand}</span>
                     </p>
                     <p className="text-base font-medium text-custom-black-700 flex justify-between">
-                        Días de alquiler:<span>{days}</span>
+                        Días de alquiler:<span>{days || "Selecciona fechas"}</span>
                     </p>
                     <p className="text-base font-medium text-custom-black-700 flex justify-between">
                         Precio por día:<span>{basePrice.toFixed(2).replace(".", ",")} €</span>
@@ -74,7 +99,7 @@ const RentalSidebar = ({ vehicleOffer }: RentalSidebarProps) => {
                             <span className="font-medium">Importe</span>
                             <ChevronRight size={16} className="text-custom-gray-500" />
                         </div>
-                        <span className="text-xl font-semibold text-custom-black-800">{total.toFixed(2).replace(".", ",")} €</span>
+                        <span className="text-xl font-semibold text-custom-black-800">{(canPay ? total : 0).toFixed(2).replace(".", ",")} €</span>
                     </div>
 
                     <div className="flex items-center justify-between mb-2">
@@ -82,7 +107,7 @@ const RentalSidebar = ({ vehicleOffer }: RentalSidebarProps) => {
                             <span className="font-medium">IVA ({IVA}%)</span>
                             <ChevronRight size={16} className="text-custom-gray-500" />
                         </div>
-                        <span className="text-xl font-semibold text-custom-black-800">{iva.toFixed(2).replace(".", ",")} €</span>
+                        <span className="text-xl font-semibold text-custom-black-800">{(canPay ? iva : 0).toFixed(2).replace(".", ",")} €</span>
                     </div>
 
                     <div className="flex items-center justify-between">
@@ -90,14 +115,20 @@ const RentalSidebar = ({ vehicleOffer }: RentalSidebarProps) => {
                             <span className="font-medium">Importe Final</span>
                             <ChevronRight size={16} className="text-custom-gray-500" />
                         </div>
-                        <span className="text-2xl font-bold text-custom-black-800">{final.toFixed(2).replace(".", ",")} €</span>
+                        <span className="text-2xl font-bold text-custom-black-800">{(canPay ? final : 0).toFixed(2).replace(".", ",")} €</span>
                     </div>
                 </div>
 
-                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.96 }}>
+                <motion.div whileHover={{ scale: canPay ? 1.02 : 1 }} whileTap={{ scale: canPay ? 0.96 : 1 }}>
                     <button
                         onClick={handleBookingClick}
-                        className="w-full bg-custom-golden-600 hover:bg-custom-golden-700 text-custom-white-100 py-4 mt-4 rounded-lg flex items-center justify-center"
+                        disabled={!canPay}
+                        className={`w-full py-4 mt-4 rounded-lg flex items-center justify-center
+              ${
+                  canPay
+                      ? "bg-custom-golden-600 hover:bg-custom-golden-700 text-custom-white-100"
+                      : "bg-custom-gray-300 text-custom-gray-600 cursor-not-allowed"
+              }`}
                     >
                         <Calendar1Icon size={16} className="mr-2" />
                         Ir a pagar
