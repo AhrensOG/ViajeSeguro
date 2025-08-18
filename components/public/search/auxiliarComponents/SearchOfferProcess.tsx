@@ -51,6 +51,10 @@ export default function SearchOfferProcess() {
                         dateEnd: off.availableTo,
                         pricePerDay: off.pricePerDay,
                         vehicleOfferType: off.vehicleOfferType,
+                        requestedStartDate: availableFrom,
+                        requestedEndDate: availableTo,
+                        requestedOfferType: vehicleOfferType,
+                        requestedCapacity: capacity,
                     }));
                 }
 

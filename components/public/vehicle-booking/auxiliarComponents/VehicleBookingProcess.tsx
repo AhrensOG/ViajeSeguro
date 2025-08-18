@@ -15,6 +15,9 @@ import { convertUTCToLocalDate } from "@/lib/functions";
 export default function VehicleBookingProcess() {
     const searchParams = useSearchParams();
     const id = searchParams.get("id");
+    const dateStart = searchParams.get("dateStart");
+    const dateEnd = searchParams.get("dateEnd");
+
 
     const [vehicleOffer, setVehicleOffer] = useState<VehicleOfferWithVehicle | null>(null);
     const [pickStart, setPickStart] = useState<Date | undefined>(undefined);
@@ -27,14 +30,14 @@ export default function VehicleBookingProcess() {
                 const res = await fetchOffer(id);
                 setVehicleOffer(res);
                 // Opcional: limpiar selección al cambiar de oferta
-                setPickStart(undefined);
-                setPickEnd(undefined);
+                setPickStart(dateStart ? new Date(dateStart) : undefined);
+                setPickEnd(dateEnd ? new Date(dateEnd) : undefined);
             } catch (error) {
                 console.error("Error fetching offer:", error);
             }
         };
         getOffer();
-    }, [id]);
+    }, [id, dateStart, dateEnd]);
 
     // Fechas formateadas para el header (con guardas por si vinieran undefined)
     const headerDates = useMemo(() => {
