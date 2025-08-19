@@ -52,7 +52,6 @@ export default function CardReservation(props: CardProps) {
     requestedOfferType,
     requestedCapacity,
   } = props;
-  console.log(props);
   const formatDate = (input: string): string => {
     const date = new Date(input);
     const yyyy = date.getFullYear();
