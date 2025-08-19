@@ -10,30 +10,47 @@ import TripCardFallback from "@/lib/client/components/fallbacks/shared/TripCardF
 
 export default function SearchOfferProcess() {
   const searchParams = useSearchParams();
+
   const [offers, setOffers] = useState<CardReservationVehicleOfferProps[]>([]);
   const [offerSelected, setOfferSelected] =
     useState<CardReservationVehicleOfferProps | null>(null);
   const [loading, setLoading] = useState(true);
-  const capacity = Number(searchParams.get("capacity") || 1);
+  const [invalidParams, setInvalidParams] = useState(false);
+
+  // Leer parámetros de la URL
+  const capacityParam = searchParams.get("capacity");
+  const capacity =
+    capacityParam !== null && capacityParam !== ""
+      ? Number(capacityParam)
+      : NaN;
+
   const vehicleOfferType = searchParams.get("serviceType") || "WITH_DRIVER";
+
   const availableFrom = searchParams.get("departure") || "";
   const availableTo = searchParams.get("return") || "";
-  const [invalidParams, setInvalidParams] = useState(false);
 
   useEffect(() => {
     const fetchData = async () => {
-      if (!availableFrom || !availableTo || !capacity) {
+      setLoading(true);
+
+      const hasDates = Boolean(availableFrom && availableTo);
+      const hasCapacity = Number.isFinite(capacity) && capacity > 0;
+
+      if (!hasDates || !hasCapacity) {
         setInvalidParams(true);
+        setOffers([]);
         setLoading(false);
         return;
       }
 
+      setInvalidParams(false);
+
       try {
         const data = await searchVehicleOffers({
-          capacity,
-          vehicleOfferType,
-          availableFrom,
-          availableTo,
+          capacity: capacity,
+          vehicleOfferType: vehicleOfferType,
+          availableFrom: availableFrom,
+          availableTo: availableTo,
         });
 
         let dataFormated: CardReservationVehicleOfferProps[] = [];
@@ -62,13 +79,15 @@ export default function SearchOfferProcess() {
         setOffers(dataFormated);
       } catch (err) {
         console.error("Error buscando ofertas:", err);
+        setInvalidParams(false);
+        setOffers([]);
       } finally {
         setLoading(false);
       }
     };
 
     fetchData();
-  }, [capacity, vehicleOfferType, availableFrom, availableTo]);
+  }, [availableFrom, availableTo, capacity, vehicleOfferType, searchParams]);
 
   if (loading) {
     return (
@@ -109,14 +128,11 @@ export default function SearchOfferProcess() {
             <h1 className="text-custom-gray-800 text-2xl xl:text-4xl font-bold">
               Furgonetas disponibles en Valencia
             </h1>
+
             {invalidParams ? (
               <p className="text-custom-red-600 text-sm mt-6">
                 Faltan datos para realizar la búsqueda. Verifica que hayas
                 seleccionado fecha de recogida, devolución y capacidad.
-              </p>
-            ) : loading ? (
-              <p className="text-custom-gray-600 text-sm">
-                Buscando ofertas...
               </p>
             ) : offers.length > 0 ? (
               <p className="text-custom-gray-600 text-sm">
@@ -131,7 +147,6 @@ export default function SearchOfferProcess() {
 
           <div className="w-full mx-auto px-4 space-y-4">
             {!invalidParams &&
-              !loading &&
               offers.map((offer) => (
                 <CardReservation
                   key={offer.id}
