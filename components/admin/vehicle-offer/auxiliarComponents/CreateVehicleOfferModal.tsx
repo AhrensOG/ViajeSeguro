@@ -69,7 +69,7 @@ const CreateVehicleOfferModal = ({
   }, [selectedVehicleId, vehicles, owners, setValue]);
 
   const submit: SubmitHandler<FormData> = async (data) => {
-    const toastId = toast.loading("Creando viaje...");
+    const toastId = toast.loading("Creando oferta de vehículo...");
     try {
       const payload: CreateVehicleOfferRequest = {
         pricePerDay: Number(data.pricePerDay),
