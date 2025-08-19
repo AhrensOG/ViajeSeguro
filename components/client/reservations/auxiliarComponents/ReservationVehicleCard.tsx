@@ -13,6 +13,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ResponseForProfilePage } from "@/lib/api/vehicle-booking/vehicleBooking.types";
 import { calculateTotalDays } from "@/lib/functions";
+import { DateTime } from "luxon";
 const transmissionTypeMap = {
   MANUAL: "Manual",
   AUTOMATIC: "Automática",
@@ -52,14 +53,20 @@ const ReservationVehicleCard = ({
     qrCode,
     status,
   } = vehicleBooking || {};
-  const { vehicle, returnLocation, pricePerDay, vehicleOfferType } =
+  const { vehicle, returnLocation, pricePerDay, vehicleOfferType, originalTimeZone } =
     offer || {};
   const { model, brand, year, capacity, fuelType, transmissionType, images } =
     vehicle || {};
   const { imageUrl } = qrCode?.[0] || {};
 
-  const formattedStart = String(startDate).split("T")[0];
-  const formattedEnd = String(endDate).split("T")[0];
+  const formattedStart = DateTime.fromISO(startDate, { zone: "utc" })
+    .setZone(originalTimeZone || "Europe/Madrid")
+    .toFormat("yyyy-MM-dd");
+
+  const formattedEnd = DateTime.fromISO(endDate, { zone: "utc" })
+    .setZone(originalTimeZone || "Europe/Madrid")
+    .toFormat("yyyy-MM-dd");
+
   const days =
     formattedStart && formattedEnd
       ? Math.ceil(

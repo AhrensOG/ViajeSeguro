@@ -74,8 +74,8 @@ export interface ResponseForQrPage {
 
 export interface ResponseForProfilePage {
     id: string;
-    startDate: Date;
-    endDate: Date;
+    startDate: string;
+    endDate: string;
     status: "PENDING" | "APPROVED" | "COMPLETED" | "FINISHED" | "DECLINED" | "CANCELLED";
     isDeleted: boolean;
     paymentMethod: "CASH" | "STRIPE";
