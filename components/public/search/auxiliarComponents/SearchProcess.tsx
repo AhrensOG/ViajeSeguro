@@ -4,7 +4,7 @@ import React, { useState, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import {
   SearchTrip,
-  TripCardType,
+  SearchTripResult,
   TripServiceType,
 } from "@/lib/shared/types/trip-service-type.type";
 import Image from "next/image";
@@ -14,11 +14,18 @@ import { convertUTCToLocalTime } from "@/lib/functions";
 import TripCardFallback from "@/lib/client/components/fallbacks/shared/TripCardFallback";
 import { searchTrips } from "@/lib/api/trip";
 
+const EMPTY_RESULT: SearchTripResult = {
+  exact: [],
+  previous: [],
+  next: [],
+  futureAll: [],
+};
+
 const SearchProcess = () => {
   const searchParams = useSearchParams();
   const userTimeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
 
-  const [trips, setTrips] = useState<TripCardType[]>([]);
+  const [trips, setTrips] = useState<SearchTripResult>(EMPTY_RESULT);
   const [isLoading, setIsLoading] = useState(false);
   const [invalidParams, setInvalidParams] = useState(false);
 
@@ -39,7 +46,7 @@ const SearchProcess = () => {
       const departure = departureParam || "";
 
       if (!origin || !destination || !departure) {
-        setTrips([]);
+        setTrips(EMPTY_RESULT);
         setInvalidParams(true);
         return;
       }
@@ -51,13 +58,13 @@ const SearchProcess = () => {
 
       try {
         const data = await searchTrips(query);
-        setTrips(data);
+        setTrips(data); // <-- ahora data es SearchTripResult
       } catch (error) {
         console.log(error);
         toast.info("¡Ups! Ocurrió un error inesperado.", {
           description: "Intenta nuevamente o contacta con nuestro soporte",
         });
-        setTrips([]);
+        setTrips(EMPTY_RESULT);
       } finally {
         setIsLoading(false);
       }
@@ -66,23 +73,28 @@ const SearchProcess = () => {
     fetchTrips();
   }, [searchParams, departureParam]);
 
-  const tripsOnSameDay = trips.filter((trip) => {
-    const localDate = convertUTCToLocalTime(
-      trip.departure,
-      userTimeZone,
-      "yyyy-MM-dd"
-    );
+  // ============================
+  // Adaptación mínima a la nueva respuesta
+  // ============================
+
+  // Antes filtrabas por fecha local; ahora el backend ya separa "exact".
+  // Si igualmente quieres validar por la zona local, descomenta el filtro de seguridad.
+  let tripsOnSameDay = trips.exact || [];
+  tripsOnSameDay = tripsOnSameDay.filter((trip) => {
+    console.log(trip)
+    const localDate = convertUTCToLocalTime(trip.departure, userTimeZone, "yyyy-MM-dd");
     return localDate === targetDateStr;
   });
 
-  const nearbyTrips = trips.filter((trip) => {
-    const localDate = convertUTCToLocalTime(
-      trip.departure,
-      userTimeZone,
-      "yyyy-MM-dd"
-    );
-    return localDate !== targetDateStr;
-  });
+  const nearbyTrips = [...(trips.previous || []), ...(trips.next || [])];
+
+  // Opcional: más opciones a futuro (lo mantenemos separado para no romper tu UX actual)
+  const futureTrips = trips.futureAll || [];
+
+  const noResults =
+    tripsOnSameDay.length === 0 &&
+    nearbyTrips.length === 0 &&
+    futureTrips.length === 0;
 
   return (
     <div>
@@ -107,7 +119,7 @@ const SearchProcess = () => {
                 mostrar los resultados.
               </p>
             </div>
-          ) : tripsOnSameDay.length === 0 && nearbyTrips.length === 0 ? (
+          ) : noResults ? (
             <div className="text-center py-12">
               <p className="text-lg font-semibold text-custom-gray-700">
                 No se encontraron viajes disponibles para esta fecha.
@@ -119,12 +131,13 @@ const SearchProcess = () => {
             </div>
           ) : (
             <>
-              {tripsOnSameDay.length === 0 && nearbyTrips.length > 0 && (
-                <p className="text-sm text-center text-custom-gray-600">
-                  No hay viajes exactos para la fecha seleccionada, pero
-                  encontramos estas opciones cercanas:
-                </p>
-              )}
+              {tripsOnSameDay.length === 0 &&
+                (nearbyTrips.length > 0 || futureTrips.length > 0) && (
+                  <p className="text-sm text-center text-custom-gray-600">
+                    No hay viajes exactos para la fecha seleccionada, pero
+                    encontramos estas opciones:
+                  </p>
+                )}
 
               {tripsOnSameDay.length > 0 && (
                 <>
@@ -145,6 +158,23 @@ const SearchProcess = () => {
                   </h2>
                   <div className="space-y-4">
                     {nearbyTrips.map((trip) => (
+                      <TripCard
+                        key={trip.id}
+                        trip={trip}
+                        timeZone={userTimeZone}
+                      />
+                    ))}
+                  </div>
+                </div>
+              )}
+
+              {futureTrips.length > 0 && (
+                <div className="mt-10 text-center">
+                  <h2 className="text-base font-semibold text-custom-gray-800 mb-4">
+                    Más opciones a futuro:
+                  </h2>
+                  <div className="space-y-4">
+                    {futureTrips.map((trip) => (
                       <TripCard
                         key={trip.id}
                         trip={trip}
