@@ -70,9 +70,9 @@ const ReservationVehicleCard = ({
   const days =
     formattedStart && formattedEnd
       ? Math.ceil(
-          (new Date(endDate).getTime() - new Date(startDate).getTime()) /
-            (1000 * 60 * 60 * 24)
-        )
+        (new Date(endDate).getTime() - new Date(startDate).getTime()) /
+        (1000 * 60 * 60 * 24)
+      )
       : "-";
   const formattedTotal = `${totalPrice.toFixed(2)}€`;
 
@@ -188,13 +188,61 @@ const ReservationVehicleCard = ({
               </div>
             )}
 
-            {/* <div className="rounded-xl border-custom-gray-200 bg-[#f9fafb] p-4 text-sm">
+            <p className="text-xs text-custom-gray-500 italic">Toca para ver más detalles de tu reserva</p>
+
+            {/* Contenido expandido */}
+            <AnimatePresence>
+              {openCard && (
+                <motion.div
+                  key="details"
+                  onClick={(e) => e.stopPropagation()}
+                  initial={{ height: 0, opacity: 0 }}
+                  animate={{ height: "auto", opacity: 1 }}
+                  exit={{ height: 0, opacity: 0 }}
+                  transition={{ duration: 0.3 }}
+                  className="overflow-hidden flex flex-col gap-6 mt-2"
+                >
+                  <div className="rounded-xl border border-custom-gray-200 bg-[#f9fafb] p-4 text-sm">
+                    <p className="font-semibold text-custom-black-900 mb-1">Estado de tu reserva</p>
+                    <p className="text-custom-gray-700">
+                      Tu solicitud fue procesada correctamente y se encuentra en estado <strong>{statusMap[status]}</strong>.
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
+                    <p className="font-semibold text-blue-900 mb-2">📍 Información de recogida</p>
+                    <p className="text-blue-800 mb-2">
+                      Debes recoger tu furgoneta en la siguiente dirección:
+                    </p>
+                    <p className="font-semibold text-blue-900 bg-blue-100 p-2 rounded-md">
+                      {returnLocation}
+                    </p>
+                    <p className="text-blue-700 text-xs mt-2">
+                      Recuerda llevar tu documento de identidad y licencia de conducir válida.
+                    </p>
+                  </div>
+
+                  {paymentMethod === "CASH" && (
+                    <div className="rounded-md border-l-4 border-yellow-400 bg-yellow-50 p-4 text-sm text-yellow-800">
+                      <p className="font-bold mb-2 text-yellow-800">Método de pago: Efectivo</p>
+                      <p className="mb-2">
+                        El pago se ha procesado correctamente. Recuerda presentar tu documento de identidad y licencia de conducir (si
+                        aplica) al momento de recoger el vehículo.
+                      </p>
+                    </div>
+                  )}
+
+                  {/* <div className="rounded-xl border-custom-gray-200 bg-[#f9fafb] p-4 text-sm">
                             <p className="font-semibold text-custom-black-900 mb-3">Extras incluidos</p>
                             <ul className="list-disc pl-10 space-y-1">
                                 <li className="text-custom-gray-700">Seguro de vida</li>
                                 <li className="text-custom-gray-700">Silla de Niños 5.00€</li>
                             </ul>
                         </div> */}
+                </motion.div>)}
+
+            </AnimatePresence>
+
 
             <div className="border-b border-custom-gray-200"></div>
 
