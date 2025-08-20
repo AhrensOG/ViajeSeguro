@@ -121,6 +121,19 @@ const ReservationVehicleCard = ({ vehicleBooking }: { vehicleBooking: ResponseFo
                             </p>
                         </div>
 
+                        <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
+                            <p className="font-semibold text-blue-900 mb-2">📍 Información de recogida</p>
+                            <p className="text-blue-800 mb-2">
+                                Debes recoger tu furgoneta en la siguiente dirección:
+                            </p>
+                            <p className="font-semibold text-blue-900 bg-blue-100 p-2 rounded-md">
+                                {returnLocation}
+                            </p>
+                            <p className="text-blue-700 text-xs mt-2">
+                                Recuerda llevar tu documento de identidad y licencia de conducir válida.
+                            </p>
+                        </div>
+
                         {paymentMethod === "CASH" && (
                             <div className="rounded-md border-l-4 border-yellow-400 bg-yellow-50 p-4 text-sm text-yellow-800">
                                 <p className="font-bold mb-2 text-yellow-800">Método de pago: Efectivo</p>
