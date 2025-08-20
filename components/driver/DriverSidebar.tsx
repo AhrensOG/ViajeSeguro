@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
-import { User, CreditCard, CalendarDays, LogOut } from "lucide-react";
+import { User, CalendarDays, LogOut } from "lucide-react";
 
 const DriverSidebar = () => {
   const pathname = usePathname();
