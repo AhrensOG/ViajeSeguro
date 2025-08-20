@@ -1,7 +1,7 @@
-import Sidebar from "@/components/client/Sidebar";
+import DriverSidebar from "@/components/driver/DriverSidebar";
 import NavBar from "@/components/public/navigation/NavBar";
 
-export default function RootLayout({
+export default function DriverPageLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
@@ -12,7 +12,7 @@ export default function RootLayout({
 
       <div className={`flex justify-center items-start grow pt-16 px-4`}>
         <div className={`flex grow max-w-screen-xl w-full gap-8`}>
-          <Sidebar />
+          <DriverSidebar />
           <main className={`w-full flex grow`}>{children}</main>
         </div>
       </div>

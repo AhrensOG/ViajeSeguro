@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import { User, CreditCard, CalendarDays, LogOut } from "lucide-react";
 
-const Sidebar = () => {
+const DriverSidebar = () => {
   const pathname = usePathname();
   const { data: session } = useSession();
 
@@ -14,21 +14,15 @@ const Sidebar = () => {
   const links = [
     {
       name: "Perfil",
-      href: "/dashboard/client/profile",
+      href: "/dashboard/driver/profile",
       icon: <User className="size-5" />,
-      roles: ["CLIENT"],
+      roles: ["DRIVER"],
     },
     {
-      name: "Reservas",
-      href: "/dashboard/client/reservations",
+      name: "Viajes",
+      href: "/dashboard/driver/trips",
       icon: <CalendarDays className="size-5" />,
-      roles: ["CLIENT"],
-    },
-    {
-      name: "Pagos",
-      href: "/dashboard/client/payments",
-      icon: <CreditCard className="size-5" />,
-      roles: ["CLIENT"],
+      roles: ["DRIVER"],
     },
   ];
 
@@ -76,4 +70,4 @@ const Sidebar = () => {
   );
 };
 
-export default Sidebar;
+export default DriverSidebar;
