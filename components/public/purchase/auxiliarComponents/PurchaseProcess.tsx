@@ -98,7 +98,7 @@ const PurchaseProcess = () => {
                 toast.success("Reserva generada correctamente.", {
                     description: "Puedes ver el estado de la misma en tu perfil.",
                 });
-                router.push("/dashboard/client/reservations");
+                router.push("/dashboard/user/reservations");
             } catch (error) {
                 console.log("Error al crear la reserva:", error);
                 toast.info("Hubo un error al crear la reserva", {
@@ -126,7 +126,7 @@ const PurchaseProcess = () => {
                 toast.success("Reserva generada correctamente.", {
                     description: "Puedes ver el estado de la misma en tu perfil.",
                 });
-                router.push("/dashboard/client/reservations");
+                router.push("/dashboard/user/reservations");
             } catch (error) {
                 console.log("Error al crear la reserva:", error);
                 toast.info("Hubo un error al crear la reserva", {

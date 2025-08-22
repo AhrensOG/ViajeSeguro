@@ -1,7 +1,7 @@
 import Sidebar from "@/components/user/Sidebar";
 import NavBar from "@/components/public/navigation/NavBar";
 
-export default function DriverPageLayout({
+export default function ClientPageLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;

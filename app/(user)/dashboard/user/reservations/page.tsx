@@ -1,4 +1,4 @@
-import ReservationsPage from "@/components/client/reservations/ReservationsPage";
+import ReservationsPage from "@/components/user/reservations/ReservationsPage";
 import React from "react";
 
 const Reservations = () => {

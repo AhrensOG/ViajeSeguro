@@ -1,4 +1,4 @@
-import Sidebar from "@/components/client/Sidebar";
+import Sidebar from "@/components/user/Sidebar";
 import NavBar from "@/components/public/navigation/NavBar";
 
 export default function ClientPageLayout({
