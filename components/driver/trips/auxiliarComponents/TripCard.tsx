@@ -103,7 +103,7 @@ const TripCard = ({ trip }: Props) => {
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
-                                router.push(`/dashboard/client/trips/details?id=${trip.id}`);
+                                router.push(`/dashboard/user/trips/details?id=${trip.id}`);
                             }}
                             className="mt-4 w-full text-center text-sm text-custom-golden-700 font-semibold hover:underline cursor-pointer"
                         >

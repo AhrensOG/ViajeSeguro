@@ -1,62 +1,128 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ChevronDown, Ellipsis, User, X } from "lucide-react";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 
+type Role = "ADMIN" | "CLIENT" | "DRIVER" | "PARTNER";
+
+type LinkItem = {
+  name: string;
+  href: string;
+};
+
+const CLIENT_PREFIX = "/dashboard/user"; // si unificas a /dashboard/client, cambias aquí
+const DRIVER_PREFIX = "/dashboard/driver";
+const PARTNER_PREFIX = "/dashboard/partner";
+const ADMIN_HOME = "/admin";
+
+// Enlaces públicos (barra principal)
+const PUBLIC_LINKS: LinkItem[] = [
+  { name: "Promociones", href: "/promotions" },
+  { name: "Inicio", href: "/" },
+  { name: "Nosotros", href: "/about" },
+  { name: "Servicios", href: "/services" },
+  { name: "Contacto", href: "/contact" },
+];
+
+// Grupos por funcionalidad (forma única de los menús)
+const GROUPS = {
+  CLIENT_BASE: [
+    { name: "Perfil", href: `${CLIENT_PREFIX}/profile` },
+    { name: "Reservas", href: `${CLIENT_PREFIX}/reservations` },
+    { name: "Mis pagos", href: `${CLIENT_PREFIX}/payments` },
+  ],
+  PARTNER_EXTRA: [
+    { name: "Mis vehículos", href: `${PARTNER_PREFIX}/vehicles` },
+    { name: "Ofertas de alquiler", href: `${PARTNER_PREFIX}/offers` },
+    { name: "Viajes compartidos", href: `${PARTNER_PREFIX}/trips` },
+  ],
+  DRIVER_BASE: [
+    { name: "Perfil", href: `${DRIVER_PREFIX}/profile` },
+    { name: "Viajes", href: `${DRIVER_PREFIX}/trips` },
+  ],
+  ADMIN_BASE: [{ name: "Dashboard", href: ADMIN_HOME }],
+} satisfies Record<string, LinkItem[]>;
+
+type GroupKey = keyof typeof GROUPS;
+
+const ROLE_COMPOSITION: Record<Role, GroupKey[]> = {
+  ADMIN: ["ADMIN_BASE"],
+  CLIENT: ["CLIENT_BASE"],
+  DRIVER: ["DRIVER_BASE"],
+  PARTNER: ["CLIENT_BASE", "PARTNER_EXTRA"],
+};
+
+function composeLinksForRole(role?: Role): LinkItem[] {
+  if (!role) return [];
+  // Si algún día hay solapes, esto evita duplicados por href
+  const merged = ROLE_COMPOSITION[role].flatMap((g) => GROUPS[g]);
+  const map = new Map<string, LinkItem>();
+  merged.forEach((l) => map.set(l.href, l));
+  return Array.from(map.values());
+}
+
 const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const { data: session } = useSession();
-  const role = session?.user?.role;
 
-  const renderRoleLinks = (isMobile = false) => {
-    if (!session?.user) return null;
+  const role = session?.user?.role as Role | undefined;
+  const roleLinks = useMemo(() => composeLinksForRole(role), [role]);
 
-    const className = isMobile
-      ? "text-custom-gray-800 hover:text-custom-black-900 transition"
-      : "block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100";
+  // Renderer genérico para enlaces
+  const renderLinks = (
+    items: LinkItem[],
+    opts?: { variant?: "desktop" | "mobile" }
+  ) => {
+    const variant = opts?.variant ?? "desktop";
+    const className =
+      variant === "mobile"
+        ? "text-custom-gray-800 hover:text-custom-black-900 transition"
+        : "text-custom-gray-800 hover:text-custom-black-900 transition";
 
-    if (role === "ADMIN") {
-      return (
-        <Link href="/admin" className={className}>
-          Dashboard
-        </Link>
-      );
-    }
+    return items.map((item) => (
+      <Link key={item.href} href={item.href} className={className}>
+        {item.name}
+      </Link>
+    ));
+  };
 
-    if (role === "CLIENT") {
+  const renderUserArea = (variant: "desktop" | "mobile") => {
+    const linkClass =
+      variant === "mobile"
+        ? "text-custom-gray-800 hover:text-custom-black-900 transition"
+        : "block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100 w-full text-left";
+
+    if (!session?.user) {
       return (
         <>
-          <Link href="/dashboard/client/profile" className={className}>
-            Perfil
+          <Link href="/auth/login" className={linkClass}>
+            Iniciar sesión
           </Link>
-          <Link href="/dashboard/client/reservations" className={className}>
-            Reservas
-          </Link>
-          <Link href="/dashboard/client/payments" className={className}>
-            Mis pagos
+          <Link href="/auth/register" className={linkClass}>
+            Registrate
           </Link>
         </>
       );
     }
 
-    if (role === "DRIVER") {
-      return (
-        <>
-          <Link href="/dashboard/client/profile" className={className}>
-            Perfil
+    return (
+      <>
+        {roleLinks.map((l) => (
+          <Link key={l.href} href={l.href} className={linkClass}>
+            {l.name}
           </Link>
-          <Link href="/dashboard/client/trips" className={className}>
-            Viajes
-          </Link>
-        </>
-      );
-    }
-
-    return null;
+        ))}
+        <button
+          onClick={() => signOut({ callbackUrl: "/" })}
+          className={linkClass}>
+          Cerrar sesión
+        </button>
+      </>
+    );
   };
 
   return (
@@ -67,42 +133,26 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
       <div className="w-full h-full px-6 py-3 flex items-center justify-between">
         <Link
           href="/"
-          className="font-bold text-2xl flex items-center text-custom-white-100">
+          className="font-bold text-2xl flex items-center text-custom-white-100"
+          aria-label="Ir a inicio">
           <span className="text-custom-gray-800">Viaje</span>
           <span className="text-custom-golden-600">Seguro</span>
         </Link>
 
+        {/* Desktop */}
         <nav className="hidden md:flex items-center space-x-6">
-          <Link
-            href="/promotions"
-            className="text-custom-black-900 hover:text-custom-golden-600 transition font-medium">
-            Promociones
-          </Link>
-          <Link
-            href="/"
-            className="text-custom-gray-800 hover:text-custom-black-900 transition">
-            Inicio
-          </Link>
-          <Link
-            href="/about"
-            className="text-custom-gray-800 hover:text-custom-black-900 transition">
-            Nosotros
-          </Link>
-          <Link
-            href="/services"
-            className="text-custom-gray-800 hover:text-custom-black-900 transition">
-            Servicios
-          </Link>
-          <Link
-            href="/contact"
-            className="text-custom-gray-800 hover:text-custom-black-900 transition">
-            Contacto
-          </Link>
+          {renderLinks(PUBLIC_LINKS, { variant: "desktop" })}
+
+          {/* User dropdown */}
           <div
             className="relative"
             onMouseEnter={() => setIsUserMenuOpen(true)}
             onMouseLeave={() => setIsUserMenuOpen(false)}>
-            <button className="flex items-center gap-1 bg-custom-white-50 text-custom-black-900 rounded-full p-2 hover:transition">
+            <button
+              className="flex items-center gap-1 bg-custom-white-50 text-custom-black-900 rounded-full p-2 hover:transition"
+              aria-haspopup="menu"
+              aria-expanded={isUserMenuOpen}
+              onClick={() => setIsUserMenuOpen((s) => !s)}>
               <User className="h-5 w-5" />
               <ChevronDown
                 className={`h-4 w-4 ${
@@ -116,40 +166,22 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, y: -10 }}
-                  transition={{ duration: 0.3 }}
-                  className="p-1 absolute right-0 w-44 bg-custom-white-100 shadow-lg rounded-md z-10">
-                  {session?.user ? (
-                    <>
-                      {renderRoleLinks()}
-                      <button
-                        onClick={() => signOut({ callbackUrl: "/" })}
-                        className="w-full text-start block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
-                        Cerrar sesión
-                      </button>
-                    </>
-                  ) : (
-                    <>
-                      <Link
-                        href="/auth/login"
-                        className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
-                        Iniciar sesión
-                      </Link>
-                      <Link
-                        href="/auth/register"
-                        className="block px-4 py-2 text-sm text-custom-black-900 hover:bg-custom-gray-100">
-                        Registrate
-                      </Link>
-                    </>
-                  )}
+                  transition={{ duration: 0.2 }}
+                  className="p-1 absolute right-0 w-52 bg-custom-white-100 shadow-lg rounded-md z-10"
+                  role="menu">
+                  {renderUserArea("desktop")}
                 </motion.div>
               )}
             </AnimatePresence>
           </div>
         </nav>
 
+        {/* Mobile toggle */}
         <button
           className="md:hidden text-custom-black-900 focus:outline-none"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}>
+          onClick={() => setIsMobileMenuOpen((s) => !s)}
+          aria-label="Abrir menú"
+          aria-expanded={isMobileMenuOpen}>
           {isMobileMenuOpen ? (
             <X className="h-7 w-7" />
           ) : (
@@ -158,67 +190,24 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
         </button>
       </div>
 
+      {/* Mobile menu */}
       <AnimatePresence>
         {isMobileMenuOpen && (
           <motion.div
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.3 }}
+            transition={{ duration: 0.2 }}
             className="md:hidden bg-custom-white-100 shadow-md absolute top-full left-0 w-full p-4">
             <nav className="flex flex-col items-start space-y-4">
-              <Link
-                href="/promotions"
-                className="text-custom-black-900 hover:text-custom-golden-600 transition font-medium">
-                Promociones
-              </Link>
-              <Link
-                href="/"
-                className="text-custom-gray-800 hover:text-custom-black-900 transition">
-                Inicio
-              </Link>
-              <Link
-                href="/about"
-                className="text-custom-gray-800 hover:text-custom-black-900 transition">
-                Nosotros
-              </Link>
-              <Link
-                href="/services"
-                className="text-custom-gray-800 hover:text-custom-black-900 transition">
-                Servicios
-              </Link>
-              <Link
-                href="/contact"
-                className="text-custom-gray-800 hover:text-custom-black-900 transition">
-                Contacto
-              </Link>
+              {renderLinks(PUBLIC_LINKS, { variant: "mobile" })}
             </nav>
 
             <hr className="my-4 border-t border-gray-300" />
 
-            {session?.user ? (
-              <nav className="flex flex-col items-start space-y-4">
-                {renderRoleLinks(true)}
-                <button
-                  onClick={() => signOut({ callbackUrl: "/" })}
-                  className="text-custom-gray-800 hover:text-custom-black-900 transition">
-                  Cerrar sesión
-                </button>
-              </nav>
-            ) : (
-              <nav className="flex flex-col items-start space-y-4">
-                <Link
-                  href="/auth/login"
-                  className="text-custom-gray-800 hover:text-custom-black-900 transition">
-                  Iniciar sesión
-                </Link>
-                <Link
-                  href="/auth/register"
-                  className="text-custom-gray-800 hover:text-custom-black-900 transition">
-                  Registrate
-                </Link>
-              </nav>
-            )}
+            <nav className="flex flex-col items-start space-y-4">
+              {renderUserArea("mobile")}
+            </nav>
           </motion.div>
         )}
       </AnimatePresence>
