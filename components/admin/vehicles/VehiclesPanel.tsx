@@ -5,7 +5,7 @@ import { Plus, Search, Pencil, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import SkeletonTable from "../SkeletonTable";
 import DeleteToast from "../DeleteToast";
-import { Vehicle } from "@/lib/api/admin/vehicles/vehicles.type";
+import { Vehicle, VehicleApprovalStatus } from "@/lib/api/admin/vehicles/vehicles.type";
 import CreateVehicleModal from "./auxiliarComponents/CreateVehicleModal";
 import EditVehicleModal from "./auxiliarComponents/EditVehicleModal";
 import VehicleDetailsModal from "./auxiliarComponents/VehicleDetailsModal";
@@ -34,6 +34,19 @@ const providerMap: Record<string, string> = {
     VS: "Viaje Seguro",
     PARTNER: "Particular",
 } as const;
+
+const getApprovalStatusBadge = (status: VehicleApprovalStatus) => {
+    switch (status) {
+        case VehicleApprovalStatus.APPROVED:
+            return <span className="bg-green-100 text-green-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">Aprobado</span>;
+        case VehicleApprovalStatus.REJECTED:
+            return <span className="bg-red-100 text-red-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">Rechazado</span>;
+        case VehicleApprovalStatus.PENDING:
+            return <span className="bg-yellow-100 text-yellow-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">Pendiente</span>;
+        default:
+            return <span className="bg-gray-100 text-gray-800 text-xs font-medium mr-2 px-2.5 py-0.5 rounded">Desconocido</span>;
+    }
+};
 
 export default function VehiclesPanel() {
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
@@ -160,6 +173,18 @@ export default function VehiclesPanel() {
                                     <td className="px-4 py-2 border-b border-r border-custom-gray-200">{vehicle.allowSeatSelection ? "Sí" : "No"}</td>
                                     <td className="px-4 py-2 border-b border-r border-custom-gray-200">
                                         {vehicle.owner?.name} {vehicle.owner?.lastName && `- ${vehicle.owner.lastName}`}
+                                    </td>
+                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">
+                                        <button
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setSelectedVehicle(vehicle);
+                                                setIsEditModalOpen(true);
+                                            }}
+                                            className="cursor-pointer hover:opacity-80 transition-opacity"
+                                        >
+                                            {getApprovalStatusBadge(vehicle.approvalStatus)}
+                                        </button>
                                     </td>
 
                                     <td className="px-4 py-2 border-b border-custom-gray-200 text-center space-x-2">
