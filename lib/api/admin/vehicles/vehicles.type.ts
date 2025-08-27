@@ -13,6 +13,10 @@ export interface Vehicle {
     features: string[];
     images: string[];
     ownerId: string;
+    approvalStatus: VehicleApprovalStatus;
+    rejectionReason?: string;
+    createdAt: string;
+    updatedAt?: string;
     owner?: {
         id: string;
         name: string;
@@ -59,8 +63,14 @@ export enum ServiceType {
 }
 
 export enum Provider {
-    VS = "VS",
     PRIVATE = "PRIVATE",
+    VS = "VS",
+}
+
+export enum VehicleApprovalStatus {
+    PENDING = "PENDING",
+    APPROVED = "APPROVED",
+    REJECTED = "REJECTED",
 }
 
 export enum FeatureEnum {
