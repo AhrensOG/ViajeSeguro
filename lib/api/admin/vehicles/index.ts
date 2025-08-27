@@ -35,3 +35,16 @@ export async function deleteVehicle(id: string) {
         method: "DELETE",
     });
 }
+
+export async function approveVehicle(id: string): Promise<Vehicle> {
+    return await fetchWithAuth(`${BACKEND_URL}/vehicle/${id}/approve`, {
+        method: "PUT",
+    });
+}
+
+export async function rejectVehicle(id: string, reason?: string): Promise<Vehicle> {
+    return await fetchWithAuth(`${BACKEND_URL}/vehicle/${id}/reject`, {
+        method: "PUT",
+        body: JSON.stringify({ reason }),
+    });
+}
