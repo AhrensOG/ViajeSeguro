@@ -34,7 +34,7 @@ const PurchaseTripSummary = ({
     priceDetails,
 }: Props) => {
     const [showDetails, setShowDetails] = useState(false);
-    const IVA_RATE = Number(process.env.NEXT_PUBLIC_IVA || 0) / 100;
+    const IVA_RATE = Number(process.env.NEXT_PUBLIC_IVA || 21) / 100;
 
     const hasDiscounts = priceDetails && priceDetails.discounts.length > 0;
     const totalWithIVA = (priceDetails?.finalPrice ?? price) * (1 + IVA_RATE);
