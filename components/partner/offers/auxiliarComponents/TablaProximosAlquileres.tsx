@@ -1,0 +1,211 @@
+"use client"
+
+import { Clock, MapPin, Phone, MessageCircle, Truck } from "lucide-react"
+import { markBookingAsDelivered } from "@/lib/api/vehicle-booking"
+import { toast } from "sonner"
+import { useState } from "react"
+
+interface ProximoAlquiler {
+  id: number
+  vehicleName: string
+  vehicleImage: string
+  vehiclePlate: string
+  renterName: string
+  renterAvatar?: string
+  renterPhone: string
+  startDate: string
+  endDate: string
+  totalAmount: number
+  daysUntilStart: number
+  status: "pending" | "confirmed" | "rejected" | "approved" | "APPROVED" | "CONFIRMED" | "DELIVERED" | "delivered"
+  location: string
+}
+
+interface TablaProximosAlquileresProps {
+  rentals: ProximoAlquiler[]
+  onRentalUpdate?: () => void
+}
+
+export function TablaProximosAlquileres({ rentals, onRentalUpdate }: TablaProximosAlquileresProps) {
+  const [loadingDelivery, setLoadingDelivery] = useState<number | null>(null)
+  // Filtrar alquileres aprobados o entregados desde hoy en adelante
+  const confirmedRentals = rentals.filter(rental => {
+    // Estados válidos para mostrar
+    const isApproved = rental.status === 'approved' || 
+                      rental.status === 'confirmed'
+    const isDelivered = rental.status === 'DELIVERED' || 
+                       rental.status === 'delivered'
+    
+    // Fecha de hoy o futura (usar daysUntilStart ya calculado)
+    const isTodayOrFuture = rental.daysUntilStart >= 0
+    
+    // Debug para verificar filtrado
+    console.log('TablaProximosAlquileres Filter:', {
+      id: rental.id,
+      status: rental.status,
+      daysUntilStart: rental.daysUntilStart,
+      isApproved,
+      isDelivered,
+      isTodayOrFuture,
+      willShow: (isApproved || isDelivered) && isTodayOrFuture
+    })
+    
+    return (isApproved || isDelivered) && isTodayOrFuture
+  })
+
+  console.log('TablaProximosAlquileres - Total:', rentals.length, 'Approved future:', confirmedRentals.length)
+
+  // Si no hay alquileres aprobados futuros, no mostrar la tabla
+  if (confirmedRentals.length === 0) {
+    return null
+  }
+
+  const getStatusBadge = (daysUntilStart: number) => {
+    if (daysUntilStart <= 1) {
+      return <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs font-medium">Mañana</span>
+    }
+    if (daysUntilStart <= 3) {
+      return <span className="bg-orange-100 text-orange-800 px-2 py-1 rounded-full text-xs font-medium">En {daysUntilStart} días</span>
+    }
+    if (daysUntilStart <= 7) {
+      return <span className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">En {daysUntilStart} días</span>
+    }
+    return <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs font-medium">Confirmado</span>
+  }
+
+  const handleCall = (phone: string) => {
+    window.open(`tel:${phone}`, '_self')
+  }
+
+  const handleDelivery = async (rentalId: number) => {
+    try {
+      setLoadingDelivery(rentalId)
+      await markBookingAsDelivered(rentalId.toString())
+      toast.success("Vehículo marcado como entregado")
+      onRentalUpdate?.()
+    } catch (error) {
+      console.error('Error al marcar como entregado:', error)
+      toast.error("Error al marcar vehículo como entregado")
+    } finally {
+      setLoadingDelivery(null)
+    }
+  }
+
+  return (
+    <div className="w-full bg-white border border-gray-200 rounded-lg shadow-sm mb-8">
+      <div className="p-6 pb-3 border-b border-gray-100">
+        <h3 className="text-lg font-semibold text-gray-900 flex items-center gap-2">
+          <Clock className="h-5 w-5 text-blue-600" />
+          Próximos Alquileres
+        </h3>
+      </div>
+      <div className="p-6">
+        {confirmedRentals.length === 0 ? (
+          <div className="text-center py-8 text-gray-500">
+            <Clock className="h-12 w-12 mx-auto mb-4 text-gray-300" />
+            <p className="text-lg font-medium">No hay próximos alquileres</p>
+            <p className="text-sm">Los alquileres aprobados aparecerán aquí</p>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            {confirmedRentals.map((rental, index) => {
+              const isDelivered = rental.status === 'DELIVERED' || rental.status === 'delivered';
+              
+              return (
+              <div key={rental.id} className="flex items-center gap-4 p-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors">
+                {/* Imagen del vehículo */}
+                <div className="flex-shrink-0">
+                  <img
+                    src={rental.vehicleImage || "/placeholder-vehicle.jpg"}
+                    alt={rental.vehicleName}
+                    className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                  />
+                </div>
+
+                {/* Información del vehículo */}
+                <div className="flex-1 min-w-0">
+                  <h4 className="font-semibold text-gray-900 truncate">{rental.vehicleName}</h4>
+                  <p className="text-sm text-gray-600">Placa: {rental.vehiclePlate}</p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <MapPin className="h-4 w-4 text-gray-400" />
+                    <span className="text-sm text-gray-600 truncate">{rental.location}</span>
+                  </div>
+                </div>
+
+                {/* Información del cliente */}
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    {rental.renterAvatar && (
+                      <img
+                        src={rental.renterAvatar}
+                        alt={rental.renterName}
+                        className="w-8 h-8 rounded-full"
+                      />
+                    )}
+                    <div>
+                      <p className="font-medium text-gray-900">{rental.renterName}</p>
+                      <p className="text-sm text-gray-600">{rental.renterPhone}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Fechas y duración */}
+                <div className="flex-1 min-w-0 text-center">
+                  <p className="text-sm font-medium text-gray-900">
+                    {rental.startDate} - {rental.endDate}
+                  </p>
+                  <div className="mt-1">
+                    {getStatusBadge(rental.daysUntilStart)}
+                  </div>
+                </div>
+
+                {/* Precio total */}
+                <div className="flex-shrink-0 text-right">
+                  <p className="font-semibold text-lg text-gray-900">€{rental.totalAmount.toFixed(2)}</p>
+                  <p className="text-sm text-gray-600">Total</p>
+                </div>
+
+                <div className="flex-shrink-0">
+
+                  {/* Acciones */}
+                  <div className="flex gap-2">
+                    <button 
+                      onClick={() => handleCall(rental.renterPhone)}
+                      className="flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                      title="Llamar al cliente"
+                    >
+                      <Phone className="h-4 w-4" />
+                    </button>
+                    {/* Solo mostrar botón de entrega si NO está entregado */}
+                    {!isDelivered && (
+                      <button 
+                        onClick={() => handleDelivery(rental.id)}
+                        disabled={loadingDelivery === rental.id}
+                        className="flex items-center justify-center w-8 h-8 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                        title="Marcar como entregado"
+                      >
+                        {loadingDelivery === rental.id ? (
+                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                        ) : (
+                          <Truck className="h-4 w-4" />
+                        )}
+                      </button>
+                    )}
+                    
+                    {/* Mostrar estado entregado si ya fue entregado */}
+                    {isDelivered && (
+                      <div className="flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded" title="Vehículo entregado">
+                        <Truck className="h-4 w-4" />
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+              );
+            })}
+          </div>
+        )}
+      </div>
+    </div>
+  )
+}
