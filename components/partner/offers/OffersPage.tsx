@@ -7,11 +7,20 @@ import { RentalOffersEmpty } from "./auxiliarComponents/RentalOffersEmpty"
 import { RentalOffersGrid } from "./auxiliarComponents/RentalOffersGrid"
 import CreateOfferModal from "./auxiliarComponents/CreateOfferModal"
 import EditOfferModal from "./auxiliarComponents/EditOfferModal"
+import { EstadisticasDashboardAlquileres } from "./auxiliarComponents/EstadisticasDashboardAlquileres"
+import { RentalBookingsSection } from "./auxiliarComponents/RentalBookingsSection"
+import { TablaProximosAlquileres } from "./auxiliarComponents/TablaProximosAlquileres"
+import { TablaPendientesAprobacion } from "./auxiliarComponents/TablaPendientesAprobacion"
+import { ActiveRentalsTable } from "./auxiliarComponents/ActiveRentalsTable"
+import { TablaHistorialPagos } from "./auxiliarComponents/TablaHistorialPagos"
+import { RentalHistoryTable } from "./auxiliarComponents/RentalHistoryTable"
 import { Vehicle } from "@/lib/api/admin/vehicles/vehicles.type"
 import { getUserVehicles } from "@/lib/api/partner/vehicles"
 import { VehicleOffersAdminResponse } from "@/lib/api/admin/vehicle-offers/vehicleOffers.types"
 import { fetchWithAuth } from "@/lib/functions"
 import { BACKEND_URL } from "@/lib/constants"
+import { getPartnerEarnings, getPartnerUpcomingBookings } from "@/lib/api/vehicle-booking"
+import { PartnerEarningsResponse } from "@/lib/api/vehicle-booking/vehicleBooking.types"
 
 // Tipo adaptado para las ofertas del usuario
 interface RentalOffer {
@@ -51,6 +60,50 @@ export default function OffersPage() {
   const [userOffers, setUserOffers] = useState<RentalOffer[]>([])
   const [isLoadingVehicles, setIsLoadingVehicles] = useState(true)
   const [isLoadingOffers, setIsLoadingOffers] = useState(true)
+  const [statistics, setStatistics] = useState({
+    totalEarnings: 0,
+    monthlyEarnings: 0,
+    activeRentals: 0,
+    totalVehicles: 0,
+    upcomingReturns: 0,
+    earningsGrowthPercentage: 0,
+    nextReturnDate: "2024-02-17"
+  })
+  const [proximosAlquileres, setProximosAlquileres] = useState<any[]>([])
+  const [activeRentals, setActiveRentals] = useState<any[]>([])
+  const [rentalHistory, setRentalHistory] = useState<any[]>([])
+  const [historialPagos, setHistorialPagos] = useState([
+    {
+      id: 1,
+      vehicleName: "Ford Transit 2023",
+      renterName: "Carlos García",
+      amount: 450,
+      date: "2024-02-10",
+      status: "completed" as const,
+      paymentMethod: "Tarjeta de Crédito",
+      transactionId: "TXN-2024-001234"
+    },
+    {
+      id: 2,
+      vehicleName: "Mercedes Sprinter",
+      renterName: "Ana López",
+      amount: 680,
+      date: "2024-02-08",
+      status: "completed" as const,
+      paymentMethod: "PayPal",
+      transactionId: "TXN-2024-001235"
+    },
+    {
+      id: 3,
+      vehicleName: "Volkswagen Crafter",
+      renterName: "Miguel Rodríguez",
+      amount: 560,
+      date: "2024-02-05",
+      status: "pending" as const,
+      paymentMethod: "Transferencia",
+      transactionId: "TXN-2024-001236"
+    }
+  ])
 
   // Función para obtener ofertas del usuario
   const getUserOffers = async (): Promise<RentalOffer[]> => {
@@ -120,7 +173,85 @@ export default function OffersPage() {
     }
 
     loadUserOffers()
+    loadStatistics()
+    loadUpcomingBookings()
   }, [])
+
+  // Función para calcular estadísticas
+  const loadStatistics = async () => {
+    try {
+      const data = await getPartnerEarnings() as PartnerEarningsResponse
+      setStatistics({
+        totalEarnings: data.totalEarnings,
+        monthlyEarnings: data.currentMonthEarnings,
+        activeRentals: data.currentlyRentedVehicles,
+        totalVehicles: data.publishedVehicles,
+        upcomingReturns: data.totalBookings,
+        earningsGrowthPercentage: data.growthPercentage,
+        nextReturnDate: "2024-02-17"
+      })
+    } catch (error) {
+      console.error('Error loading statistics:', error)
+    }
+  }
+
+  // Función para cargar próximos alquileres
+  const loadUpcomingBookings = async () => {
+    try {
+      const bookings = await getPartnerUpcomingBookings() as any[]
+      
+      // Transformar datos del backend al formato del frontend
+      const transformedBookings = bookings.map((booking: any) => {
+        const startDate = new Date(booking.startDate)
+        const endDate = new Date(booking.endDate)
+        const today = new Date()
+        const daysUntilStart = Math.ceil((startDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+        
+        return {
+          id: booking.id,
+          vehicleName: `${booking.offer.vehicle.brand} ${booking.offer.vehicle.model}`,
+          vehicleImage: booking.offer.vehicle.images?.[0] || "/placeholder.svg",
+          vehiclePlate: booking.offer.vehicle.plate || "N/A",
+          renterName: `${booking.renter.name} ${booking.renter.lastName}`,
+          renterPhone: booking.renter.phone || "No disponible",
+          startDate: startDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }),
+          endDate: endDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }),
+          totalAmount: booking.totalPrice,
+          daysUntilStart: Math.max(0, daysUntilStart),
+          status: booking.status,
+          location: booking.offer.withdrawLocation
+        }
+      })
+
+      // Debug: Mostrar todos los estados recibidos
+      console.log('All bookings from backend:', transformedBookings.map(b => ({ id: b.id, status: b.status })))
+      
+      // Separar reservas por estado
+      const proximosAlquileresFiltered = transformedBookings.filter(booking => 
+        booking.status === 'PENDING' || booking.status === 'APPROVED' || booking.status === 'DELIVERED'
+      )
+      
+      const activeRentalsFiltered = transformedBookings.filter(booking => 
+        booking.status === 'ACTIVE' || booking.status === 'RETURNED'
+      )
+
+      // Pasar TODAS las reservas al historial
+      const rentalHistoryFiltered = transformedBookings
+
+      console.log('Filtered active rentals:', activeRentalsFiltered)
+      console.log('Filtered rental history:', rentalHistoryFiltered)
+
+      setProximosAlquileres(proximosAlquileresFiltered)
+      setActiveRentals(activeRentalsFiltered)
+      setRentalHistory(rentalHistoryFiltered)
+    } catch (error) {
+      console.error('Error loading upcoming bookings:', error)
+      setProximosAlquileres([])
+      setActiveRentals([])
+      setRentalHistory([])
+    }
+  }
+
 
   // Handlers para las acciones de ofertas
   const handleCreateOffer = () => {
@@ -182,6 +313,20 @@ export default function OffersPage() {
     }
   }
 
+  // Handler para cambios de aprobación
+  const handleApprovalChange = (rentalId: number, newStatus: 'confirmed' | 'rejected' | 'approved') => {
+    console.log('handleApprovalChange called:', { rentalId, newStatus })
+    setProximosAlquileres(prev => {
+      const updated = prev.map(rental => 
+        rental.id === rentalId 
+          ? { ...rental, status: newStatus }
+          : rental
+      )
+      console.log('Updated proximosAlquileres:', updated)
+      return updated
+    })
+  }
+
   if (isLoadingVehicles || isLoadingOffers) {
     return (
       <div className="w-full flex flex-col items-center px-0 md:px-6 my-4 pb-10 bg-white">
@@ -195,9 +340,56 @@ export default function OffersPage() {
     )
   }
 
+  // Solo mostrar estadísticas si el partner tiene al menos un vehículo aprobado
+  const hasApprovedVehicles = userVehicles.some(v => v.approvalStatus === "APPROVED")
+
   return (
     <div className="w-full flex flex-col items-center px-0 md:px-6 my-4 pb-10 bg-white">
       <div className="w-full flex flex-col justify-start items-start">
+        {/* Estadísticas - Solo mostrar si tiene vehículos aprobados */}
+        {hasApprovedVehicles && (
+          <EstadisticasDashboardAlquileres
+            totalEarnings={statistics.totalEarnings}
+            monthlyEarnings={statistics.monthlyEarnings}
+            userVehicles={userVehicles}
+            rentals={rentalHistory}
+            earningsGrowthPercentage={statistics.earningsGrowthPercentage}
+          />
+        )}
+
+        {/* Tabla de pendientes de aprobación */}
+        <div className="w-full max-w-none">
+          <TablaPendientesAprobacion 
+            rentals={proximosAlquileres} 
+            onApprovalChange={handleApprovalChange}
+          />
+        </div>
+
+        {/* Tabla de próximos alquileres */}
+        <div className="w-full max-w-none">
+          <TablaProximosAlquileres rentals={proximosAlquileres} />
+        </div>
+
+        {/* Tabla de alquileres activos - SIEMPRE MOSTRAR PARA DEBUG */}
+        <div className="w-full max-w-none">
+          <ActiveRentalsTable rentals={activeRentals} />
+        </div>
+
+        {/* Tabla de historial de pagos */}
+        {/* {hasApprovedVehicles && historialPagos.length > 0 && (
+          <div className="w-full max-w-none mb-8">
+            <TablaHistorialPagos payments={historialPagos} />
+          </div>
+        )} */}
+
+        {/* Tabla de historial de alquileres */}
+        <div className="w-full max-w-none mb-8">
+          <RentalHistoryTable rentals={rentalHistory} />
+        </div>
+
+        {/* Separador visual */}
+        <div className="h-12"></div>
+
         {userOffers.length > 0 ? (
           <RentalOffersGrid
             offers={userOffers}
@@ -230,7 +422,7 @@ export default function OffersPage() {
             id: selectedOffer.id,
             vehicleId: selectedOffer.vehicleId,
             pricePerDay: selectedOffer.pricePerDay,
-            agencyFee: selectedOffer.pricePerDay * 0.15, // Calcular tarifa de agencia
+            agencyFee: selectedOffer.pricePerDay * 0.22, // Calcular tarifa de agencia
             vehicleOfferType: selectedOffer.vehicleOfferType,
             availableFrom: selectedOffer.availableFrom,
             availableTo: selectedOffer.availableTo,
