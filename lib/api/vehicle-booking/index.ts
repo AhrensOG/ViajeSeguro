@@ -33,6 +33,7 @@ const fetchOffer = async (id: string) => {
 
     return formatedOffer;
 };
+
 const fetchVehicleBooking = async (id: string) => {
     const res = await fetcher<VehicleOfferWithVehicle>(`${BACKEND_URL}/vehicle-booking/${id}`);
     return res;
@@ -62,6 +63,34 @@ const markBookingAsPaid = async (id: string) => {
     return res;
 };
 
+const markBookingAsDelivered = async (id: string) => {
+  const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-booking/${id}/mark-delivered`, {
+    method: 'PATCH',
+  });
+  return res;
+}
+
+const confirmBookingPickup = async (id: string) => {
+  const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-booking/${id}/confirm-pickup`, {
+    method: 'PATCH',
+  });
+  return res;
+}
+
+const markAsReturned = async (id: string) => {
+  const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-booking/${id}/mark-returned`, {
+    method: 'PATCH',
+  });
+  return res;
+}
+
+const confirmVehicleReturn = async (id: string) => {
+  const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-booking/${id}/confirm-return`, {
+    method: 'PATCH',
+  });
+  return res;
+}
+
 const getVehicleBookingsForProfile = async (id: string) => {
     const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-booking/by-user/${id}`, {
         method: "GET",
@@ -69,4 +98,32 @@ const getVehicleBookingsForProfile = async (id: string) => {
     return res;
 };
 
-export { fetchOffer, fetchVehicleBooking, createVehicleBooking, fetchVehicleBookingWhitDetails, markBookingAsPaid, getVehicleBookingsForProfile };
+const getPartnerEarnings = async () => {
+    const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-booking/partner/earnings`, {
+        method: "GET",
+    });
+    return res;
+};
+
+const getPartnerUpcomingBookings = async () => {
+    const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-booking/partner/upcoming`, {
+        method: "GET",
+    });
+    return res;
+};
+
+
+export {
+    fetchOffer,
+    createVehicleBooking,
+    fetchVehicleBooking,
+    fetchVehicleBookingWhitDetails,
+    getVehicleBookingsForProfile,
+    getPartnerEarnings,
+    getPartnerUpcomingBookings,
+    markBookingAsPaid,
+    markBookingAsDelivered,
+    confirmBookingPickup,
+    markAsReturned,
+    confirmVehicleReturn,
+};
