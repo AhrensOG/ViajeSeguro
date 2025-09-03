@@ -17,25 +17,25 @@ const ReservationsPage = () => {
     const [vehicleBookings, setVehicleBookings] = useState<ResponseForProfilePage[]>([]);
     const [loading, setLoading] = useState(true);
 
+    const fetchReservations = async () => {
+        if (!session?.user?.id) return;
+        try {
+            const data = await getReservationsByUser(session.user.id);
+            const vehicleBookings = await getVehicleBookingsForProfile(session.user.id);
+
+            setVehicleBookings(vehicleBookings as ResponseForProfilePage[]);
+            setReservations(data);
+        } catch (error) {
+            console.log("Error al obtener reservas:", error);
+            toast.info("¡Ups! Ocurrió un error al obtener tus reservas.", {
+                description: "Intenta recargando la pagina o contacta con el soporte",
+            });
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        const fetchReservations = async () => {
-            if (!session?.user?.id) return;
-            try {
-                const data = await getReservationsByUser(session.user.id);
-                const vehicleBookings = await getVehicleBookingsForProfile(session.user.id);
-
-                setVehicleBookings(vehicleBookings as ResponseForProfilePage[]);
-                setReservations(data);
-            } catch (error) {
-                console.log("Error al obtener reservas:", error);
-                toast.info("¡Ups! Ocurrió un error al obtener tus reservas.", {
-                    description: "Intenta recargando la pagina o contacta con el soporte",
-                });
-            } finally {
-                setLoading(false);
-            }
-        };
-
         fetchReservations();
     }, [session?.user?.id]);
 
@@ -67,7 +67,11 @@ const ReservationsPage = () => {
                         <ReservationCard key={reservation.id} reservation={reservation} />
                     ))}
                     {vehicleBookings.map((vehicleBooking) => (
-                        <ReservationVehicleCard key={vehicleBooking.id} vehicleBooking={vehicleBooking} />
+                        <ReservationVehicleCard 
+                            key={vehicleBooking.id} 
+                            vehicleBooking={vehicleBooking} 
+                            onBookingUpdate={fetchReservations}
+                        />
                     ))}
                 </div>
             )}
