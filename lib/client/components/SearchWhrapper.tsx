@@ -59,7 +59,7 @@ export default function SearchSelectorWrapper() {
                     onClick={() => setActiveMode("car")}
                 >
                     <Car className="h-6 w-6" />
-                    Transporte
+                    Viaje Compartido
                 </p>
                 <p
                     className={`text-custom-gray-800 flex w-full md:w-[45%] justify-center items-center gap-2 cursor-pointer ${
@@ -68,7 +68,7 @@ export default function SearchSelectorWrapper() {
                     onClick={() => setActiveMode("van")}
                 >
                     <Truck className="h-6 w-6" />
-                    Furgonetas
+                    Alquiler de Vehículos
                 </p>
             </div>
 
