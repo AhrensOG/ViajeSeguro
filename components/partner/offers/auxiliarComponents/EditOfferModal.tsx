@@ -70,11 +70,11 @@ const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
 
   const pricePerDay = watch("pricePerDay");
 
-  // Calcular tarifa de agencia automáticamente (15% del precio por día)
+  // Calcular tarifa de agencia automáticamente (22% del precio por día)
   useEffect(() => {
     const price = parseFloat(pricePerDay?.replace(",", "."));
     if (!isNaN(price)) {
-      const fee = (price * 0.15).toFixed(2);
+      const fee = (price * 0.22).toFixed(2);
       setValue("agencyFee", fee);
     } else {
       setValue("agencyFee", "");
@@ -219,7 +219,7 @@ const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
               disabled={isLoading}
             />
             <p className="text-xs text-custom-gray-500 mt-1">
-              Se calcula automáticamente como el 15% del precio por día
+              Se calcula automáticamente como el 22% del precio por día
             </p>
             {errors.agencyFee && (
               <p className="text-red-500 text-xs">
