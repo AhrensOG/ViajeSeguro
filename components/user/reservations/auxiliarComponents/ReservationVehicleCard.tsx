@@ -81,14 +81,16 @@ const ReservationVehicleCard = ({
     totalPrice,
     paymentMethod,
     offer,
-    qrCode,
     status,
   } = vehicleBooking || {};
   const { vehicle, returnLocation, pricePerDay, vehicleOfferType, originalTimeZone } =
     offer || {};
   const { model, brand, year, capacity, fuelType, transmissionType, images } =
     vehicle || {};
-  const { imageUrl } = qrCode?.[0] || {};
+  // QR oculto en cards de alquiler de vehículos a pedido: no mostrar QR aquí
+
+  // Estado local para feedback instantáneo en UI
+  const [currentStatus, setCurrentStatus] = useState(status);
 
   const formattedStart = DateTime.fromISO(startDate, { zone: "utc" })
     .setZone(originalTimeZone || "Europe/Madrid")
@@ -105,17 +107,22 @@ const ReservationVehicleCard = ({
         (1000 * 60 * 60 * 24)
       )
       : "-";
-  const formattedTotal = `${totalPrice.toFixed(2)}€`;
+  // Cálculos correctos para mostrar al cliente
+  const daysCount = calculateTotalDays(String(startDate), String(endDate));
+  const subTotal = pricePerDay * daysCount;
+  const ivaPercent = Number(IVA) || 0;
+  const ivaAmount = Number(((subTotal * ivaPercent) / 100).toFixed(2));
+  const totalWithIva = Number((subTotal + ivaAmount).toFixed(2));
 
-  const subTotal =
-    pricePerDay * calculateTotalDays(String(startDate), String(endDate));
-  // const total = subTotal * (1 + Number(IVA) / 100);
+  // Nota: subTotal/ivaAmount/totalWithIva calculados arriba
 
   const handleConfirmPickup = async () => {
     try {
       setLoadingPickup(true);
       await confirmBookingPickup(id.toString());
       toast.success("¡Vehículo recogido! Tu alquiler está ahora activo");
+      // Optimista: reflejar inmediatamente en la UI
+      setCurrentStatus("ACTIVE");
       onBookingUpdate?.();
     } catch (error) {
       console.error('Error al confirmar recogida:', error);
@@ -130,6 +137,9 @@ const ReservationVehicleCard = ({
       setLoadingReturn(true);
       await markAsReturned(id.toString());
       toast.success("¡Vehículo devuelto exitosamente!");
+      // Optimista: reflejar inmediatamente en la UI (usar FINISHED para respetar el tipo)
+      setCurrentStatus("FINISHED");
+
       onBookingUpdate?.();
     } catch (error) {
       console.error('Error al devolver vehículo:', error);
@@ -203,7 +213,7 @@ const ReservationVehicleCard = ({
         </div>
         <div className="flex flex-row-reverse md:flex-col gap-4 md:gap-2 md:w-[10rem] md:h-full justify-center md:justify-end items-center md:items-start ">
           <h3 className="text-2xl font-bold text-custom-black-800">
-            {formattedTotal}
+            {totalWithIva.toFixed(2)}€
           </h3>
           <p className="text-sm text-custom-gray-600">Precio total</p>
         </div>
@@ -224,13 +234,13 @@ const ReservationVehicleCard = ({
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
             className="overflow-hidden flex flex-col gap-6 mt-2">
-            <div className={`rounded-xl border p-4 text-sm ${getStatusColor(status)}`}>
+            <div className={`rounded-xl border p-4 text-sm ${getStatusColor(currentStatus as keyof typeof statusMap)}`}>
               <p className="font-semibold mb-1">
                 Estado de tu reserva
               </p>
               <p>
                 Tu solicitud fue procesada correctamente y se encuentra en
-                estado <strong>{statusMap[status]}</strong>.
+                estado <strong>{statusMap[currentStatus as keyof typeof statusMap]}</strong>.
               </p>
             </div>
 
@@ -283,48 +293,25 @@ const ReservationVehicleCard = ({
                 <p>{subTotal.toFixed(2)}€</p>
               </div>
               <div className="flex justify-between text-sm text-custom-gray-700 w-full">
-                <p>IVA ({IVA}%):</p>
-                <p>{formattedTotal}</p>
+                <p>IVA ({ivaPercent}%):</p>
+                <p>{ivaAmount.toFixed(2)}€</p>
               </div>
               <div className="flex justify-between text-custom-gray-700 w-full text-lg font-bold">
                 <p>Importe Final:</p>
-                <p>{formattedTotal}</p>
+                <p>{totalWithIva.toFixed(2)}€</p>
               </div>
               {/* <p className="text-sm text-custom-golden-600 text-end w-full hover:underline cursor-pointer">Ver detalle de descuentos</p> */}
             </div>
 
             <div className="border-b border-custom-gray-200"></div>
 
-            {imageUrl && (
-              <div className="flex flex-col justify-center items-center w-full">
-                <h2 className="text-lg font-semibold mb-4 text-center text-custom-black-900">
-                  Código QR de tu viaje
-                </h2>
-
-                <p className="text-sm text-center text-custom-gray-600">
-                  Muestra este código al conductor al momento del embarque.
-                </p>
-                <Image
-                  src={imageUrl}
-                  alt="QR Code"
-                  width={200}
-                  height={200}
-                  className="w-48 h-48"
-                />
-                <p className="text-xs text-center text-custom-gray-400 mt-1">
-                  Si el QR falla, proporciona este ID al conductor:{" "}
-                  <span className="font-semibold text-custom-black-700">
-                    {vehicleBooking.id}
-                  </span>
-                </p>
-              </div>
-            )}
+            {/* QR intencionalmente no visible en esta card (alquiler de vehículos) */}
 
             <div className="border-b border-custom-gray-200"></div>
 
             <div className="flex flex-col justify-center items-end gap-4 relative">
               {/* Botón de confirmar recogida cuando estado es DELIVERED */}
-              {status === "DELIVERED" && (
+              {currentStatus === "DELIVERED" && (
                 <div className="w-full flex justify-center">
                   <button
                     onClick={(e) => {
@@ -345,7 +332,7 @@ const ReservationVehicleCard = ({
               )}
 
               {/* Botón de devolver vehículo cuando estado es ACTIVE */}
-              {status === "ACTIVE" && (
+              {currentStatus === "ACTIVE" && (
                 <div className="w-full flex justify-center">
                   <button
                     onClick={(e) => {
@@ -366,9 +353,9 @@ const ReservationVehicleCard = ({
               )}
 
               {/* Botón de cancelar para estados apropiados */}
-              {(status === "COMPLETED" ||
-                status === "PENDING" ||
-                status === "APPROVED") && (
+              {(currentStatus === "COMPLETED" ||
+                currentStatus === "PENDING" ||
+                currentStatus === "APPROVED") && (
                   <div className="flex flex-col gap-2 items-center">
                     <AnimatePresence>
                       {!hideButton && (
