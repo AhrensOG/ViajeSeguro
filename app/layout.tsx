@@ -21,7 +21,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="es">
       <body className={`${montserrat.className} antialiased`}>
         <Toaster position="bottom-right" richColors />
         <Providers>{children}</Providers>
