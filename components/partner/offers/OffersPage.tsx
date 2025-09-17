@@ -206,6 +206,13 @@ export default function OffersPage() {
         const endDate = new Date(booking.endDate)
         const today = new Date()
         const daysUntilStart = Math.ceil((startDate.getTime() - today.getTime()) / (1000 * 60 * 60 * 24))
+        // Calcular lo pagado realmente por el cliente (Stripe):
+        // Sumamos pagos COMPLETED asociados a este booking hechos por el mismo renter
+        const payments = Array.isArray(booking.payments) ? booking.payments : []
+        const renterId = booking?.renter?.id
+        const paidAmount = payments
+          .filter((p: any) => p?.userId && p?.amount && p.userId === renterId)
+          .reduce((sum: number, p: any) => sum + Number(p.amount || 0), 0)
         
         return {
           id: booking.id,
@@ -216,7 +223,11 @@ export default function OffersPage() {
           renterPhone: booking.renter.phone || "No disponible",
           startDate: startDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }),
           endDate: endDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }),
-          totalAmount: booking.totalPrice,
+          // Guardar ISO para cálculos posteriores (estadísticas por mes)
+          startDateISO: booking.startDate,
+          endDateISO: booking.endDate,
+          // Usar lo pagado en Stripe; si no hay pagos, usar totalPrice como fallback
+          totalAmount: paidAmount > 0 ? Number(paidAmount.toFixed(2)) : booking.totalPrice,
           daysUntilStart: Math.max(0, daysUntilStart),
           status: booking.status,
           location: booking.offer.withdrawLocation
@@ -244,6 +255,30 @@ export default function OffersPage() {
       setProximosAlquileres(proximosAlquileresFiltered)
       setActiveRentals(activeRentalsFiltered)
       setRentalHistory(rentalHistoryFiltered)
+
+      // Actualizar estadísticas arriba con montos realmente pagados (Stripe)
+      try {
+        const now = new Date()
+        const currentMonth = now.getMonth()
+        const currentYear = now.getFullYear()
+
+        const totalEarningsGross = rentalHistoryFiltered.reduce((sum: number, r: any) => sum + Number(r.totalAmount || 0), 0)
+        const monthlyEarningsGross = rentalHistoryFiltered
+          .filter((r: any) => {
+            const d = new Date(r.startDateISO || r.startDate)
+            return d.getMonth() === currentMonth && d.getFullYear() === currentYear
+          })
+          .reduce((sum: number, r: any) => sum + Number(r.totalAmount || 0), 0)
+
+        setStatistics(prev => ({
+          ...prev,
+          totalEarnings: Number(totalEarningsGross.toFixed(2)),
+          monthlyEarnings: Number(monthlyEarningsGross.toFixed(2)),
+          activeRentals: activeRentalsFiltered.length,
+        }))
+      } catch (e) {
+        console.warn('Failed to compute earnings stats from bookings:', e)
+      }
     } catch (error) {
       console.error('Error loading upcoming bookings:', error)
       setProximosAlquileres([])
@@ -314,17 +349,25 @@ export default function OffersPage() {
   }
 
   // Handler para cambios de aprobación
-  const handleApprovalChange = (rentalId: number, newStatus: 'confirmed' | 'rejected' | 'approved') => {
+  const handleApprovalChange = async (rentalId: number, newStatus: 'confirmed' | 'rejected' | 'approved') => {
     console.log('handleApprovalChange called:', { rentalId, newStatus })
+    // Actualización optimista
     setProximosAlquileres(prev => {
       const updated = prev.map(rental => 
         rental.id === rentalId 
           ? { ...rental, status: newStatus }
           : rental
       )
-      console.log('Updated proximosAlquileres:', updated)
+      console.log('Updated proximosAlquileres (optimistic):', updated)
       return updated
     })
+
+    // Refrescar desde backend para sincronizar todas las tablas
+    try {
+      await loadUpcomingBookings()
+    } catch (e) {
+      console.warn('Failed to refresh bookings after approval change:', e)
+    }
   }
 
   if (isLoadingVehicles || isLoadingOffers) {
