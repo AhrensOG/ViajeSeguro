@@ -24,7 +24,7 @@ interface PendienteAprobacion {
 
 interface TablaPendientesAprobacionProps {
   rentals: PendienteAprobacion[]
-  onApprovalChange: (rentalId: number, newStatus: 'confirmed' | 'rejected') => void
+  onApprovalChange: (rentalId: number, newStatus: 'confirmed' | 'rejected' | 'approved') => void
 }
 
 export function TablaPendientesAprobacion({ rentals, onApprovalChange }: TablaPendientesAprobacionProps) {
