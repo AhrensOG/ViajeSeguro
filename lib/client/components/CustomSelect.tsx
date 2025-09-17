@@ -15,6 +15,7 @@ interface CustomSelectProps {
   onSelect: (value: string) => void;
   value?: string;
   icon?: ReactNode;
+  disabled?: boolean;
 }
 
 const CustomSelect = ({
@@ -23,6 +24,7 @@ const CustomSelect = ({
   onSelect,
   value,
   icon,
+  disabled = false,
 }: CustomSelectProps) => {
   const [isOpen, setIsOpen] = useState(false);
   const [selected, setSelected] = useState<string | null>(value || null);
@@ -39,8 +41,11 @@ const CustomSelect = ({
       tabIndex={0}
       onBlur={() => setIsOpen(false)}>
       <button
-        onClick={() => setIsOpen(!isOpen)}
-        className="w-full flex items-center justify-between border border-custom-gray-300 bg-custom-white-100 px-4 py-3 rounded-lg shadow-sm text-custom-gray-500 hover: focus:ring-1 focus:ring-custom-golden-600 transition">
+        onClick={() => !disabled && setIsOpen(!isOpen)}
+        disabled={disabled}
+        className={`w-full flex items-center justify-between border border-custom-gray-300 bg-custom-white-100 px-4 py-3 rounded-lg shadow-sm text-custom-gray-500 hover: focus:ring-1 focus:ring-custom-golden-600 transition ${
+          disabled ? 'opacity-50 cursor-not-allowed' : 'cursor-pointer'
+        }`}>
         <div className="flex items-center gap-3">
           {icon && <span className="text-custom-gray-500">{icon}</span>}
           {selected
