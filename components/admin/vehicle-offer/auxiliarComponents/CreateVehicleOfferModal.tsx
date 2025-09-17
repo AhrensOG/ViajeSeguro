@@ -52,19 +52,32 @@ const CreateVehicleOfferModal = ({
 
   const selectedVehicleId = watch("vehicleId");
   const [matchedOwner, setMatchedOwner] = useState<SimpleUser | null>(null);
+  const [selectedVehicle, setSelectedVehicle] = useState<SimpleVehicle | null>(null);
 
   useEffect(() => {
     if (selectedVehicleId) {
       const vehicle = vehicles.find((v) => v.id === selectedVehicleId);
       if (vehicle) {
-        const owner = owners.find((o) => o.id === vehicle.ownerId);
-        if (owner) {
-          setValue("ownerId", owner.id);
-          setMatchedOwner(owner);
+        setSelectedVehicle(vehicle);
+        
+        // Solo buscar y asignar owner si NO es vehículo de Viaje Seguro
+        if (vehicle.provider !== "VS") {
+          const owner = owners.find((o) => o.id === vehicle.ownerId);
+          if (owner) {
+            setValue("ownerId", owner.id);
+            setMatchedOwner(owner);
+          } else {
+            setMatchedOwner(null);
+          }
         } else {
+          // Para vehículos VS, limpiar el owner y no asignar ownerId
           setMatchedOwner(null);
+          setValue("ownerId", "");
         }
       }
+    } else {
+      setSelectedVehicle(null);
+      setMatchedOwner(null);
     }
   }, [selectedVehicleId, vehicles, owners, setValue]);
 
@@ -108,7 +121,7 @@ const CreateVehicleOfferModal = ({
   useEffect(() => {
     const price = parseFloat(pricePerDay?.replace(",", "."));
     if (!isNaN(price)) {
-      const fee = (price * 0.15).toFixed(2);
+      const fee = (price * 0.22).toFixed(2);
       setValue("agencyFee", fee);
     } else {
       setValue("agencyFee", "");
@@ -162,20 +175,34 @@ const CreateVehicleOfferModal = ({
             )}
           </div>
 
-          <div>
-            <label className={labelClass}>Propietario</label>
-            <input
-              type="text"
-              readOnly
-              value={
-                matchedOwner
-                  ? `${matchedOwner.name} ${matchedOwner.lastName} - ${matchedOwner.email}`
-                  : ""
-              }
-              className={inputClass}
-            />
-            <input type="hidden" {...register("ownerId", { required: true })} />
-          </div>
+          {/* Solo mostrar campo propietario para vehículos que NO son de Viaje Seguro */}
+          {selectedVehicle?.provider !== "VS" && (
+            <div>
+              <label className={labelClass}>Propietario</label>
+              <input
+                type="text"
+                readOnly
+                value={
+                  matchedOwner
+                    ? `${matchedOwner.name} ${matchedOwner.lastName} - ${matchedOwner.email}`
+                    : ""
+                }
+                className={inputClass}
+              />
+              <input type="hidden" {...register("ownerId", { required: true })} />
+            </div>
+          )}
+
+          {/* Mostrar información para vehículos de Viaje Seguro */}
+          {selectedVehicle?.provider === "VS" && (
+            <div>
+              <label className={labelClass}>Propietario</label>
+              <div className="w-full border border-custom-gray-300 rounded-md px-4 py-2 bg-custom-gray-50 text-custom-gray-600 text-sm">
+                Viaje Seguro (asignado automáticamente)
+              </div>
+              <input type="hidden" {...register("ownerId", { required: false })} />
+            </div>
+          )}
 
           <div>
             <label className={labelClass}>Precio por día (€)</label>
