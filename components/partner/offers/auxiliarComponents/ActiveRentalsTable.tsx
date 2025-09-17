@@ -1,6 +1,6 @@
 "use client"
 
-import { CalendarDays, MapPin, Phone, MessageCircle, ChevronDown } from "lucide-react"
+import { CalendarDays, MapPin, Phone, ChevronDown } from "lucide-react"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { confirmVehicleReturn } from "@/lib/api/vehicle-booking"
@@ -156,9 +156,6 @@ export function ActiveRentalsTable({ rentals }: ActiveRentalsTableProps) {
                     className="p-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
                   >
                     <Phone className="h-4 w-4" />
-                  </button>
-                  <button className="p-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors">
-                    <MessageCircle className="h-4 w-4" />
                   </button>
                   {rental.status === "RETURNED" && (
                     <button 
