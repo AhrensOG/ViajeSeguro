@@ -1,6 +1,6 @@
 "use client"
 
-import { Clock, MapPin, Phone, MessageCircle, Truck } from "lucide-react"
+import { Clock, MapPin, Phone, MessageCircle, Truck, CheckCircle } from "lucide-react"
 import { markBookingAsDelivered } from "@/lib/api/vehicle-booking"
 import { toast } from "sonner"
 import { useState } from "react"
@@ -17,7 +17,7 @@ interface ProximoAlquiler {
   endDate: string
   totalAmount: number
   daysUntilStart: number
-  status: "pending" | "confirmed" | "rejected" | "approved" | "APPROVED" | "CONFIRMED" | "DELIVERED" | "delivered"
+  status: "pending" | "confirmed" | "rejected" | "approved" | "APPROVED" | "CONFIRMED" | "DELIVERED" | "delivered" | "PENDING"
   location: string
 }
 
@@ -28,11 +28,13 @@ interface TablaProximosAlquileresProps {
 
 export function TablaProximosAlquileres({ rentals, onRentalUpdate }: TablaProximosAlquileresProps) {
   const [loadingDelivery, setLoadingDelivery] = useState<number | null>(null)
+  const [deliveredRentals, setDeliveredRentals] = useState<Set<number>>(new Set())
   // Filtrar alquileres aprobados o entregados desde hoy en adelante
   const confirmedRentals = rentals.filter(rental => {
-    // Estados válidos para mostrar
+    // Estados válidos para mostrar (solo APPROVED/CONFIRMED y DELIVERED; excluir PENDING)
     const isApproved = rental.status === 'approved' || 
-                      rental.status === 'confirmed'
+                      rental.status === 'confirmed' ||
+                      rental.status === 'APPROVED'
     const isDelivered = rental.status === 'DELIVERED' || 
                        rental.status === 'delivered'
     
@@ -81,7 +83,11 @@ export function TablaProximosAlquileres({ rentals, onRentalUpdate }: TablaProxim
     try {
       setLoadingDelivery(rentalId)
       await markBookingAsDelivered(rentalId.toString())
-      toast.success("Vehículo marcado como entregado")
+      
+      // Marcar como entregado localmente
+      setDeliveredRentals(prev => new Set([...prev, rentalId]))
+      
+      toast.success("🚗 Vehículo entregado exitosamente al cliente")
       onRentalUpdate?.()
     } catch (error) {
       console.error('Error al marcar como entregado:', error)
@@ -109,7 +115,7 @@ export function TablaProximosAlquileres({ rentals, onRentalUpdate }: TablaProxim
         ) : (
           <div className="space-y-3">
             {confirmedRentals.map((rental, index) => {
-              const isDelivered = rental.status === 'DELIVERED' || rental.status === 'delivered';
+              const isDelivered = rental.status === 'DELIVERED' || rental.status === 'delivered' || deliveredRentals.has(rental.id);
               
               return (
               <div key={rental.id} className="flex items-center gap-4 p-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors">
@@ -168,7 +174,7 @@ export function TablaProximosAlquileres({ rentals, onRentalUpdate }: TablaProxim
                 <div className="flex-shrink-0">
 
                   {/* Acciones */}
-                  <div className="flex gap-2">
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <button 
                       onClick={() => handleCall(rental.renterPhone)}
                       className="flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
@@ -181,21 +187,30 @@ export function TablaProximosAlquileres({ rentals, onRentalUpdate }: TablaProxim
                       <button 
                         onClick={() => handleDelivery(rental.id)}
                         disabled={loadingDelivery === rental.id}
-                        className="flex items-center justify-center w-8 h-8 bg-green-600 text-white rounded hover:bg-green-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
-                        title="Marcar como entregado"
+                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:scale-105 min-w-[140px] sm:min-w-[160px]"
+                        title="Marcar vehículo como entregado al cliente"
                       >
                         {loadingDelivery === rental.id ? (
-                          <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                          <>
+                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                            <span className="text-sm font-medium hidden sm:inline">Entregando...</span>
+                          </>
                         ) : (
-                          <Truck className="h-4 w-4" />
+                          <>
+                            <CheckCircle className="h-5 w-5" />
+                            <span className="text-sm font-medium hidden sm:inline">Marcar Entregado</span>
+                            <span className="text-xs font-medium sm:hidden">Entregar</span>
+                          </>
                         )}
                       </button>
                     )}
                     
                     {/* Mostrar estado entregado si ya fue entregado */}
                     {isDelivered && (
-                      <div className="flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded" title="Vehículo entregado">
-                        <Truck className="h-4 w-4" />
+                      <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-lg shadow-md min-w-[140px] sm:min-w-[160px] animate-pulse" title="Vehículo entregado exitosamente">
+                        <CheckCircle className="h-5 w-5" />
+                        <span className="text-sm font-medium hidden sm:inline">✅ Entregado</span>
+                        <span className="text-xs font-medium sm:hidden">✅ OK</span>
                       </div>
                     )}
                   </div>
