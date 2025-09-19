@@ -180,6 +180,19 @@ export default function VehicleCard({ vehicle, onEditClick }: VehicleCardProps) 
           </div>
         )}
 
+        {/* Approval Note (reuses rejectionReason field as admin note) */}
+        {vehicle.approvalStatus === "APPROVED" && vehicle.rejectionReason && (
+          <div className="mb-4 p-3 bg-emerald-50 border border-emerald-200 rounded-lg">
+            <div className="flex items-start gap-2">
+              <span className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0">✓</span>
+              <div>
+                <p className="text-sm font-medium text-emerald-800 mb-1">Nota de aprobación:</p>
+                <p className="text-sm text-emerald-700">{vehicle.rejectionReason}</p>
+              </div>
+            </div>
+          </div>
+        )}
+
         {/* Spacer para empujar los botones hacia abajo */}
         <div className="flex-1"></div>
         
