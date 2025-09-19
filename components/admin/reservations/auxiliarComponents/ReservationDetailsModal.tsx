@@ -21,6 +21,10 @@ const ReservationDetailModal = ({ reservation, onClose }: Props) => {
         };
     }, [onClose]);
 
+    // Calcular cantidad de maletas adicionales desde seatCode (formato: EXTRA_BAGS:N)
+    const extraBagsMatch = reservation.seatCode?.match(/EXTRA_BAGS:(\d+)/);
+    const extraBags = extraBagsMatch ? Number(extraBagsMatch[1]) : 0;
+
     return (
         <div onClick={onClose} className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
             <div
@@ -54,6 +58,11 @@ const ReservationDetailModal = ({ reservation, onClose }: Props) => {
                     <div className="bg-custom-white-50 p-3 rounded-md border border-custom-gray-200">
                         <label className="block text-xs font-semibold text-custom-gray-500 mb-1">Método de pago</label>
                         <p>{reservation.paymentMethod}</p>
+                    </div>
+
+                    <div className="bg-custom-white-50 p-3 rounded-md border border-custom-gray-200">
+                        <label className="block text-xs font-semibold text-custom-gray-500 mb-1">Equipaje adicional</label>
+                        <p>{Number.isFinite(extraBags) ? `${extraBags} maleta(s)` : "0 maleta(s)"}</p>
                     </div>
 
                     <div className="bg-custom-white-50 p-3 rounded-md border border-custom-gray-200">
