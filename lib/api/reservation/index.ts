@@ -28,3 +28,13 @@ export const markReservationAsPaid = async (reservationId: string): Promise<void
         method: "PUT",
     });
 };
+
+export const addReservationExtras = async (reservationId: string, extraBags: number): Promise<ReservationResponse> => {
+    return fetchWithAuth<ReservationResponse>(`${BACKEND_URL}/reservation/add-extras/${reservationId}`, {
+        method: "PUT",
+        body: JSON.stringify({ extraBags }),
+        headers: {
+            "Content-Type": "application/json",
+        },
+    });
+};
