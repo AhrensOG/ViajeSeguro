@@ -44,6 +44,7 @@ const EditVehicleModal = ({ vehicle, owners, onClose, onSuccess }: Props) => {
     const [newImageFiles, setNewImageFiles] = useState<FileList | null>(null);
     const [approvalStatus, setApprovalStatus] = useState<VehicleApprovalStatus>(vehicle.approvalStatus);
     const [rejectionReason, setRejectionReason] = useState<string>(vehicle.rejectionReason || "");
+    const [approvalNote, setApprovalNote] = useState<string>("");
 
     useEffect(() => {
         if (vehicle) {
@@ -92,7 +93,8 @@ const EditVehicleModal = ({ vehicle, owners, onClose, onSuccess }: Props) => {
             // Manejar cambios de estado de aprobación
             if (approvalStatus !== vehicle.approvalStatus) {
                 if (approvalStatus === VehicleApprovalStatus.APPROVED) {
-                    updated = await approveVehicle(vehicle.id);
+                    // Enviar nota opcional al aprobar
+                    updated = await approveVehicle(vehicle.id, approvalNote?.trim() || undefined);
                 } else if (approvalStatus === VehicleApprovalStatus.REJECTED) {
                     if (!rejectionReason.trim()) {
                         toast.error("Debe proporcionar una razón para el rechazo", { id: toastId });
@@ -110,7 +112,13 @@ const EditVehicleModal = ({ vehicle, owners, onClose, onSuccess }: Props) => {
                     ...updateData, // Aplicar cambios del formulario
                     ...updated, // Aplicar respuesta de la API
                     approvalStatus: approvalStatus, // Forzar el estado seleccionado
-                    rejectionReason: approvalStatus === VehicleApprovalStatus.REJECTED ? rejectionReason : (approvalStatus === VehicleApprovalStatus.PENDING ? "" : updated.rejectionReason)
+                    // Guardar nota en ambos casos: rechazo usa rejectionReason, aprobado reutiliza rejectionReason como nota
+                    rejectionReason:
+                        approvalStatus === VehicleApprovalStatus.REJECTED
+                            ? rejectionReason
+                            : approvalStatus === VehicleApprovalStatus.APPROVED
+                            ? (approvalNote?.trim() || updated.rejectionReason)
+                            : ""
                 };
             } else {
                 // Si no hay cambio de estado, actualizar normalmente
@@ -183,6 +191,18 @@ const EditVehicleModal = ({ vehicle, owners, onClose, onSuccess }: Props) => {
                                     placeholder="Especifique la razón del rechazo..."
                                     rows={3}
                                     required
+                                />
+                            </div>
+                        )}
+                        {approvalStatus === VehicleApprovalStatus.APPROVED && (
+                            <div>
+                                <label className={labelClass}>Nota de aprobación (opcional)</label>
+                                <textarea
+                                    value={approvalNote}
+                                    onChange={(e) => setApprovalNote(e.target.value)}
+                                    className={inputClass}
+                                    placeholder="Escriba un comentario para el partner..."
+                                    rows={3}
                                 />
                             </div>
                         )}
