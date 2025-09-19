@@ -11,6 +11,7 @@ import { BASE_URL } from "@/lib/constants";
 import { convertUTCToLocalTime, formatFullDate, getDurationString } from "@/lib/functions";
 import { useSession } from "next-auth/react";
 import { getDiscountByUserId } from "@/lib/api/trip";
+import { useTripOptions } from "./TripOptionsContext";
 
 type BookingSidebarProps = {
     trip: TripWithPriceDetails;
@@ -33,6 +34,8 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
     const searchParams = useSearchParams();
     const IVA = process.env.NEXT_PUBLIC_IVA;
     const [referral, setReferral] = useState("");
+    const { extraBags } = useTripOptions();
+    const EXTRA_BAG_PRICE = 5;
 
     const departureTime = convertUTCToLocalTime(trip.departure, trip.originalTimeZone);
     const arrivalTime = convertUTCToLocalTime(trip.arrival, trip.originalTimeZone);
@@ -61,13 +64,17 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
         if (!trip.priceDetails) {
             setShowModal(true);
         } else {
-            router.push(`/purchase?id=${trip.id}&&referral=${referral}&&type=trip`);
+            router.push(`/purchase?id=${trip.id}&&referral=${referral}&&type=trip&&extraBags=${extraBags}`);
         }
     };
 
     const basePrice = trip.basePrice;
     const finalPrice = trip.priceDetails?.finalPrice ?? basePrice;
     const hasDiscounts = !!trip.priceDetails?.discounts?.length;
+    const extraCost = (extraBags || 0) * EXTRA_BAG_PRICE;
+    const effectivePrice = (hasDiscounts ? finalPrice : basePrice) + extraCost;
+    const ivaAmount = (effectivePrice * Number(IVA)) / 100;
+    const totalWithIVA = effectivePrice * (1 + Number(IVA) / 100);
 
     return (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }} className="space-y-4">
@@ -103,22 +110,29 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
                             <div className="text-xl font-semibold text-custom-black-800">{basePrice.toFixed(2).replace(".", ",")} €</div>
                         )}
                     </div>
+
+                    {/* Equipaje adicional */}
+                    <div className="flex items-center justify-between mb-1">
+                        <div className="flex items-center gap-2">
+                            <span className="font-medium">Equipaje adicional</span>
+                            <ChevronRight size={16} className="text-custom-gray-500" />
+                        </div>
+                        <div className="text-right">
+                            <div className="text-sm text-custom-gray-600">{extraBags} x {EXTRA_BAG_PRICE.toFixed(2).replace(".", ",")} €</div>
+                            <div className="text-base font-semibold text-custom-black-800">{extraCost.toFixed(2).replace(".", ",")} €</div>
+                        </div>
+                    </div>
+
                     <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
                             <span className="font-medium">IVA</span>
                             <ChevronRight size={16} className="text-custom-gray-500" />
                         </div>
-                        {hasDiscounts ? (
-                            <div className="text-right">
-                                <div className="text-xl font-semibold text-custom-black-800">
-                                    {((finalPrice * Number(IVA)) / 100).toFixed(2).replace(".", ",")} €
-                                </div>
+                        <div className="text-right">
+                            <div className="text-xl font-semibold text-custom-black-800">
+                                {ivaAmount.toFixed(2).replace(".", ",")} €
                             </div>
-                        ) : (
-                            <div className="text-2xl font-semibold text-custom-black-800">
-                                {((basePrice * Number(IVA)) / 100).toFixed(2).replace(".", ",")} €
-                            </div>
-                        )}
+                        </div>
                     </div>
 
                     <div className="flex items-center justify-between mb-1">
@@ -126,20 +140,16 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
                             <span className="font-medium">Importe Final</span>
                             <ChevronRight size={16} className="text-custom-gray-500" />
                         </div>
-                        {hasDiscounts ? (
-                            <div className="text-right">
+                        <div className="text-right">
+                            {hasDiscounts ? (
                                 <div className="text-sm text-gray-500 line-through">
                                     {(basePrice * (1 + Number(IVA) / 100)).toFixed(2).replace(".", ",")} €
                                 </div>
-                                <div className="text-2xl font-bold text-custom-black-800">
-                                    {(finalPrice * (1 + Number(IVA) / 100)).toFixed(2).replace(".", ",")} €
-                                </div>
-                            </div>
-                        ) : (
+                            ) : null}
                             <div className="text-2xl font-bold text-custom-black-800">
-                                {(basePrice * (1 + Number(IVA) / 100)).toFixed(2).replace(".", ",")} €
+                                {totalWithIVA.toFixed(2).replace(".", ",")} €
                             </div>
-                        )}
+                        </div>
                     </div>
 
                     {hasDiscounts && (
@@ -179,6 +189,11 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
                         </div>
                     )}
                 </div>
+
+                {/* Nota de equipaje incluido */}
+                <p className="mt-2 text-xs text-custom-gray-600">
+                    Este viaje incluye 1 equipaje de mano y 1 maleta.
+                </p>
 
                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.96 }}>
                     <button
