@@ -8,6 +8,10 @@ type Props = {
 
 const PriceInfo = ({ reservation }: Props) => {
   const { priceDetails, price } = reservation;
+  const pricePerBag = 5;
+  const extraBagsMatch = reservation.seatCode?.match(/EXTRA_BAGS:(\d+)/);
+  const extraBags = extraBagsMatch ? Number(extraBagsMatch[1]) : 0;
+  const extrasAmount = extraBags * pricePerBag;
 
   return (
     <section className="bg-custom-gray-100 p-4 rounded-lg text-sm flex flex-col gap-2">
@@ -31,6 +35,18 @@ const PriceInfo = ({ reservation }: Props) => {
               </li>
             ))}
           </ul>
+        </div>
+      )}
+
+      {extraBags > 0 && (
+        <div className="mt-2">
+          <p className="font-medium text-custom-black-800 mb-1">Equipaje adicional</p>
+          <div className="flex justify-between items-center text-custom-gray-700">
+            <span>
+              Maletas adicionales ({extraBags} x € {pricePerBag.toFixed(2).replace(".", ",")}):
+            </span>
+            <span>€ {extrasAmount.toFixed(2).replace(".", ",")}</span>
+          </div>
         </div>
       )}
 
