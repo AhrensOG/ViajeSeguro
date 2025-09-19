@@ -35,7 +35,7 @@ const TripDetailsPage = () => {
           status: raw.status,
           capacity: raw.capacity,
           minPassengers: raw.minPassengers,
-          passengers: (raw.reservations || []).map((res: Passengers) => {
+          passengers: (raw.reservations || []).map((res: Passengers | any) => {
             const validStatuses: ValidStatus[] = [
               "PENDING",
               "CONFIRMED",
@@ -46,6 +46,14 @@ const TripDetailsPage = () => {
             )
               ? (res.status as ValidStatus)
               : "PENDING";
+            const seatCode: string | null = (res as any)?.seatCode ?? null;
+            const m = seatCode?.match(/^EXTRA_BAGS:(\d+)$/);
+            const extraBags = m ? Number(m[1]) : 0;
+            // Normalizar QR: el backend devuelve un array de QRs. Tomamos uno no eliminado si existe, o el primero.
+            const rawQr = (res as any)?.qr;
+            const qr = Array.isArray(rawQr)
+              ? (rawQr.find((q: any) => !q?.isDeleted) ?? rawQr[0] ?? null)
+              : rawQr ?? null;
             return {
               id: res.id,
               userId: res.user?.id ?? "",
@@ -55,7 +63,8 @@ const TripDetailsPage = () => {
               email: res.user?.email ?? "Sin email",
               paymentMethod: res.paymentMethod,
               status,
-              qr: res.qr ?? null,
+              qr,
+              extraBags,
             };
           }),
           serviceType: raw.serviceType,
@@ -137,6 +146,7 @@ const TripDetailsPage = () => {
                   <th className="px-4 py-3">Nombre</th>
                   <th className="px-4 py-3">Correo</th>
                   <th className="px-4 py-3">Método de pago</th>
+                  <th className="px-4 py-3">Equipaje</th>
                   <th className="px-4 py-3">Estado</th>
                   <th className="px-4 py-3">Abordaje</th>
                 </tr>
@@ -149,6 +159,7 @@ const TripDetailsPage = () => {
                     <td className="px-4 py-3">{passenger.fullName}</td>
                     <td className="px-4 py-3">{passenger.email}</td>
                     <td className="px-4 py-3">{passenger.paymentMethod}</td>
+                    <td className="px-4 py-3">{(passenger as any).extraBags ?? 0} maleta(s)</td>
                     <td className="px-4 py-3">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-semibold ${
