@@ -7,6 +7,7 @@ import Image from "next/image";
 import { Trip } from "@/lib/shared/types/trip-service-type.type";
 import TripRouteCompact from "@/lib/client/components/TripRouteCompact";
 import Link from "next/link";
+import LuggageInfoCard from "./LuggageInfoCard";
 
 type TripDetailProps = {
   trip: Trip;
@@ -42,6 +43,9 @@ const TripDetail = ({ trip }: TripDetailProps) => {
           size="md"
         />
       </motion.div>
+
+      {/* Política de equipaje y selección de maletas adicionales */}
+      <LuggageInfoCard />
 
       {/* Info del conductor */}
       <motion.div
