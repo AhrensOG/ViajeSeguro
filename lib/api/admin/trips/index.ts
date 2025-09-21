@@ -15,6 +15,19 @@ export async function createTrip(data: CreateTripRequest): Promise<TripResponse>
     }
 }
 
+export async function createTripsBulk(data: any): Promise<TripResponse[]> {
+    try {
+        const res = await fetchWithAuth(`${BACKEND_URL}/trip/bulk`, {
+            method: "POST",
+            body: JSON.stringify(data),
+        });
+        return res as TripResponse[];
+    } catch (error) {
+        console.log(error);
+        throw new Error("Failed to create trips in bulk");
+    }
+}
+
 export async function getDrivers() {
     try {
         const response = await fetchWithAuth(`${BACKEND_URL}/user/drivers`, {
