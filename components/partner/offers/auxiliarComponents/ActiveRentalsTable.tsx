@@ -1,8 +1,8 @@
 "use client"
+/* eslint-disable @next/next/no-img-element */
 
-import { CalendarDays, MapPin, Phone, ChevronDown } from "lucide-react"
+import { CalendarDays, MapPin, Phone } from "lucide-react"
 import { useState } from "react"
-import { motion, AnimatePresence } from "framer-motion"
 import { confirmVehicleReturn } from "@/lib/api/vehicle-booking"
 import { toast } from "sonner"
 
@@ -26,7 +26,6 @@ interface ActiveRentalsTableProps {
 }
 
 export function ActiveRentalsTable({ rentals }: ActiveRentalsTableProps) {
-  const [expandedRentals, setExpandedRentals] = useState<Set<number>>(new Set())
   const [loadingConfirm, setLoadingConfirm] = useState<Set<number>>(new Set())
 
   console.log('🔍 ActiveRentalsTable DEBUG:', {
@@ -48,17 +47,7 @@ export function ActiveRentalsTable({ rentals }: ActiveRentalsTableProps) {
     return null
   }
 
-  const toggleExpanded = (rentalId: number) => {
-    setExpandedRentals(prev => {
-      const newSet = new Set(prev)
-      if (newSet.has(rentalId)) {
-        newSet.delete(rentalId)
-      } else {
-        newSet.add(rentalId)
-      }
-      return newSet
-    })
-  }
+  // (UI simplificada) Si se requiere expandir filas en el futuro, reactivar estado y handler
 
   const handleConfirmReturn = async (rentalId: number) => {
     try {

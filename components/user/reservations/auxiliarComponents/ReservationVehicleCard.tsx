@@ -78,7 +78,6 @@ const ReservationVehicleCard = ({
     id,
     startDate,
     endDate,
-    totalPrice,
     paymentMethod,
     offer,
     status,

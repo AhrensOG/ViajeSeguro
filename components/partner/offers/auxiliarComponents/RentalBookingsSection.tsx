@@ -31,7 +31,15 @@ export function RentalBookingsSection({ className }: RentalBookingsSectionProps)
     try {
       setIsLoading(true)
       // Endpoint para obtener las reservas de las ofertas del usuario
-      const response = await fetchWithAuth<any[]>(`${BACKEND_URL}/vehicle-booking/user-bookings`)
+      const response = await fetchWithAuth<Array<{
+        id: string;
+        renter: { name: string; lastName: string; email: string };
+        offer: { vehicle: { brand: string; model: string; year: number }; withdrawLocation: string; returnLocation: string };
+        startDate: string;
+        endDate: string;
+        totalPrice: number;
+        status: RentalBooking["status"];
+      }>>(`${BACKEND_URL}/vehicle-booking/user-bookings`)
       
       const transformedBookings: RentalBooking[] = response.map((booking) => ({
         id: booking.id,
@@ -66,13 +74,7 @@ export function RentalBookingsSection({ className }: RentalBookingsSectionProps)
       })
 
       // Actualizar el estado local
-      setBookings(prev => 
-        prev.map(booking => 
-          booking.id === bookingId 
-            ? { ...booking, status: newStatus as any }
-            : booking
-        )
-      )
+      setBookings(prev => prev.map(booking => booking.id === bookingId ? { ...booking, status: newStatus as RentalBooking["status"] } : booking))
     } catch (error) {
       console.error("Error updating booking status:", error)
       throw error

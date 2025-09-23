@@ -1,6 +1,7 @@
 "use client"
+/* eslint-disable @next/next/no-img-element */
 
-import { CalendarDays, MapPin, Phone, MessageCircle, ChevronDown, User, CreditCard, Clock, CheckCircle, XCircle } from "lucide-react"
+import { CalendarDays, MapPin, Phone, MessageCircle, ChevronDown, User, CreditCard, Clock } from "lucide-react"
 import { useState } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import { DateTime } from "luxon"

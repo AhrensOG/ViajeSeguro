@@ -1,18 +1,17 @@
 "use client"
 
-import { useState, useEffect } from "react"
+import { useState, useEffect, useCallback } from "react"
 import { toast } from "sonner"
-import { useSession } from "next-auth/react"
 import { RentalOffersEmpty } from "./auxiliarComponents/RentalOffersEmpty"
 import { RentalOffersGrid } from "./auxiliarComponents/RentalOffersGrid"
 import CreateOfferModal from "./auxiliarComponents/CreateOfferModal"
 import EditOfferModal from "./auxiliarComponents/EditOfferModal"
 import { EstadisticasDashboardAlquileres } from "./auxiliarComponents/EstadisticasDashboardAlquileres"
-import { RentalBookingsSection } from "./auxiliarComponents/RentalBookingsSection"
+// import { RentalBookingsSection } from "./auxiliarComponents/RentalBookingsSection"
 import { TablaProximosAlquileres } from "./auxiliarComponents/TablaProximosAlquileres"
 import { TablaPendientesAprobacion } from "./auxiliarComponents/TablaPendientesAprobacion"
 import { ActiveRentalsTable } from "./auxiliarComponents/ActiveRentalsTable"
-import { TablaHistorialPagos } from "./auxiliarComponents/TablaHistorialPagos"
+// import { TablaHistorialPagos } from "./auxiliarComponents/TablaHistorialPagos"
 import { RentalHistoryTable } from "./auxiliarComponents/RentalHistoryTable"
 import { Vehicle } from "@/lib/api/admin/vehicles/vehicles.type"
 import { getUserVehicles } from "@/lib/api/partner/vehicles"
@@ -51,8 +50,76 @@ interface RentalOffer {
   }
 }
 
+// Tipos locales alineados con los componentes hijos
+type ProximoAlquiler = {
+  id: number;
+  vehicleName: string;
+  vehicleImage: string;
+  vehiclePlate: string;
+  renterName: string;
+  renterAvatar?: string;
+  renterPhone: string;
+  startDate: string;
+  endDate: string;
+  totalAmount: number;
+  daysUntilStart: number;
+  status: "pending" | "confirmed" | "rejected" | "approved" | "APPROVED" | "CONFIRMED" | "DELIVERED" | "delivered" | "PENDING";
+  location: string;
+};
+
+type ActiveRental = {
+  id: number;
+  vehicleName: string;
+  vehicleImage: string;
+  vehiclePlate?: string;
+  renterName: string;
+  renterAvatar?: string;
+  renterPhone: string;
+  startDate: string;
+  endDate: string;
+  totalAmount: number;
+  status: "ACTIVE" | "RETURNED" | "overdue" | "ending-soon";
+  location: string;
+};
+
+type RentalHistory = {
+  id: number;
+  vehicleName: string;
+  vehicleImage: string;
+  vehiclePlate?: string;
+  renterName: string;
+  renterAvatar?: string;
+  renterPhone: string;
+  renterEmail?: string;
+  startDate: string;
+  endDate: string;
+  totalAmount: number;
+  status: "PENDING" | "APPROVED" | "DELIVERED" | "ACTIVE" | "RETURNED" | "FINISHED" | "CANCELLED" | "DECLINED" | "COMPLETED";
+  location: string;
+  paymentMethod?: string;
+  createdAt: string;
+  returnLocation?: string;
+  agencyFee?: number;
+  pricePerDay?: number;
+};
+
+type PendienteAprobacion = {
+  id: number;
+  vehicleName: string;
+  vehicleImage: string;
+  vehiclePlate: string;
+  renterName: string;
+  renterAvatar?: string;
+  renterPhone: string;
+  startDate: string;
+  endDate: string;
+  totalAmount: number;
+  daysUntilStart: number;
+  status: "PENDING" | "confirmed" | "rejected" | "completed" | "approved";
+  location: string;
+};
+
 export default function OffersPage() {
-  const { data: session } = useSession()
   const [showCreateModal, setShowCreateModal] = useState(false)
   const [showEditModal, setShowEditModal] = useState(false)
   const [selectedOffer, setSelectedOffer] = useState<RentalOffer | null>(null)
@@ -69,41 +136,10 @@ export default function OffersPage() {
     earningsGrowthPercentage: 0,
     nextReturnDate: "2024-02-17"
   })
-  const [proximosAlquileres, setProximosAlquileres] = useState<any[]>([])
-  const [activeRentals, setActiveRentals] = useState<any[]>([])
-  const [rentalHistory, setRentalHistory] = useState<any[]>([])
-  const [historialPagos, setHistorialPagos] = useState([
-    {
-      id: 1,
-      vehicleName: "Ford Transit 2023",
-      renterName: "Carlos García",
-      amount: 450,
-      date: "2024-02-10",
-      status: "completed" as const,
-      paymentMethod: "Tarjeta de Crédito",
-      transactionId: "TXN-2024-001234"
-    },
-    {
-      id: 2,
-      vehicleName: "Mercedes Sprinter",
-      renterName: "Ana López",
-      amount: 680,
-      date: "2024-02-08",
-      status: "completed" as const,
-      paymentMethod: "PayPal",
-      transactionId: "TXN-2024-001235"
-    },
-    {
-      id: 3,
-      vehicleName: "Volkswagen Crafter",
-      renterName: "Miguel Rodríguez",
-      amount: 560,
-      date: "2024-02-05",
-      status: "pending" as const,
-      paymentMethod: "Transferencia",
-      transactionId: "TXN-2024-001236"
-    }
-  ])
+  const [proximosAlquileres, setProximosAlquileres] = useState<ProximoAlquiler[]>([])
+  const [activeRentals, setActiveRentals] = useState<ActiveRental[]>([])
+  const [rentalHistory, setRentalHistory] = useState<RentalHistory[]>([])
+  const [pendingApprovals, setPendingApprovals] = useState<PendienteAprobacion[]>([])
 
   // Función para obtener ofertas del usuario
   const getUserOffers = async (): Promise<RentalOffer[]> => {
@@ -156,7 +192,10 @@ export default function OffersPage() {
     loadUserVehicles()
   }, [])
 
+  
+
   // Cargar ofertas del usuario
+  // Cargar ofertas y estadísticas al montar
   useEffect(() => {
     const loadUserOffers = async () => {
       try {
@@ -174,7 +213,6 @@ export default function OffersPage() {
 
     loadUserOffers()
     loadStatistics()
-    loadUpcomingBookings()
   }, [])
 
   // Función para calcular estadísticas
@@ -196,12 +234,27 @@ export default function OffersPage() {
   }
 
   // Función para cargar próximos alquileres
-  const loadUpcomingBookings = async () => {
+  interface BackendBookingPayment { userId?: string; amount?: number }
+  interface BackendBookingOfferVehicle { brand: string; model: string; year: number; images?: string[]; plate?: string }
+  interface BackendBookingOffer { vehicle: BackendBookingOfferVehicle; withdrawLocation: string; returnLocation: string }
+  interface BackendBookingRenter { id?: string; name: string; lastName: string; phone?: string }
+  interface BackendBooking {
+    id: number | string;
+    offer: BackendBookingOffer;
+    renter: BackendBookingRenter;
+    payments?: BackendBookingPayment[];
+    startDate: string | Date;
+    endDate: string | Date;
+    totalPrice: number;
+    status: string;
+  }
+
+  const loadUpcomingBookings = useCallback(async () => {
     try {
-      const bookings = await getPartnerUpcomingBookings() as any[]
+      const bookings = await getPartnerUpcomingBookings() as BackendBooking[]
       
       // Transformar datos del backend al formato del frontend
-      const transformedBookings = bookings.map((booking: any) => {
+      const transformedBookings = bookings.map((booking: BackendBooking) => {
         const startDate = new Date(booking.startDate)
         const endDate = new Date(booking.endDate)
         const today = new Date()
@@ -211,8 +264,8 @@ export default function OffersPage() {
         const payments = Array.isArray(booking.payments) ? booking.payments : []
         const renterId = booking?.renter?.id
         const paidAmount = payments
-          .filter((p: any) => p?.userId && p?.amount && p.userId === renterId)
-          .reduce((sum: number, p: any) => sum + Number(p.amount || 0), 0)
+          .filter((p) => p?.userId && p?.amount && p.userId === renterId)
+          .reduce((sum: number, p) => sum + Number(p.amount || 0), 0)
         
         return {
           id: booking.id,
@@ -237,17 +290,71 @@ export default function OffersPage() {
       // Debug: Mostrar todos los estados recibidos
       console.log('All bookings from backend:', transformedBookings.map(b => ({ id: b.id, status: b.status })))
       
-      // Separar reservas por estado
-      const proximosAlquileresFiltered = transformedBookings.filter(booking => 
-        booking.status === 'PENDING' || booking.status === 'APPROVED' || booking.status === 'DELIVERED'
-      )
-      
-      const activeRentalsFiltered = transformedBookings.filter(booking => 
-        booking.status === 'ACTIVE' || booking.status === 'RETURNED'
-      )
+      // Mapear a formas específicas para cada tabla
+      const proximosAlquileresFiltered: ProximoAlquiler[] = transformedBookings
+        .filter(b => b.status === 'PENDING' || b.status === 'APPROVED' || b.status === 'DELIVERED')
+        .map(b => ({
+          id: Number(b.id),
+          vehicleName: b.vehicleName,
+          vehicleImage: b.vehicleImage,
+          vehiclePlate: b.vehiclePlate,
+          renterName: b.renterName,
+          renterPhone: b.renterPhone,
+          startDate: b.startDate,
+          endDate: b.endDate,
+          totalAmount: b.totalAmount,
+          daysUntilStart: b.daysUntilStart,
+          status: b.status as ProximoAlquiler["status"],
+          location: b.location,
+        }))
 
-      // Pasar TODAS las reservas al historial
-      const rentalHistoryFiltered = transformedBookings
+      const activeRentalsFiltered: ActiveRental[] = transformedBookings
+        .filter(b => b.status === 'ACTIVE' || b.status === 'RETURNED')
+        .map(b => ({
+          id: Number(b.id),
+          vehicleName: b.vehicleName,
+          vehicleImage: b.vehicleImage,
+          vehiclePlate: b.vehiclePlate,
+          renterName: b.renterName,
+          renterPhone: b.renterPhone,
+          startDate: b.startDate,
+          endDate: b.endDate,
+          totalAmount: b.totalAmount,
+          status: b.status as ActiveRental["status"],
+          location: b.location,
+        }))
+
+      const rentalHistoryFiltered: RentalHistory[] = transformedBookings.map(b => ({
+        id: Number(b.id),
+        vehicleName: b.vehicleName,
+        vehicleImage: b.vehicleImage,
+        vehiclePlate: b.vehiclePlate,
+        renterName: b.renterName,
+        renterPhone: b.renterPhone,
+        startDate: b.startDate,
+        endDate: b.endDate,
+        totalAmount: b.totalAmount,
+        status: (b.status as RentalHistory["status"]) ?? "PENDING",
+        location: b.location,
+        createdAt: String(b.startDateISO ?? b.startDate),
+      }))
+
+      const pendingApprovalsFiltered: PendienteAprobacion[] = transformedBookings
+        .filter(b => b.status === 'PENDING' || b.status === 'completed')
+        .map(b => ({
+          id: Number(b.id),
+          vehicleName: b.vehicleName,
+          vehicleImage: b.vehicleImage,
+          vehiclePlate: b.vehiclePlate,
+          renterName: b.renterName,
+          renterPhone: b.renterPhone,
+          startDate: b.startDate,
+          endDate: b.endDate,
+          totalAmount: b.totalAmount,
+          daysUntilStart: b.daysUntilStart,
+          status: (b.status as PendienteAprobacion["status"]) ?? 'PENDING',
+          location: b.location,
+        }))
 
       console.log('Filtered active rentals:', activeRentalsFiltered)
       console.log('Filtered rental history:', rentalHistoryFiltered)
@@ -255,6 +362,7 @@ export default function OffersPage() {
       setProximosAlquileres(proximosAlquileresFiltered)
       setActiveRentals(activeRentalsFiltered)
       setRentalHistory(rentalHistoryFiltered)
+      setPendingApprovals(pendingApprovalsFiltered)
 
       // Actualizar estadísticas arriba con montos realmente pagados (Stripe)
       try {
@@ -262,13 +370,13 @@ export default function OffersPage() {
         const currentMonth = now.getMonth()
         const currentYear = now.getFullYear()
 
-        const totalEarningsGross = rentalHistoryFiltered.reduce((sum: number, r: any) => sum + Number(r.totalAmount || 0), 0)
+        const totalEarningsGross = rentalHistoryFiltered.reduce((sum: number, r: RentalHistory) => sum + Number(r.totalAmount || 0), 0)
         const monthlyEarningsGross = rentalHistoryFiltered
-          .filter((r: any) => {
-            const d = new Date(r.startDateISO || r.startDate)
+          .filter((r: RentalHistory) => {
+            const d = new Date(r.startDate)
             return d.getMonth() === currentMonth && d.getFullYear() === currentYear
           })
-          .reduce((sum: number, r: any) => sum + Number(r.totalAmount || 0), 0)
+          .reduce((sum: number, r: RentalHistory) => sum + Number(r.totalAmount || 0), 0)
 
         setStatistics(prev => ({
           ...prev,
@@ -285,7 +393,7 @@ export default function OffersPage() {
       setActiveRentals([])
       setRentalHistory([])
     }
-  }
+  }, [])
 
 
   // Handlers para las acciones de ofertas
@@ -352,15 +460,7 @@ export default function OffersPage() {
   const handleApprovalChange = async (rentalId: number, newStatus: 'confirmed' | 'rejected' | 'approved') => {
     console.log('handleApprovalChange called:', { rentalId, newStatus })
     // Actualización optimista
-    setProximosAlquileres(prev => {
-      const updated = prev.map(rental => 
-        rental.id === rentalId 
-          ? { ...rental, status: newStatus }
-          : rental
-      )
-      console.log('Updated proximosAlquileres (optimistic):', updated)
-      return updated
-    })
+    setPendingApprovals(prev => prev.map(r => (r.id === rentalId ? { ...r, status: newStatus } : r)))
 
     // Refrescar desde backend para sincronizar todas las tablas
     try {
@@ -403,7 +503,7 @@ export default function OffersPage() {
         {/* Tabla de pendientes de aprobación */}
         <div className="w-full max-w-none">
           <TablaPendientesAprobacion 
-            rentals={proximosAlquileres} 
+            rentals={pendingApprovals} 
             onApprovalChange={handleApprovalChange}
           />
         </div>

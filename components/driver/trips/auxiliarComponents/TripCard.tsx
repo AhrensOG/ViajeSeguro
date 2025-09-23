@@ -14,7 +14,7 @@ const TripCard = ({ trip }: Props) => {
     const router = useRouter();
 
     // Total de equipaje adicional (suma de todas las reservas del viaje)
-    const reservations: Array<{ seatCode?: string | null }> = (trip as any)?.reservations || [];
+    const reservations = ((trip as unknown as { reservations?: Array<{ seatCode?: string | null }> }).reservations) ?? [];
     const totalExtraBags = reservations.reduce((acc, r) => {
         const m = r.seatCode?.match(/^EXTRA_BAGS:(\d+)$/);
         const n = m ? Number(m[1]) : 0;

@@ -11,7 +11,7 @@ interface RentalData {
 interface EstadisticasDashboardProps {
   totalEarnings: number
   monthlyEarnings: number
-  userVehicles: any[] // Array de vehículos del usuario
+  userVehicles: unknown[] // Array de vehículos del usuario
   rentals: RentalData[] // Array de todas las reservas
   earningsGrowthPercentage?: number
 }

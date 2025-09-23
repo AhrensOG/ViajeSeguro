@@ -2,21 +2,12 @@ import React, { useState, useEffect } from "react";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 import { updateCity } from "@/lib/api/admin/cities";
-
-interface City {
-    id: string;
-    name: string;
-    state: string;
-    country: string;
-    isActive: boolean;
-    createdAt: string;
-    updatedAt: string;
-}
+import type { CityResponse, UpdateCityRequest } from "@/lib/api/admin/cities/cities.type";
 
 interface Props {
     onClose: () => void;
-    onSuccess: (updatedCity: City) => void;
-    city: City;
+    onSuccess: (updatedCity: CityResponse) => void;
+    city: CityResponse;
 }
 
 interface EditCityForm {
@@ -85,9 +76,15 @@ const EditCityModal = ({ onClose, onSuccess, city }: Props) => {
         const toastId = toast.loading("Actualizando ciudad...");
 
         try {
-            const response = await updateCity(city.id, form);
-            
-            const updatedCity: City = {
+            const payload: UpdateCityRequest = {
+                name: form.name.trim(),
+                state: form.state.trim(),
+                country: form.country.trim(),
+                isActive: form.isActive,
+            };
+            await updateCity(city.id, payload);
+
+            const updatedCity: CityResponse = {
                 ...city,
                 name: form.name,
                 state: form.state,
@@ -99,7 +96,7 @@ const EditCityModal = ({ onClose, onSuccess, city }: Props) => {
             onSuccess(updatedCity);
             toast.success("Ciudad actualizada exitosamente", { id: toastId });
             onClose();
-        } catch (error) {
+        } catch {
             toast.error("Error al actualizar la ciudad", { id: toastId });
         } finally {
             setLoading(false);

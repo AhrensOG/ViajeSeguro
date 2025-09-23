@@ -3,7 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
-import { X, AlertTriangle, Info } from "lucide-react";
+import { X, AlertTriangle } from "lucide-react";
 import { Vehicle, VehicleApprovalStatus, CreateVehicleDto, FeatureEnum } from "@/lib/api/admin/vehicles/vehicles.type";
 import { updateUserVehicle } from "@/lib/api/partner/vehicles";
 import { uploadFiles } from "@/lib/firebase/uploadFiles";
@@ -132,7 +132,7 @@ export default function EditVehicleModal({ vehicle, isOpen, onClose, onSuccess }
             <div>
               <h3 className="text-sm font-medium text-amber-800">Importante</h3>
               <p className="text-sm text-amber-700 mt-1">
-                Al editar tu vehículo, el estado cambiará a "Pendiente" y deberá ser revisado nuevamente por el administrador antes de estar disponible.
+                Al editar tu vehículo, el estado cambiará a &quot;Pendiente&quot; y deberá ser revisado nuevamente por el administrador antes de estar disponible.
               </p>
             </div>
           </div>

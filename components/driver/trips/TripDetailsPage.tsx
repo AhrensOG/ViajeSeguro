@@ -12,6 +12,7 @@ const TripDetailsPage = () => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const [trip, setTrip] = useState<TripDetailsResponse | null>(null);
+  const [extraBagsById, setExtraBagsById] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,6 +22,18 @@ const TripDetailsPage = () => {
     const fetchTrip = async () => {
       try {
         const raw = (await getTripById(id as string)) as TripDetailsResponse;
+
+        type Qr = {
+          id: string;
+          imageUrl: string;
+          usedAt: string | null;
+          isValid: boolean;
+          createdAt: string;
+          reservationId: string;
+          isDeleted: boolean;
+        };
+
+        const extraMap: Record<string, number> = {};
 
         const mapped: TripDetailsResponse = {
           id: raw.id,
@@ -35,7 +48,7 @@ const TripDetailsPage = () => {
           status: raw.status,
           capacity: raw.capacity,
           minPassengers: raw.minPassengers,
-          passengers: (raw.reservations || []).map((res: Passengers | any) => {
+          passengers: (raw.reservations || []).map((res: Passengers & { seatCode?: string | null; qr?: Qr[] | Qr | null }) => {
             const validStatuses: ValidStatus[] = [
               "PENDING",
               "CONFIRMED",
@@ -46,14 +59,16 @@ const TripDetailsPage = () => {
             )
               ? (res.status as ValidStatus)
               : "PENDING";
-            const seatCode: string | null = (res as any)?.seatCode ?? null;
+            const seatCode: string | null = res?.seatCode ?? null;
             const m = seatCode?.match(/^EXTRA_BAGS:(\d+)$/);
             const extraBags = m ? Number(m[1]) : 0;
             // Normalizar QR: el backend devuelve un array de QRs. Tomamos uno no eliminado si existe, o el primero.
-            const rawQr = (res as any)?.qr;
-            const qr = Array.isArray(rawQr)
-              ? (rawQr.find((q: any) => !q?.isDeleted) ?? rawQr[0] ?? null)
-              : rawQr ?? null;
+            const rawQr = res?.qr;
+            const qrArray = Array.isArray(rawQr) ? (rawQr as Qr[]) : null;
+            const qr: Qr | null = qrArray ? (qrArray.find((q) => !q?.isDeleted) ?? qrArray[0] ?? null) : ((rawQr as Qr | null | undefined) ?? null);
+
+            // Guardar extraBags por pasajero para usar en UI sin alterar el tipo
+            extraMap[res.id] = extraBags;
             return {
               id: res.id,
               userId: res.user?.id ?? "",
@@ -64,7 +79,6 @@ const TripDetailsPage = () => {
               paymentMethod: res.paymentMethod,
               status,
               qr,
-              extraBags,
             };
           }),
           serviceType: raw.serviceType,
@@ -74,6 +88,7 @@ const TripDetailsPage = () => {
         };
 
         setTrip(mapped);
+        setExtraBagsById(extraMap);
       } catch (error) {
         console.error("Error al cargar el viaje:", error);
       } finally {
@@ -159,7 +174,7 @@ const TripDetailsPage = () => {
                     <td className="px-4 py-3">{passenger.fullName}</td>
                     <td className="px-4 py-3">{passenger.email}</td>
                     <td className="px-4 py-3">{passenger.paymentMethod}</td>
-                    <td className="px-4 py-3">{(passenger as any).extraBags ?? 0} maleta(s)</td>
+                    <td className="px-4 py-3">{extraBagsById[passenger.id] ?? 0} maleta(s)</td>
                     <td className="px-4 py-3">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-semibold ${

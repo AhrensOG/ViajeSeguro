@@ -30,7 +30,7 @@ export function RentalBookingCard({ booking, onStatusUpdate }: RentalBookingCard
     try {
       await onStatusUpdate(booking.id, "APPROVED")
       toast.success("Alquiler aprobado exitosamente")
-    } catch (error) {
+    } catch {
       toast.error("Error al aprobar el alquiler")
     } finally {
       setIsUpdating(false)
@@ -42,7 +42,7 @@ export function RentalBookingCard({ booking, onStatusUpdate }: RentalBookingCard
     try {
       await onStatusUpdate(booking.id, "DECLINED")
       toast.success("Alquiler rechazado")
-    } catch (error) {
+    } catch {
       toast.error("Error al rechazar el alquiler")
     } finally {
       setIsUpdating(false)

@@ -90,9 +90,9 @@ export default function CloneTripModal({ onClose, onSuccess, drivers, trip }: Pr
       toast.success("Viaje clonado con éxito", { id: toastId });
       onSuccess((prev) => [...prev, res]);
       onClose();
-    } catch (error: any) {
-      console.error(error);
-      const message = (error?.message as string) || "Error al clonar el viaje";
+    } catch (err: unknown) {
+      console.error(err);
+      const message = err instanceof Error ? err.message : "Error al clonar el viaje";
       toast.error(message, { id: toastId });
     }
   };

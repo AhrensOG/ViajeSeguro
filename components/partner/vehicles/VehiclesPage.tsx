@@ -18,9 +18,9 @@ export default function VehiclesPage() {
       try {
         const userVehicles = await getUserVehicles();
         setVehicles(userVehicles);
-      } catch (error) {
+      } catch (err) {
         toast.error("Error al cargar los vehículos");
-        console.error("Error fetching vehicles:", error);
+        console.error("Error fetching vehicles:", err);
       } finally {
         setLoading(false);
       }
@@ -36,6 +36,7 @@ export default function VehiclesPage() {
         const userVehicles = await getUserVehicles();
         setVehicles(userVehicles);
       } catch (error) {
+        console.error("Error fetching vehicles after create:", error);
         toast.error("Error al cargar los vehículos");
       }
     };

@@ -16,6 +16,8 @@ const inputClass =
   "w-full border border-custom-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-custom-golden-400 transition";
 const labelClass = "block text-xs font-semibold text-custom-gray-500 mb-1 uppercase tracking-wide";
 
+type WeekKey = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
+
 export default function CreateTripsRangeModal({ onClose, onSuccess, drivers }: Props) {
   const [cities, setCities] = useState<CityResponse[]>([]);
   const [form, setForm] = useState({
@@ -42,24 +44,26 @@ export default function CreateTripsRangeModal({ onClose, onSuccess, drivers }: P
       fri: true,
       sat: true,
       sun: true,
-    },
+    } as Record<WeekKey, boolean>,
   });
 
   const selectedDriver = useMemo(() => drivers.find((d) => d.id === form.driverId), [drivers, form.driverId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, type, value } = e.target as any;
+    const target = e.target as HTMLInputElement | HTMLSelectElement;
+    const { name } = target;
 
     if (name.startsWith("weekday:")) {
-      const key = name.split(":")[1] as keyof typeof form.weekdays;
+      const key = name.split(":")[1] as WeekKey;
       const checked = (e.target as HTMLInputElement).checked;
       setForm((prev) => ({ ...prev, weekdays: { ...prev.weekdays, [key]: checked } }));
       return;
     }
 
-    let parsed: any = value;
-    if (type === "checkbox") parsed = (e.target as HTMLInputElement).checked;
-    if (name === "basePrice") parsed = String(value).replace(/,/g, ".");
+    let parsed: string | boolean = (target as HTMLInputElement).type === "checkbox"
+      ? (e.target as HTMLInputElement).checked
+      : target.value;
+    if (name === "basePrice") parsed = String(target.value).replace(/,/g, ".");
     setForm((prev) => ({ ...prev, [name]: parsed }));
   };
 
@@ -89,9 +93,9 @@ export default function CreateTripsRangeModal({ onClose, onSuccess, drivers }: P
         dateEnd: form.dateEnd,
         departureTime: form.departureTime,
         arrivalTime: form.arrivalTime,
-        weekdays: Object.entries(form.weekdays)
+        weekdays: (Object.entries(form.weekdays)
           .filter(([, v]) => v)
-          .map(([k]) => k),
+          .map(([k]) => k) as WeekKey[]),
       };
 
       const created = await createTripsBulk(payload);
@@ -209,7 +213,7 @@ export default function CreateTripsRangeModal({ onClose, onSuccess, drivers }: P
             <h3 className="text-base font-semibold text-custom-golden-600 mb-1">Días de la semana</h3>
             <hr className="mb-3" />
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">
-              {[
+              {([
                 ["mon", "Lunes"],
                 ["tue", "Martes"],
                 ["wed", "Miércoles"],
@@ -217,9 +221,9 @@ export default function CreateTripsRangeModal({ onClose, onSuccess, drivers }: P
                 ["fri", "Viernes"],
                 ["sat", "Sábado"],
                 ["sun", "Domingo"],
-              ].map(([k, label]) => (
+              ] as [WeekKey, string][]).map(([k, label]) => (
                 <label key={k} className="flex items-center gap-2 bg-custom-gray-100 px-3 py-2 rounded-md border border-custom-gray-200">
-                  <input type="checkbox" name={`weekday:${k}`} checked={(form.weekdays as any)[k]} onChange={handleChange} />
+                  <input type="checkbox" name={`weekday:${k}`} checked={form.weekdays[k]} onChange={handleChange} />
                   {label}
                 </label>
               ))}

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { getReservationsByUser } from "@/lib/api/reservation";
 import { ReservationResponse } from "@/lib/api/reservation/reservation.types";
@@ -17,7 +17,7 @@ const ReservationsPage = () => {
     const [vehicleBookings, setVehicleBookings] = useState<ResponseForProfilePage[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const fetchReservations = async () => {
+    const fetchReservations = useCallback(async () => {
         if (!session?.user?.id) return;
         try {
             const data = await getReservationsByUser(session.user.id);
@@ -33,11 +33,11 @@ const ReservationsPage = () => {
         } finally {
             setLoading(false);
         }
-    };
+    }, [session?.user?.id]);
 
     useEffect(() => {
         fetchReservations();
-    }, [session?.user?.id]);
+    }, [fetchReservations]);
 
     return (
         <div className="w-full flex flex-col items-center px-0 md:px-6 my-4 pb-10 bg-white">

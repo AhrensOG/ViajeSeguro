@@ -8,7 +8,7 @@ import { toast } from "sonner"; // Para notificaciones/toasts
 import { useSession } from "next-auth/react"; // Para obtener datos del usuario logueado
 
 // Importaciones de tipos y APIs
-import { CreateVehicleDto, Vehicle, FeatureEnum } from "@/lib/api/admin/vehicles/vehicles.type";
+import { CreateVehicleDto, Vehicle, FeatureEnum, Provider } from "@/lib/api/admin/vehicles/vehicles.type";
 import { createVehicle } from "@/lib/api/admin/vehicles";
 import { uploadFiles } from "@/lib/firebase/uploadFiles";
 
@@ -53,7 +53,6 @@ const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
     register, // Función para registrar campos del formulario
     handleSubmit, // Función para manejar el envío del formulario
     formState: { errors }, // Objeto con errores de validación
-    reset, // Función para limpiar/resetear el formulario
   } = useForm<CreateVehicleDto>();
 
   /**
@@ -88,7 +87,7 @@ const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
         capacity: Number(data.capacity),
         features: ([] as string[]).concat(data.features || []).map((f) => f as FeatureEnum),
         images: uploadedUrls,
-        provider: "PARTNER" as any, // String literal igual que CreateVehicleModal
+        provider: Provider.PRIVATE, // Usar enum válido en lugar de any
         ownerId: ownerIdFromSession,
         allowSeatSelection: false, // Por defecto false para partners
       });

@@ -1,6 +1,7 @@
 "use client"
+/* eslint-disable @next/next/no-img-element */
 
-import { Clock, MapPin, Phone, MessageCircle, Truck, CheckCircle } from "lucide-react"
+import { Clock, MapPin, Phone, CheckCircle } from "lucide-react"
 import { markBookingAsDelivered } from "@/lib/api/vehicle-booking"
 import { toast } from "sonner"
 import { useState } from "react"
@@ -114,7 +115,7 @@ export function TablaProximosAlquileres({ rentals, onRentalUpdate }: TablaProxim
           </div>
         ) : (
           <div className="space-y-3">
-            {confirmedRentals.map((rental, index) => {
+            {confirmedRentals.map((rental) => {
               const isDelivered = rental.status === 'DELIVERED' || rental.status === 'delivered' || deliveredRentals.has(rental.id);
               
               return (

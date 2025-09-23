@@ -1,6 +1,7 @@
 "use client"
+/* eslint-disable @next/next/no-img-element */
 
-import { Clock, MapPin, Phone, MessageCircle, AlertTriangle, Check, X, ChevronDown } from "lucide-react"
+import { MapPin, Phone, AlertTriangle, Check, X, ChevronDown } from "lucide-react"
 import { useState } from "react"
 import { fetchWithAuth } from "@/lib/functions"
 import { BACKEND_URL } from "@/lib/constants"
@@ -55,7 +56,7 @@ export function TablaPendientesAprobacion({ rentals, onApprovalChange }: TablaPe
     try {
       await updateBookingStatus(rentalId, 'APPROVED')
       // Cambiar a 'approved' en lugar de 'confirmed' para que coincida con el filtro
-      onApprovalChange(rentalId, 'approved' as any)
+      onApprovalChange(rentalId, 'approved')
       console.log('Alquiler aprobado exitosamente - Estado cambiado a approved')
     } catch (error) {
       console.error('Error al aprobar:', error)

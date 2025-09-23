@@ -1,7 +1,7 @@
 "use client"
 
 import { useState } from "react"
-import { Plus, Edit, Trash2, Eye, MapPin, Calendar, DollarSign, Users, Car, Clock } from "lucide-react"
+import { Plus, Eye, Calendar, DollarSign, Users, Car, Clock } from "lucide-react"
 import { RentalOfferCard } from "./RentalOfferCard"
 
 interface RentalOffer {

@@ -2,10 +2,11 @@ import React, { useState } from "react";
 import { X } from "lucide-react";
 import { toast } from "sonner";
 import { createCity } from "@/lib/api/admin/cities";
+import type { CityResponse, CreateCityRequest } from "@/lib/api/admin/cities/cities.type";
 
 interface Props {
     onClose: () => void;
-    onSuccess: (newCity: any) => void;
+    onSuccess: (newCity: CityResponse) => void;
 }
 
 interface CreateCityForm {
@@ -64,11 +65,17 @@ const CreateCityModal = ({ onClose, onSuccess }: Props) => {
         const toastId = toast.loading("Creando ciudad...");
 
         try {
-            const response = await createCity(form);
+            const payload: CreateCityRequest = {
+                name: form.name.trim(),
+                state: form.state.trim(),
+                country: form.country.trim(),
+                isActive: form.isActive,
+            };
+            const response = await createCity(payload);
             onSuccess(response);
             toast.success("Ciudad creada exitosamente", { id: toastId });
             onClose();
-        } catch (error) {
+        } catch {
             toast.error("Error al crear la ciudad", { id: toastId });
         } finally {
             setLoading(false);

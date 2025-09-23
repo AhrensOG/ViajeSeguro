@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Image from "next/image";
-import { Eye, Edit, Trash2, Star, MapPin, Users, Fuel, Settings, Calendar, AlertTriangle } from "lucide-react";
+import { Edit, Trash2, MapPin, Users, Fuel, Settings, Calendar, AlertTriangle } from "lucide-react";
 import { Vehicle } from "@/lib/api/admin/vehicles/vehicles.type";
 
 interface VehicleCardProps {
@@ -53,7 +53,7 @@ const getFuelLabel = (fuel: string) => {
   return fuelMap[fuel] || fuel;
 };
 
-const getServiceTypeLabel = (serviceType: any) => {
+const getServiceTypeLabel = (serviceType: unknown) => {
   const serviceMap: Record<string, string> = {
     SIMPLE_TRIP: "Viaje simple",
     RENTAL_WITH_DRIVER: "Con chofer",

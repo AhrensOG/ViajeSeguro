@@ -18,7 +18,7 @@ import { BASE_URL } from "@/lib/constants";
 import { createCheckoutSession } from "@/lib/api/stripe";
 import PurchaseProcessFallback from "@/lib/client/components/fallbacks/purchase/PurchaseProcessFallback";
 import CashConfirmationModal from "./CashConfirmationModal";
-import { VehicleOfferWithVehicle } from "@/lib/api/vehicle-booking/vehicleBooking.types";
+import { VehicleOfferWithVehicle, CreateVehicleBookingPayload } from "@/lib/api/vehicle-booking/vehicleBooking.types";
 import { createVehicleBooking } from "@/lib/api/vehicle-booking";
 import { fetchVehicleOffer } from "@/lib/api/vehicleOffer";
 import { calculateTotalDays } from "@/lib/functions";
@@ -142,7 +142,7 @@ const PurchaseProcess = () => {
                 endDate: new Date(end || vehicleOffer.availableTo),
                 status: "PENDING",
                 paymentMethod: "CASH",
-                referralId: referralId || undefined,
+                referrerId: referralId || undefined,
                 totalPrice: totalPrice,
             };
 
@@ -180,12 +180,13 @@ const PurchaseProcess = () => {
                 try {
                     const data = await createCheckoutSession({
                         amount: Math.round(extraBags * EXTRA_BAG_PRICE * (1 + Number(IVA) / 100) * 100),
-                        metadata: {
+                        metadata: ({
+                            // Se usa el tipo de reserva para facilitar conciliación en backend
                             type: "EXTRA_BAGS",
                             reservationId,
                             tripId: trip.id,
                             seatCode: `EXTRA_BAGS:${extraBags}`,
-                        } as any,
+                        } as unknown) as CreateReservationPayload,
                     });
                     if (data.url) {
                         window.location.href = data.url;
@@ -209,7 +210,7 @@ const PurchaseProcess = () => {
             try {
                 const data = await createCheckoutSession({
                     amount: Math.round(((trip.priceDetails?.finalPrice ?? trip.basePrice) + extraBags * EXTRA_BAG_PRICE) * (1 + Number(IVA) / 100) * 100),
-                    metadata: payload as any,
+                    metadata: payload,
                 });
                 if (data.url) {
                     window.location.href = data.url;
@@ -221,16 +222,15 @@ const PurchaseProcess = () => {
         }
         if (vehicleOffer) {
             const finalPrice = vehicleOffer.pricePerDay * calculateTotalDays(start || vehicleOffer.availableFrom, end || vehicleOffer.availableTo);
-            const createVehicleBookingPayload = {
+            const createVehicleBookingPayload: CreateVehicleBookingPayload = {
                 renterId: session.user.id,
                 offerId: vehicleOffer.id,
                 startDate: new Date(start || vehicleOffer.availableFrom),
                 endDate: new Date(end || vehicleOffer.availableTo),
                 status: "PENDING",
                 paymentMethod: "STRIPE",
-                referralId: referralId || undefined,
+                referrerId: referralId || undefined,
                 totalPrice: finalPrice,
-                type: "VEHICLE_BOOKING",
             };
             try {
                 const data = await createCheckoutSession({

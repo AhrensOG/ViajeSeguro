@@ -266,7 +266,7 @@ export function EditVehicleModalUser({ vehicle, isOpen, onClose, onSuccess }: Ed
             <div className="flex items-start space-x-2">
               <Info className="w-5 h-5 text-amber-600 mt-0.5 flex-shrink-0" />
               <p className="text-sm text-amber-800">
-                <strong>Importante:</strong> Al editar tu vehículo, este pasará nuevamente a estado "Pendiente" 
+                <strong>Importante:</strong> Al editar tu vehículo, este pasará nuevamente a estado &quot;Pendiente&quot; 
                 y deberá ser revisado por administración antes de ser aprobado.
               </p>
             </div>

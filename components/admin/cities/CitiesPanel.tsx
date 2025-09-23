@@ -8,24 +8,14 @@ import DeleteToast from "../DeleteToast";
 import CreateCityModal from "./auxiliarComponents/CreateCityModal";
 import EditCityModal from "./auxiliarComponents/EditCityModal";
 import { getAllCities, deleteCity } from "@/lib/api/admin/cities";
-
-// Tipo temporal para las ciudades
-interface City {
-    id: string;
-    name: string;
-    state: string;
-    country: string;
-    isActive: boolean;
-    createdAt: string;
-    updatedAt: string;
-}
+import type { CityResponse } from "@/lib/api/admin/cities/cities.type";
 
 export default function CitiesPanel() {
-    const [cities, setCities] = useState<City[]>([]);
+    const [cities, setCities] = useState<CityResponse[]>([]);
     const [loading, setLoading] = useState(true);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
-    const [selectedCity, setSelectedCity] = useState<City | null>(null);
+    const [selectedCity, setSelectedCity] = useState<CityResponse | null>(null);
 
     const [search, setSearch] = useState("");
     const [filters, setFilters] = useState({
@@ -67,11 +57,11 @@ export default function CitiesPanel() {
         }
     };
 
-    const handleCreateSuccess = (newCity: any) => {
+    const handleCreateSuccess = (newCity: CityResponse) => {
         setCities((prevCities) => [...prevCities, newCity]);
     };
 
-    const handleEditSuccess = (updatedCity: City) => {
+    const handleEditSuccess = (updatedCity: CityResponse) => {
         setCities((prevCities) => 
             prevCities.map((city) => 
                 city.id === updatedCity.id ? updatedCity : city

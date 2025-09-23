@@ -15,7 +15,7 @@ const ReservationPriceInfo = ({ reservation }: Props) => {
   const router = useRouter();
 
   // IVA y equipaje adicional
-  const ivaFromReservation = (reservation as any)?.IVA;
+  const ivaFromReservation = (reservation as unknown as { IVA?: number | string })?.IVA;
   const IVA_RATE = ivaFromReservation && Number(ivaFromReservation) > 0
     ? Number(ivaFromReservation) / 100
     : Number(process.env.NEXT_PUBLIC_IVA || 21) / 100;
