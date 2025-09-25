@@ -16,6 +16,8 @@ const DISCOUNT_LABELS: Record<string, string> = {
 type Props = {
     dateLabel: string;
     price: number;
+    extraBags?: number;
+    pricePerBag?: number;
 } & ClientTripRouteCompactType & {
         priceDetails?: PriceDetails | null;
     };
@@ -32,14 +34,17 @@ const PurchaseTripSummary = ({
     destinationLocation,
     size = "md",
     priceDetails,
+    extraBags = 0,
+    pricePerBag = 5,
 }: Props) => {
     const [showDetails, setShowDetails] = useState(false);
-    const IVA_RATE = Number(process.env.NEXT_PUBLIC_IVA || 0) / 100;
+    const IVA_RATE = Number(process.env.NEXT_PUBLIC_IVA || 21) / 100;
 
     const hasDiscounts = priceDetails && priceDetails.discounts.length > 0;
-    const totalWithIVA = (priceDetails?.finalPrice ?? price) * (1 + IVA_RATE);
-    const totalWithoutIVA = priceDetails?.finalPrice ?? price;
-    const ivaAmount = totalWithIVA - totalWithoutIVA;
+    const extras = (extraBags || 0) * (pricePerBag || 5);
+    const subtotal = (priceDetails?.finalPrice ?? price) + extras; // base + extras
+    const totalWithIVA = subtotal * (1 + IVA_RATE);
+    const ivaAmount = subtotal * IVA_RATE;
 
     return (
         <motion.div
@@ -94,7 +99,14 @@ const PurchaseTripSummary = ({
                     >
                         <div className="flex justify-between">
                             <span>Precio base (sin IVA):</span>
-                            <span>{totalWithoutIVA.toFixed(2).replace(".", ",")} €</span>
+                            <span>{(priceDetails?.finalPrice ?? price).toFixed(2).replace(".", ",")} €</span>
+                        </div>
+
+                        <div className="flex justify-between">
+                            <span>Equipaje adicional:</span>
+                            <span>
+                                {extraBags} x {pricePerBag.toFixed(2).replace(".", ",")} € = {extras.toFixed(2).replace(".", ",")} €
+                            </span>
                         </div>
 
                         {hasDiscounts &&

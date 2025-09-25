@@ -1,14 +1,16 @@
 "use client";
 
-import { Pencil, Trash2, Search, Plus } from "lucide-react";
+import { Pencil, Trash2, Search, Plus, Copy } from "lucide-react";
 import { useEffect, useState } from "react";
 import SkeletonTable from "../SkeletonTable";
 import { CreateTripRequest, Driver, Partner, TripResponse } from "@/lib/api/admin/trips/trips.type";
 import TripDetailsModal from "./auxiliarComponents/TripDetailsModal";
 import CreateTripModal from "./auxiliarComponents/CreateTripModal";
+import CreateTripsRangeModal from "./auxiliarComponents/CreateTripsRangeModal";
 import { toast } from "sonner";
 import { deleteTrip, getAllTrips, getDrivers, getPartners } from "@/lib/api/admin/trips";
 import EditTripModal from "./auxiliarComponents/EditTripModal";
+import CloneTripModal from "./auxiliarComponents/CloneTripModal";
 import DeleteToast from "../DeleteToast";
 
 const statusMap = {
@@ -27,6 +29,8 @@ export default function TripsPanel() {
     const [selectedTrip, setSelectedTrip] = useState<TripResponse | null>(null);
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
+    const [isCreateRangeModalOpen, setIsCreateRangeModalOpen] = useState(false);
+    const [isCloneModalOpen, setIsCloneModalOpen] = useState(false);
 
     const [search, setSearch] = useState("");
     const [filters, setFilters] = useState({
@@ -135,12 +139,20 @@ export default function TripsPanel() {
         <div className="w-full h-full flex flex-col overflow-hidden pb-2">
             <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
                 <h1 className="text-2xl font-bold text-custom-golden-600">Panel de Viajes</h1>
-                <button
-                    onClick={() => setIsCreateModalOpen(true)}
-                    className="cursor-pointer flex items-center gap-2 bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold px-4 py-2 rounded-md shadow-sm"
-                >
-                    <Plus className="h-4 w-4" /> Crear viaje
-                </button>
+                <div className="flex items-center gap-2">
+                    <button
+                        onClick={() => setIsCreateRangeModalOpen(true)}
+                        className="cursor-pointer flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-md shadow-sm"
+                    >
+                        <Plus className="h-4 w-4" /> Crear por rango
+                    </button>
+                    <button
+                        onClick={() => setIsCreateModalOpen(true)}
+                        className="cursor-pointer flex items-center gap-2 bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold px-4 py-2 rounded-md shadow-sm"
+                    >
+                        <Plus className="h-4 w-4" /> Crear viaje
+                    </button>
+                </div>
             </div>
 
             {/* Filtros */}
@@ -266,6 +278,16 @@ export default function TripsPanel() {
                                             <button
                                                 onClick={() => {
                                                     setSelectedTrip(trip);
+                                                    setIsCloneModalOpen(true);
+                                                }}
+                                                className="cursor-pointer text-blue-600 hover:text-blue-700"
+                                                aria-label="Clonar"
+                                            >
+                                                <Copy className="h-4 w-4 inline-block" />
+                                            </button>
+                                            <button
+                                                onClick={() => {
+                                                    setSelectedTrip(trip);
                                                     setIsEditModalOpen(true);
                                                 }}
                                                 className="cursor-pointer text-custom-golden-600 hover:text-custom-golden-700"
@@ -311,6 +333,22 @@ export default function TripsPanel() {
                 <EditTripModal
                     onClose={() => setIsEditModalOpen(false)}
                     onSuccess={handleUpdateTrip}
+                    partners={partners}
+                    drivers={drivers}
+                    trip={selectedTrip as CreateTripRequest}
+                />
+            )}
+            {isCreateRangeModalOpen && (
+                <CreateTripsRangeModal
+                    onClose={() => setIsCreateRangeModalOpen(false)}
+                    onSuccess={setTrips}
+                    drivers={drivers}
+                />
+            )}
+            {isCloneModalOpen && selectedTrip && (
+                <CloneTripModal
+                    onClose={() => setIsCloneModalOpen(false)}
+                    onSuccess={setTrips}
                     partners={partners}
                     drivers={drivers}
                     trip={selectedTrip as CreateTripRequest}

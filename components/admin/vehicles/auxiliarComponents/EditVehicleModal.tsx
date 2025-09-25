@@ -5,8 +5,8 @@ import { useForm } from "react-hook-form";
 import { Trash2, X } from "lucide-react";
 import { toast } from "sonner";
 import { User } from "@/lib/api/reservation/reservation.types";
-import { CreateVehicleDto, FeatureEnum, Vehicle } from "@/lib/api/admin/vehicles/vehicles.type";
-import { updateVehicle } from "@/lib/api/admin/vehicles";
+import { CreateVehicleDto, FeatureEnum, Vehicle, VehicleApprovalStatus } from "@/lib/api/admin/vehicles/vehicles.type";
+import { updateVehicle, approveVehicle, rejectVehicle } from "@/lib/api/admin/vehicles";
 import Image from "next/image";
 import ImagePreviewModal from "./ImagePreviewModal";
 import { uploadFiles } from "@/lib/firebase/uploadFiles";
@@ -42,6 +42,9 @@ const EditVehicleModal = ({ vehicle, owners, onClose, onSuccess }: Props) => {
     );
     const [previewImage, setPreviewImage] = useState<string | null>(null);
     const [newImageFiles, setNewImageFiles] = useState<FileList | null>(null);
+    const [approvalStatus, setApprovalStatus] = useState<VehicleApprovalStatus>(vehicle.approvalStatus);
+    const [rejectionReason, setRejectionReason] = useState<string>(vehicle.rejectionReason || "");
+    const [approvalNote, setApprovalNote] = useState<string>("");
 
     useEffect(() => {
         if (vehicle) {
@@ -85,7 +88,50 @@ const EditVehicleModal = ({ vehicle, owners, onClose, onSuccess }: Props) => {
                     typeof data.allowSeatSelection === "string" ? data.allowSeatSelection === "true" : Boolean(data.allowSeatSelection),
             };
 
-            const updated = await updateVehicle(vehicle.id, updateData);
+            let updated: Vehicle;
+
+            // Manejar cambios de estado de aprobación
+            if (approvalStatus !== vehicle.approvalStatus) {
+                if (approvalStatus === VehicleApprovalStatus.APPROVED) {
+                    // Enviar nota opcional al aprobar
+                    updated = await approveVehicle(vehicle.id, approvalNote?.trim() || undefined);
+                } else if (approvalStatus === VehicleApprovalStatus.REJECTED) {
+                    if (!rejectionReason.trim()) {
+                        toast.error("Debe proporcionar una razón para el rechazo", { id: toastId });
+                        return;
+                    }
+                    updated = await rejectVehicle(vehicle.id, rejectionReason);
+                } else {
+                    // Si se cambia a PENDING, actualizar normalmente
+                    updated = await updateVehicle(vehicle.id, updateData);
+                }
+                
+                // Asegurar que el objeto actualizado tenga todos los campos necesarios
+                updated = {
+                    ...vehicle, // Mantener todos los datos originales
+                    ...updateData, // Aplicar cambios del formulario
+                    ...updated, // Aplicar respuesta de la API
+                    approvalStatus: approvalStatus, // Forzar el estado seleccionado
+                    // Guardar nota en ambos casos: rechazo usa rejectionReason, aprobado reutiliza rejectionReason como nota
+                    rejectionReason:
+                        approvalStatus === VehicleApprovalStatus.REJECTED
+                            ? rejectionReason
+                            : approvalStatus === VehicleApprovalStatus.APPROVED
+                            ? (approvalNote?.trim() || updated.rejectionReason)
+                            : ""
+                };
+            } else {
+                // Si no hay cambio de estado, actualizar normalmente
+                updated = await updateVehicle(vehicle.id, updateData);
+                // Mantener el estado y razón actuales
+                updated = {
+                    ...vehicle,
+                    ...updated,
+                    approvalStatus: vehicle.approvalStatus,
+                    rejectionReason: vehicle.rejectionReason
+                };
+            }
+
             onSuccess(updated);
             onClose();
             toast.success("Vehículo actualizado", { id: toastId });
@@ -118,6 +164,50 @@ const EditVehicleModal = ({ vehicle, owners, onClose, onSuccess }: Props) => {
 
                 <h2 className="text-2xl font-bold mb-1 text-custom-golden-700 tracking-tight">Editar vehículo</h2>
                 <p className="text-sm text-custom-gray-500 mb-6 leading-relaxed">Modifica los datos del vehículo y guarda los cambios realizados.</p>
+
+                {/* Sección de Estado de Aprobación */}
+                <div className="mb-6 p-4 bg-gray-50 rounded-lg border border-gray-200">
+                    <h3 className="text-base font-semibold text-custom-golden-600 mb-4">Estado de Aprobación</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                            <label className={labelClass}>Estado</label>
+                            <select
+                                value={approvalStatus}
+                                onChange={(e) => setApprovalStatus(e.target.value as VehicleApprovalStatus)}
+                                className={inputClass}
+                            >
+                                <option value={VehicleApprovalStatus.PENDING}>Pendiente</option>
+                                <option value={VehicleApprovalStatus.APPROVED}>Aprobado</option>
+                                <option value={VehicleApprovalStatus.REJECTED}>Rechazado</option>
+                            </select>
+                        </div>
+                        {approvalStatus === VehicleApprovalStatus.REJECTED && (
+                            <div>
+                                <label className={labelClass}>Razón del rechazo</label>
+                                <textarea
+                                    value={rejectionReason}
+                                    onChange={(e) => setRejectionReason(e.target.value)}
+                                    className={inputClass}
+                                    placeholder="Especifique la razón del rechazo..."
+                                    rows={3}
+                                    required
+                                />
+                            </div>
+                        )}
+                        {approvalStatus === VehicleApprovalStatus.APPROVED && (
+                            <div>
+                                <label className={labelClass}>Nota de aprobación (opcional)</label>
+                                <textarea
+                                    value={approvalNote}
+                                    onChange={(e) => setApprovalNote(e.target.value)}
+                                    className={inputClass}
+                                    placeholder="Escriba un comentario para el partner..."
+                                    rows={3}
+                                />
+                            </div>
+                        )}
+                    </div>
+                </div>
 
                 <form onSubmit={handleSubmit(onSubmit)} className="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm text-custom-black-800">
                     <div className="col-span-full">
@@ -192,13 +282,24 @@ const EditVehicleModal = ({ vehicle, owners, onClose, onSuccess }: Props) => {
                             }}
                             className={inputClass}
                         />
-                        {errors.year && <p className="text-red-500 text-xs">{errors.year.message || "Campo obligatorio"}</p>}
+                        {errors.capacity && <p className="text-red-500 text-xs">Campo obligatorio</p>}
                     </div>
 
                     <div>
                         <label className={labelClass}>Patente</label>
-                        <input type="text" {...register("plate", { required: true })} className={inputClass} />
-                        {errors.plate && <p className="text-red-500 text-xs">Campo obligatorio</p>}
+                        <input
+                            type="text"
+                            {...register("plate", {
+                                required: "La placa es requerida",
+                                validate: (value) => {
+                                    if (!value || value.trim() === "") return "La placa es requerida";
+                                    return true;
+                                },
+                            })}
+                            className={inputClass}
+                            placeholder="Ej: ABC-123"
+                        />
+                        {errors.plate && <p className="text-red-500 text-xs mt-1">{errors.plate.message}</p>}
                     </div>
 
                     <div>

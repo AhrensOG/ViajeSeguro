@@ -11,14 +11,14 @@ import { getTripForPurchase } from "@/lib/api/trip";
 import NotFoundMessage from "@/lib/client/components/NotFoundMessage";
 import { toast } from "sonner";
 import { CreateReservationPayload } from "@/lib/api/reservation/reservation.types";
-import { createReservation } from "@/lib/api/reservation";
+import { createReservation, addReservationExtras } from "@/lib/api/reservation";
 import { getSummaryFromTrip } from "@/lib/client/purchase/functions";
 import { useSession } from "next-auth/react";
 import { BASE_URL } from "@/lib/constants";
 import { createCheckoutSession } from "@/lib/api/stripe";
 import PurchaseProcessFallback from "@/lib/client/components/fallbacks/purchase/PurchaseProcessFallback";
 import CashConfirmationModal from "./CashConfirmationModal";
-import { VehicleOfferWithVehicle } from "@/lib/api/vehicle-booking/vehicleBooking.types";
+import { VehicleOfferWithVehicle, CreateVehicleBookingPayload } from "@/lib/api/vehicle-booking/vehicleBooking.types";
 import { createVehicleBooking } from "@/lib/api/vehicle-booking";
 import { fetchVehicleOffer } from "@/lib/api/vehicleOffer";
 import { calculateTotalDays } from "@/lib/functions";
@@ -32,6 +32,11 @@ const PurchaseProcess = () => {
     const isVehicle = type === "vehicle";
     const start = searchParams.get("start");
     const end = searchParams.get("end");
+    const extraBagsParam = searchParams.get("extraBags");
+    const extraBags = extraBagsParam ? Number(extraBagsParam) : 0;
+    const EXTRA_BAG_PRICE = 5;
+    const extrasOnly = searchParams.get("extrasOnly") === "1";
+    const reservationId = searchParams.get("reservationId");
 
     const IVA = process.env.NEXT_PUBLIC_IVA || 0;
     const referralId = searchParams.get("referral");
@@ -85,12 +90,32 @@ const PurchaseProcess = () => {
         if ((!trip && !vehicleOffer) || !session) return;
 
         if (trip) {
+            // Flujo SOLO equipaje en efectivo: actualizar reserva existente sin validar capacidad
+            if (extrasOnly && reservationId) {
+                try {
+                    await addReservationExtras(reservationId, extraBags);
+                    toast.success("Equipaje agregado correctamente.", {
+                        description: "Se actualizó tu reserva con las maletas adicionales.",
+                    });
+                    router.push("/dashboard/user/reservations");
+                } catch (error) {
+                    console.log("Error al agregar equipaje en efectivo:", error);
+                    toast.info("No se pudo agregar el equipaje", {
+                        description: "Intenta nuevamente o contacta con el soporte",
+                    });
+                } finally {
+                    setShowCashModal(false);
+                }
+                return;
+            }
             const payload: CreateReservationPayload = {
                 tripId: trip.id,
-                price: trip.priceDetails?.finalPrice ?? trip.basePrice,
+                // Mantiene la lógica actual (sin IVA en cash) pero suma equipaje adicional
+                price: (trip.priceDetails?.finalPrice ?? trip.basePrice) + extraBags * EXTRA_BAG_PRICE,
                 status: "PENDING",
                 paymentMethod: "CASH",
                 referralId: referralId || undefined,
+                seatCode: `EXTRA_BAGS:${extraBags}`,
             };
 
             try {
@@ -117,7 +142,7 @@ const PurchaseProcess = () => {
                 endDate: new Date(end || vehicleOffer.availableTo),
                 status: "PENDING",
                 paymentMethod: "CASH",
-                referralId: referralId || undefined,
+                referrerId: referralId || undefined,
                 totalPrice: totalPrice,
             };
 
@@ -150,17 +175,43 @@ const PurchaseProcess = () => {
         }
 
         if (trip) {
+            // Si es flujo de solo equipaje, crear sesión por solo las maletas y salir
+            if (extrasOnly && reservationId) {
+                try {
+                    const data = await createCheckoutSession({
+                        amount: Math.round(extraBags * EXTRA_BAG_PRICE * (1 + Number(IVA) / 100) * 100),
+                        metadata: ({
+                            // Se usa el tipo de reserva para facilitar conciliación en backend
+                            type: "EXTRA_BAGS",
+                            reservationId,
+                            tripId: trip.id,
+                            userId: String(session.user.id),
+                            seatCode: `EXTRA_BAGS:${extraBags}`,
+                        } as unknown) as CreateReservationPayload,
+                    });
+                    if (data.url) {
+                        window.location.href = data.url;
+                        return;
+                    }
+                } catch (err) {
+                    console.log("Error al iniciar el checkout de equipaje:", err);
+                    toast.info("No se pudo redirigir al pago de equipaje");
+                    return;
+                }
+            }
             const payload: CreateReservationPayload = {
                 tripId: trip.id,
-                price: (trip.priceDetails?.finalPrice ?? trip.basePrice) * (1 + Number(IVA) / 100),
+                // Para Stripe, la app ya enviaba precio con IVA: ahora sumamos equipaje y luego IVA
+                price: ((trip.priceDetails?.finalPrice ?? trip.basePrice) + extraBags * EXTRA_BAG_PRICE) * (1 + Number(IVA) / 100),
                 status: "PENDING",
                 paymentMethod: "STRIPE",
                 referralId: referralId || undefined,
+                seatCode: `EXTRA_BAGS:${extraBags}`,
             };
             try {
                 const data = await createCheckoutSession({
-                    amount: Math.round((trip.priceDetails?.finalPrice ?? trip.basePrice) * (1 + Number(IVA) / 100) * 100),
-                    metadata: payload,
+                    amount: Math.round(((trip.priceDetails?.finalPrice ?? trip.basePrice) + extraBags * EXTRA_BAG_PRICE) * (1 + Number(IVA) / 100) * 100),
+                    metadata: ({ ...payload, userId: String(session.user.id) } as unknown) as CreateReservationPayload,
                 });
                 if (data.url) {
                     window.location.href = data.url;
@@ -172,21 +223,22 @@ const PurchaseProcess = () => {
         }
         if (vehicleOffer) {
             const finalPrice = vehicleOffer.pricePerDay * calculateTotalDays(start || vehicleOffer.availableFrom, end || vehicleOffer.availableTo);
-            const createVehicleBookingPayload = {
-                renterId: session.user.id,
-                offerId: vehicleOffer.id,
-                startDate: new Date(start || vehicleOffer.availableFrom),
-                endDate: new Date(end || vehicleOffer.availableTo),
-                status: "PENDING",
-                paymentMethod: "STRIPE",
-                referralId: referralId || undefined,
-                totalPrice: finalPrice,
-                type: "VEHICLE_BOOKING",
-            };
             try {
+                const vehicleMetadata: CreateVehicleBookingPayload & { type: 'VEHICLE_BOOKING' } = {
+                    type: 'VEHICLE_BOOKING',
+                    renterId: String(session.user.id),
+                    offerId: String(vehicleOffer.id),
+                    startDate: new Date(start || vehicleOffer.availableFrom),
+                    endDate: new Date(end || vehicleOffer.availableTo),
+                    status: "PENDING",
+                    paymentMethod: "STRIPE",
+                    referrerId: referralId || undefined,
+                    totalPrice: finalPrice,
+                };
+
                 const data = await createCheckoutSession({
                     amount: Math.round(finalPrice * (1 + Number(IVA) / 100) * 100),
-                    metadata: createVehicleBookingPayload,
+                    metadata: vehicleMetadata,
                 });
 
                 if (data.url) {
@@ -205,19 +257,25 @@ const PurchaseProcess = () => {
 
     const tripSummary = trip ? getSummaryFromTrip(trip) : null;
 
-    const priceFormatted = (finalPrice: number | undefined, basePrice: number, IVA: number) => {
-        const price = finalPrice !== undefined ? finalPrice : basePrice;
+    const priceFormatted = (finalPrice: number | undefined, basePrice: number, IVA: number, extra: number) => {
+        const price = (finalPrice !== undefined ? finalPrice : basePrice) + extra;
         return (price * (1 + Number(IVA) / 100)).toFixed(2).replace(".", ",");
     };
 
     let price: string = "0,00";
 
     if (trip) {
-        price = priceFormatted(trip.priceDetails?.finalPrice, trip.basePrice, Number(IVA));
+        const extraAmount = extraBags * EXTRA_BAG_PRICE;
+        // Si es flujo de solo equipaje, mostrar solo el total de equipaje en el botón
+        if (extrasOnly) {
+            price = ((extraAmount) * (1 + Number(IVA) / 100)).toFixed(2).replace(".", ",");
+        } else {
+            price = priceFormatted(trip.priceDetails?.finalPrice, trip.basePrice, Number(IVA), extraAmount);
+        }
     } else if (vehicleOffer?.pricePerDay !== undefined && (start || vehicleOffer.availableFrom) && (end || vehicleOffer.availableTo)) {
         const totalDays = calculateTotalDays(start || vehicleOffer.availableFrom, end || vehicleOffer.availableTo);
         const totalPrice = vehicleOffer.pricePerDay * totalDays;
-        price = priceFormatted(totalPrice, vehicleOffer.pricePerDay, Number(IVA));
+        price = priceFormatted(totalPrice, vehicleOffer.pricePerDay, Number(IVA), 0);
     }
 
     //Logica para vehicle
@@ -294,6 +352,8 @@ const PurchaseProcess = () => {
                         <PurchaseTripSummary
                             {...tripSummary}
                             priceDetails={trip.priceDetails}
+                            extraBags={extraBags}
+                            pricePerBag={EXTRA_BAG_PRICE}
                             // title={isVehicle ? "Resumen de tu reserva" : "Resumen de tu viaje"}
                         />
                     )}

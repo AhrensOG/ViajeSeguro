@@ -8,6 +8,13 @@ type Props = {
 
 const PriceInfo = ({ reservation }: Props) => {
   const { priceDetails, price } = reservation;
+  const pricePerBag = 5;
+  const extraBagsMatch = reservation.seatCode?.match(/EXTRA_BAGS:(\d+)/);
+  const extraBags = extraBagsMatch ? Number(extraBagsMatch[1]) : 0;
+  const extrasAmount = extraBags * pricePerBag;
+  const IVA = Number(process.env.NEXT_PUBLIC_IVA || 21);
+  const ivaAmount = (price * IVA) / 100;
+  const totalWithIva = price + ivaAmount;
 
   return (
     <section className="bg-custom-gray-100 p-4 rounded-lg text-sm flex flex-col gap-2">
@@ -34,12 +41,31 @@ const PriceInfo = ({ reservation }: Props) => {
         </div>
       )}
 
+      {extraBags > 0 && (
+        <div className="mt-2">
+          <p className="font-medium text-custom-black-800 mb-1">Equipaje adicional</p>
+          <div className="flex justify-between items-center text-custom-gray-700">
+            <span>
+              Maletas adicionales ({extraBags} x € {pricePerBag.toFixed(2).replace(".", ",")}):
+            </span>
+            <span>€ {extrasAmount.toFixed(2).replace(".", ",")}</span>
+          </div>
+        </div>
+      )}
+
       <hr className="border-t border-custom-gray-300 my-2" />
 
       <div className="flex justify-between items-center">
-        <span className="text-custom-gray-700">Importe final:</span>
+        <span className="text-custom-gray-600">IVA ({IVA}%):</span>
+        <span className="text-custom-black-900 font-medium">
+          € {ivaAmount.toFixed(2).replace(".", ",")}
+        </span>
+      </div>
+
+      <div className="flex justify-between items-center">
+        <span className="text-custom-gray-700">Total con IVA:</span>
         <span className="text-lg font-bold text-custom-black-900">
-          € {price.toFixed(2).replace(".", ",")}
+          € {totalWithIva.toFixed(2).replace(".", ",")}
         </span>
       </div>
     </section>

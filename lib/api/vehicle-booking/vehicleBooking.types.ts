@@ -42,7 +42,7 @@ export interface ResponseForQrPage {
     id: string;
     startDate: Date;
     endDate: Date;
-    status: "PENDING" | "APPROVED" | "COMPLETED" | "FINISHED" | "DECLINED" | "CANCELLED";
+    status: "PENDING" | "APPROVED" | "COMPLETED" | "FINISHED" | "DECLINED" | "CANCELLED" | "DELIVERED" | "ACTIVE";
     isDeleted: boolean;
     paymentMethod: "CASH" | "STRIPE";
     offer: {
@@ -76,7 +76,7 @@ export interface ResponseForProfilePage {
     id: string;
     startDate: string;
     endDate: string;
-    status: "PENDING" | "APPROVED" | "COMPLETED" | "FINISHED" | "DECLINED" | "CANCELLED";
+    status: "PENDING" | "APPROVED" | "COMPLETED" | "FINISHED" | "DECLINED" | "CANCELLED" | "DELIVERED" | "ACTIVE";
     isDeleted: boolean;
     paymentMethod: "CASH" | "STRIPE";
     totalPrice: number;
@@ -117,4 +117,14 @@ export interface ResponseForProfilePage {
         id: string;
         paymentStatus: "PENDING" | "COMPLETED" | "FAILED";
     };
+}
+
+export interface PartnerEarningsResponse {
+    totalEarnings: number;
+    currentMonthEarnings: number;
+    previousMonthEarnings: number;
+    growthPercentage: number;
+    totalBookings: number;
+    publishedVehicles: number;
+    currentlyRentedVehicles: number;
 }

@@ -3,6 +3,8 @@ import { X } from "lucide-react";
 import { toast } from "sonner";
 import { createTrip } from "@/lib/api/admin/trips";
 import { CreateTripRequest, Driver, Partner, TripResponse, TripServiceType, TripStatus } from "@/lib/api/admin/trips/trips.type";
+import { getActiveCities } from "@/lib/api/admin/cities";
+import { CityResponse } from "@/lib/api/admin/cities/cities.type";
 import { DateTime } from "luxon";
 
 interface Props {
@@ -18,6 +20,7 @@ const labelClass = "block text-xs font-semibold text-custom-gray-500 mb-1 upperc
 
 // const CreateTripModal = ({ onClose, onSuccess, partners, drivers }: Props) => {
 const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
+    const [cities, setCities] = useState<CityResponse[]>([]);
     const [form, setForm] = useState<CreateTripRequest>({
         origin: "",
         destination: "",
@@ -98,6 +101,17 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
     };
 
     useEffect(() => {
+        const fetchCities = async () => {
+            try {
+                const activeCities = await getActiveCities();
+                setCities(activeCities);
+            } catch {
+                toast.info("Error al cargar las ciudades");
+            }
+        };
+
+        fetchCities();
+
         const handleKeyDown = (e: KeyboardEvent) => {
             if (e.key === "Escape") {
                 onClose(); // función que cierra el modal
@@ -189,7 +203,43 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
                         <hr className="mb-4" />
                     </div>
 
-                    {["origin", "destination", "departure", "arrival", "originalTimeZone", "originLocation", "destinationLocation"].map((name) => (
+                    <div>
+                        <label className={labelClass}>Origen</label>
+                        <select
+                            name="origin"
+                            value={form.origin}
+                            onChange={handleChange}
+                            className={inputClass}
+                            required
+                        >
+                            <option value="">-- Seleccionar ciudad de origen --</option>
+                            {cities.map((city) => (
+                                <option key={city.id} value={`${city.name}, ${city.state}, ${city.country}`}>
+                                    {city.name}, {city.state}, {city.country}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className={labelClass}>Destino</label>
+                        <select
+                            name="destination"
+                            value={form.destination}
+                            onChange={handleChange}
+                            className={inputClass}
+                            required
+                        >
+                            <option value="">-- Seleccionar ciudad de destino --</option>
+                            {cities.map((city) => (
+                                <option key={city.id} value={`${city.name}, ${city.state}, ${city.country}`}>
+                                    {city.name}, {city.state}, {city.country}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    {["departure", "arrival", "originalTimeZone", "originLocation", "destinationLocation"].map((name) => (
                         <div key={name}>
                             <label className={labelClass}>{name}</label>
                             <input
@@ -271,7 +321,7 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
                         <button
                             type="submit"
                             className="cursor-pointer bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold py-2 px-5 rounded-md"
-                            disabled={!form.driverId}
+                            disabled={!form.driverId || !form.origin || !form.destination}
                         >
                             Crear viaje
                         </button>

@@ -7,6 +7,7 @@ import ReservationPanel from "./reservations/ReservationsPanel";
 import PaymentsPanel from "./payments/PaymentsPanel";
 import TripsPanel from "./trips/TripsPanel";
 import VehiclesPanel from "./vehicles/VehiclesPanel";
+import CitiesPanel from "./cities/CitiesPanel";
 import VehicleOfferPanel from "./vehicle-offer/VehicleOfferPanel";
 import VehicleBookingPanel from "./vehicle-booking/VehicleBookingPanel";
 
@@ -27,6 +28,8 @@ export default function AdminPage() {
                 return <TripsPanel />;
             case "vehiculos":
                 return <VehiclesPanel />;
+            case "ciudades":
+                return <CitiesPanel />;
             case "ofertas-furgonetas":
                 return <VehicleOfferPanel />;
             case "reservas-furgonetas":

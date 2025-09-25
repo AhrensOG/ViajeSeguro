@@ -12,6 +12,7 @@ const TripDetailsPage = () => {
   const searchParams = useSearchParams();
   const id = searchParams.get("id");
   const [trip, setTrip] = useState<TripDetailsResponse | null>(null);
+  const [extraBagsById, setExtraBagsById] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -21,6 +22,18 @@ const TripDetailsPage = () => {
     const fetchTrip = async () => {
       try {
         const raw = (await getTripById(id as string)) as TripDetailsResponse;
+
+        type Qr = {
+          id: string;
+          imageUrl: string;
+          usedAt: string | null;
+          isValid: boolean;
+          createdAt: string;
+          reservationId: string;
+          isDeleted: boolean;
+        };
+
+        const extraMap: Record<string, number> = {};
 
         const mapped: TripDetailsResponse = {
           id: raw.id,
@@ -35,7 +48,7 @@ const TripDetailsPage = () => {
           status: raw.status,
           capacity: raw.capacity,
           minPassengers: raw.minPassengers,
-          passengers: (raw.reservations || []).map((res: Passengers) => {
+          passengers: (raw.reservations || []).map((res: Passengers & { seatCode?: string | null; qr?: Qr[] | Qr | null }) => {
             const validStatuses: ValidStatus[] = [
               "PENDING",
               "CONFIRMED",
@@ -46,6 +59,16 @@ const TripDetailsPage = () => {
             )
               ? (res.status as ValidStatus)
               : "PENDING";
+            const seatCode: string | null = res?.seatCode ?? null;
+            const m = seatCode?.match(/^EXTRA_BAGS:(\d+)$/);
+            const extraBags = m ? Number(m[1]) : 0;
+            // Normalizar QR: el backend devuelve un array de QRs. Tomamos uno no eliminado si existe, o el primero.
+            const rawQr = res?.qr;
+            const qrArray = Array.isArray(rawQr) ? (rawQr as Qr[]) : null;
+            const qr: Qr | null = qrArray ? (qrArray.find((q) => !q?.isDeleted) ?? qrArray[0] ?? null) : ((rawQr as Qr | null | undefined) ?? null);
+
+            // Guardar extraBags por pasajero para usar en UI sin alterar el tipo
+            extraMap[res.id] = extraBags;
             return {
               id: res.id,
               userId: res.user?.id ?? "",
@@ -55,7 +78,7 @@ const TripDetailsPage = () => {
               email: res.user?.email ?? "Sin email",
               paymentMethod: res.paymentMethod,
               status,
-              qr: res.qr ?? null,
+              qr,
             };
           }),
           serviceType: raw.serviceType,
@@ -65,6 +88,7 @@ const TripDetailsPage = () => {
         };
 
         setTrip(mapped);
+        setExtraBagsById(extraMap);
       } catch (error) {
         console.error("Error al cargar el viaje:", error);
       } finally {
@@ -82,6 +106,8 @@ const TripDetailsPage = () => {
     trip.originalTimeZone
   );
   const arrival = DateTime.fromISO(trip.arrival).setZone(trip.originalTimeZone);
+  const IVA = Number(process.env.NEXT_PUBLIC_IVA || 21);
+  const priceWithIva = (trip.basePrice * (1 + IVA / 100));
 
   return (
     <div className="w-full max-w-7xl mx-auto p-4 md:p-6">
@@ -119,6 +145,9 @@ const TripDetailsPage = () => {
         <p className="text-sm text-custom-gray-700 mt-2">
           <strong>Precio base:</strong> {trip.basePrice.toFixed(2)} €
         </p>
+        <p className="text-sm text-custom-gray-700">
+          <strong>Precio con IVA ({IVA}%):</strong> {priceWithIva.toFixed(2)} €
+        </p>
       </div>
 
       <div className="mt-8">
@@ -137,6 +166,7 @@ const TripDetailsPage = () => {
                   <th className="px-4 py-3">Nombre</th>
                   <th className="px-4 py-3">Correo</th>
                   <th className="px-4 py-3">Método de pago</th>
+                  <th className="px-4 py-3">Equipaje</th>
                   <th className="px-4 py-3">Estado</th>
                   <th className="px-4 py-3">Abordaje</th>
                 </tr>
@@ -149,6 +179,7 @@ const TripDetailsPage = () => {
                     <td className="px-4 py-3">{passenger.fullName}</td>
                     <td className="px-4 py-3">{passenger.email}</td>
                     <td className="px-4 py-3">{passenger.paymentMethod}</td>
+                    <td className="px-4 py-3">{extraBagsById[passenger.id] ?? 0} maleta(s)</td>
                     <td className="px-4 py-3">
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-semibold ${

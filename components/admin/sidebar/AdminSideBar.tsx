@@ -2,13 +2,14 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Coins, FileText, Users, CalendarDays, LogOut, Home, Car, Truck } from "lucide-react";
+import { Coins, FileText, Users, CalendarDays, LogOut, Home, Car, Truck, MapPin } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
 const menuItems = [
     { name: "Inicio", icon: <Home size={20} />, isHome: true },
     { name: "Usuarios", icon: <Users size={20} /> },
+    { name: "Ciudades", icon: <MapPin size={20} /> },
     { name: "Reservas", icon: <FileText size={20} /> },
     { name: "Pagos", icon: <Coins size={20} /> },
     { name: "Viajes", icon: <CalendarDays size={20} /> },

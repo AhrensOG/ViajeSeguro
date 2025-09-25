@@ -2,6 +2,27 @@ import { fetchWithAuth } from "@/lib/functions";
 import { CreateTripRequest, TripResponse, UpdateTripRequest } from "./trips.type";
 import { BACKEND_URL } from "@/lib/constants";
 
+type WeekKey = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
+
+export interface CreateTripsBulkPayload {
+  origin: string;
+  destination: string;
+  originalTimeZone: string;
+  basePrice: number;
+  capacity?: number;
+  minPassengers?: number;
+  visible?: boolean;
+  status?: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'FINISHED' | string;
+  originLocation?: string;
+  destinationLocation?: string;
+  driverId: string;
+  dateStart: string; // YYYY-MM-DD
+  dateEnd: string;   // YYYY-MM-DD
+  departureTime: string; // HH:mm
+  arrivalTime: string;   // HH:mm
+  weekdays?: WeekKey[];
+}
+
 export async function createTrip(data: CreateTripRequest): Promise<TripResponse> {
     try {
         const res = await fetchWithAuth(`${BACKEND_URL}/trip`, {
@@ -12,6 +33,19 @@ export async function createTrip(data: CreateTripRequest): Promise<TripResponse>
     } catch (error) {
         console.log(error);
         throw new Error("Failed to create trip");
+    }
+}
+
+export async function createTripsBulk(data: CreateTripsBulkPayload): Promise<TripResponse[]> {
+    try {
+        const res = await fetchWithAuth(`${BACKEND_URL}/trip/bulk`, {
+            method: "POST",
+            body: JSON.stringify(data),
+        });
+        return res as TripResponse[];
+    } catch (error) {
+        console.log(error);
+        throw new Error("Failed to create trips in bulk");
     }
 }
 

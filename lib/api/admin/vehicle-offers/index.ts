@@ -53,6 +53,18 @@ async function updateVehicleOffer(id: string, data: CreateVehicleOfferRequest) {
     }
 }
 
+async function updateUserVehicleOffer(id: string, data: CreateVehicleOfferRequest) {
+    try {
+        const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-offer/user-update`, {
+            method: "PUT",
+            body: JSON.stringify({ ...data, offerId: id }),
+        });
+        return res;
+    } catch {
+        throw new Error("Error updating user vehicle offer");
+    }
+}
+
 async function deleteVehicleOffer(id: string) {
     try {
         const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-offer/${id}`, {
@@ -64,4 +76,4 @@ async function deleteVehicleOffer(id: string) {
     }
 }
 
-export { fetchVehicleOffers, fetchSimpleUsers, fetchSimpleVehicles, createVehicleOffer, updateVehicleOffer, deleteVehicleOffer };
+export { fetchVehicleOffers, fetchSimpleUsers, fetchSimpleVehicles, createVehicleOffer, updateVehicleOffer, updateUserVehicleOffer, deleteVehicleOffer };

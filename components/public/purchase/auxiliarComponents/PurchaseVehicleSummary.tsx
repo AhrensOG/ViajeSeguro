@@ -15,7 +15,7 @@ interface PurchaseVehicleSummaryProps {
 
 const PurchaseVehicleSummary = ({ vehicleOffer, start, end, originalTimeZone }: PurchaseVehicleSummaryProps) => {
     const [showDetails, setShowDetails] = useState(false);
-    const IVA_RATE = Number(process.env.NEXT_PUBLIC_IVA || 0) / 100;
+    const IVA_RATE = Number(process.env.NEXT_PUBLIC_IVA || 21) / 100;
 
     const from = DateTime.fromISO(start || vehicleOffer.availableFrom).setZone(originalTimeZone);
     const to = DateTime.fromISO(end || vehicleOffer.availableTo).setZone(originalTimeZone);

@@ -13,6 +13,14 @@ const TripCard = ({ trip }: Props) => {
     const [openCard, setOpenCard] = useState(false);
     const router = useRouter();
 
+    // Total de equipaje adicional (suma de todas las reservas del viaje)
+    const reservations = ((trip as unknown as { reservations?: Array<{ seatCode?: string | null }> }).reservations) ?? [];
+    const totalExtraBags = reservations.reduce((acc, r) => {
+        const m = r.seatCode?.match(/^EXTRA_BAGS:(\d+)$/);
+        const n = m ? Number(m[1]) : 0;
+        return acc + (Number.isFinite(n) ? n : 0);
+    }, 0);
+
     const departure = DateTime.fromISO(trip.departure).setZone(trip.originalTimeZone);
     const arrival = DateTime.fromISO(trip.arrival).setZone(trip.originalTimeZone);
     const formattedDate = departure.setLocale("es").toFormat("cccc, d 'de' LLLL");
@@ -92,6 +100,10 @@ const TripCard = ({ trip }: Props) => {
                             Capacidad: {trip.capacity} pasajeros mínimo {trip.minPassengers}
                         </div>
                         <div className="flex items-center gap-2 text-sm text-custom-gray-700">
+                            <Users className="size-4" />
+                            Equipaje adicional total: <span className="font-medium">{totalExtraBags}</span> maleta(s)
+                        </div>
+                        <div className="flex items-center gap-2 text-sm text-custom-gray-700">
                             <MapPin className="size-4" />
                             Origen: {trip.originLocation}
                         </div>
@@ -103,7 +115,7 @@ const TripCard = ({ trip }: Props) => {
                         <button
                             onClick={(e) => {
                                 e.stopPropagation();
-                                router.push(`/dashboard/user/trips/details?id=${trip.id}`);
+                                router.push(`/dashboard/driver/trips/details?id=${trip.id}`);
                             }}
                             className="mt-4 w-full text-center text-sm text-custom-golden-700 font-semibold hover:underline cursor-pointer"
                         >

@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useState } from "react";
 import { useSession } from "next-auth/react";
 import { getReservationsByUser } from "@/lib/api/reservation";
 import { ReservationResponse } from "@/lib/api/reservation/reservation.types";
@@ -17,27 +17,27 @@ const ReservationsPage = () => {
     const [vehicleBookings, setVehicleBookings] = useState<ResponseForProfilePage[]>([]);
     const [loading, setLoading] = useState(true);
 
-    useEffect(() => {
-        const fetchReservations = async () => {
-            if (!session?.user?.id) return;
-            try {
-                const data = await getReservationsByUser(session.user.id);
-                const vehicleBookings = await getVehicleBookingsForProfile(session.user.id);
+    const fetchReservations = useCallback(async () => {
+        if (!session?.user?.id) return;
+        try {
+            const data = await getReservationsByUser(session.user.id);
+            const vehicleBookings = await getVehicleBookingsForProfile(session.user.id);
 
-                setVehicleBookings(vehicleBookings as ResponseForProfilePage[]);
-                setReservations(data);
-            } catch (error) {
-                console.log("Error al obtener reservas:", error);
-                toast.info("¡Ups! Ocurrió un error al obtener tus reservas.", {
-                    description: "Intenta recargando la pagina o contacta con el soporte",
-                });
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchReservations();
+            setVehicleBookings(vehicleBookings as ResponseForProfilePage[]);
+            setReservations(data);
+        } catch (error) {
+            console.log("Error al obtener reservas:", error);
+            toast.info("¡Ups! Ocurrió un error al obtener tus reservas.", {
+                description: "Intenta recargando la pagina o contacta con el soporte",
+            });
+        } finally {
+            setLoading(false);
+        }
     }, [session?.user?.id]);
+
+    useEffect(() => {
+        fetchReservations();
+    }, [fetchReservations]);
 
     return (
         <div className="w-full flex flex-col items-center px-0 md:px-6 my-4 pb-10 bg-white">
@@ -67,7 +67,11 @@ const ReservationsPage = () => {
                         <ReservationCard key={reservation.id} reservation={reservation} />
                     ))}
                     {vehicleBookings.map((vehicleBooking) => (
-                        <ReservationVehicleCard key={vehicleBooking.id} vehicleBooking={vehicleBooking} />
+                        <ReservationVehicleCard 
+                            key={vehicleBooking.id} 
+                            vehicleBooking={vehicleBooking} 
+                            onBookingUpdate={fetchReservations}
+                        />
                     ))}
                 </div>
             )}

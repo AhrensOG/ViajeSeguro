@@ -65,12 +65,11 @@ export default function SearchFormVehicle() {
             value={capacity}
             onChange={(e) => setCapacity(e.target.value)}
             className="w-full outline-none border border-gray-300 rounded-md p-3 ring-offset-amber-300 focus:ring-1 focus:ring-amber-500 focus:border-transparent">
-            <option value="2">2 Personas</option>
-            <option value="3">3 Personas</option>
-            <option value="4">4 Personas</option>
-            <option value="6">6 Personas</option>
-            <option value="8">8 Personas</option>
-            <option value="10">10 Personas</option>
+            {Array.from({ length: 9 }, (_, i) => i + 1).map((n) => (
+              <option key={n} value={String(n)}>
+                {n} {n === 1 ? "Persona" : "Personas"}
+              </option>
+            ))}
           </select>
         </div>
         {/* Origen */}

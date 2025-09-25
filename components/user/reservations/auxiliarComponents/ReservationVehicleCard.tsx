@@ -8,12 +8,15 @@ import {
   Users,
   MapIcon,
   X,
+  CheckCircle,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
 import { ResponseForProfilePage } from "@/lib/api/vehicle-booking/vehicleBooking.types";
 import { calculateTotalDays } from "@/lib/functions";
 import { DateTime } from "luxon";
+import { confirmBookingPickup, markAsReturned } from "@/lib/api/vehicle-booking";
+import { toast } from "sonner";
 const transmissionTypeMap = {
   MANUAL: "Manual",
   AUTOMATIC: "Automática",
@@ -29,35 +32,64 @@ const statusMap = {
   CANCELLED: "Cancelada",
   DECLINED: "Declinada",
   FINISHED: "Finalizada",
-  APPROVED: "Aprobada", // agregado
-  COMPLETED: "Completada", // agregado
+  APPROVED: "Aprobada",
+  COMPLETED: "Completada",
+  DELIVERED: "Entregada",
+  ACTIVE: "Activa",
+  RETURNED: "Devuelta",
 } as const;
+
+const getStatusColor = (status: keyof typeof statusMap) => {
+  switch (status) {
+    case "APPROVED":
+    case "COMPLETED":
+    case "ACTIVE":
+      return "bg-green-50 border-green-200 text-green-800";
+    case "DELIVERED":
+      return "bg-blue-50 border-blue-200 text-blue-800";
+    case "PENDING":
+      return "bg-yellow-50 border-yellow-200 text-yellow-800";
+    case "FINISHED":
+    case "RETURNED":
+      return "bg-blue-50 border-blue-200 text-blue-800";
+    case "DECLINED":
+    case "CANCELLED":
+      return "bg-red-50 border-red-200 text-red-800";
+    default:
+      return "bg-gray-50 border-gray-200 text-gray-800";
+  }
+};
 
 const ReservationVehicleCard = ({
   vehicleBooking,
+  onBookingUpdate,
 }: {
   vehicleBooking: ResponseForProfilePage;
+  onBookingUpdate?: () => void;
 }) => {
   const [showCancelWarning, setShowCancelWarning] = useState(false);
   const [hideButton, setHideButton] = useState(false);
   const [openCard, setOpenCard] = useState(false);
+  const [loadingPickup, setLoadingPickup] = useState(false);
+  const [loadingReturn, setLoadingReturn] = useState(false);
   const IVA = process.env.NEXT_PUBLIC_IVA || 0;
 
   const {
     id,
     startDate,
     endDate,
-    totalPrice,
     paymentMethod,
     offer,
-    qrCode,
     status,
   } = vehicleBooking || {};
   const { vehicle, returnLocation, pricePerDay, vehicleOfferType, originalTimeZone } =
     offer || {};
   const { model, brand, year, capacity, fuelType, transmissionType, images } =
     vehicle || {};
-  const { imageUrl } = qrCode?.[0] || {};
+  // QR oculto en cards de alquiler de vehículos a pedido: no mostrar QR aquí
+
+  // Estado local para feedback instantáneo en UI
+  const [currentStatus, setCurrentStatus] = useState(status);
 
   const formattedStart = DateTime.fromISO(startDate, { zone: "utc" })
     .setZone(originalTimeZone || "Europe/Madrid")
@@ -74,11 +106,47 @@ const ReservationVehicleCard = ({
         (1000 * 60 * 60 * 24)
       )
       : "-";
-  const formattedTotal = `${totalPrice.toFixed(2)}€`;
+  // Cálculos correctos para mostrar al cliente
+  const daysCount = calculateTotalDays(String(startDate), String(endDate));
+  const subTotal = pricePerDay * daysCount;
+  const ivaPercent = Number(IVA) || 0;
+  const ivaAmount = Number(((subTotal * ivaPercent) / 100).toFixed(2));
+  const totalWithIva = Number((subTotal + ivaAmount).toFixed(2));
 
-  const subTotal =
-    pricePerDay * calculateTotalDays(String(startDate), String(endDate));
-  // const total = subTotal * (1 + Number(IVA) / 100);
+  // Nota: subTotal/ivaAmount/totalWithIva calculados arriba
+
+  const handleConfirmPickup = async () => {
+    try {
+      setLoadingPickup(true);
+      await confirmBookingPickup(id.toString());
+      toast.success("¡Vehículo recogido! Tu alquiler está ahora activo");
+      // Optimista: reflejar inmediatamente en la UI
+      setCurrentStatus("ACTIVE");
+      onBookingUpdate?.();
+    } catch (error) {
+      console.error('Error al confirmar recogida:', error);
+      toast.error("Error al confirmar la recogida del vehículo");
+    } finally {
+      setLoadingPickup(false);
+    }
+  };
+
+  const handleReturnVehicle = async () => {
+    try {
+      setLoadingReturn(true);
+      await markAsReturned(id.toString());
+      toast.success("¡Vehículo devuelto exitosamente!");
+      // Optimista: reflejar inmediatamente en la UI (usar FINISHED para respetar el tipo)
+      setCurrentStatus("FINISHED");
+
+      onBookingUpdate?.();
+    } catch (error) {
+      console.error('Error al devolver vehículo:', error);
+      toast.error("Error al devolver el vehículo");
+    } finally {
+      setLoadingReturn(false);
+    }
+  };
 
   return (
     <div
@@ -144,7 +212,7 @@ const ReservationVehicleCard = ({
         </div>
         <div className="flex flex-row-reverse md:flex-col gap-4 md:gap-2 md:w-[10rem] md:h-full justify-center md:justify-end items-center md:items-start ">
           <h3 className="text-2xl font-bold text-custom-black-800">
-            {formattedTotal}
+            {totalWithIva.toFixed(2)}€
           </h3>
           <p className="text-sm text-custom-gray-600">Precio total</p>
         </div>
@@ -165,13 +233,13 @@ const ReservationVehicleCard = ({
             exit={{ height: 0, opacity: 0 }}
             transition={{ duration: 0.3 }}
             className="overflow-hidden flex flex-col gap-6 mt-2">
-            <div className="rounded-xl border border-custom-gray-200 bg-[#f9fafb] p-4 text-sm">
-              <p className="font-semibold text-custom-black-900 mb-1">
+            <div className={`rounded-xl border p-4 text-sm ${getStatusColor(currentStatus as keyof typeof statusMap)}`}>
+              <p className="font-semibold mb-1">
                 Estado de tu reserva
               </p>
-              <p className="text-custom-gray-700">
+              <p>
                 Tu solicitud fue procesada correctamente y se encuentra en
-                estado <strong>{statusMap[status]}</strong>.
+                estado <strong>{statusMap[currentStatus as keyof typeof statusMap]}</strong>.
               </p>
             </div>
 
@@ -188,60 +256,28 @@ const ReservationVehicleCard = ({
               </div>
             )}
 
-            <p className="text-xs text-custom-gray-500 italic">Toca para ver más detalles de tu reserva</p>
+            <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
+              <p className="font-semibold text-blue-900 mb-2">📍 Información de recogida</p>
+              <p className="text-blue-800 mb-2">
+                Debes recoger tu furgoneta en la siguiente dirección:
+              </p>
+              <p className="font-semibold text-blue-900 bg-blue-100 p-2 rounded-md">
+                {returnLocation}
+              </p>
+              <p className="text-blue-700 text-xs mt-2">
+                Recuerda llevar tu documento de identidad y licencia de conducir válida.
+              </p>
+            </div>
 
-            {/* Contenido expandido */}
-            <AnimatePresence>
-              {openCard && (
-                <motion.div
-                  key="details"
-                  onClick={(e) => e.stopPropagation()}
-                  initial={{ height: 0, opacity: 0 }}
-                  animate={{ height: "auto", opacity: 1 }}
-                  exit={{ height: 0, opacity: 0 }}
-                  transition={{ duration: 0.3 }}
-                  className="overflow-hidden flex flex-col gap-6 mt-2"
-                >
-                  <div className="rounded-xl border border-custom-gray-200 bg-[#f9fafb] p-4 text-sm">
-                    <p className="font-semibold text-custom-black-900 mb-1">Estado de tu reserva</p>
-                    <p className="text-custom-gray-700">
-                      Tu solicitud fue procesada correctamente y se encuentra en estado <strong>{statusMap[status]}</strong>.
-                    </p>
-                  </div>
-
-                  <div className="rounded-xl border border-blue-200 bg-blue-50 p-4 text-sm">
-                    <p className="font-semibold text-blue-900 mb-2">📍 Información de recogida</p>
-                    <p className="text-blue-800 mb-2">
-                      Debes recoger tu furgoneta en la siguiente dirección:
-                    </p>
-                    <p className="font-semibold text-blue-900 bg-blue-100 p-2 rounded-md">
-                      {returnLocation}
-                    </p>
-                    <p className="text-blue-700 text-xs mt-2">
-                      Recuerda llevar tu documento de identidad y licencia de conducir válida.
-                    </p>
-                  </div>
-
-                  {paymentMethod === "CASH" && (
-                    <div className="rounded-md border-l-4 border-yellow-400 bg-yellow-50 p-4 text-sm text-yellow-800">
-                      <p className="font-bold mb-2 text-yellow-800">Método de pago: Efectivo</p>
-                      <p className="mb-2">
-                        El pago se ha procesado correctamente. Recuerda presentar tu documento de identidad y licencia de conducir (si
-                        aplica) al momento de recoger el vehículo.
-                      </p>
-                    </div>
-                  )}
-
-                  {/* <div className="rounded-xl border-custom-gray-200 bg-[#f9fafb] p-4 text-sm">
-                            <p className="font-semibold text-custom-black-900 mb-3">Extras incluidos</p>
-                            <ul className="list-disc pl-10 space-y-1">
-                                <li className="text-custom-gray-700">Seguro de vida</li>
-                                <li className="text-custom-gray-700">Silla de Niños 5.00€</li>
-                            </ul>
-                        </div> */}
-                </motion.div>)}
-
-            </AnimatePresence>
+            {paymentMethod === "CASH" && (
+              <div className="rounded-md border-l-4 border-yellow-400 bg-yellow-50 p-4 text-sm text-yellow-800">
+                <p className="font-bold mb-2 text-yellow-800">Método de pago: Efectivo</p>
+                <p className="mb-2">
+                  El pago se ha procesado correctamente. Recuerda presentar tu documento de identidad y licencia de conducir (si
+                  aplica) al momento de recoger el vehículo.
+                </p>
+              </div>
+            )}
 
 
             <div className="border-b border-custom-gray-200"></div>
@@ -256,49 +292,69 @@ const ReservationVehicleCard = ({
                 <p>{subTotal.toFixed(2)}€</p>
               </div>
               <div className="flex justify-between text-sm text-custom-gray-700 w-full">
-                <p>IVA ({IVA}%):</p>
-                <p>{formattedTotal}</p>
+                <p>IVA ({ivaPercent}%):</p>
+                <p>{ivaAmount.toFixed(2)}€</p>
               </div>
               <div className="flex justify-between text-custom-gray-700 w-full text-lg font-bold">
                 <p>Importe Final:</p>
-                <p>{formattedTotal}</p>
+                <p>{totalWithIva.toFixed(2)}€</p>
               </div>
               {/* <p className="text-sm text-custom-golden-600 text-end w-full hover:underline cursor-pointer">Ver detalle de descuentos</p> */}
             </div>
 
             <div className="border-b border-custom-gray-200"></div>
 
-            {imageUrl && (
-              <div className="flex flex-col justify-center items-center w-full">
-                <h2 className="text-lg font-semibold mb-4 text-center text-custom-black-900">
-                  Código QR de tu viaje
-                </h2>
-
-                <p className="text-sm text-center text-custom-gray-600">
-                  Muestra este código al conductor al momento del embarque.
-                </p>
-                <Image
-                  src={imageUrl}
-                  alt="QR Code"
-                  width={200}
-                  height={200}
-                  className="w-48 h-48"
-                />
-                <p className="text-xs text-center text-custom-gray-400 mt-1">
-                  Si el QR falla, proporciona este ID al conductor:{" "}
-                  <span className="font-semibold text-custom-black-700">
-                    {vehicleBooking.id}
-                  </span>
-                </p>
-              </div>
-            )}
+            {/* QR intencionalmente no visible en esta card (alquiler de vehículos) */}
 
             <div className="border-b border-custom-gray-200"></div>
 
             <div className="flex flex-col justify-center items-end gap-4 relative">
-              {status === "COMPLETED" ||
-                status === "PENDING" ||
-                (status === "APPROVED" && (
+              {/* Botón de confirmar recogida cuando estado es DELIVERED */}
+              {currentStatus === "DELIVERED" && (
+                <div className="w-full flex justify-center">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleConfirmPickup();
+                    }}
+                    disabled={loadingPickup}
+                    className="bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition flex items-center gap-2"
+                  >
+                    {loadingPickup ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    ) : (
+                      <CheckCircle className="h-5 w-5" />
+                    )}
+                    {loadingPickup ? "Confirmando..." : "Confirmar que recibí el vehículo"}
+                  </button>
+                </div>
+              )}
+
+              {/* Botón de devolver vehículo cuando estado es ACTIVE */}
+              {currentStatus === "ACTIVE" && (
+                <div className="w-full flex justify-center">
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleReturnVehicle();
+                    }}
+                    disabled={loadingReturn}
+                    className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition flex items-center gap-2"
+                  >
+                    {loadingReturn ? (
+                      <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                    ) : (
+                      <Truck className="h-5 w-5" />
+                    )}
+                    {loadingReturn ? "Procesando..." : "Devolver vehículo"}
+                  </button>
+                </div>
+              )}
+
+              {/* Botón de cancelar para estados apropiados */}
+              {(currentStatus === "COMPLETED" ||
+                currentStatus === "PENDING" ||
+                currentStatus === "APPROVED") && (
                   <div className="flex flex-col gap-2 items-center">
                     <AnimatePresence>
                       {!hideButton && (
@@ -347,7 +403,7 @@ const ReservationVehicleCard = ({
                       )}
                     </AnimatePresence>
                   </div>
-                ))}
+                )}
             </div>
           </motion.div>
         )}

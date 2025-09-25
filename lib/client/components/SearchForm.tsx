@@ -1,13 +1,15 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { MapPin } from "lucide-react";
-import { LOCATIONS } from "@/lib/constants";
+import { getActiveCitiesPublic } from "@/lib/api/admin/cities";
+import { CityResponse } from "@/lib/api/admin/cities/cities.type";
 import CustomSelect from "./CustomSelect";
 import CustomDatePicker from "./CustomDatePicker";
 import { motion } from "framer-motion";
 import { TripServiceType } from "@/lib/shared/types/trip-service-type.type";
 import { ClientSearchFormData } from "../trip/types/search-form.type";
+import { toast } from "sonner";
 
 interface SearchFormProps {
     initialData?: ClientSearchFormData;
@@ -24,9 +26,32 @@ const SearchForm = ({
     },
     onSearch,
 }: SearchFormProps) => {
+    const [cities, setCities] = useState<CityResponse[]>([]);
     const [origin, setOrigin] = useState(initialData.origin || "");
     const [destination, setDestination] = useState(initialData.destination || "");
     const [departure, setDeparture] = useState<Date | undefined>(initialData.departure ? new Date(initialData.departure) : undefined);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchCities = async () => {
+            try {
+                const activeCities = await getActiveCitiesPublic();
+                setCities(activeCities);
+            } catch {
+                toast.error("Error al cargar las ciudades");
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchCities();
+    }, []);
+
+    // Transform cities to the format expected by CustomSelect
+    const cityOptions = cities.map(city => ({
+        value: `${city.name}, ${city.state}, ${city.country}`,
+        label: `${city.name}, ${city.state}, ${city.country}`
+    }));
 
     const isFormValid = origin && destination && departure;
 
@@ -56,18 +81,20 @@ const SearchForm = ({
                     <div className="flex flex-col lg:flex-row gap-2 w-full">
                         <div className="flex flex-col sm:flex-row gap-2 w-full">
                             <CustomSelect
-                                options={LOCATIONS}
-                                placeholder="Origen"
+                                options={cityOptions}
+                                placeholder={loading ? "Cargando ciudades..." : "Origen"}
                                 onSelect={setOrigin}
                                 value={origin}
                                 icon={<MapPin className="h-5 w-5 text-custom-gray-600" />}
+                                disabled={loading}
                             />
                             <CustomSelect
-                                options={LOCATIONS}
-                                placeholder="Destino"
+                                options={cityOptions}
+                                placeholder={loading ? "Cargando ciudades..." : "Destino"}
                                 onSelect={setDestination}
                                 value={destination}
                                 icon={<MapPin className="h-5 w-5 text-custom-gray-600" />}
+                                disabled={loading}
                             />
                             <CustomDatePicker onSelect={setDeparture} value={departure} />
                         </div>
