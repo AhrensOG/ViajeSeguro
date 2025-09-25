@@ -7,7 +7,7 @@ import { toast } from "sonner"
 import { useState } from "react"
 
 interface ProximoAlquiler {
-  id: number
+  id: string
   vehicleName: string
   vehicleImage: string
   vehiclePlate: string
@@ -28,8 +28,8 @@ interface TablaProximosAlquileresProps {
 }
 
 export function TablaProximosAlquileres({ rentals, onRentalUpdate }: TablaProximosAlquileresProps) {
-  const [loadingDelivery, setLoadingDelivery] = useState<number | null>(null)
-  const [deliveredRentals, setDeliveredRentals] = useState<Set<number>>(new Set())
+  const [loadingDelivery, setLoadingDelivery] = useState<string | null>(null)
+  const [deliveredRentals, setDeliveredRentals] = useState<Set<string>>(new Set())
   // Filtrar alquileres aprobados o entregados desde hoy en adelante
   const confirmedRentals = rentals.filter(rental => {
     // Estados válidos para mostrar (solo APPROVED/CONFIRMED y DELIVERED; excluir PENDING)
@@ -80,10 +80,10 @@ export function TablaProximosAlquileres({ rentals, onRentalUpdate }: TablaProxim
     window.open(`tel:${phone}`, '_self')
   }
 
-  const handleDelivery = async (rentalId: number) => {
+  const handleDelivery = async (rentalId: string) => {
     try {
       setLoadingDelivery(rentalId)
-      await markBookingAsDelivered(rentalId.toString())
+      await markBookingAsDelivered(rentalId)
       
       // Marcar como entregado localmente
       setDeliveredRentals(prev => new Set([...prev, rentalId]))

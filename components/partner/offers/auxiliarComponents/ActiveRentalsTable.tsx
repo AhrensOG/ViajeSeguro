@@ -7,7 +7,7 @@ import { confirmVehicleReturn } from "@/lib/api/vehicle-booking"
 import { toast } from "sonner"
 
 interface ActiveRental {
-  id: number
+  id: string
   vehicleName: string
   vehicleImage: string
   vehiclePlate?: string
@@ -26,7 +26,7 @@ interface ActiveRentalsTableProps {
 }
 
 export function ActiveRentalsTable({ rentals }: ActiveRentalsTableProps) {
-  const [loadingConfirm, setLoadingConfirm] = useState<Set<number>>(new Set())
+  const [loadingConfirm, setLoadingConfirm] = useState<Set<string>>(new Set())
 
   console.log('🔍 ActiveRentalsTable DEBUG:', {
     totalRentals: rentals.length,
@@ -49,10 +49,10 @@ export function ActiveRentalsTable({ rentals }: ActiveRentalsTableProps) {
 
   // (UI simplificada) Si se requiere expandir filas en el futuro, reactivar estado y handler
 
-  const handleConfirmReturn = async (rentalId: number) => {
+  const handleConfirmReturn = async (rentalId: string) => {
     try {
       setLoadingConfirm(prev => new Set(prev).add(rentalId))
-      await confirmVehicleReturn(rentalId.toString())
+      await confirmVehicleReturn(rentalId)
       toast.success("¡Recepción confirmada! El alquiler ha finalizado")
       // TODO: Actualizar la lista de reservas
     } catch (error) {

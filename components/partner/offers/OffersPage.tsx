@@ -52,7 +52,7 @@ interface RentalOffer {
 
 // Tipos locales alineados con los componentes hijos
 type ProximoAlquiler = {
-  id: number;
+  id: string;
   vehicleName: string;
   vehicleImage: string;
   vehiclePlate: string;
@@ -68,7 +68,7 @@ type ProximoAlquiler = {
 };
 
 type ActiveRental = {
-  id: number;
+  id: string;
   vehicleName: string;
   vehicleImage: string;
   vehiclePlate?: string;
@@ -83,7 +83,7 @@ type ActiveRental = {
 };
 
 type RentalHistory = {
-  id: number;
+  id: string;
   vehicleName: string;
   vehicleImage: string;
   vehiclePlate?: string;
@@ -104,7 +104,7 @@ type RentalHistory = {
 };
 
 type PendienteAprobacion = {
-  id: number;
+  id: string;
   vehicleName: string;
   vehicleImage: string;
   vehiclePlate: string;
@@ -115,7 +115,7 @@ type PendienteAprobacion = {
   endDate: string;
   totalAmount: number;
   daysUntilStart: number;
-  status: "PENDING" | "confirmed" | "rejected" | "completed" | "approved";
+  status: "PENDING" | "APPROVED" | "DECLINED" | "CANCELLED" | "COMPLETED";
   location: string;
 };
 
@@ -213,7 +213,10 @@ export default function OffersPage() {
 
     loadUserOffers()
     loadStatistics()
-  }, [])
+    // Cargar reservas (pendientes, próximas, activas, historial) al montar
+    // para poblar las tablas del panel de partner
+    void loadUpcomingBookings()
+  }, []) // eslint-disable-line react-hooks/exhaustive-deps
 
   // Función para calcular estadísticas
   const loadStatistics = async () => {
@@ -268,7 +271,7 @@ export default function OffersPage() {
           .reduce((sum: number, p) => sum + Number(p.amount || 0), 0)
         
         return {
-          id: booking.id,
+          id: String(booking.id),
           vehicleName: `${booking.offer.vehicle.brand} ${booking.offer.vehicle.model}`,
           vehicleImage: booking.offer.vehicle.images?.[0] || "/placeholder.svg",
           vehiclePlate: booking.offer.vehicle.plate || "N/A",
@@ -294,7 +297,7 @@ export default function OffersPage() {
       const proximosAlquileresFiltered: ProximoAlquiler[] = transformedBookings
         .filter(b => b.status === 'PENDING' || b.status === 'APPROVED' || b.status === 'DELIVERED')
         .map(b => ({
-          id: Number(b.id),
+          id: String(b.id),
           vehicleName: b.vehicleName,
           vehicleImage: b.vehicleImage,
           vehiclePlate: b.vehiclePlate,
@@ -311,7 +314,7 @@ export default function OffersPage() {
       const activeRentalsFiltered: ActiveRental[] = transformedBookings
         .filter(b => b.status === 'ACTIVE' || b.status === 'RETURNED')
         .map(b => ({
-          id: Number(b.id),
+          id: String(b.id),
           vehicleName: b.vehicleName,
           vehicleImage: b.vehicleImage,
           vehiclePlate: b.vehiclePlate,
@@ -325,7 +328,7 @@ export default function OffersPage() {
         }))
 
       const rentalHistoryFiltered: RentalHistory[] = transformedBookings.map(b => ({
-        id: Number(b.id),
+        id: String(b.id),
         vehicleName: b.vehicleName,
         vehicleImage: b.vehicleImage,
         vehiclePlate: b.vehiclePlate,
@@ -340,9 +343,10 @@ export default function OffersPage() {
       }))
 
       const pendingApprovalsFiltered: PendienteAprobacion[] = transformedBookings
-        .filter(b => b.status === 'PENDING' || b.status === 'completed')
+        // Mostrar en "Pendientes" tanto las aún pendientes como las ya aprobadas a la espera de entrega
+        .filter(b => b.status === 'PENDING' || b.status === 'APPROVED')
         .map(b => ({
-          id: Number(b.id),
+          id: String(b.id),
           vehicleName: b.vehicleName,
           vehicleImage: b.vehicleImage,
           vehiclePlate: b.vehiclePlate,
@@ -457,7 +461,7 @@ export default function OffersPage() {
   }
 
   // Handler para cambios de aprobación
-  const handleApprovalChange = async (rentalId: number, newStatus: 'confirmed' | 'rejected' | 'approved') => {
+  const handleApprovalChange = async (rentalId: string, newStatus: 'APPROVED' | 'DECLINED') => {
     console.log('handleApprovalChange called:', { rentalId, newStatus })
     // Actualización optimista
     setPendingApprovals(prev => prev.map(r => (r.id === rentalId ? { ...r, status: newStatus } : r)))
@@ -495,7 +499,7 @@ export default function OffersPage() {
             totalEarnings={statistics.totalEarnings}
             monthlyEarnings={statistics.monthlyEarnings}
             userVehicles={userVehicles}
-            rentals={rentalHistory}
+            rentals={rentalHistory.map((r, idx) => ({ id: idx, endDate: r.endDate, status: r.status }))}
             earningsGrowthPercentage={statistics.earningsGrowthPercentage}
           />
         )}

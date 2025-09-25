@@ -106,6 +106,8 @@ const TripDetailsPage = () => {
     trip.originalTimeZone
   );
   const arrival = DateTime.fromISO(trip.arrival).setZone(trip.originalTimeZone);
+  const IVA = Number(process.env.NEXT_PUBLIC_IVA || 21);
+  const priceWithIva = (trip.basePrice * (1 + IVA / 100));
 
   return (
     <div className="w-full max-w-7xl mx-auto p-4 md:p-6">
@@ -142,6 +144,9 @@ const TripDetailsPage = () => {
         </p>
         <p className="text-sm text-custom-gray-700 mt-2">
           <strong>Precio base:</strong> {trip.basePrice.toFixed(2)} €
+        </p>
+        <p className="text-sm text-custom-gray-700">
+          <strong>Precio con IVA ({IVA}%):</strong> {priceWithIva.toFixed(2)} €
         </p>
       </div>
 

@@ -185,6 +185,7 @@ const PurchaseProcess = () => {
                             type: "EXTRA_BAGS",
                             reservationId,
                             tripId: trip.id,
+                            userId: String(session.user.id),
                             seatCode: `EXTRA_BAGS:${extraBags}`,
                         } as unknown) as CreateReservationPayload,
                     });
@@ -210,7 +211,7 @@ const PurchaseProcess = () => {
             try {
                 const data = await createCheckoutSession({
                     amount: Math.round(((trip.priceDetails?.finalPrice ?? trip.basePrice) + extraBags * EXTRA_BAG_PRICE) * (1 + Number(IVA) / 100) * 100),
-                    metadata: payload,
+                    metadata: ({ ...payload, userId: String(session.user.id) } as unknown) as CreateReservationPayload,
                 });
                 if (data.url) {
                     window.location.href = data.url;
@@ -222,20 +223,22 @@ const PurchaseProcess = () => {
         }
         if (vehicleOffer) {
             const finalPrice = vehicleOffer.pricePerDay * calculateTotalDays(start || vehicleOffer.availableFrom, end || vehicleOffer.availableTo);
-            const createVehicleBookingPayload: CreateVehicleBookingPayload = {
-                renterId: session.user.id,
-                offerId: vehicleOffer.id,
-                startDate: new Date(start || vehicleOffer.availableFrom),
-                endDate: new Date(end || vehicleOffer.availableTo),
-                status: "PENDING",
-                paymentMethod: "STRIPE",
-                referrerId: referralId || undefined,
-                totalPrice: finalPrice,
-            };
             try {
+                const vehicleMetadata: CreateVehicleBookingPayload & { type: 'VEHICLE_BOOKING' } = {
+                    type: 'VEHICLE_BOOKING',
+                    renterId: String(session.user.id),
+                    offerId: String(vehicleOffer.id),
+                    startDate: new Date(start || vehicleOffer.availableFrom),
+                    endDate: new Date(end || vehicleOffer.availableTo),
+                    status: "PENDING",
+                    paymentMethod: "STRIPE",
+                    referrerId: referralId || undefined,
+                    totalPrice: finalPrice,
+                };
+
                 const data = await createCheckoutSession({
                     amount: Math.round(finalPrice * (1 + Number(IVA) / 100) * 100),
-                    metadata: createVehicleBookingPayload,
+                    metadata: vehicleMetadata,
                 });
 
                 if (data.url) {

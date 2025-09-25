@@ -7,8 +7,8 @@ import { fetchWithAuth } from "@/lib/functions"
 import { BACKEND_URL } from "@/lib/constants"
 import { motion, AnimatePresence } from "framer-motion"
 
-interface PendienteAprobacion {
-  id: number
+export interface PendienteAprobacion {
+  id: string
   vehicleName: string
   vehicleImage: string
   vehiclePlate: string
@@ -19,23 +19,21 @@ interface PendienteAprobacion {
   endDate: string
   totalAmount: number
   daysUntilStart: number
-  status: "PENDING" | "confirmed" | "rejected" | "completed" | "approved"
+  status: "PENDING" | "APPROVED" | "DECLINED" | "CANCELLED" | "COMPLETED"
   location: string
 }
 
-interface TablaPendientesAprobacionProps {
+export interface TablaPendientesAprobacionProps {
   rentals: PendienteAprobacion[]
-  onApprovalChange: (rentalId: number, newStatus: 'confirmed' | 'rejected' | 'approved') => void
+  onApprovalChange: (rentalId: string, newStatus: 'APPROVED' | 'DECLINED') => void
 }
 
 export function TablaPendientesAprobacion({ rentals, onApprovalChange }: TablaPendientesAprobacionProps) {
   const [loading, setLoading] = useState<string | null>(null)
-  const [expandedRentals, setExpandedRentals] = useState<Set<number>>(new Set())
+  const [expandedRentals, setExpandedRentals] = useState<Set<string>>(new Set())
 
-  // Filtrar solo alquileres pendientes (backend envía en mayúsculas)
-  const pendingRentals = rentals.filter(rental => 
-    rental.status === 'PENDING' || rental.status === 'completed'
-  )
+  // Filtrar solo alquileres en estado PENDING (desaparece al aprobar)
+  const pendingRentals = rentals.filter(rental => rental.status === 'PENDING')
   
   console.log('TablaPendientesAprobacion - Todos los rentals:', rentals.map(r => ({ id: r.id, status: r.status })))
   console.log('TablaPendientesAprobacion - Rentals filtrados:', pendingRentals.length)
@@ -45,18 +43,18 @@ export function TablaPendientesAprobacion({ rentals, onApprovalChange }: TablaPe
     return null
   }
 
-  const updateBookingStatus = async (bookingId: number, status: string) => {
+  const updateBookingStatus = async (bookingId: string, status: string) => {
     return await fetchWithAuth(`${BACKEND_URL}/vehicle-booking/${bookingId}/${status}`, {
       method: 'PATCH',
     })
   }
 
-  const handleApprove = async (rentalId: number) => {
+  const handleApprove = async (rentalId: string) => {
     setLoading(`approve-${rentalId}`)
     try {
       await updateBookingStatus(rentalId, 'APPROVED')
-      // Cambiar a 'approved' en lugar de 'confirmed' para que coincida con el filtro
-      onApprovalChange(rentalId, 'approved')
+      // Informar cambio a estado 'APPROVED' (enum backend)
+      onApprovalChange(rentalId, 'APPROVED')
       console.log('Alquiler aprobado exitosamente - Estado cambiado a approved')
     } catch (error) {
       console.error('Error al aprobar:', error)
@@ -66,11 +64,11 @@ export function TablaPendientesAprobacion({ rentals, onApprovalChange }: TablaPe
     }
   }
 
-  const handleReject = async (rentalId: number) => {
+  const handleReject = async (rentalId: string) => {
     setLoading(`reject-${rentalId}`)
     try {
       await updateBookingStatus(rentalId, 'DECLINED')
-      onApprovalChange(rentalId, 'rejected')
+      onApprovalChange(rentalId, 'DECLINED')
       console.log('Alquiler rechazado exitosamente')
     } catch (error) {
       console.error('Error al rechazar:', error)
@@ -84,7 +82,7 @@ export function TablaPendientesAprobacion({ rentals, onApprovalChange }: TablaPe
     window.open(`tel:${phone}`, '_self')
   }
 
-  const toggleExpanded = (rentalId: number) => {
+  const toggleExpanded = (rentalId: string) => {
     setExpandedRentals(prev => {
       const newSet = new Set(prev)
       if (newSet.has(rentalId)) {
@@ -265,7 +263,7 @@ export function TablaPendientesAprobacion({ rentals, onApprovalChange }: TablaPe
                             className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors shadow-sm"
                           >
                             <Phone className="h-4 w-4" />
-                            Llamar Cliente
+                            Soporte Tecnico
                           </button>
                         </div>
                       </div>

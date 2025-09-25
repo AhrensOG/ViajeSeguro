@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion"
 import { DateTime } from "luxon"
 
 interface RentalHistory {
-  id: number
+  id: string
   vehicleName: string
   vehicleImage: string
   vehiclePlate?: string
@@ -32,7 +32,7 @@ interface RentalHistoryTableProps {
 }
 
 export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
-  const [expandedRentals, setExpandedRentals] = useState<Set<number>>(new Set())
+  const [expandedRentals, setExpandedRentals] = useState<Set<string>>(new Set())
 
   // Calcular ganancias reales del partner (78% después de comisión del 22%)
   const calculatePartnerEarnings = (totalAmount: number, agencyFee?: number) => {
@@ -59,7 +59,7 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
     return null
   }
 
-  const toggleExpanded = (rentalId: number) => {
+  const toggleExpanded = (rentalId: string) => {
     setExpandedRentals(prev => {
       const newSet = new Set(prev)
       if (newSet.has(rentalId)) {
