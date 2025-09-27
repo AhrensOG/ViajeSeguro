@@ -2,9 +2,10 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { CalendarDays, MapPin, Phone } from "lucide-react"
-import { useState } from "react"
-import { confirmVehicleReturn } from "@/lib/api/vehicle-booking"
+import { useEffect, useState } from "react"
+import { confirmVehicleReturn, saveReturnPhotos } from "@/lib/api/vehicle-booking"
 import { toast } from "sonner"
+import DeliveryCaptureModal from "./DeliveryCaptureModal"
 
 interface ActiveRental {
   id: string
@@ -27,15 +28,23 @@ interface ActiveRentalsTableProps {
 
 export function ActiveRentalsTable({ rentals }: ActiveRentalsTableProps) {
   const [loadingConfirm, setLoadingConfirm] = useState<Set<string>>(new Set())
+  const [visibleRentals, setVisibleRentals] = useState<ActiveRental[]>(rentals)
+  const [captureOpen, setCaptureOpen] = useState(false)
+  const [selectedRentalId, setSelectedRentalId] = useState<string | null>(null)
+
+  // Mantener el estado local sincronizado con las props
+  useEffect(() => {
+    setVisibleRentals(rentals)
+  }, [rentals])
 
   console.log('🔍 ActiveRentalsTable DEBUG:', {
-    totalRentals: rentals.length,
-    rentalsData: rentals,
-    statuses: rentals.map(r => ({ id: r.id, status: r.status, type: typeof r.status }))
+    totalRentals: visibleRentals.length,
+    rentalsData: visibleRentals,
+    statuses: visibleRentals.map(r => ({ id: r.id, status: r.status, type: typeof r.status }))
   })
 
   // Filtrar reservas con estado ACTIVE y RETURNED
-  const activeRentals = rentals.filter(rental => 
+  const activeRentals = visibleRentals.filter(rental => 
     rental.status === 'ACTIVE' || rental.status === 'RETURNED'
   )
   
@@ -49,12 +58,29 @@ export function ActiveRentalsTable({ rentals }: ActiveRentalsTableProps) {
 
   // (UI simplificada) Si se requiere expandir filas en el futuro, reactivar estado y handler
 
-  const handleConfirmReturn = async (rentalId: string) => {
+  const openCaptureFlow = (rentalId: string) => {
+    setSelectedRentalId(rentalId)
+    setCaptureOpen(true)
+  }
+
+  const handleCaptureComplete = async (urls: string[]) => {
+    if (!selectedRentalId) return
+    const rentalId = selectedRentalId
     try {
       setLoadingConfirm(prev => new Set(prev).add(rentalId))
+      // Intentar registrar fotos de devolución; si el endpoint no existe, continuar
+      try {
+        await saveReturnPhotos(rentalId, urls)
+      } catch (e: unknown) {
+        console.warn('saveReturnPhotos failed, proceeding anyway:', e)
+        toast.message("Fotos de recepción cargadas", {
+          description: "No se pudieron registrar en el servidor, pero se continuará con la confirmación."
+        })
+      }
       await confirmVehicleReturn(rentalId)
       toast.success("¡Recepción confirmada! El alquiler ha finalizado")
-      // TODO: Actualizar la lista de reservas
+      // Eliminar de la vista local para evitar necesidad de refrescar la página
+      setVisibleRentals(prev => prev.filter(r => r.id !== rentalId))
     } catch (error) {
       console.error('Error al confirmar recepción:', error)
       toast.error("Error al confirmar la recepción del vehículo")
@@ -64,6 +90,8 @@ export function ActiveRentalsTable({ rentals }: ActiveRentalsTableProps) {
         newSet.delete(rentalId)
         return newSet
       })
+      setCaptureOpen(false)
+      setSelectedRentalId(null)
     }
   }
 
@@ -94,7 +122,7 @@ export function ActiveRentalsTable({ rentals }: ActiveRentalsTableProps) {
       </div>
       <div className="p-6">
         <div className="space-y-4">
-          {rentals.map((rental) => (
+          {activeRentals.map((rental) => (
             <div
               key={rental.id}
               className="flex items-center justify-between p-4 border border-gray-200 rounded-lg hover:bg-gray-50 transition-colors"
@@ -150,7 +178,7 @@ export function ActiveRentalsTable({ rentals }: ActiveRentalsTableProps) {
                     <button 
                       onClick={(e) => {
                         e.stopPropagation();
-                        handleConfirmReturn(rental.id);
+                        openCaptureFlow(rental.id);
                       }}
                       disabled={loadingConfirm.has(rental.id)}
                       className="px-3 py-2 bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white text-xs font-medium rounded-md transition-colors flex items-center gap-1"
@@ -171,6 +199,13 @@ export function ActiveRentalsTable({ rentals }: ActiveRentalsTableProps) {
           ))}
         </div>
       </div>
+      {/* Modal de captura obligatorio para confirmar recepción */}
+      <DeliveryCaptureModal
+        isOpen={captureOpen}
+        bookingId={selectedRentalId}
+        onClose={() => setCaptureOpen(false)}
+        onComplete={handleCaptureComplete}
+      />
     </div>
   )
 }

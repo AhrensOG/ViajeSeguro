@@ -1,8 +1,9 @@
 "use client"
 /* eslint-disable @next/next/no-img-element */
 
-import { CalendarDays, MapPin, Phone, MessageCircle, ChevronDown, User, CreditCard, Clock } from "lucide-react"
+import { CalendarDays, MapPin, Phone, MessageCircle, ChevronDown, User, CreditCard, Clock, Image as ImageIcon } from "lucide-react"
 import { useState } from "react"
+import { getDeliveryPhotos } from "@/lib/api/vehicle-booking"
 import { motion, AnimatePresence } from "framer-motion"
 import { DateTime } from "luxon"
 
@@ -33,6 +34,8 @@ interface RentalHistoryTableProps {
 
 export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
   const [expandedRentals, setExpandedRentals] = useState<Set<string>>(new Set())
+  const [photosByRental, setPhotosByRental] = useState<Record<string, string[]>>({})
+  const [loadingPhotos, setLoadingPhotos] = useState<Set<string>>(new Set())
 
   // Calcular ganancias reales del partner (78% después de comisión del 22%)
   const calculatePartnerEarnings = (totalAmount: number, agencyFee?: number) => {
@@ -69,6 +72,27 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
       }
       return newSet
     })
+    // Cargar fotos al expandir por primera vez
+    if (!expandedRentals.has(rentalId) && !photosByRental[rentalId]) {
+      loadDeliveryPhotos(rentalId)
+    }
+  }
+
+  const loadDeliveryPhotos = async (rentalId: string) => {
+    try {
+      setLoadingPhotos(prev => new Set(prev).add(rentalId))
+      const urls = await getDeliveryPhotos(rentalId)
+      setPhotosByRental(prev => ({ ...prev, [rentalId]: urls || [] }))
+    } catch (e) {
+      console.warn('No se pudieron cargar fotos de entrega para', rentalId, e)
+      setPhotosByRental(prev => ({ ...prev, [rentalId]: [] }))
+    } finally {
+      setLoadingPhotos(prev => {
+        const s = new Set(prev)
+        s.delete(rentalId)
+        return s
+      })
+    }
   }
 
   const getStatusBadge = (status: RentalHistory["status"]) => {
@@ -359,6 +383,29 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
                               <span className="font-medium">{rental.returnLocation}</span>
                             </div>
                           </div>
+                        </div>
+                      )}
+
+                      {/* Fotos de Entrega */}
+                      {(loadingPhotos.has(rental.id) || (photosByRental[rental.id] && photosByRental[rental.id].length > 0)) && (
+                        <div className="space-y-3 md:col-span-2 lg:col-span-3">
+                          <h5 className="font-semibold text-gray-900 flex items-center gap-2">
+                            <ImageIcon className="h-4 w-4 text-purple-600" />
+                            Fotos de entrega
+                          </h5>
+                          {loadingPhotos.has(rental.id) ? (
+                            <div className="text-sm text-gray-500">Cargando fotos...</div>
+                          ) : photosByRental[rental.id] && photosByRental[rental.id].length > 0 ? (
+                            <div className="flex gap-3 overflow-x-auto snap-x pb-2">
+                              {photosByRental[rental.id].map((url, idx) => (
+                                <div key={idx} className="min-w-[160px] snap-start">
+                                  <img src={url} alt={`Entrega ${idx + 1}`} className="w-40 h-28 object-cover rounded border" />
+                                </div>
+                              ))}
+                            </div>
+                          ) : (
+                            <div className="text-sm text-gray-500">No hay fotos registradas para esta entrega.</div>
+                          )}
                         </div>
                       )}
                     </div>

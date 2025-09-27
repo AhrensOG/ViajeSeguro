@@ -15,8 +15,9 @@ import Image from "next/image";
 import { ResponseForProfilePage } from "@/lib/api/vehicle-booking/vehicleBooking.types";
 import { calculateTotalDays } from "@/lib/functions";
 import { DateTime } from "luxon";
-import { confirmBookingPickup, markAsReturned } from "@/lib/api/vehicle-booking";
+import { confirmBookingPickup, markAsReturned, saveDeliveryPhotos, saveReturnPhotos } from "@/lib/api/vehicle-booking";
 import { toast } from "sonner";
+import DeliveryCaptureModal from "../../../partner/offers/auxiliarComponents/DeliveryCaptureModal";
 const transmissionTypeMap = {
   MANUAL: "Manual",
   AUTOMATIC: "Automática",
@@ -72,6 +73,8 @@ const ReservationVehicleCard = ({
   const [openCard, setOpenCard] = useState(false);
   const [loadingPickup, setLoadingPickup] = useState(false);
   const [loadingReturn, setLoadingReturn] = useState(false);
+  const [captureOpen, setCaptureOpen] = useState(false);
+  const [captureOpenReturn, setCaptureOpenReturn] = useState(false);
   const IVA = process.env.NEXT_PUBLIC_IVA || 0;
 
   const {
@@ -115,36 +118,67 @@ const ReservationVehicleCard = ({
 
   // Nota: subTotal/ivaAmount/totalWithIva calculados arriba
 
-  const handleConfirmPickup = async () => {
+  // Flujo de confirmación con cámara implementado; función directa de confirmación eliminada por no uso
+
+  // Flujo nuevo: abrir cámara y, tras subir fotos, guardar URLs (si backend disponible) y confirmar recogida
+  const openCaptureFlow = () => {
+    setCaptureOpen(true);
+  };
+
+  const handleCaptureComplete = async (urls: string[]) => {
     try {
       setLoadingPickup(true);
+      // Intentar registrar fotos en backend; si no existe endpoint, continuar
+      try {
+        await saveDeliveryPhotos(id.toString(), urls);
+      } catch (e: unknown) {
+        console.warn("saveDeliveryPhotos (cliente) no disponible, continuando...", e);
+        toast.message("Fotos capturadas", {
+          description: "No se pudieron registrar en el servidor, pero continuarás con la confirmación."
+        })
+      }
       await confirmBookingPickup(id.toString());
       toast.success("¡Vehículo recogido! Tu alquiler está ahora activo");
-      // Optimista: reflejar inmediatamente en la UI
       setCurrentStatus("ACTIVE");
       onBookingUpdate?.();
     } catch (error) {
-      console.error('Error al confirmar recogida:', error);
+      console.error('Error al confirmar recogida con fotos:', error);
       toast.error("Error al confirmar la recogida del vehículo");
     } finally {
       setLoadingPickup(false);
+      setCaptureOpen(false);
     }
   };
 
-  const handleReturnVehicle = async () => {
+  // Flujo de devolución se realiza vía captura con cámara; función directa eliminada por no uso
+
+  // Flujo de devolución con cámara
+  const openReturnCaptureFlow = () => {
+    setCaptureOpenReturn(true);
+  };
+
+  const handleReturnCaptureComplete = async (urls: string[]) => {
     try {
       setLoadingReturn(true);
+      // Intentar registrar fotos de devolución; si no existe endpoint, continuar
+      try {
+        await saveReturnPhotos(id.toString(), urls);
+      } catch (e: unknown) {
+        console.warn("saveReturnPhotos (cliente) no disponible, continuando...", e);
+        toast.message("Fotos de devolución capturadas", {
+          description: "No se pudieron registrar en el servidor, pero continuarás con la devolución."
+        })
+      }
       await markAsReturned(id.toString());
       toast.success("¡Vehículo devuelto exitosamente!");
-      // Optimista: reflejar inmediatamente en la UI (usar FINISHED para respetar el tipo)
       setCurrentStatus("FINISHED");
-
       onBookingUpdate?.();
     } catch (error) {
-      console.error('Error al devolver vehículo:', error);
+      console.error('Error al devolver vehículo con fotos:', error);
       toast.error("Error al devolver el vehículo");
     } finally {
       setLoadingReturn(false);
+      setCaptureOpenReturn(false);
     }
   };
 
@@ -315,7 +349,7 @@ const ReservationVehicleCard = ({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleConfirmPickup();
+                      openCaptureFlow();
                     }}
                     disabled={loadingPickup}
                     className="bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition flex items-center gap-2"
@@ -336,7 +370,7 @@ const ReservationVehicleCard = ({
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      handleReturnVehicle();
+                      openReturnCaptureFlow();
                     }}
                     disabled={loadingReturn}
                     className="bg-blue-600 hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-semibold py-3 px-6 rounded-lg transition flex items-center gap-2"
@@ -408,6 +442,19 @@ const ReservationVehicleCard = ({
           </motion.div>
         )}
       </AnimatePresence>
+      {/* Modal de captura para confirmar recogida (usuario) */}
+      <DeliveryCaptureModal
+        isOpen={captureOpen}
+        bookingId={id ? id.toString() : null}
+        onClose={() => setCaptureOpen(false)}
+        onComplete={handleCaptureComplete}
+      />
+      <DeliveryCaptureModal
+        isOpen={captureOpenReturn}
+        bookingId={id ? id.toString() : null}
+        onClose={() => setCaptureOpenReturn(false)}
+        onComplete={handleReturnCaptureComplete}
+      />
     </div>
   );
 };
