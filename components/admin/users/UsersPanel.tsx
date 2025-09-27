@@ -19,6 +19,16 @@ export default function UsersPanel() {
     const [editModalIsOpen, setEditModalIsOpen] = useState(false);
     const [viewModalIsOpen, setViewModalIsOpen] = useState(false);
 
+    const formatDate = (dateString?: string) => {
+        if (!dateString) return "-";
+        const d = new Date(dateString);
+        if (isNaN(d.getTime())) return dateString;
+        const dd = String(d.getDate()).padStart(2, '0');
+        const mm = String(d.getMonth() + 1).padStart(2, '0');
+        const yyyy = d.getFullYear();
+        return `${dd}/${mm}/${yyyy}`;
+    };
+
     useEffect(() => {
         const fetchUsers = async () => {
             try {
@@ -57,6 +67,13 @@ export default function UsersPanel() {
             user.email.toLowerCase().includes(searchTerm.toLowerCase());
         const matchesRole = roleFilter === "ALL" || user.role === roleFilter;
         return matchesSearch && matchesRole;
+    });
+
+    // Ordenar por fecha de registro (createdAt) descendente: más nuevos arriba
+    const filteredAndSortedUsers = [...filteredUsers].sort((a, b) => {
+        const aTime = a.createdAt ? new Date(a.createdAt).getTime() : 0;
+        const bTime = b.createdAt ? new Date(b.createdAt).getTime() : 0;
+        return bTime - aTime;
     });
 
     const handleEditUser = (user: SimpleUser) => {
@@ -127,14 +144,15 @@ export default function UsersPanel() {
                     <table className="min-w-full text-sm text-left table-fixed border-separate border-spacing-0">
                         <thead className="bg-custom-golden-100 text-custom-golden-700 uppercase text-xs">
                             <tr>
-                                <th className="px-4 py-2 border-b border-r border-custom-gray-300 w-1/4">Nombre</th>
-                                <th className="px-4 py-2 border-b border-r border-custom-gray-300 w-1/4">Email</th>
-                                <th className="px-4 py-2 border-b border-r border-custom-gray-300 w-1/4">Rol</th>
-                                <th className="px-4 py-2 border-b border-custom-gray-300 text-center w-1/4">Acciones</th>
+                                <th className="px-4 py-2 border-b border-r border-custom-gray-300 w-[26%]">Nombre</th>
+                                <th className="px-4 py-2 border-b border-r border-custom-gray-300 w-[28%]">Email</th>
+                                <th className="px-4 py-2 border-b border-r border-custom-gray-300 w-[16%]">Rol</th>
+                                <th className="px-4 py-2 border-b border-r border-custom-gray-300 w-[18%]">Fecha de registro</th>
+                                <th className="px-4 py-2 border-b border-custom-gray-300 text-center w-[12%]">Acciones</th>
                             </tr>
                         </thead>
                         <tbody className="text-custom-black-800">
-                            {filteredUsers.map((user, index) => (
+                            {filteredAndSortedUsers.map((user, index) => (
                                 <tr
                                     key={index}
                                     className={`${
@@ -147,6 +165,7 @@ export default function UsersPanel() {
                                     </td>
                                     <td className="px-4 py-2 border-b border-r border-custom-gray-200">{user.email}</td>
                                     <td className="px-4 py-2 border-b border-r border-custom-gray-200">{user.role}</td>
+                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">{formatDate(user.createdAt)}</td>
                                     <td className="px-4 py-2 border-b border-custom-gray-200 text-center space-x-2">
                                         <button
                                             onClick={(e) => {
