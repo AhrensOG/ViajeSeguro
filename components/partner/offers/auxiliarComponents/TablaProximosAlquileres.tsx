@@ -2,9 +2,10 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { Clock, MapPin, Phone, CheckCircle } from "lucide-react"
-import { markBookingAsDelivered } from "@/lib/api/vehicle-booking"
+import { markBookingAsDelivered, saveDeliveryPhotos } from "@/lib/api/vehicle-booking"
 import { toast } from "sonner"
 import { useState } from "react"
+import DeliveryCaptureModal from "./DeliveryCaptureModal"
 
 interface ProximoAlquiler {
   id: string
@@ -30,6 +31,8 @@ interface TablaProximosAlquileresProps {
 export function TablaProximosAlquileres({ rentals, onRentalUpdate }: TablaProximosAlquileresProps) {
   const [loadingDelivery, setLoadingDelivery] = useState<string | null>(null)
   const [deliveredRentals, setDeliveredRentals] = useState<Set<string>>(new Set())
+  const [captureOpen, setCaptureOpen] = useState(false)
+  const [selectedBookingId, setSelectedBookingId] = useState<string | null>(null)
   // Filtrar alquileres aprobados o entregados desde hoy en adelante
   const confirmedRentals = rentals.filter(rental => {
     // Estados válidos para mostrar (solo APPROVED/CONFIRMED y DELIVERED; excluir PENDING)
@@ -80,14 +83,27 @@ export function TablaProximosAlquileres({ rentals, onRentalUpdate }: TablaProxim
     window.open(`tel:${phone}`, '_self')
   }
 
-  const handleDelivery = async (rentalId: string) => {
+  const openCaptureFlow = (rentalId: string) => {
+    setSelectedBookingId(rentalId)
+    setCaptureOpen(true)
+  }
+
+  const handleCaptureComplete = async (urls: string[]) => {
+    if (!selectedBookingId) return
     try {
-      setLoadingDelivery(rentalId)
-      await markBookingAsDelivered(rentalId)
-      
-      // Marcar como entregado localmente
-      setDeliveredRentals(prev => new Set([...prev, rentalId]))
-      
+      setLoadingDelivery(selectedBookingId)
+      // Guardar URLs de fotos de entrega antes de marcar entregado
+      try {
+        await saveDeliveryPhotos(selectedBookingId, urls)
+      } catch (e: unknown) {
+        console.warn('saveDeliveryPhotos failed, proceeding anyway:', e)
+        toast.message("Fotos subidas", {
+          description: "No se pudieron registrar en el servidor, pero se continuará con la entrega."
+        })
+      }
+      await markBookingAsDelivered(selectedBookingId)
+      // Actualizar UI local
+      setDeliveredRentals(prev => new Set([...prev, selectedBookingId]))
       toast.success("🚗 Vehículo entregado exitosamente al cliente")
       onRentalUpdate?.()
     } catch (error) {
@@ -95,6 +111,7 @@ export function TablaProximosAlquileres({ rentals, onRentalUpdate }: TablaProxim
       toast.error("Error al marcar vehículo como entregado")
     } finally {
       setLoadingDelivery(null)
+      setSelectedBookingId(null)
     }
   }
 
@@ -186,7 +203,7 @@ export function TablaProximosAlquileres({ rentals, onRentalUpdate }: TablaProxim
                     {/* Solo mostrar botón de entrega si NO está entregado */}
                     {!isDelivered && (
                       <button 
-                        onClick={() => handleDelivery(rental.id)}
+                        onClick={() => openCaptureFlow(rental.id)}
                         disabled={loadingDelivery === rental.id}
                         className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:scale-105 min-w-[140px] sm:min-w-[160px]"
                         title="Marcar vehículo como entregado al cliente"
@@ -222,6 +239,13 @@ export function TablaProximosAlquileres({ rentals, onRentalUpdate }: TablaProxim
           </div>
         )}
       </div>
+      {/* Modal de captura de fotos para entrega */}
+      <DeliveryCaptureModal
+        isOpen={captureOpen}
+        bookingId={selectedBookingId}
+        onClose={() => setCaptureOpen(false)}
+        onComplete={handleCaptureComplete}
+      />
     </div>
   )
 }

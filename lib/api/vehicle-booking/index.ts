@@ -91,6 +91,43 @@ const confirmVehicleReturn = async (id: string) => {
   return res;
 }
 
+// Guarda las URLs de fotos de entrega asociadas a una reserva
+const saveDeliveryPhotos = async (id: string, photoUrls: string[]) => {
+  const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-booking/${id}/delivery-photos`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ photos: photoUrls }),
+  });
+  return res;
+}
+
+// Guarda las URLs de fotos de devolución asociadas a una reserva
+const saveReturnPhotos = async (id: string, photoUrls: string[]) => {
+  const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-booking/${id}/return-photos`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ photos: photoUrls }),
+  });
+  return res;
+}
+
+// Obtiene las URLs de fotos de entrega asociadas a una reserva
+const getDeliveryPhotos = async (id: string) => {
+  try {
+    const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-booking/${id}/delivery-photos`, {
+      method: 'GET',
+    });
+    return res as string[];
+  } catch (e: unknown) {
+    // Si el endpoint aún no existe, devolvemos lista vacía para no romper la UI
+    const err = e as { status?: number; message?: string } | undefined;
+    if (err?.status === 404 || (typeof err?.message === 'string' && err.message.includes('404'))) {
+      return []
+    }
+    throw e
+  }
+}
+
 const getVehicleBookingsForProfile = async (id: string) => {
     const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-booking/by-user/${id}`, {
         method: "GET",
@@ -126,4 +163,7 @@ export {
     confirmBookingPickup,
     markAsReturned,
     confirmVehicleReturn,
+    saveDeliveryPhotos,
+    saveReturnPhotos,
+    getDeliveryPhotos,
 };

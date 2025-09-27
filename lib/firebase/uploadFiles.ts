@@ -1,6 +1,6 @@
 import { getDownloadURL, ref, uploadBytes } from "firebase/storage";
 import { storage } from "./config";
-export async function uploadFiles(files: File[], folder = "Documentos", name = false) {
+export async function uploadFiles(files: File[], folder = "Documentos", name: string | false = false) {
   try {
     const uploadedUrls: string[] = [];
 
@@ -12,6 +12,7 @@ export async function uploadFiles(files: File[], folder = "Documentos", name = f
       const url = await getDownloadURL(storageRef);
       uploadedUrls.push(url);
     }
+
     return uploadedUrls;
   } catch (error) {
     console.log(error)
