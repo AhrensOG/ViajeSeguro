@@ -18,7 +18,7 @@ type BookingSidebarProps = {
 };
 
 const DISCOUNT_LABELS = {
-    PREFERENCIAL: "Cliente Preferencial",
+    PREFERENCIAL: "Descuento Promocional",
     CLUB_LEALTAD: "Club Lealtad",
     CLUB_FIDELIDAD: "Club Fidelidad",
 };

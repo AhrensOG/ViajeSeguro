@@ -20,6 +20,8 @@ const TripCard = ({
   const localDate = convertUTCToLocalDate(trip.departure, timeZone);
 
   const [int, decimal] = trip.basePrice.toFixed(2).split(".");
+  const discountedPrice = +(trip.basePrice * 0.6).toFixed(2);
+  const [dInt, dDec] = discountedPrice.toFixed(2).split(".");
   return (
     <div className="bg-white rounded-lg shadow-md border border-custom-gray-300 overflow-hidden">
       <div className="p-4 flex flex-col md:flex-row justify-between gap-4">
@@ -44,6 +46,11 @@ const TripCard = ({
               </span>
             </div>
           </div>
+          {/* City names row (above locations) */}
+          <div className="max-w-sm flex justify-between text-custom-black-700 text-sm font-semibold mt-1">
+            <div className="text-start">{trip.origin}</div>
+            <div className="text-end">{trip.destination}</div>
+          </div>
           <div className="max-w-sm flex justify-between text-custom-gray-800 font-semibold text-sm">
             <div className="text-start">{trip.originLocation}</div>
             <div className="text-end">{trip.destinationLocation}</div>
@@ -55,9 +62,19 @@ const TripCard = ({
             <span className="text-sm text-custom-gray-800 font-light">
               {localDate}
             </span>
-            <div className="font-bold text-2xl text-custom-black-700">
+            {/* Promotion label */}
+            <div className="text-sm md:text-base font-semibold text-custom-golden-700 mt-1">
+              Descuento promocional del 40 %
+            </div>
+            {/* Original price (struck-through) */}
+            <div className="text-base text-custom-gray-500 line-through">
               {int}
-              <span className="text-sm align-top"> ,{decimal}</span> €
+              <span className="align-top"> ,{decimal}</span> €
+            </div>
+            {/* Discounted price (40% off) */}
+            <div className="font-bold text-3xl text-custom-black-700">
+              {dInt}
+              <span className="text-sm align-top"> ,{dDec}</span> €
             </div>
           </div>
         </div>
