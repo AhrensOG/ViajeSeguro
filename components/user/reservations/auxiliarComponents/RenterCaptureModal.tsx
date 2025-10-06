@@ -1,4 +1,4 @@
-"use client"
+"use client";
 /* eslint-disable @next/next/no-img-element */
 
 import { useEffect, useRef, useState } from "react";
@@ -7,23 +7,15 @@ import { uploadFiles } from "@/lib/firebase/uploadFiles";
 import { addVehicleBookingMedia } from "@/lib/api/vehicle-booking";
 import { toast } from "sonner";
 
-type OwnerPhase = 'OWNER_PRE' | 'OWNER_POST';
-
-interface DeliveryCaptureModalProps {
+interface Props {
   isOpen: boolean;
   bookingId: string | null;
+  mode: "pickup" | "return"; // pickup -> RENTER_PICKUP, return -> RENTER_RETURN
   onClose: () => void;
   onComplete: (urls: string[]) => void;
-  phase?: OwnerPhase; // default OWNER_PRE
 }
 
-type GuidedStep = {
-  key: string;
-  label: string;
-  hint: string;
-};
-
-const CAPTURE_STEPS: GuidedStep[] = [
+const CAPTURE_STEPS = [
   { key: "odometer_photo", label: "Odómetro (kilometraje)", hint: "Enfoca el tablero para que los números se vean nítidos" },
   { key: "fuel_photo", label: "Nivel de combustible", hint: "Enfoca el indicador para que se aprecie claramente" },
   { key: "front_photo", label: "Frente del vehículo", hint: "Toma la foto de frente, manteniendo el vehículo centrado" },
@@ -31,21 +23,19 @@ const CAPTURE_STEPS: GuidedStep[] = [
   { key: "left_side_photo", label: "Lateral izquierdo", hint: "Fotografía el lado izquierdo completo del vehículo" },
   { key: "right_side_photo", label: "Lateral derecho", hint: "Fotografía el lado derecho completo del vehículo" },
   { key: "interior_photo", label: "Interior", hint: "Incluye asientos delanteros y tablero si es posible" },
-  { key: "detail_photo", label: "Detalle adicional", hint: "Cualquier marca o detalle que quieras dejar registrado" },
-];
+  { key: "detail_photo", label: "Detalle adicional", hint: "Marca o detalle que quieras registrar" },
+] as const;
 
-export default function DeliveryCaptureModal({ isOpen, bookingId, onClose, onComplete, phase = 'OWNER_PRE' }: DeliveryCaptureModalProps) {
+export default function RenterCaptureModal({ isOpen, bookingId, mode, onClose, onComplete }: Props) {
   const videoRef = useRef<HTMLVideoElement | null>(null);
   const streamRef = useRef<MediaStream | null>(null);
-  // Paso 0 (formulario) -> ingresar kilometraje; luego guía de 8 fotos
   const [kmValue, setKmValue] = useState<string>("");
-  const [stepIndex, setStepIndex] = useState<number>(-1); // -1 = formulario km, 0..7 = pasos de cámara
+  const [stepIndex, setStepIndex] = useState<number>(-1);
   const [capturedByStep, setCapturedByStep] = useState<(File | null)[]>(Array(CAPTURE_STEPS.length).fill(null));
   const [isUploading, setIsUploading] = useState(false);
   const [cameraError, setCameraError] = useState<string | null>(null);
 
-  const MAX_PHOTOS = CAPTURE_STEPS.length;
-  const MIN_PHOTOS = CAPTURE_STEPS.length; // ahora requerimos todas las fotos de la guía
+  const MAX = CAPTURE_STEPS.length;
 
   useEffect(() => {
     if (!isOpen || !bookingId) return;
@@ -61,19 +51,14 @@ export default function DeliveryCaptureModal({ isOpen, bookingId, onClose, onCom
         }
       } catch (err) {
         console.error("No se pudo acceder a la cámara:", err);
-        setCameraError("No se pudo acceder a la cámara. Asegúrate de haber dado permisos y de usar un dispositivo con cámara.");
+        setCameraError("No se pudo acceder a la cámara. Verifica permisos.");
       }
     }
 
-    // Solo iniciamos la cámara cuando entramos al primer paso de captura
-    if (stepIndex >= 0) {
-      initCamera();
-    }
+    if (stepIndex >= 0) initCamera();
 
-    // Capturar el valor actual del ref para usarlo de forma segura en el cleanup
     const videoEl = videoRef.current;
     return () => {
-      // Detener cámara al cambiar paso o cerrar
       if (streamRef.current) {
         streamRef.current.getTracks().forEach((t) => t.stop());
         streamRef.current = null;
@@ -82,11 +67,9 @@ export default function DeliveryCaptureModal({ isOpen, bookingId, onClose, onCom
         try { videoEl.pause(); } catch {}
         (videoEl as HTMLVideoElement & { srcObject?: MediaStream | null }).srcObject = null;
       }
-      // IMPORTANTE: No resetear estados aquí, porque este cleanup corre al cambiar stepIndex
     };
   }, [isOpen, bookingId, stepIndex]);
 
-  // Resetear estados SOLO cuando el modal se cierra desde fuera
   useEffect(() => {
     if (!isOpen) {
       setCapturedByStep(Array(CAPTURE_STEPS.length).fill(null));
@@ -120,9 +103,7 @@ export default function DeliveryCaptureModal({ isOpen, bookingId, onClose, onCom
       return copy;
     });
   };
-
   const handleRetake = (idx: number) => {
-    // Permite volver a tomar la foto de un paso específico
     if (idx < 0 || idx >= CAPTURE_STEPS.length) return;
     setCapturedByStep((prev) => {
       const copy = [...prev];
@@ -142,11 +123,10 @@ export default function DeliveryCaptureModal({ isOpen, bookingId, onClose, onCom
     try {
       setIsUploading(true);
       const files = capturedByStep.filter((f): f is File => !!f);
-      const urls = await uploadFiles(files, `vehicle-deliveries/${bookingId}`, `delivery_${bookingId}`);
-      // Persistir en backend como evidencia del retiro del arrendatario
+      const urls = await uploadFiles(files, `vehicle-deliveries/${bookingId}`, `renter_${mode}_${bookingId}`);
       const mileageNumber = Number(kmValue);
       await addVehicleBookingMedia(bookingId, {
-        phase,
+        phase: mode === "pickup" ? "RENTER_PICKUP" : "RENTER_RETURN",
         urls,
         mileage: Number.isFinite(mileageNumber) ? mileageNumber : undefined,
       });
@@ -167,21 +147,23 @@ export default function DeliveryCaptureModal({ isOpen, bookingId, onClose, onCom
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
       <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h3 className="text-xl font-semibold text-gray-900">Registro fotográfico de entrega</h3>
+          <h3 className="text-xl font-semibold text-gray-900">
+            {mode === "pickup" ? "Registro de retiro" : "Registro de devolución"}
+          </h3>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-50" aria-label="Cerrar">
             <X className="h-5 w-5" />
           </button>
         </div>
 
         <div className="p-4 grid gap-4">
-          {/* Paso 0: formulario de kilometraje (antes de activar cámara) */}
+          {/* Paso 0 */}
           {stepIndex === -1 && (
             <div className="space-y-4">
               <div className="rounded-xl border border-orange-100 bg-orange-50 p-5">
                 <p className="text-sm text-gray-900 font-medium">Antes de comenzar</p>
                 <ul className="list-disc ml-5 mt-2 space-y-1 text-sm text-gray-800">
                   <li>Ingresa el kilometraje actual del vehículo (odómetro).</li>
-                  <li>Luego, tomaremos 8 fotos guiadas para documentar el estado del vehículo.</li>
+                  <li>Luego, tomaremos 8 fotos guiadas del vehículo.</li>
                 </ul>
               </div>
               <div className="space-y-2">
@@ -195,7 +177,7 @@ export default function DeliveryCaptureModal({ isOpen, bookingId, onClose, onCom
                   placeholder="Ej. 54.231"
                   inputMode="numeric"
                 />
-                <p className="text-xs text-gray-500">Este dato ayuda a dejar constancia del estado de entrega.</p>
+                <p className="text-xs text-gray-500">Este dato ayuda a dejar constancia del estado.</p>
               </div>
               <div className="flex justify-end">
                 <button
@@ -216,11 +198,10 @@ export default function DeliveryCaptureModal({ isOpen, bookingId, onClose, onCom
             </div>
           )}
 
-          {/* Pasos de cámara guiados */}
+          {/* Pasos de cámara */}
           {stepIndex >= 0 && (
             <>
-              {/* Indicaciones */}
-              {/* Barra de progreso */}
+              {/* Progreso */}
               <div className="w-full h-1.5 bg-gray-100 rounded-full overflow-hidden">
                 <div
                   className="h-full bg-orange-600 transition-all"
@@ -236,12 +217,10 @@ export default function DeliveryCaptureModal({ isOpen, bookingId, onClose, onCom
                 <p className="mt-2 text-sm text-gray-800">{CAPTURE_STEPS[stepIndex].hint}</p>
               </div>
 
-              {/* Cámara */}
               {cameraError ? (
                 <div className="text-red-600 text-sm bg-red-50 border border-red-100 rounded p-3">{cameraError}</div>
               ) : (
                 <div className="relative w-full aspect-video bg-black rounded-2xl overflow-hidden ring-1 ring-gray-200">
-                  {/* Mostrar video si aún no se capturó foto en este paso */}
                   {!capturedByStep[stepIndex] ? (
                     <>
                       <video ref={videoRef} className="w-full h-full object-contain" playsInline muted />
@@ -255,13 +234,8 @@ export default function DeliveryCaptureModal({ isOpen, bookingId, onClose, onCom
                       </div>
                     </>
                   ) : (
-                    // Mostrar la foto recién capturada como vista previa
                     <>
-                      <img
-                        src={URL.createObjectURL(capturedByStep[stepIndex] as File)}
-                        alt="captura-previa"
-                        className="w-full h-full object-contain bg-black"
-                      />
+                      <img src={URL.createObjectURL(capturedByStep[stepIndex] as File)} alt="captura-previa" className="w-full h-full object-contain bg-black" />
                       <div className="absolute bottom-3 left-0 right-0 flex items-center justify-center gap-3">
                         <button
                           onClick={() => handleRetake(stepIndex)}
@@ -270,10 +244,7 @@ export default function DeliveryCaptureModal({ isOpen, bookingId, onClose, onCom
                           Repetir foto
                         </button>
                         {stepIndex < CAPTURE_STEPS.length - 1 && (
-                          <button
-                            onClick={() => setStepIndex((i) => Math.min(i + 1, CAPTURE_STEPS.length - 1))}
-                            className="px-4 py-2 bg-orange-600 text-white rounded-full shadow-sm hover:bg-orange-700"
-                          >
+                          <button onClick={() => setStepIndex((i) => Math.min(i + 1, CAPTURE_STEPS.length - 1))} className="px-4 py-2 bg-orange-600 text-white rounded-full shadow-sm hover:bg-orange-700">
                             Siguiente foto
                           </button>
                         )}
@@ -283,18 +254,17 @@ export default function DeliveryCaptureModal({ isOpen, bookingId, onClose, onCom
                 </div>
               )}
 
-              {/* Progreso (secuencial) */}
-              <p className="text-sm text-gray-600 text-center">Progreso: {capturedByStep.filter(Boolean).length}/{MAX_PHOTOS} fotos</p>
+              <p className="text-sm text-gray-600 text-center">Progreso: {capturedByStep.filter(Boolean).length}/{MAX} fotos</p>
             </>
           )}
         </div>
 
-        {stepIndex >= 0 && capturedByStep.filter(Boolean).length === MIN_PHOTOS && (
+        {stepIndex >= 0 && capturedByStep.filter(Boolean).length === MAX && (
           <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-gray-100">
             <div className="text-xs text-gray-500">Revisa que todas las fotos se vean claras antes de continuar.</div>
             <button
               onClick={handleUploadAndContinue}
-              disabled={isUploading || capturedByStep.filter(Boolean).length < MIN_PHOTOS}
+              disabled={isUploading}
               className="flex items-center gap-2 px-5 py-2.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 shadow-sm"
             >
               {isUploading ? (

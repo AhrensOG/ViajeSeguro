@@ -15,9 +15,9 @@ import Image from "next/image";
 import { ResponseForProfilePage } from "@/lib/api/vehicle-booking/vehicleBooking.types";
 import { calculateTotalDays } from "@/lib/functions";
 import { DateTime } from "luxon";
-import { confirmBookingPickup, markAsReturned, saveDeliveryPhotos, saveReturnPhotos } from "@/lib/api/vehicle-booking";
+import { confirmBookingPickup, markAsReturned } from "@/lib/api/vehicle-booking";
 import { toast } from "sonner";
-import DeliveryCaptureModal from "../../../partner/offers/auxiliarComponents/DeliveryCaptureModal";
+import RenterCaptureModal from "./RenterCaptureModal";
 const transmissionTypeMap = {
   MANUAL: "Manual",
   AUTOMATIC: "Automática",
@@ -126,17 +126,9 @@ const ReservationVehicleCard = ({
   };
 
   const handleCaptureComplete = async (urls: string[]) => {
+    void urls;
     try {
       setLoadingPickup(true);
-      // Intentar registrar fotos en backend; si no existe endpoint, continuar
-      try {
-        await saveDeliveryPhotos(id.toString(), urls);
-      } catch (e: unknown) {
-        console.warn("saveDeliveryPhotos (cliente) no disponible, continuando...", e);
-        toast.message("Fotos capturadas", {
-          description: "No se pudieron registrar en el servidor, pero continuarás con la confirmación."
-        })
-      }
       await confirmBookingPickup(id.toString());
       toast.success("¡Vehículo recogido! Tu alquiler está ahora activo");
       setCurrentStatus("ACTIVE");
@@ -158,17 +150,9 @@ const ReservationVehicleCard = ({
   };
 
   const handleReturnCaptureComplete = async (urls: string[]) => {
+    void urls;
     try {
       setLoadingReturn(true);
-      // Intentar registrar fotos de devolución; si no existe endpoint, continuar
-      try {
-        await saveReturnPhotos(id.toString(), urls);
-      } catch (e: unknown) {
-        console.warn("saveReturnPhotos (cliente) no disponible, continuando...", e);
-        toast.message("Fotos de devolución capturadas", {
-          description: "No se pudieron registrar en el servidor, pero continuarás con la devolución."
-        })
-      }
       await markAsReturned(id.toString());
       toast.success("¡Vehículo devuelto exitosamente!");
       setCurrentStatus("FINISHED");
@@ -443,14 +427,16 @@ const ReservationVehicleCard = ({
         )}
       </AnimatePresence>
       {/* Modal de captura para confirmar recogida (usuario) */}
-      <DeliveryCaptureModal
+      <RenterCaptureModal
         isOpen={captureOpen}
+        mode="pickup"
         bookingId={id ? id.toString() : null}
         onClose={() => setCaptureOpen(false)}
         onComplete={handleCaptureComplete}
       />
-      <DeliveryCaptureModal
+      <RenterCaptureModal
         isOpen={captureOpenReturn}
+        mode="return"
         bookingId={id ? id.toString() : null}
         onClose={() => setCaptureOpenReturn(false)}
         onComplete={handleReturnCaptureComplete}

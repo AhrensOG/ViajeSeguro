@@ -6,6 +6,20 @@ export interface VehicleBookingResponseAdmin {
     status: string;
     offerId: string;
     renterId: string;
+    // Nuevos campos resumen
+    odometerOut?: number;
+    odometerIn?: number;
+    fuelOut?: number;
+    fuelIn?: number;
+    // Media por fases
+    media?: Array<{
+        id: string;
+        phase: 'OWNER_PRE' | 'RENTER_PICKUP' | 'RENTER_RETURN' | 'OWNER_POST';
+        urls: string[];
+        mileage?: number;
+        fuelLevel?: number;
+        createdAt: string;
+    }>;
     offer: {
         id: string;
         pricePerDay: number;

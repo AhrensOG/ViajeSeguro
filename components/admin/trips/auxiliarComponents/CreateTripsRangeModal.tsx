@@ -1,10 +1,9 @@
 import React, { Dispatch, SetStateAction, useEffect, useMemo, useState } from "react";
 import { X } from "lucide-react";
 import { toast } from "sonner";
-import { getActiveCities } from "@/lib/api/admin/cities";
-import { CityResponse } from "@/lib/api/admin/cities/cities.type";
 import { createTripsBulk } from "@/lib/api/admin/trips";
 import { Driver, TripResponse } from "@/lib/api/admin/trips/trips.type";
+import CityAutocomplete from "@/components/common/CityAutocomplete";
 
 interface Props {
   onClose: () => void;
@@ -19,7 +18,6 @@ const labelClass = "block text-xs font-semibold text-custom-gray-500 mb-1 upperc
 type WeekKey = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
 
 export default function CreateTripsRangeModal({ onClose, onSuccess, drivers }: Props) {
-  const [cities, setCities] = useState<CityResponse[]>([]);
   const [form, setForm] = useState({
     origin: "",
     destination: "",
@@ -111,16 +109,6 @@ export default function CreateTripsRangeModal({ onClose, onSuccess, drivers }: P
   };
 
   useEffect(() => {
-    const loadCities = async () => {
-      try {
-        const cs = await getActiveCities();
-        setCities(cs);
-      } catch {
-        toast.info("Error al cargar las ciudades");
-      }
-    };
-    loadCities();
-
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
     };
@@ -169,26 +157,28 @@ export default function CreateTripsRangeModal({ onClose, onSuccess, drivers }: P
 
           <div>
             <label className={labelClass}>Origen</label>
-            <select name="origin" value={form.origin} onChange={handleChange} className={inputClass} required>
-              <option value="">-- Seleccionar ciudad de origen --</option>
-              {cities.map((city) => (
-                <option key={city.id} value={`${city.name}, ${city.state}, ${city.country}`}>
-                  {city.name}, {city.state}, {city.country}
-                </option>
-              ))}
-            </select>
+            <CityAutocomplete
+              value={form.origin}
+              onChange={(val, meta) => {
+                const onlyCity = meta?.payload?.name || (val || "").split(",")[0]?.trim() || val;
+                setForm((prev) => ({ ...prev, origin: onlyCity }));
+              }}
+              placeholder="Ciudad de origen"
+              allowFreeText
+            />
           </div>
 
           <div>
             <label className={labelClass}>Destino</label>
-            <select name="destination" value={form.destination} onChange={handleChange} className={inputClass} required>
-              <option value="">-- Seleccionar ciudad de destino --</option>
-              {cities.map((city) => (
-                <option key={city.id} value={`${city.name}, ${city.state}, ${city.country}`}>
-                  {city.name}, {city.state}, {city.country}
-                </option>
-              ))}
-            </select>
+            <CityAutocomplete
+              value={form.destination}
+              onChange={(val, meta) => {
+                const onlyCity = meta?.payload?.name || (val || "").split(",")[0]?.trim() || val;
+                setForm((prev) => ({ ...prev, destination: onlyCity }));
+              }}
+              placeholder="Ciudad de destino"
+              allowFreeText
+            />
           </div>
 
           <div>

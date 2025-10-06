@@ -72,7 +72,7 @@ const ALL_LINKS: LinkItem[] = [
     roles: ["PARTNER"],
   },
   {
-    name: "Viajes compartidos",
+    name: "Viajes",
     href: "/dashboard/partner/trips",
     icon: <Route className="size-5" />,
     roles: ["PARTNER"],

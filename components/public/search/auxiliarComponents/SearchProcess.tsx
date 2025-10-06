@@ -10,7 +10,7 @@ import {
 import Image from "next/image";
 import { toast } from "sonner";
 import TripCard from "./TripCard";
-import { convertUTCToLocalTime } from "@/lib/functions";
+// Client-side date normalization not needed; backend already returns exact day groups
 import TripCardFallback from "@/lib/client/components/fallbacks/shared/TripCardFallback";
 import { searchTrips } from "@/lib/api/trip";
 
@@ -30,12 +30,7 @@ const SearchProcess = () => {
   const [invalidParams, setInvalidParams] = useState(false);
 
   const departureParam = searchParams.get("departure");
-  const departureDate = departureParam ? new Date(departureParam) : new Date();
-  const targetDateStr = convertUTCToLocalTime(
-    departureDate.toISOString(),
-    userTimeZone,
-    "yyyy-MM-dd"
-  );
+  // Backend groups results; no need to compute local target day here
 
   useEffect(() => {
     const fetchTrips = async () => {
@@ -77,14 +72,8 @@ const SearchProcess = () => {
   // Adaptación mínima a la nueva respuesta
   // ============================
 
-  // Antes filtrabas por fecha local; ahora el backend ya separa "exact".
-  // Si igualmente quieres validar por la zona local, descomenta el filtro de seguridad.
-  let tripsOnSameDay = trips.exact || [];
-  tripsOnSameDay = tripsOnSameDay.filter((trip) => {
-    console.log(trip)
-    const localDate = convertUTCToLocalTime(trip.departure, userTimeZone, "yyyy-MM-dd");
-    return localDate === targetDateStr;
-  });
+  // El backend ya devuelve "exact" acotado a la fecha buscada; no re-filtramos en cliente
+  const tripsOnSameDay = trips.exact || [];
 
   const nearbyTrips = [...(trips.previous || []), ...(trips.next || [])];
 

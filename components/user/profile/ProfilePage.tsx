@@ -4,6 +4,7 @@ import { useForm } from "react-hook-form";
 import ChangePasswordModal from "./auxiliarComponents/ChangePasswordModal";
 import { useSession } from "next-auth/react";
 import SkeletonProfile from "@/lib/client/components/fallbacks/profile/SkeletonProfile";
+import ReferralCard from "@/components/common/ReferralCard";
 import { toast } from "sonner";
 import { fetchUserData, updateProfile } from "../../../lib/api/client-profile";
 import { UserProfile } from "@/lib/api/client-profile/clientProfile.types";
@@ -36,6 +37,7 @@ const ProfilePage = () => {
     const referralCode = watch("referralCode");
     const referredByName = watch("referredByName") || "";
     const url = BASE_URL;
+    const [referredCount, setReferredCount] = useState<number>(0);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -52,6 +54,10 @@ const ProfilePage = () => {
                     setValue("lastName", res.lastName);
                     setValue("phone", res.phone || "");
                     setValue("referralCode", res.referralCode || "");
+
+                    if (typeof res.referredCount === "number") {
+                        setReferredCount(res.referredCount);
+                    }
 
                     if (res.referralsTo?.length) {
                         const ref = res.referralsTo[0].referrer;
@@ -86,6 +92,15 @@ const ProfilePage = () => {
 
     return (
         <div className="w-full flex flex-col items-center px-0 md:px-6 my-4 pb-10 bg-white">
+            {/* Referral section */}
+            <div className="w-full mb-4">
+                <ReferralCard
+                    referralCode={watch("referralCode")}
+                    title="Comparte y gana"
+                    subtitle="Invita a tus amigos con tu enlace de referido"
+                    referredCount={referredCount}
+                />
+            </div>
             <div className="w-full flex flex-col justify-start items-start">
                 <h1 className="text-xl font-semibold text-gray-900 mb-2">Información Personal</h1>
             </div>

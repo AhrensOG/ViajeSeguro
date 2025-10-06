@@ -9,11 +9,13 @@ import Contact from "./Contact";
 import Footer from "../navigation/Footer";
 import Subscriptions from "./Subscriptions";
 import SearchWrapper from "@/lib/client/components/SearchWhrapper";
+import ReferralBanner from "@/components/common/ReferralBanner";
 
 const HomePage = () => {
     return (
         <div className="bg-custom-gray-100">
             <NavBar />
+            <ReferralBanner />
             <Hero />
             <SearchWrapper />
             <Subscriptions />
