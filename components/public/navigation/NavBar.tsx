@@ -7,6 +7,7 @@ import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
 import { toast } from "sonner";
 import { BASE_URL } from "@/lib/constants";
+import { fetchUserData } from "@/lib/api/client-profile";
 
 type Role = "ADMIN" | "CLIENT" | "DRIVER" | "PARTNER";
 
@@ -71,18 +72,36 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
   const [mounted, setMounted] = useState(false);
   const { data: session } = useSession();
+  const [refCodeFromApi, setRefCodeFromApi] = useState<string>("");
 
   const role = session?.user?.role as Role | undefined;
   const roleLinks = useMemo(() => composeLinksForRole(role), [role]);
 
-  const hasReferralCode = (u: unknown): u is Record<string, unknown> & { referralCode: string } => {
-    return typeof (u as Record<string, unknown> | undefined)?.referralCode === "string";
-  };
+  // Try to read code from session, otherwise fetch from profile API once
+  const sessionReferralCode = (session?.user as Record<string, unknown> | undefined)?.referralCode;
+
+  useEffect(() => {
+    const loadCode = async () => {
+      if (!session?.user?.id) return;
+      if (typeof sessionReferralCode === "string" && sessionReferralCode.length > 0) return;
+      try {
+        const res = await fetchUserData(session.user.id);
+        if (res?.referralCode) setRefCodeFromApi(res.referralCode);
+      } catch {
+        /* ignore */
+      }
+    };
+    loadCode();
+  }, [session?.user?.id, sessionReferralCode]);
+
+  const referralCode = useMemo(() => {
+    if (typeof sessionReferralCode === "string" && sessionReferralCode.length > 0) return sessionReferralCode;
+    return refCodeFromApi;
+  }, [sessionReferralCode, refCodeFromApi]);
 
   const referralLink = useMemo(() => {
-    const code = hasReferralCode(session?.user) ? session!.user.referralCode : "";
-    return code ? `${BASE_URL}/auth/register?ref=${code}` : `${BASE_URL}`;
-  }, [session]);
+    return referralCode ? `${BASE_URL}/auth/register?ref=${referralCode}` : "";
+  }, [referralCode]);
 
   const handleShareReferral = async () => {
     try {
@@ -174,8 +193,8 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
         <nav className="hidden md:flex items-center space-x-6">
           {renderLinks(PUBLIC_LINKS, { variant: "desktop" })}
 
-          {/* Referral share (desktop) */}
-          {mounted && (
+          {/* Referral share (desktop) - solo logueado con referral code */}
+          {mounted && session?.user && referralLink && (
             <button
               onClick={handleShareReferral}
               className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-custom-golden-600 hover:bg-custom-golden-700 text-white text-sm shadow-sm"
@@ -242,8 +261,8 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
             transition={{ duration: 0.2 }}
             className="md:hidden bg-custom-white-100 shadow-md absolute top-full left-0 w-full p-4">
             <nav className="flex flex-col items-start space-y-4">
-              {/* Referral share (mobile) */}
-              {mounted && (
+              {/* Referral share (mobile) - solo logueado con referral code */}
+              {mounted && session?.user && referralLink && (
                 <button
                   onClick={handleShareReferral}
                   className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-custom-golden-600 hover:bg-custom-golden-700 text-white text-sm shadow-sm"

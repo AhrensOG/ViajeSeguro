@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Gift, Share2, X } from "lucide-react";
 import { toast } from "sonner";
 import { BASE_URL } from "@/lib/constants";
+import { useSession } from "next-auth/react";
 
 // Use a fresh storage key so it appears para todos nuevamente
 const STORAGE_KEY = "vs_referral_banner_dismissed_v2";
@@ -11,20 +12,26 @@ type Props = { referralCode?: string | null };
 
 export default function ReferralBanner({ referralCode }: Props) {
   const [dismissed, setDismissed] = useState(false);
+  const { data: session } = useSession();
 
   useEffect(() => {
     const v = typeof window !== "undefined" ? localStorage.getItem(STORAGE_KEY) : null;
     setDismissed(v === "1");
   }, []);
 
-  // No contador: sin llamadas extra ni estado adicional
+  // Preferir el código del usuario logueado; fallback al prop si existe
+  const code = useMemo(() => {
+    const userCode = (session?.user as Record<string, unknown> | undefined)?.referralCode;
+    if (typeof userCode === "string" && userCode.length > 0) return userCode;
+    return referralCode || "";
+  }, [session, referralCode]);
 
   const link = useMemo(() => {
-    const code = referralCode || "";
-    return `${BASE_URL}/auth/register?ref=${code}`;
-  }, [referralCode]);
+    return code ? `${BASE_URL}/auth/register?ref=${code}` : "";
+  }, [code]);
 
-  if (dismissed) return null;
+  // Mostrar solo si está logueado y hay código disponible
+  if (dismissed || !session?.user || !code) return null;
 
   const onShare = async () => {
     try {
