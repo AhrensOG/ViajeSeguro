@@ -12,19 +12,6 @@ import { calculateTotalDays } from "@/lib/functions";
 import { toast } from "sonner";
 import DeleteToast from "../DeleteToast";
 
-const transmissionTypeMap = {
-    MANUAL: "Manual",
-    AUTOMATIC: "Automática",
-    SEMI_AUTOMATIC: "Semi Automática",
-} as const;
-
-const fuelTypeMap = {
-    DIESEL: "Diésel",
-    GASOLINE: "Nafta",
-    ELECTRIC: "Eléctrico",
-    HYBRID: "Híbrido",
-} as const;
-
 const vehicleOfferTypeMap = {
     WITH_DRIVER: "Con conductor",
     WITHOUT_DRIVER: "Sin conductor",
@@ -214,8 +201,8 @@ export default function VehicleOfferPanel() {
                                 <th className="px-4 py-2 border-b border-r border-custom-gray-300">Precio por día</th>
                                 <th className="px-4 py-2 border-b border-r border-custom-gray-300">Capacidad</th>
                                 <th className="px-4 py-2 border-b border-r border-custom-gray-300">Tipo</th>
-                                <th className="px-4 py-2 border-b border-r border-custom-gray-300">Combustible</th>
-                                <th className="px-4 py-2 border-b border-r border-custom-gray-300">Transmisión</th>
+                                <th className="px-4 py-2 border-b border-r border-custom-gray-300">Marca</th>
+                                <th className="px-4 py-2 border-b border-r border-custom-gray-300">Matrícula</th>
                                 <th className="px-4 py-2 border-b border-custom-gray-300 text-center">Acciones</th>
                             </tr>
                         </thead>
@@ -244,10 +231,8 @@ export default function VehicleOfferPanel() {
                                     <td className="px-4 py-2 border-b border-r border-custom-gray-200">
                                         {vehicleOfferTypeMap[offer.vehicleOfferType as keyof typeof vehicleOfferTypeMap]}
                                     </td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">{fuelTypeMap[offer.vehicle.fuelType]}</td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">
-                                        {transmissionTypeMap[offer.vehicle.transmissionType]}
-                                    </td>
+                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">{offer.vehicle.brand}</td>
+                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">{offer.vehicle.plate || "—"}</td>
                                     <td
                                         onClick={(e) => e.stopPropagation()}
                                         className="px-4 py-2 border-b border-custom-gray-200 text-center space-x-2"

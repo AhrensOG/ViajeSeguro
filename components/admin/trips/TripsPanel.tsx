@@ -12,6 +12,7 @@ import { deleteTrip, getAllTrips, getDrivers, getPartners } from "@/lib/api/admi
 import EditTripModal from "./auxiliarComponents/EditTripModal";
 import CloneTripModal from "./auxiliarComponents/CloneTripModal";
 import DeleteToast from "../DeleteToast";
+import CityAutocomplete from "@/components/common/CityAutocomplete";
 
 const statusMap = {
     PENDING: "Pendiente",
@@ -167,18 +168,26 @@ export default function TripsPanel() {
                     />
                     <Search className="absolute top-2.5 left-2.5 h-5 w-5 text-custom-gray-400" />
                 </div>
-                <input
-                    type="text"
-                    placeholder="Origen"
-                    className="w-full border border-custom-gray-300 rounded-md px-4 py-2"
-                    onChange={(e) => setFilters((f) => ({ ...f, origin: e.target.value }))}
-                />
-                <input
-                    type="text"
-                    placeholder="Destino"
-                    className="w-full border border-custom-gray-300 rounded-md px-4 py-2"
-                    onChange={(e) => setFilters((f) => ({ ...f, destination: e.target.value }))}
-                />
+                <div className="w-full">
+                    <CityAutocomplete
+                        value={filters.origin}
+                        onChange={(val, meta) =>
+                            setFilters((f) => ({ ...f, origin: meta?.payload?.name ?? val }))
+                        }
+                        placeholder="Origen"
+                        allowFreeText
+                    />
+                </div>
+                <div className="w-full">
+                    <CityAutocomplete
+                        value={filters.destination}
+                        onChange={(val, meta) =>
+                            setFilters((f) => ({ ...f, destination: meta?.payload?.name ?? val }))
+                        }
+                        placeholder="Destino"
+                        allowFreeText
+                    />
+                </div>
                 <input
                     type="date"
                     className="w-full border border-custom-gray-300 rounded-md px-4 py-2"

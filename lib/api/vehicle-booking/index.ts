@@ -91,6 +91,31 @@ const confirmVehicleReturn = async (id: string) => {
   return res;
 }
 
+// Nuevo: guardar evidencia por fase (fotos + odómetro/combustible)
+type MediaPhase = 'OWNER_PRE' | 'RENTER_PICKUP' | 'RENTER_RETURN' | 'OWNER_POST';
+interface AddVehicleBookingMediaPayload {
+  phase: MediaPhase;
+  urls: string[];
+  mileage?: number;
+  fuelLevel?: number;
+}
+
+const addVehicleBookingMedia = async (id: string, payload: AddVehicleBookingMediaPayload) => {
+  const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-booking/${id}/media`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(payload),
+  });
+  return res as {
+    id: string;
+    phase: MediaPhase;
+    urls: string[];
+    mileage?: number;
+    fuelLevel?: number;
+    createdAt: string;
+  };
+}
+
 // Guarda las URLs de fotos de entrega asociadas a una reserva
 const saveDeliveryPhotos = async (id: string, photoUrls: string[]) => {
   const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-booking/${id}/delivery-photos`, {
@@ -166,4 +191,5 @@ export {
     saveDeliveryPhotos,
     saveReturnPhotos,
     getDeliveryPhotos,
+    addVehicleBookingMedia,
 };

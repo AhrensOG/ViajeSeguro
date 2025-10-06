@@ -32,7 +32,8 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    const IVA = process.env.NEXT_PUBLIC_IVA;
+    // Frontend: IVA fijo para mostrar precios finales
+    const IVA = 21;
     const [referral, setReferral] = useState("");
     const { extraBags } = useTripOptions();
     const EXTRA_BAG_PRICE = 5;
@@ -71,10 +72,13 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
     const basePrice = trip.basePrice;
     const finalPrice = trip.priceDetails?.finalPrice ?? basePrice;
     const hasDiscounts = !!trip.priceDetails?.discounts?.length;
+    // Mostrar promoción del 40% aunque no haya sesión/discounts
+    const promoPrice = +(basePrice * 0.6).toFixed(2);
+    const displayFinalPrice = hasDiscounts ? finalPrice : promoPrice;
     const extraCost = (extraBags || 0) * EXTRA_BAG_PRICE;
-    const effectivePrice = (hasDiscounts ? finalPrice : basePrice) + extraCost;
-    const ivaAmount = (effectivePrice * Number(IVA)) / 100;
-    const totalWithIVA = effectivePrice * (1 + Number(IVA) / 100);
+    const effectivePrice = displayFinalPrice + extraCost;
+    const ivaAmount = (effectivePrice * IVA) / 100;
+    const totalWithIVA = effectivePrice * (1 + IVA / 100);
 
     return (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }} className="space-y-4">
@@ -101,14 +105,10 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
                             <span className="font-medium">Importe</span>
                             <ChevronRight size={16} className="text-custom-gray-500" />
                         </div>
-                        {hasDiscounts ? (
-                            <div className="text-right">
-                                <div className="text-sm text-gray-500 line-through">{basePrice.toFixed(2).replace(".", ",")} €</div>
-                                <div className="text-xl font-semibold text-custom-black-800">{finalPrice.toFixed(2).replace(".", ",")} €</div>
-                            </div>
-                        ) : (
-                            <div className="text-xl font-semibold text-custom-black-800">{basePrice.toFixed(2).replace(".", ",")} €</div>
-                        )}
+                        <div className="text-right">
+                            <div className="text-sm text-gray-500 line-through">{basePrice.toFixed(2).replace(".", ",")} €</div>
+                            <div className="text-xl font-semibold text-custom-black-800">{displayFinalPrice.toFixed(2).replace(".", ",")} €</div>
+                        </div>
                     </div>
 
                     {/* Equipaje adicional */}
@@ -141,11 +141,9 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
                             <ChevronRight size={16} className="text-custom-gray-500" />
                         </div>
                         <div className="text-right">
-                            {hasDiscounts ? (
-                                <div className="text-sm text-gray-500 line-through">
-                                    {(basePrice * (1 + Number(IVA) / 100)).toFixed(2).replace(".", ",")} €
-                                </div>
-                            ) : null}
+                            <div className="text-sm text-gray-500 line-through">
+                                {((basePrice + extraCost) * (1 + IVA / 100)).toFixed(2).replace(".", ",")} €
+                            </div>
                             <div className="text-2xl font-bold text-custom-black-800">
                                 {totalWithIVA.toFixed(2).replace(".", ",")} €
                             </div>

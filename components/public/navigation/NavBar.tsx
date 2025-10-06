@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { ChevronDown, Ellipsis, User, X } from "lucide-react";
+import { ChevronDown, Ellipsis, Gift, User, X } from "lucide-react";
 import Link from "next/link";
 import { signOut, useSession } from "next-auth/react";
+import { toast } from "sonner";
+import { BASE_URL } from "@/lib/constants";
 
 type Role = "ADMIN" | "CLIENT" | "DRIVER" | "PARTNER";
 
@@ -67,10 +69,39 @@ function composeLinksForRole(role?: Role): LinkItem[] {
 const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+  const [mounted, setMounted] = useState(false);
   const { data: session } = useSession();
 
   const role = session?.user?.role as Role | undefined;
   const roleLinks = useMemo(() => composeLinksForRole(role), [role]);
+
+  const hasReferralCode = (u: unknown): u is Record<string, unknown> & { referralCode: string } => {
+    return typeof (u as Record<string, unknown> | undefined)?.referralCode === "string";
+  };
+
+  const referralLink = useMemo(() => {
+    const code = hasReferralCode(session?.user) ? session!.user.referralCode : "";
+    return code ? `${BASE_URL}/auth/register?ref=${code}` : `${BASE_URL}`;
+  }, [session]);
+
+  const handleShareReferral = async () => {
+    try {
+      if (navigator.share) {
+        await navigator.share({ title: "Viaje Seguro", text: "Únete con mi enlace", url: referralLink });
+      } else {
+        await navigator.clipboard.writeText(referralLink);
+        toast.success("Compartir no disponible. Enlace copiado.");
+      }
+    } catch {
+      /* cancelado */
+    }
+  };
+
+  // Ensure client-only UI (like share button behavior) mounts after hydration
+  // This avoids SSR/CSR markup mismatches
+  useEffect(() => {
+    setMounted(true);
+  }, []);
 
   // Renderer genérico para enlaces
   const renderLinks = (
@@ -143,6 +174,17 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
         <nav className="hidden md:flex items-center space-x-6">
           {renderLinks(PUBLIC_LINKS, { variant: "desktop" })}
 
+          {/* Referral share (desktop) */}
+          {mounted && (
+            <button
+              onClick={handleShareReferral}
+              className="inline-flex items-center gap-2 px-3 py-2 rounded-full bg-custom-golden-600 hover:bg-custom-golden-700 text-white text-sm shadow-sm"
+              aria-label="Compartir enlace de referido">
+              <Gift size={16} />
+              <span>Invitar amigos</span>
+            </button>
+          )}
+
           {/* User dropdown */}
           <div
             className="relative"
@@ -200,6 +242,17 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
             transition={{ duration: 0.2 }}
             className="md:hidden bg-custom-white-100 shadow-md absolute top-full left-0 w-full p-4">
             <nav className="flex flex-col items-start space-y-4">
+              {/* Referral share (mobile) */}
+              {mounted && (
+                <button
+                  onClick={handleShareReferral}
+                  className="w-full inline-flex items-center justify-center gap-2 px-4 py-2 rounded-full bg-custom-golden-600 hover:bg-custom-golden-700 text-white text-sm shadow-sm"
+                  aria-label="Compartir enlace de referido">
+                  <Gift size={16} />
+                  <span>Invitar amigos</span>
+                </button>
+              )}
+
               {renderLinks(PUBLIC_LINKS, { variant: "mobile" })}
             </nav>
 

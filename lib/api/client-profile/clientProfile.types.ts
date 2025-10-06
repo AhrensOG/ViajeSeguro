@@ -6,6 +6,7 @@ export interface UserProfile {
     referralCode: string;
     referralCodeFrom?: string;
     referredByName?: string | null;
+    referredCount?: number;
     referralsTo?: {
         referrer: {
             name: string;

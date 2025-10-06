@@ -3,7 +3,7 @@
 
 import { CalendarDays, MapPin, Phone } from "lucide-react"
 import { useEffect, useState } from "react"
-import { confirmVehicleReturn, saveReturnPhotos } from "@/lib/api/vehicle-booking"
+import { confirmVehicleReturn } from "@/lib/api/vehicle-booking"
 import { toast } from "sonner"
 import DeliveryCaptureModal from "./DeliveryCaptureModal"
 
@@ -64,19 +64,11 @@ export function ActiveRentalsTable({ rentals }: ActiveRentalsTableProps) {
   }
 
   const handleCaptureComplete = async (urls: string[]) => {
+    void urls;
     if (!selectedRentalId) return
     const rentalId = selectedRentalId
     try {
       setLoadingConfirm(prev => new Set(prev).add(rentalId))
-      // Intentar registrar fotos de devolución; si el endpoint no existe, continuar
-      try {
-        await saveReturnPhotos(rentalId, urls)
-      } catch (e: unknown) {
-        console.warn('saveReturnPhotos failed, proceeding anyway:', e)
-        toast.message("Fotos de recepción cargadas", {
-          description: "No se pudieron registrar en el servidor, pero se continuará con la confirmación."
-        })
-      }
       await confirmVehicleReturn(rentalId)
       toast.success("¡Recepción confirmada! El alquiler ha finalizado")
       // Eliminar de la vista local para evitar necesidad de refrescar la página
@@ -205,6 +197,7 @@ export function ActiveRentalsTable({ rentals }: ActiveRentalsTableProps) {
         bookingId={selectedRentalId}
         onClose={() => setCaptureOpen(false)}
         onComplete={handleCaptureComplete}
+        phase="OWNER_POST"
       />
     </div>
   )

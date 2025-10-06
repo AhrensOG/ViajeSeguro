@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { updateTrip } from "@/lib/api/admin/trips";
 import { CreateTripRequest, Driver, Partner, TripResponse, TripServiceType, TripStatus, UpdateTripRequest } from "@/lib/api/admin/trips/trips.type";
 import { convertUtcToDatetimeLocalInput } from "@/lib/functions";
+import CityAutocomplete from "@/components/common/CityAutocomplete";
 
 interface Props {
     onClose: () => void;
@@ -190,12 +191,28 @@ const EditTripModal = ({ onClose, onSuccess, drivers, trip }: Props) => {
 
                     <div>
                         <label className={labelClass}>Origen</label>
-                        <input name="origin" type="text" value={form.origin} onChange={handleChange} className={inputClass} required />
+                        <CityAutocomplete
+                            value={form.origin}
+                            onChange={(val, meta) => {
+                                const onlyCity = meta?.payload?.name || (val || "").split(",")[0]?.trim() || val;
+                                setForm((prev) => ({ ...prev, origin: onlyCity }));
+                            }}
+                            placeholder="Ciudad de origen"
+                            allowFreeText
+                        />
                     </div>
 
                     <div>
                         <label className={labelClass}>Destino</label>
-                        <input name="destination" type="text" value={form.destination} onChange={handleChange} className={inputClass} required />
+                        <CityAutocomplete
+                            value={form.destination}
+                            onChange={(val, meta) => {
+                                const onlyCity = meta?.payload?.name || (val || "").split(",")[0]?.trim() || val;
+                                setForm((prev) => ({ ...prev, destination: onlyCity }));
+                            }}
+                            placeholder="Ciudad de destino"
+                            allowFreeText
+                        />
                     </div>
 
                     <div>

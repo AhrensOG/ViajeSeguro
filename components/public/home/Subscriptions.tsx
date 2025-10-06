@@ -409,10 +409,9 @@ const Subscriptions = () => {
           {plans.map((plan, i) => (
             <motion.div
               key={i}
-              initial={{ opacity: 0, y: 40 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: i * 0.15 }}
-              viewport={{ once: true, amount: 0.3 }}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, ease: "easeOut", delay: i * 0.1 }}
               className={`relative bg-custom-white-100 border flex flex-col transition-shadow rounded-xl overflow-hidden ${
                 plan.highlight
                   ? "border-custom-golden-500 shadow-md hover:shadow-lg"

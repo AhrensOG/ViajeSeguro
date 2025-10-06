@@ -20,8 +20,12 @@ const TripCard = ({
   const localDate = convertUTCToLocalDate(trip.departure, timeZone);
 
   const [int, decimal] = trip.basePrice.toFixed(2).split(".");
+  // 40% de descuento y luego IVA incluido si está configurado
   const discountedPrice = +(trip.basePrice * 0.6).toFixed(2);
-  const [dInt, dDec] = discountedPrice.toFixed(2).split(".");
+  // Frontend: IVA fijo del 21% para mostrar precio final
+  const ivaRate = 21;
+  const discountedWithIva = +(discountedPrice * (1 + ivaRate / 100)).toFixed(2);
+  const [dInt, dDec] = discountedWithIva.toFixed(2).split(".");
   return (
     <div className="bg-white rounded-lg shadow-md border border-custom-gray-300 overflow-hidden">
       <div className="p-4 flex flex-col md:flex-row justify-between gap-4">
@@ -71,11 +75,14 @@ const TripCard = ({
               {int}
               <span className="align-top"> ,{decimal}</span> €
             </div>
-            {/* Discounted price (40% off) */}
+            {/* Discounted price (40% off) with IVA included */}
             <div className="font-bold text-3xl text-custom-black-700">
               {dInt}
               <span className="text-sm align-top"> ,{dDec}</span> €
             </div>
+            {ivaRate > 0 && (
+              <div className="text-xs text-custom-gray-700">IVA incl.</div>
+            )}
           </div>
         </div>
       </div>
