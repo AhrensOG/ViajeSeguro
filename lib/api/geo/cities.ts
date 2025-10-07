@@ -151,8 +151,13 @@ export async function searchAdminCities(query: string, countryCode?: string, lim
     const q = normalize(query || "");
     const filtered = cities.filter((c) => {
       const slug = normalize(`${c.name} ${c.state ?? ''} ${c.country}`);
-      const cc = (c as Partial<CityResponse> & { countryCode?: string }).countryCode;
-      const countryOk = countryCode ? ((cc || '').toUpperCase() === countryCode.toUpperCase()) : true;
+      // Infer country code if missing in admin data
+      const rawCc = (c as Partial<CityResponse> & { countryCode?: string }).countryCode;
+      const cc = (rawCc || '').toUpperCase();
+      const countryUpper = String(c.country || '').toUpperCase();
+      // Minimal mapping for ES; extend if needed
+      const inferred = cc || (countryUpper === 'ESPAÑA' ? 'ES' : (countryUpper.length === 2 ? countryUpper : ''));
+      const countryOk = countryCode ? (inferred === countryCode.toUpperCase()) : true;
       return countryOk && (!q || slug.includes(q));
     }).slice(0, limit);
     return filtered.map((c) => ({
@@ -160,11 +165,11 @@ export async function searchAdminCities(query: string, countryCode?: string, lim
       name: c.name,
       region: c.state,
       country: c.country,
-      countryCode: ((c as Partial<CityResponse> & { countryCode?: string }).countryCode) || "",
+      countryCode: ((c as Partial<CityResponse> & { countryCode?: string }).countryCode)?.toUpperCase() || (String(c.country || '').toUpperCase() === 'ESPAÑA' ? 'ES' : ''),
       lat: undefined,
       lon: undefined,
       source: 'admin' as const,
-      slug: normalize(`${c.name}-${((c as Partial<CityResponse> & { countryCode?: string }).countryCode) || c.country}`),
+      slug: normalize(`${c.name}-${(((c as Partial<CityResponse> & { countryCode?: string }).countryCode)?.toUpperCase()) || (String(c.country || '').toUpperCase() === 'ESPAÑA' ? 'ES' : c.country)}`),
     }));
   } catch {
     return [];
