@@ -5,7 +5,7 @@ import { X } from "lucide-react";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { Vehicle } from "@/lib/api/admin/vehicles/vehicles.type";
-import { CreateVehicleOfferRequest } from "@/lib/api/admin/vehicle-offers/vehicleOffers.types";
+import { UpdateVehicleOfferRequest } from "@/lib/api/admin/vehicle-offers/vehicleOffers.types";
 import { updateUserVehicleOffer } from "@/lib/api/admin/vehicle-offers";
 import { useSession } from "next-auth/react";
 
@@ -18,6 +18,7 @@ interface Props {
     vehicleId: string;
     pricePerDay: number;
     agencyFee: number;
+    depositAmount?: number;
     vehicleOfferType: "WITH_DRIVER" | "WITHOUT_DRIVER";
     availableFrom: string;
     availableTo: string;
@@ -31,6 +32,7 @@ type FormData = {
   vehicleId: string;
   pricePerDay: string;
   agencyFee: string;
+  depositAmount: string;
   vehicleOfferType: "WITH_DRIVER" | "WITHOUT_DRIVER";
   availableFrom: string;
   availableTo: string;
@@ -59,6 +61,7 @@ const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
       vehicleId: offer.vehicleId,
       pricePerDay: offer.pricePerDay.toString(),
       agencyFee: offer.agencyFee.toString(),
+      depositAmount: (offer.depositAmount ?? 0).toString(),
       vehicleOfferType: offer.vehicleOfferType,
       availableFrom: new Date(offer.availableFrom).toISOString().split('T')[0],
       availableTo: new Date(offer.availableTo).toISOString().split('T')[0],
@@ -91,20 +94,42 @@ const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
     const toastId = toast.loading("Actualizando oferta de vehículo...");
     
     try {
-      const payload: CreateVehicleOfferRequest = {
-        pricePerDay: Number(data.pricePerDay),
-        withdrawLocation: data.withdrawLocation,
-        returnLocation: data.returnLocation,
-        originalTimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
-        availableFrom: new Date(data.availableFrom),
-        availableTo: new Date(data.availableTo),
-        agencyFee: Number(data.agencyFee),
-        vehicleOfferType: data.vehicleOfferType,
+      const depositParsed = Number(String(data.depositAmount ?? "").replace(",", "."));
+      if (Number.isNaN(depositParsed) || depositParsed < 0) {
+        toast.error("La fianza debe ser un número válido mayor o igual a 0", { id: toastId });
+        setIsLoading(false);
+        return;
+      }
+
+      // Construir payload solo con cambios relevantes para evitar modificar fechas pasadas
+      const payload: UpdateVehicleOfferRequest = {
         vehicleId: data.vehicleId,
-        ownerId: session.user.id, // El propietario es siempre el usuario autenticado
-        conditions: data.conditions,
-        available: "AVAILABLE", // Mantener como disponible al editar
+        depositAmount: depositParsed,
       };
+
+      const originalAgencyFee = Number(offer.agencyFee);
+      const pricePerDayNum = Number(data.pricePerDay);
+      const agencyFeeNum = Number(String(data.agencyFee ?? "").replace(",", "."));
+
+      if (!Number.isNaN(pricePerDayNum) && pricePerDayNum !== offer.pricePerDay) {
+        payload.pricePerDay = pricePerDayNum;
+      }
+      if (!Number.isNaN(agencyFeeNum) && agencyFeeNum !== originalAgencyFee) {
+        payload.agencyFee = agencyFeeNum;
+      }
+      if (data.withdrawLocation !== offer.withdrawLocation) {
+        payload.withdrawLocation = data.withdrawLocation;
+      }
+      if (data.returnLocation !== offer.returnLocation) {
+        payload.returnLocation = data.returnLocation;
+      }
+      if (data.vehicleOfferType !== offer.vehicleOfferType) {
+        payload.vehicleOfferType = data.vehicleOfferType;
+      }
+      if ((data.conditions || "") !== (offer.conditions || "")) {
+        payload.conditions = data.conditions;
+      }
+      // Importante: no enviar availableFrom/availableTo si no se cambiaron explícitamente
 
       await updateUserVehicleOffer(offer.id, payload);
       toast.success("Oferta actualizada con éxito", { id: toastId });
@@ -181,6 +206,31 @@ const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
               </p>
             )}
           </div>
+
+        {/* Fianza */}
+        <div>
+          <label className={labelClass}>Fianza (€)</label>
+          <input
+            type="number"
+            step="0.01"
+            min="0"
+            {...register("depositAmount", {
+              required: "La fianza es obligatoria",
+              min: { value: 0, message: "La fianza no puede ser negativa" },
+            })}
+            className={inputClass}
+            placeholder="200.00"
+            disabled={isLoading}
+          />
+          <p className="text-xs text-custom-gray-500 mt-1">
+            La fianza se devuelve al devolver el vehículo sin incidencias.
+          </p>
+          {errors.depositAmount && (
+            <p className="text-red-500 text-xs">
+              {errors.depositAmount.message || "Campo obligatorio"}
+            </p>
+          )}
+        </div>
 
           <div>
             <label className={labelClass}>Precio por día (€)</label>

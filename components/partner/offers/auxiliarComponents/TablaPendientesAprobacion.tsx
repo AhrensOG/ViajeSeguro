@@ -31,6 +31,8 @@ export interface TablaPendientesAprobacionProps {
 export function TablaPendientesAprobacion({ rentals, onApprovalChange }: TablaPendientesAprobacionProps) {
   const [loading, setLoading] = useState<string | null>(null)
   const [expandedRentals, setExpandedRentals] = useState<Set<string>>(new Set())
+  const [approveTargetId, setApproveTargetId] = useState<string | null>(null)
+  const [showApproveModal, setShowApproveModal] = useState(false)
 
   // Filtrar solo alquileres en estado PENDING (desaparece al aprobar)
   const pendingRentals = rentals.filter(rental => rental.status === 'PENDING')
@@ -61,6 +63,8 @@ export function TablaPendientesAprobacion({ rentals, onApprovalChange }: TablaPe
       alert('Error al aprobar el alquiler. Inténtalo de nuevo.')
     } finally {
       setLoading(null)
+      setShowApproveModal(false)
+      setApproveTargetId(null)
     }
   }
 
@@ -234,7 +238,8 @@ export function TablaPendientesAprobacion({ rentals, onApprovalChange }: TablaPe
                             <button 
                               onClick={(e) => {
                                 e.stopPropagation()
-                                handleApprove(rental.id)
+                                setApproveTargetId(rental.id)
+                                setShowApproveModal(true)
                               }}
                               disabled={loading === `approve-${rental.id}`}
                               className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
@@ -273,6 +278,51 @@ export function TablaPendientesAprobacion({ rentals, onApprovalChange }: TablaPe
               </div>
             )
           })}
+        </div>
+      </div>
+      {/* Modal de confirmación de aprobación */}
+      <ApprovalReminderModal
+        open={showApproveModal}
+        onClose={() => { setShowApproveModal(false); setApproveTargetId(null) }}
+        onConfirm={() => { if (approveTargetId) handleApprove(approveTargetId) }}
+        loading={!!(approveTargetId && loading === `approve-${approveTargetId}`)}
+      />
+    </div>
+  )
+}
+
+// Modal de confirmación de aprobación con recordatorio de requisitos
+export function ApprovalReminderModal({
+  open,
+  onClose,
+  onConfirm,
+  loading,
+}: {
+  open: boolean
+  onClose: () => void
+  onConfirm: () => void
+  loading?: boolean
+}) {
+  if (!open) return null
+  return (
+    <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40">
+      <div className="bg-white rounded-xl shadow-xl w-full max-w-md p-6">
+        <h4 className="text-lg font-bold text-slate-800 mb-2">Antes de aprobar</h4>
+        <p className="text-sm text-slate-700 mb-3">
+          Recuerda verificar la identidad del arrendatario y que cuente con <strong>más de 8 años</strong> de carnet de conducir.
+        </p>
+        <p className="text-sm text-slate-700 mb-4">
+          Si no cumple este requisito, el propietario del coche tiene derecho a rechazar la reserva. Esta verificación es <strong>responsabilidad del propietario</strong>.
+        </p>
+        <div className="flex justify-end gap-3">
+          <button onClick={onClose} className="px-4 py-2 rounded-md border border-slate-300 text-slate-700 hover:bg-slate-50">Cancelar</button>
+          <button
+            onClick={onConfirm}
+            disabled={!!loading}
+            className="px-4 py-2 rounded-md bg-green-600 text-white hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed"
+          >
+            {loading ? 'Aprobando...' : 'Confirmar y aprobar'}
+          </button>
         </div>
       </div>
     </div>

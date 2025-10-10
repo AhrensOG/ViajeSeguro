@@ -223,22 +223,23 @@ const PurchaseProcess = () => {
         }
         if (vehicleOffer) {
             const finalPrice = vehicleOffer.pricePerDay * calculateTotalDays(start || vehicleOffer.availableFrom, end || vehicleOffer.availableTo);
+            const deposit = typeof vehicleOffer.depositAmount === 'number' ? vehicleOffer.depositAmount : 600;
             try {
-                const vehicleMetadata: CreateVehicleBookingPayload & { type: 'VEHICLE_BOOKING' } = {
+                const vehicleMetadataStrings: Record<string, string> = {
                     type: 'VEHICLE_BOOKING',
                     renterId: String(session.user.id),
                     offerId: String(vehicleOffer.id),
-                    startDate: new Date(start || vehicleOffer.availableFrom),
-                    endDate: new Date(end || vehicleOffer.availableTo),
-                    status: "PENDING",
-                    paymentMethod: "STRIPE",
-                    referrerId: referralId || undefined,
-                    totalPrice: finalPrice,
+                    startDate: new Date(start || vehicleOffer.availableFrom).toISOString(),
+                    endDate: new Date(end || vehicleOffer.availableTo).toISOString(),
+                    status: 'PENDING',
+                    paymentMethod: 'STRIPE',
+                    totalPrice: String(finalPrice),
                 };
+                if (referralId) vehicleMetadataStrings.referrerId = String(referralId);
 
                 const data = await createCheckoutSession({
-                    amount: Math.round(finalPrice * (1 + Number(IVA) / 100) * 100),
-                    metadata: vehicleMetadata,
+                    amount: Math.round(((finalPrice * (1 + Number(IVA) / 100)) + deposit) * 100),
+                    metadata: (vehicleMetadataStrings as unknown) as CreateVehicleBookingPayload,
                 });
 
                 if (data.url) {
@@ -275,7 +276,9 @@ const PurchaseProcess = () => {
     } else if (vehicleOffer?.pricePerDay !== undefined && (start || vehicleOffer.availableFrom) && (end || vehicleOffer.availableTo)) {
         const totalDays = calculateTotalDays(start || vehicleOffer.availableFrom, end || vehicleOffer.availableTo);
         const totalPrice = vehicleOffer.pricePerDay * totalDays;
-        price = priceFormatted(totalPrice, vehicleOffer.pricePerDay, Number(IVA), 0);
+        const deposit = typeof vehicleOffer.depositAmount === 'number' ? vehicleOffer.depositAmount : 600;
+        const priceWithIvaAndDeposit = (totalPrice * (1 + Number(IVA) / 100)) + deposit;
+        price = priceWithIvaAndDeposit.toFixed(2).replace('.', ',');
     }
 
     //Logica para vehicle

@@ -28,6 +28,7 @@ interface RentalOffer {
   vehicleName: string
   vehicleImage: string
   pricePerDay: number
+  depositAmount?: number
   withdrawLocation: string
   returnLocation: string
   availableFrom: string
@@ -93,6 +94,8 @@ type RentalHistory = {
   renterEmail?: string;
   startDate: string;
   endDate: string;
+  startDateISO?: string;
+  endDateISO?: string;
   totalAmount: number;
   status: "PENDING" | "APPROVED" | "DELIVERED" | "ACTIVE" | "RETURNED" | "FINISHED" | "CANCELLED" | "DECLINED" | "COMPLETED";
   location: string;
@@ -101,6 +104,7 @@ type RentalHistory = {
   returnLocation?: string;
   agencyFee?: number;
   pricePerDay?: number;
+  depositAmount?: number;
 };
 
 type PendienteAprobacion = {
@@ -154,6 +158,7 @@ export default function OffersPage() {
         vehicleName: `${offer.vehicle.brand} ${offer.vehicle.model} (${offer.vehicle.year})`,
         vehicleImage: offer.vehicle.images?.[0] || "",
         pricePerDay: offer.pricePerDay,
+        depositAmount: offer.depositAmount,
         withdrawLocation: offer.withdrawLocation,
         returnLocation: offer.returnLocation,
         availableFrom: offer.availableFrom.toString(),
@@ -250,6 +255,7 @@ export default function OffersPage() {
     endDate: string | Date;
     totalPrice: number;
     status: string;
+    depositAmount?: number;
   }
 
   const loadUpcomingBookings = useCallback(async () => {
@@ -269,6 +275,7 @@ export default function OffersPage() {
         const paidAmount = payments
           .filter((p) => p?.userId && p?.amount && p.userId === renterId)
           .reduce((sum: number, p) => sum + Number(p.amount || 0), 0)
+        const depositAmount = Number(booking.depositAmount ?? 0)
         
         return {
           id: String(booking.id),
@@ -279,14 +286,15 @@ export default function OffersPage() {
           renterPhone: booking.renter.phone || "No disponible",
           startDate: startDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }),
           endDate: endDate.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' }),
-          // Guardar ISO para cálculos posteriores (estadísticas por mes)
-          startDateISO: booking.startDate,
-          endDateISO: booking.endDate,
+          // Guardar ISO consistente para cálculos de mes/año
+          startDateISO: startDate.toISOString(),
+          endDateISO: endDate.toISOString(),
           // Usar lo pagado en Stripe; si no hay pagos, usar totalPrice como fallback
           totalAmount: paidAmount > 0 ? Number(paidAmount.toFixed(2)) : booking.totalPrice,
           daysUntilStart: Math.max(0, daysUntilStart),
           status: booking.status,
-          location: booking.offer.withdrawLocation
+          location: booking.offer.withdrawLocation,
+          depositAmount,
         }
       })
 
@@ -336,10 +344,14 @@ export default function OffersPage() {
         renterPhone: b.renterPhone,
         startDate: b.startDate,
         endDate: b.endDate,
+        startDateISO: b.startDateISO,
+        endDateISO: b.endDateISO,
         totalAmount: b.totalAmount,
         status: (b.status as RentalHistory["status"]) ?? "PENDING",
         location: b.location,
         createdAt: String(b.startDateISO ?? b.startDate),
+        // pasar fianza para desglose y cálculo de ganancias netas
+        depositAmount: b.depositAmount ?? 0,
       }))
 
       const pendingApprovalsFiltered: PendienteAprobacion[] = transformedBookings
@@ -368,24 +380,24 @@ export default function OffersPage() {
       setRentalHistory(rentalHistoryFiltered)
       setPendingApprovals(pendingApprovalsFiltered)
 
-      // Actualizar estadísticas arriba con montos realmente pagados (Stripe)
+      // Actualizar estadísticas arriba con MISMOS montos NETOS que muestra el historial (sin fianza y con 21% empresa → 79% partner)
       try {
-        const now = new Date()
-        const currentMonth = now.getMonth()
-        const currentYear = now.getFullYear()
+        // Removed monthly breakdown; no need for current month/year here
 
-        const totalEarningsGross = rentalHistoryFiltered.reduce((sum: number, r: RentalHistory) => sum + Number(r.totalAmount || 0), 0)
-        const monthlyEarningsGross = rentalHistoryFiltered
-          .filter((r: RentalHistory) => {
-            const d = new Date(r.startDate)
-            return d.getMonth() === currentMonth && d.getFullYear() === currentYear
-          })
-          .reduce((sum: number, r: RentalHistory) => sum + Number(r.totalAmount || 0), 0)
+        const netPerBooking = (r: RentalHistory) => {
+          const deposit = Number(r.depositAmount || 0)
+          const base = Math.max(0, Number(r.totalAmount || 0) - deposit)
+          // Si en el futuro mapeamos agencyFee, usar base - agencyFee; por ahora 79%
+          return base * 0.79
+        }
+
+        const totalEarningsNet = rentalHistoryFiltered.reduce((sum: number, r: RentalHistory) => sum + netPerBooking(r), 0)
 
         setStatistics(prev => ({
           ...prev,
-          totalEarnings: Number(totalEarningsGross.toFixed(2)),
-          monthlyEarnings: Number(monthlyEarningsGross.toFixed(2)),
+          totalEarnings: Number(totalEarningsNet.toFixed(2)),
+          // Mostrar el mismo número en 'Ganancias del Mes' que en 'Ganancias Totales'
+          monthlyEarnings: Number(totalEarningsNet.toFixed(2)),
           activeRentals: activeRentalsFiltered.length,
         }))
       } catch (e) {
@@ -570,6 +582,7 @@ export default function OffersPage() {
             vehicleId: selectedOffer.vehicleId,
             pricePerDay: selectedOffer.pricePerDay,
             agencyFee: selectedOffer.pricePerDay * 0.22, // Calcular tarifa de agencia
+            depositAmount: selectedOffer.depositAmount,
             vehicleOfferType: selectedOffer.vehicleOfferType,
             availableFrom: selectedOffer.availableFrom,
             availableTo: selectedOffer.availableTo,

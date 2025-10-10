@@ -9,6 +9,7 @@ import {
   MapIcon,
   X,
   CheckCircle,
+  Info,
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Image from "next/image";
@@ -115,6 +116,8 @@ const ReservationVehicleCard = ({
   const ivaPercent = Number(IVA) || 0;
   const ivaAmount = Number(((subTotal * ivaPercent) / 100).toFixed(2));
   const totalWithIva = Number((subTotal + ivaAmount).toFixed(2));
+  // Fianza temporal fija (no sujeta a IVA) hasta conectar backend
+  const deposit = 600;
 
   // Nota: subTotal/ivaAmount/totalWithIva calculados arriba
 
@@ -261,6 +264,15 @@ const ReservationVehicleCard = ({
               </p>
             </div>
 
+            {/* Aviso: requisito de antigüedad de carnet */}
+            <div className="rounded-md border-l-4 border-yellow-500 bg-yellow-50 p-4 text-sm text-yellow-900 flex gap-2">
+              <Info className="h-4 w-4 mt-0.5 text-yellow-700" />
+              <p>
+                El conductor debe contar con más de 8 años de carnet de conducir. Si no cumple este requisito, el propietario del coche
+                tiene derecho a rechazar la reserva.
+              </p>
+            </div>
+
             {paymentMethod === "CASH" && (
               <div className="rounded-md border-l-4 border-yellow-400 bg-yellow-50 p-4 text-sm text-yellow-800">
                 <p className="font-bold mb-2 text-yellow-800">
@@ -313,10 +325,23 @@ const ReservationVehicleCard = ({
                 <p>IVA ({ivaPercent}%):</p>
                 <p>{ivaAmount.toFixed(2)}€</p>
               </div>
+              <div className="flex justify-between text-sm text-custom-gray-700 w-full">
+                <div
+                  className="flex items-center gap-2"
+                  title="La fianza es un importe retenido como garantía. Se devuelve íntegramente al devolver el vehículo sin incidencias (daños, combustible, multas o retrasos). Puede retenerse total o parcialmente según las condiciones de la oferta y la revisión al finalizar el alquiler."
+                >
+                  <p>Fianza:</p>
+                  <Info className="h-3.5 w-3.5 text-custom-gray-500" />
+                </div>
+                <p>{deposit.toFixed(2)}€</p>
+              </div>
               <div className="flex justify-between text-custom-gray-700 w-full text-lg font-bold">
                 <p>Importe Final:</p>
-                <p>{totalWithIva.toFixed(2)}€</p>
+                <p>{(totalWithIva + deposit).toFixed(2)}€</p>
               </div>
+              <p className="text-[11px] leading-4 text-custom-gray-500 text-end">
+                Importe final incluye la fianza (no sujeta a IVA).
+              </p>
               {/* <p className="text-sm text-custom-golden-600 text-end w-full hover:underline cursor-pointer">Ver detalle de descuentos</p> */}
             </div>
 

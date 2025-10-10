@@ -23,6 +23,9 @@ const PurchaseVehicleSummary = ({ vehicleOffer, start, end, originalTimeZone }: 
     const basePrice = vehicleOffer.pricePerDay * totalDays;
     const totalWithIVA = basePrice * (1 + IVA_RATE);
     const ivaAmount = totalWithIVA - basePrice;
+    // Fianza: usar valor real si está presente; fallback 600 mientras tanto
+    const deposit = typeof vehicleOffer.depositAmount === "number" ? vehicleOffer.depositAmount : 600;
+    const totalWithIvaAndDeposit = totalWithIVA + deposit;
 
     const dateLabel = from.setLocale("es").toFormat("ccc, dd 'de' LLLL");
     const departureTime = from.toFormat("HH:mm");
@@ -41,7 +44,7 @@ const PurchaseVehicleSummary = ({ vehicleOffer, start, end, originalTimeZone }: 
         >
             <div className="flex justify-between items-start mb-4">
                 <h2 className="text-xl font-medium text-custom-black-800">Resumen de tu alquiler</h2>
-                <div className="text-2xl font-bold text-custom-black-800">{totalWithIVA.toFixed(2).replace(".", ",")} €</div>
+                <div className="text-2xl font-bold text-custom-black-800">{totalWithIvaAndDeposit.toFixed(2).replace(".", ",")} €</div>
             </div>
 
             <div className="mb-4">
@@ -107,9 +110,14 @@ const PurchaseVehicleSummary = ({ vehicleOffer, start, end, originalTimeZone }: 
                             <span>{ivaAmount.toFixed(2).replace(".", ",")} €</span>
                         </div>
 
+                        <div className="flex justify-between">
+                            <span>Fianza:</span>
+                            <span>{deposit.toFixed(2).replace(".", ",")} €</span>
+                        </div>
+
                         <div className="flex justify-between font-medium">
-                            <span>Total:</span>
-                            <span>{totalWithIVA.toFixed(2).replace(".", ",")} €</span>
+                            <span>Total (incluye fianza):</span>
+                            <span>{totalWithIvaAndDeposit.toFixed(2).replace(".", ",")} €</span>
                         </div>
                     </motion.div>
                 )}

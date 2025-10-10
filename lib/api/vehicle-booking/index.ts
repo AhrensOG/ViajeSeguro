@@ -14,6 +14,7 @@ const fetchOffer = async (id: string) => {
         availableFrom: res.availableFrom,
         availableTo: res.availableTo,
         originalTimeZone: res.originalTimeZone,
+        depositAmount: res.depositAmount,
         withdrawLocation: res.withdrawLocation,
         returnLocation: res.returnLocation,
         vehicleOfferType: res.vehicleOfferType,

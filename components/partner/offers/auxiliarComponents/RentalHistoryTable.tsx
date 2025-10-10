@@ -26,6 +26,7 @@ interface RentalHistory {
   returnLocation?: string
   agencyFee?: number
   pricePerDay?: number
+  depositAmount?: number
 }
 
 interface RentalHistoryTableProps {
@@ -37,12 +38,13 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
   const [photosByRental, setPhotosByRental] = useState<Record<string, string[]>>({})
   const [loadingPhotos, setLoadingPhotos] = useState<Set<string>>(new Set())
 
-  // Calcular ganancias reales del partner (78% después de comisión del 22%)
-  const calculatePartnerEarnings = (totalAmount: number, agencyFee?: number) => {
-    if (agencyFee) {
-      return totalAmount - agencyFee
-    }
-    return totalAmount * 0.78
+  // Calcular ganancias reales del partner EXCLUYENDO fianza (la fianza se devuelve al cliente)
+  const calculatePartnerEarnings = (totalAmount: number, agencyFee: number | undefined, depositAmount: number | undefined) => {
+    const deposit = Number(depositAmount || 0)
+    const base = Math.max(0, Number(totalAmount || 0) - deposit)
+    if (agencyFee !== undefined) return Math.max(0, base - Number(agencyFee))
+    // Si no viene agencyFee, usar 21% para empresa → 79% para partner
+    return Math.max(0, base * 0.79)
   }
 
   console.log('📋 RentalHistoryTable DEBUG:', {
@@ -234,8 +236,8 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
                   </div>
 
                   <div className="text-right">
-                    <p className="font-bold text-green-600">${calculatePartnerEarnings(rental.totalAmount, rental.agencyFee).toFixed(2)}</p>
-                    <p className="text-xs text-gray-400">Ganancias (78%)</p>
+                    <p className="font-bold text-green-600">${calculatePartnerEarnings(rental.totalAmount, rental.agencyFee, rental.depositAmount).toFixed(2)}</p>
+                    <p className="text-xs text-gray-400">Ganancias (sin fianza)</p>
                     {getStatusBadge(rental.status)}
                   </div>
 
@@ -323,6 +325,11 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
                               <span className="text-gray-600">Lo que pagó el cliente:</span>
                               <span className="font-bold text-blue-600">${rental.totalAmount}</span>
                             </div>
+
+                            <div className="flex justify-between">
+                              <span className="text-gray-600">Fianza pagada por cliente:</span>
+                              <span className="font-medium">${Number(rental.depositAmount || 0).toFixed(2)}</span>
+                            </div>
                             
                             {rental.pricePerDay && (
                               <div className="flex justify-between">
@@ -333,16 +340,22 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
                             
                             <div className="border-t border-gray-200 pt-2 space-y-1">
                               <div className="flex justify-between">
-                                <span className="text-red-600">Empresa se lleva (22%):</span>
+                                <span className="text-gray-600">Base (sin fianza):</span>
+                                <span className="font-medium">${(Number(rental.totalAmount || 0) - Number(rental.depositAmount || 0)).toFixed(2)}</span>
+                              </div>
+                              <div className="flex justify-between">
+                                <span className="text-red-600">Empresa se lleva (21%):</span>
                                 <span className="font-medium text-red-600">
-                                  {rental.agencyFee ? `$${rental.agencyFee}` : `$${(rental.totalAmount * 0.22).toFixed(2)}`}
+                                  {rental.agencyFee
+                                    ? `$${rental.agencyFee}`
+                                    : `$${(Math.max(0, Number(rental.totalAmount || 0) - Number(rental.depositAmount || 0)) * 0.21).toFixed(2)}`}
                                 </span>
                               </div>
                               
                               <div className="flex justify-between">
-                                <span className="text-green-600">Partner recibe (78%):</span>
+                                <span className="text-green-600">Partner recibe (79%):</span>
                                 <span className="font-medium text-green-600">
-                                  ${rental.agencyFee ? (rental.totalAmount - rental.agencyFee).toFixed(2) : (rental.totalAmount * 0.78).toFixed(2)}
+                                  ${calculatePartnerEarnings(rental.totalAmount, rental.agencyFee, rental.depositAmount).toFixed(2)}
                                 </span>
                               </div>
                             </div>
@@ -353,7 +366,7 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
                             <div className="flex justify-between items-center">
                               <span className="font-bold text-green-800">TUS GANANCIAS TOTALES:</span>
                               <span className="font-bold text-green-700 text-lg">
-                                ${rental.agencyFee ? (rental.totalAmount - rental.agencyFee).toFixed(2) : (rental.totalAmount * 0.78).toFixed(2)}
+                                ${calculatePartnerEarnings(rental.totalAmount, rental.agencyFee, rental.depositAmount).toFixed(2)}
                               </span>
                             </div>
                           </div>
