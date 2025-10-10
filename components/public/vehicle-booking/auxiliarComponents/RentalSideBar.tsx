@@ -1,6 +1,6 @@
 "use client";
 
-import { Calendar1Icon, ChevronRight } from "lucide-react";
+import { Calendar1Icon, ChevronRight, Info } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -43,6 +43,11 @@ const RentalSidebar = ({ vehicleOffer, selectedStart, selectedEnd }: RentalSideb
     const total = useMemo(() => basePrice * days, [basePrice, days]);
     const iva = useMemo(() => total * (IVA / 100), [total]);
     const final = useMemo(() => total + iva, [total, iva]);
+    // Mostrar siempre la fianza con fallback de 600€ hasta que el backend la provea
+    const deposit = useMemo(() => {
+        return typeof vehicleOffer.depositAmount === "number" ? vehicleOffer.depositAmount : 600;
+    }, [vehicleOffer.depositAmount]);
+    const finalWithDeposit = useMemo(() => final + deposit, [final, deposit]);
 
     useEffect(() => {
         const fetchDiscounts = async () => {
@@ -88,12 +93,29 @@ const RentalSidebar = ({ vehicleOffer, selectedStart, selectedEnd }: RentalSideb
                     <p className="text-base font-medium text-custom-black-700 flex justify-between">
                         Días de alquiler:<span>{days || "Selecciona fechas"}</span>
                     </p>
-                    <p className="text-base font-medium text-custom-black-700 flex justify-between">
-                        Precio por día:<span>{basePrice.toFixed(2).replace(".", ",")} €</span>
-                    </p>
                 </div>
 
                 <div className="border-t border-b border-custom-gray-300 py-4 my-4">
+                    {/* Precio por día */}
+                    <div className="flex items-center justify-between mb-2">
+                        <div className="flex items-center gap-2">
+                            <span className="font-medium">Precio por día</span>
+                            <ChevronRight size={16} className="text-custom-gray-500" />
+                        </div>
+                        <span className="text-xl font-semibold text-custom-black-800">{basePrice.toFixed(2).replace(".", ",")} €</span>
+                    </div>
+
+                    {/* Fianza dentro del detalle (arriba del Importe) - siempre visible con fallback */}
+                    <div className="flex items-center justify-between mb-2">
+                        <div
+                            className="flex items-center gap-2"
+                            title="La fianza es un importe retenido como garantía. Se devuelve íntegramente al devolver el vehículo sin incidencias (daños, combustible, multas o retrasos). Puede retenerse total o parcialmente según las condiciones de la oferta y la revisión al finalizar el alquiler."
+                        >
+                            <span className="font-medium">Fianza</span>
+                            <Info size={16} className="text-custom-gray-500" />
+                        </div>
+                        <span className="text-xl font-semibold text-custom-black-800">{deposit.toFixed(2).replace(".", ",")} €</span>
+                    </div>
                     <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
                             <span className="font-medium">Importe</span>
@@ -115,9 +137,14 @@ const RentalSidebar = ({ vehicleOffer, selectedStart, selectedEnd }: RentalSideb
                             <span className="font-medium">Importe Final</span>
                             <ChevronRight size={16} className="text-custom-gray-500" />
                         </div>
-                        <span className="text-2xl font-bold text-custom-black-800">{(canPay ? final : 0).toFixed(2).replace(".", ",")} €</span>
+                        <span className="text-2xl font-bold text-custom-black-800">{(canPay ? finalWithDeposit : 0).toFixed(2).replace(".", ",")} €</span>
                     </div>
                 </div>
+
+                {/* Nota: explicación fija */}
+                <p className="text-[11px] leading-4 text-custom-gray-500 mt-1 mb-2">
+                    Importe final incluye la fianza (no sujeta a IVA). La fianza se devuelve al finalizar el alquiler sin incidencias.
+                </p>
 
                 <motion.div whileHover={{ scale: canPay ? 1.02 : 1 }} whileTap={{ scale: canPay ? 0.96 : 1 }}>
                     <button

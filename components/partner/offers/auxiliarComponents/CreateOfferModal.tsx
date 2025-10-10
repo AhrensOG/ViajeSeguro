@@ -25,6 +25,8 @@ type FormData = {
   withdrawLocation: string;
   returnLocation: string;
   conditions?: string;
+  // Nuevo campo para fianza (solo UI por ahora)
+  depositAmount: string;
 };
 
 const inputClass =
@@ -59,14 +61,20 @@ const CreateOfferModal = ({ onClose, onSuccess, userVehicles }: Props) => {
 
   const submit: SubmitHandler<FormData> = async (data) => {
     if (!session?.user?.id) {
-      toast.error("Error de autenticación");
       return;
     }
 
     setIsLoading(true);
     const toastId = toast.loading("Creando oferta de vehículo...");
-    
     try {
+      // Normalizar y validar fianza
+      const depositParsed = Number(String(data.depositAmount ?? "").replace(",", "."));
+      if (Number.isNaN(depositParsed) || depositParsed < 0) {
+        toast.error("La fianza debe ser un número válido mayor o igual a 0", { id: toastId });
+        setIsLoading(false);
+        return;
+      }
+
       const payload: CreateVehicleOfferRequest = {
         pricePerDay: Number(data.pricePerDay),
         withdrawLocation: data.withdrawLocation,
@@ -74,7 +82,8 @@ const CreateOfferModal = ({ onClose, onSuccess, userVehicles }: Props) => {
         originalTimeZone: Intl.DateTimeFormat().resolvedOptions().timeZone,
         availableFrom: new Date(data.availableFrom),
         availableTo: new Date(data.availableTo),
-        agencyFee: Number(data.agencyFee),
+        agencyFee: Number(String(data.agencyFee ?? "").replace(",", ".")),
+        depositAmount: depositParsed,
         vehicleOfferType: data.vehicleOfferType,
         vehicleId: data.vehicleId,
         ownerId: session.user.id, // El propietario es siempre el usuario autenticado
@@ -201,6 +210,31 @@ const CreateOfferModal = ({ onClose, onSuccess, userVehicles }: Props) => {
             {errors.agencyFee && (
               <p className="text-red-500 text-xs">
                 {errors.agencyFee.message || "Campo obligatorio"}
+              </p>
+            )}
+          </div>
+
+          {/* Fianza */}
+          <div>
+            <label className={labelClass}>Fianza (€)</label>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              {...register("depositAmount", {
+                required: "La fianza es obligatoria",
+                min: { value: 0, message: "La fianza no puede ser negativa" },
+              })}
+              className={inputClass}
+              placeholder="200.00"
+              disabled={isLoading}
+            />
+            <p className="text-xs text-custom-gray-500 mt-1">
+              La fianza se devuelve al devolver el vehículo sin incidencias.
+            </p>
+            {errors.depositAmount && (
+              <p className="text-red-500 text-xs">
+                {errors.depositAmount.message || "Campo obligatorio"}
               </p>
             )}
           </div>

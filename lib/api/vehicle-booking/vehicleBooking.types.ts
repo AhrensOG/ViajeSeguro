@@ -20,6 +20,8 @@ export interface VehicleOfferWithVehicle {
     withdrawLocation: string;
     returnLocation: string;
     vehicleOfferType: string;
+    // Campo opcional: fianza definida por el partner (si el backend la provee)
+    depositAmount?: number;
     bookings?: {
         id: string;
         startDate: string;

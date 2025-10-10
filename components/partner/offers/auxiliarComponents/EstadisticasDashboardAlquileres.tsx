@@ -32,10 +32,7 @@ export function EstadisticasDashboardAlquileres({
     }).format(amount)
   }
 
-  // Calcular ganancias reales del partner (78% después de comisión del 22%)
-  const calculatePartnerEarnings = (totalAmount: number) => {
-    return totalAmount * 0.78
-  }
+  // Las ganancias ya llegan netas desde el padre; no recalcular aquí
 
   // Calcular estadísticas basadas en datos reales con validaciones
   const totalVehicles = userVehicles?.length || 0
@@ -82,12 +79,12 @@ export function EstadisticasDashboardAlquileres({
     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
       <div className="bg-gradient-to-br from-blue-500/10 to-blue-400/5 border border-blue-500/20 rounded-lg shadow-sm">
         <div className="flex flex-row items-center justify-between space-y-0 pb-2 p-6">
-          <h3 className="text-sm font-medium text-gray-600">Ganancias Totales (78%)</h3>
+          <h3 className="text-sm font-medium text-gray-600">Ganancias Totales</h3>
           <DollarSign className="h-4 w-4 text-blue-600" />
         </div>
         <div className="px-6 pb-6">
-          <div className="text-2xl font-bold text-blue-600">{formatCurrency(calculatePartnerEarnings(totalEarnings))}</div>
-          <p className="text-xs text-gray-400">Total bruto: {formatCurrency(totalEarnings)}</p>
+          <div className="text-2xl font-bold text-blue-600">{formatCurrency(totalEarnings)}</div>
+          <p className="text-xs text-gray-400">Total neto</p>
           <p className="text-xs text-gray-500">
             {earningsGrowthPercentage >= 0 ? '+' : ''}{earningsGrowthPercentage}% desde el mes pasado
           </p>
@@ -96,12 +93,12 @@ export function EstadisticasDashboardAlquileres({
 
       <div className="bg-gradient-to-br from-green-500/10 to-green-400/5 border border-green-500/20 rounded-lg shadow-sm">
         <div className="flex flex-row items-center justify-between space-y-0 pb-2 p-6">
-          <h3 className="text-sm font-medium text-gray-600">Ganancias del Mes (78%)</h3>
+          <h3 className="text-sm font-medium text-gray-600">Ganancias del Mes</h3>
           <TrendingUp className="h-4 w-4 text-green-600" />
         </div>
         <div className="px-6 pb-6">
-          <div className="text-2xl font-bold text-green-600">{formatCurrency(calculatePartnerEarnings(monthlyEarnings))}</div>
-          <p className="text-xs text-gray-400">Total bruto: {formatCurrency(monthlyEarnings)}</p>
+          <div className="text-2xl font-bold text-green-600">{formatCurrency(monthlyEarnings)}</div>
+          <p className="text-xs text-gray-400">Neto del mes</p>
           <p className="text-xs text-gray-500">En {getMonthName()}</p>
         </div>
       </div>

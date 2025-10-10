@@ -91,6 +91,7 @@ const EditVehicleOfferModal = ({ onClose, offer, afterEdit, vehicles, owners }: 
                 availableFrom: new Date(data.availableFrom),
                 availableTo: new Date(data.availableTo),
                 agencyFee: Number(data.agencyFee), // ← aquí está corregido
+                depositAmount: offer.depositAmount,
                 vehicleOfferType: data.vehicleOfferType,
                 vehicleId: data.vehicleId,
                 ownerId: data.ownerId,

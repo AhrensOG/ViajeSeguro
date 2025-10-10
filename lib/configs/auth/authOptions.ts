@@ -114,24 +114,57 @@ export const authOptions: NextAuthOptions = {
       }
 
       if (user) return { ...token, ...user };
-
-      if (new Date().getTime() < token.backendTokens.expiresIn) return token;
-
-      return await refreshAccessToken(token);
+      // Si no existen tokens del backend en el JWT, devolver token tal cual
+      type BackendTokens = { expiresIn?: number; refreshToken?: string; [k: string]: unknown };
+      type TokenShape = JWT & { backendTokens?: BackendTokens };
+      const bt = (token as TokenShape).backendTokens;
+      if (!bt) return token;
+      // Si no hay expiresIn válido, no intentes refrescar
+      if (typeof bt.expiresIn !== "number") return token;
+      // Si aún no expiró, mantener token
+      if (Date.now() < bt.expiresIn) return token;
+      // Refrescar solo si hay refreshToken disponible
+      if (!bt.refreshToken) return token;
+      try {
+        return await refreshAccessToken(token);
+      } catch {
+        // Si falla el refresh, devolver el token actual sin romper la sesión
+        return token;
+      }
     },
 
     async session({ session, token }) {
-      session.user = {
-        id: token.user.id,
-        email: token.user.email,
-        emailVerified: token.user.emailVerified,
-        avatarUrl: token.user.avatarUrl,
-        googleId: token.user.googleId,
-        name: token.user.name,
-        lastName: token.user.lastName,
-        role: token.user.role,
+      type BackendTokens = { expiresIn?: number; refreshToken?: string; [k: string]: unknown };
+      type TokenUser = {
+        id: string;
+        email: string;
+        emailVerified: boolean;
+        avatarUrl?: string;
+        googleId?: string;
+        name?: string;
+        lastName?: string;
+        role?: string;
       };
-      session.backendTokens = token.backendTokens;
+      type TokenShape = JWT & { user?: TokenUser; backendTokens?: BackendTokens };
+      const t = token as TokenShape;
+      // Cuando no hay usuario autenticado, evitar acceder a propiedades inexistentes
+      if (!t?.user) {
+        return session;
+      }
+      // Asignar datos de usuario con type-safe (evitar any)
+      (session as unknown as { user: Record<string, unknown> }).user = {
+        id: t.user.id,
+        email: t.user.email,
+        emailVerified: t.user.emailVerified,
+        avatarUrl: t.user.avatarUrl,
+        googleId: t.user.googleId,
+        name: t.user.name,
+        lastName: t.user.lastName,
+        role: t.user.role,
+      };
+      if (t.backendTokens) {
+        (session as unknown as { backendTokens?: BackendTokens }).backendTokens = t.backendTokens;
+      }
       return session;
     },
   },

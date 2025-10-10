@@ -1,6 +1,6 @@
 import { BACKEND_URL } from "@/lib/constants";
 import { fetchWithAuth } from "@/lib/functions";
-import { CreateVehicleOfferRequest, VehicleOffersAdminResponse } from "./vehicleOffers.types";
+import { CreateVehicleOfferRequest, UpdateVehicleOfferRequest, VehicleOffersAdminResponse } from "./vehicleOffers.types";
 
 async function fetchVehicleOffers() {
     try {
@@ -41,7 +41,7 @@ async function createVehicleOffer(data: CreateVehicleOfferRequest): Promise<Vehi
     }
 }
 
-async function updateVehicleOffer(id: string, data: CreateVehicleOfferRequest) {
+async function updateVehicleOffer(id: string, data: UpdateVehicleOfferRequest) {
     try {
         const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-offer/update`, {
             method: "PUT",
@@ -53,7 +53,7 @@ async function updateVehicleOffer(id: string, data: CreateVehicleOfferRequest) {
     }
 }
 
-async function updateUserVehicleOffer(id: string, data: CreateVehicleOfferRequest) {
+async function updateUserVehicleOffer(id: string, data: UpdateVehicleOfferRequest) {
     try {
         const res = await fetchWithAuth(`${BACKEND_URL}/vehicle-offer/user-update`, {
             method: "PUT",

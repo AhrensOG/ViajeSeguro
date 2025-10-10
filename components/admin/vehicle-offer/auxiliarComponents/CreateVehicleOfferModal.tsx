@@ -84,6 +84,8 @@ const CreateVehicleOfferModal = ({
   const submit: SubmitHandler<FormData> = async (data) => {
     const toastId = toast.loading("Creando oferta de vehículo...");
     try {
+      // Nota: Mientras no exista un campo en el formulario, usamos un valor por defecto coherente con el front (fianza = 600€)
+      const DEFAULT_DEPOSIT = 600;
       const payload: CreateVehicleOfferRequest = {
         pricePerDay: Number(data.pricePerDay),
         withdrawLocation: data.withdrawLocation,
@@ -92,6 +94,7 @@ const CreateVehicleOfferModal = ({
         availableFrom: new Date(data.availableFrom),
         availableTo: new Date(data.availableTo),
         agencyFee: Number(data.agencyFee),
+        depositAmount: DEFAULT_DEPOSIT,
         vehicleOfferType: data.vehicleOfferType,
         vehicleId: data.vehicleId,
         ownerId: data.ownerId,

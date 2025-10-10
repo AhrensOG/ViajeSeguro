@@ -7,6 +7,7 @@ export interface VehicleOffersAdminResponse {
     availableFrom: Date;
     availableTo: Date;
     agencyFee: number;
+    depositAmount: number;
     available: string;
     vehicleOfferType: string;
     conditions: string;
@@ -43,6 +44,22 @@ export interface VehicleOffersAdminResponse {
     }[];
 }
 
+export interface UpdateVehicleOfferRequest {
+    pricePerDay?: number;
+    withdrawLocation?: string;
+    returnLocation?: string;
+    originalTimeZone?: string;
+    availableFrom?: Date;
+    availableTo?: Date;
+    agencyFee?: number;
+    depositAmount?: number;
+    available?: string;
+    vehicleOfferType?: string;
+    conditions?: string;
+    ownerId?: string;
+    vehicleId: string; // requerido por el backend
+}
+
 export interface SimpleVehicle {
     id: string;
     plate: string;
@@ -76,6 +93,7 @@ export interface CreateVehicleOfferRequest {
     availableFrom: Date;
     availableTo: Date;
     agencyFee: number;
+    depositAmount: number;
     available: string;
     vehicleOfferType: string;
     conditions?: string;
