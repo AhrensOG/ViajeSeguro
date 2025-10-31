@@ -19,9 +19,9 @@ const Hero = () => {
                                max-w-[20rem] sm:max-w-2xl md:max-w-4xl 
                                break-words"
                 >
-                    <span className="block text-4xl sm:text-5xl md:text-7xl text-custom-golden-600">Plataforma</span>
+                    <span className="block text-4xl sm:text-5xl md:text-7xl text-custom-golden-600">Viaje Seguro</span>
                     <span className="block mt-2 text-3xl sm:text-4xl md:text-6xl font-semibold">
-                        Alquiler de vehiculos usuario o propietario comparte viaje, pasajero o conductor
+                         la plataforma más fácil para alquilar vehículos y compartir viajes por toda España, como pasajero o conductor
                     </span>
                 </motion.h1>
 
