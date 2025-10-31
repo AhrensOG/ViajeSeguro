@@ -19,9 +19,10 @@ const Hero = () => {
                                max-w-[20rem] sm:max-w-2xl md:max-w-4xl 
                                break-words"
                 >
-                    <span className="block">VIAJE SEGURO - TU PLATAFORMA PARA</span>
-                    <span className="block sm:block md:inline">ALQUILAR UN VEHÍCULO</span>
-                    <span className="block">COMO CLIENTE O PROPIETARIO Y COMPARTIR VIAJE COMO PASAJERO O CONDUCTOR</span>
+                    <span className="block text-4xl sm:text-5xl md:text-7xl text-custom-golden-600">Plataforma</span>
+                    <span className="block mt-2 text-3xl sm:text-4xl md:text-6xl font-semibold">
+                        Alquiler de vehiculos usuario o propietario comparte viaje, pasajero o conductor
+                    </span>
                 </motion.h1>
 
                 {/* <motion.p
