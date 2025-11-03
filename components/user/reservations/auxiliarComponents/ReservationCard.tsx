@@ -7,16 +7,18 @@ import ReservationPriceInfo from "./ReservationPriceInfo";
 import { cancellReservation } from "@/lib/api/reservation";
 import { toast } from "sonner";
 import Image from "next/image";
-
 type Props = {
     reservation: ReservationResponse;
 };
 
 const ReservationCard = ({ reservation }: Props) => {
-    const { trip } = reservation;
-    const [showCancelWarning, setShowCancelWarning] = useState(false);
-    const [hideButton, setHideButton] = useState(false);
-    const [openCard, setOpenCard] = useState(false);
+  const { trip } = reservation;
+  const [showCancelWarning, setShowCancelWarning] = useState(false);
+  const [hideButton, setHideButton] = useState(false);
+  const [openCard, setOpenCard] = useState(false);
+  // Nueva: motivo obligatorio para cancelar
+  const [cancelReason, setCancelReason] = useState("");
+  const MIN_REASON_LEN = 40;
 
     const departure = DateTime.fromISO(trip.departure).setZone(trip.originalTimeZone);
     const arrival = DateTime.fromISO(trip.arrival).setZone(trip.originalTimeZone);
@@ -27,20 +29,27 @@ const ReservationCard = ({ reservation }: Props) => {
     const now = DateTime.utc();
     const departureDate = DateTime.fromISO(trip.departure, { zone: "utc" });
 
-    const canCancel = departureDate.diff(now, "hours").hours >= 24;
+    const hoursLeft = departureDate.diff(now, "hours").hours;
+    const canCancel = hoursLeft >= 24;
 
     const handleCancell = async () => {
-        const toastId = toast.loading("Cancelando reserva...");
-        try {
-            await cancellReservation(reservation.id);
-            toast.success("Reserva cancelada con éxito", { id: toastId });
-            setShowCancelWarning(false);
-            reservation.status = "CANCELLED"; // actualización temporal si no usás refetch
-        } catch (error) {
-            console.error(error);
-            toast.info("Error al cancelar la reserva", { id: toastId });
-        }
-    };
+      const reason = cancelReason.trim();
+      if (reason.length < MIN_REASON_LEN) {
+          toast.error(`Por favor, explica el motivo de la cancelación (mínimo ${MIN_REASON_LEN} caracteres).`);
+          return;
+      }
+      const toastId = toast.loading("Cancelando reserva.");
+      try {
+          await cancellReservation(reservation.id, reason);
+          toast.success("Reserva cancelada con éxito", { id: toastId });
+          setShowCancelWarning(false);
+          reservation.status = "CANCELLED"; // actualización temporal si no usás refetch
+          setCancelReason("");
+      } catch (error) {
+          console.error(error);
+          toast.info("Error al cancelar la reserva", { id: toastId });
+      }
+  };
 
     return (
         <div
@@ -119,7 +128,16 @@ const ReservationCard = ({ reservation }: Props) => {
                                 </div>
                             )}
 
-                            {reservation.status === "CANCELLED" && <p className="text-gray-500">Has cancelado esta reserva.</p>}
+                            {reservation.status === "CANCELLED" && (
+                                <div className="text-sm text-gray-700 space-y-1">
+                                    <p>Has cancelado esta reserva.</p>
+                                    {String(reservation.paymentMethod).toUpperCase() === "STRIPE" && (
+                                        <p className="text-gray-600">
+                                            Si pagaste con tarjeta, verás reflejado el reembolso en tu cuenta bancaria entre <strong>2 y 5 días hábiles</strong>.
+                                        </p>
+                                    )}
+                                </div>
+                            )}
                         </div>
 
                         {/* Estado del viaje */}
@@ -177,45 +195,79 @@ const ReservationCard = ({ reservation }: Props) => {
                                 <div className="flex flex-col gap-2 items-center">
                                     {canCancel ? (
                                         <AnimatePresence>
-                                            {!hideButton && (
-                                                <motion.button
-                                                    initial={{ opacity: 1 }}
-                                                    exit={{ opacity: 0, height: 0, marginTop: 0 }}
-                                                    transition={{ duration: 0.3 }}
-                                                    onClick={() => {
-                                                        setHideButton(true);
-                                                        setTimeout(() => setShowCancelWarning(true), 300);
-                                                    }}
-                                                    className="absolute top-0 left-0 max-w-52 text-gray-700 cursor-pointer font-medium rounded-lg text-sm flex items-center justify-center gap-2 transition"
-                                                >
-                                                    <XCircle className="size-4" />
-                                                    Cancelar reserva
-                                                </motion.button>
-                                            )}
+                                            <div className="w-full flex items-stretch justify-end gap-2">
+                                                {/* Textos: regla + horas */}
+                                                <div className="h-10 flex flex-col justify-center gap-0.5 text-xs text-custom-gray-500">
+                                                    <p>Puedes cancelar tu reserva hasta 24 horas antes del horario de salida.</p>
+                                                    <p>Horas hasta la salida: {Math.max(0, Math.floor(hoursLeft))}</p>
+                                                </div>
+                                                {!hideButton && (
+                                                    <motion.button
+                                                        key="cancel-btn"
+                                                        initial={{ opacity: 1 }}
+                                                        exit={{ opacity: 0, height: 0, marginTop: 0 }}
+                                                        transition={{ duration: 0.3 }}
+                                                        onClick={() => {
+                                                            setHideButton(true);
+                                                            setTimeout(() => setShowCancelWarning(true), 300);
+                                                        }}
+                                                        type="button"
+                                                        className="inline-flex items-center gap-2 px-4 py-2 h-10 rounded-lg border border-gray-300 text-gray-700 hover:bg-gray-100 transition font-medium text-sm shadow-sm"
+                                                    >
+                                                        <XCircle className="size-4" />
+                                                        Cancelar reserva
+                                                    </motion.button>
+                                                )}
+                                            </div>
                                         </AnimatePresence>
                                     ) : (
-                                        <p className="text-sm text-custom-gray-500 italic">
-                                            No se puede cancelar la reserva porque falta menos de 24 horas para el viaje.
-                                        </p>
+                                        <div className="text-sm text-custom-gray-500">
+                                            <p className="italic">No se puede cancelar la reserva porque falta menos de 24 horas para el viaje.</p>
+                                            <p className="text-xs mt-1">Solo puedes cancelar hasta 24 horas antes del horario de salida.</p>
+                                        </div>
                                     )}
+
+                                    {/* Horas ahora se muestra junto al texto de regla arriba */}
 
                                     <AnimatePresence>
                                         {showCancelWarning && (
                                             <motion.div
+                                                key="cancel-panel"
                                                 initial={{ opacity: 0, y: -10 }}
                                                 animate={{ opacity: 1, y: 0 }}
                                                 exit={{ opacity: 0, y: -10 }}
                                                 transition={{ duration: 0.3 }}
-                                                className="bg-[#f3f4f6] border border-gray-300 p-4 rounded-xl text-sm text-gray-700"
+                                                className="bg-[#f3f4f6] border border-gray-300 p-4 rounded-xl text-sm text-gray-700 w-full max-w-lg"
                                             >
-                                                <p className="mb-2">
-                                                    Al cancelar tu reserva podrías perder tu lugar. La disponibilidad es limitada y no garantizamos
-                                                    que queden plazas más adelante.
+                                                <p className="mb-3">
+                                                    Para continuar, cuéntanos el motivo de tu cancelación. Esta información nos ayuda a mejorar el servicio.
                                                 </p>
-                                                <div className="flex flex-col gap-2 mt-3">
+                                                <label className="block text-xs font-semibold text-gray-600 mb-1">
+                                                    Motivo de cancelación (mínimo 40 caracteres)
+                                                </label>
+                                                <textarea
+                                                    value={cancelReason}
+                                                    onChange={(e) => setCancelReason(e.target.value)}
+                                                    rows={4}
+                                                    className="w-full border border-gray-300 rounded-md p-2 text-sm bg-white focus:outline-none focus:ring-2 focus:ring-custom-golden-400"
+                                                    placeholder="Escribe aquí el motivo..."
+                                                />
+                                                <div className="flex items-center justify-between mt-1">
+                                                    <span className={`text-xs ${cancelReason.trim().length < 40 ? 'text-red-500' : 'text-green-600'}`}>
+                                                        {cancelReason.trim().length}/40
+                                                    </span>
+                                                    {cancelReason.trim().length < 40 && (
+                                                        <span className="text-xs text-red-500">Faltan {40 - cancelReason.trim().length} caracteres</span>
+                                                    )}
+                                                </div>
+                                                <p className="mt-3 text-xs text-gray-600">
+                                                    Al cancelar tu reserva podrías perder tu lugar. La disponibilidad es limitada y no garantizamos que queden plazas más adelante.
+                                                </p>
+                                                <div className="flex flex-col gap-2 mt-4">
                                                     <button
                                                         onClick={handleCancell}
-                                                        className="w-full bg-red-500 hover:bg-red-600 text-white text-sm font-semibold py-2 px-4 rounded-lg transition"
+                                                        disabled={cancelReason.trim().length < 40}
+                                                        className={`w-full text-white text-sm font-semibold py-2 px-4 rounded-lg transition ${cancelReason.trim().length < 40 ? 'bg-red-300 cursor-not-allowed' : 'bg-red-500 hover:bg-red-600 cursor-pointer'}`}
                                                     >
                                                         Confirmar cancelación
                                                     </button>
@@ -223,6 +275,7 @@ const ReservationCard = ({ reservation }: Props) => {
                                                         onClick={() => {
                                                             setShowCancelWarning(false);
                                                             setTimeout(() => setHideButton(false), 300);
+                                                            setCancelReason("");
                                                         }}
                                                         className="w-full bg-white border border-gray-300 hover:bg-gray-100 text-sm font-medium py-2 px-4 rounded-lg transition"
                                                     >

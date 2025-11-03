@@ -47,9 +47,12 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
     useEffect(() => {
         const fetchDiscounts = async () => {
             if (!session) return;
-            const res = await getDiscountByUserId();
-            if (res) {
-                setReferral(res?.id);
+            try {
+                const res = await getDiscountByUserId();
+                if (res) {
+                    setReferral(res.id);
+                }
+            } catch {
             }
         };
         fetchDiscounts();
@@ -62,11 +65,13 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
     };
 
     const handleBookingClick = () => {
-        if (!trip.priceDetails) {
+        // Solo pedimos login si no hay sesión
+        if (!session) {
             setShowModal(true);
-        } else {
-            router.push(`/purchase?id=${trip.id}&&referral=${referral}&&type=trip&&extraBags=${extraBags}`);
+            return;
         }
+        // Si hay sesión, continuamos aunque falte priceDetails (se recalcula en backend)
+        router.push(`/purchase?id=${trip.id}&&referral=${referral}&&type=trip&&extraBags=${extraBags}`);
     };
 
     const basePrice = trip.basePrice;
