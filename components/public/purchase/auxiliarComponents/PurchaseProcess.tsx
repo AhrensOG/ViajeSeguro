@@ -23,6 +23,7 @@ import { createVehicleBooking } from "@/lib/api/vehicle-booking";
 import { fetchVehicleOffer } from "@/lib/api/vehicleOffer";
 import { calculateTotalDays } from "@/lib/functions";
 import PurchaseVehicleSummary from "./PurchaseVehicleSummary";
+import TermsAndConditionsModal from "./TermsAndConditionsModal";
 
 const PurchaseProcess = () => {
     const searchParams = useSearchParams();
@@ -48,6 +49,8 @@ const PurchaseProcess = () => {
     const [error, setError] = useState<string | null>(null);
     const { data: session } = useSession();
     const [showCashModal, setShowCashModal] = useState(false);
+    const [showTermsModal, setShowTermsModal] = useState(false);
+    const [pendingAction, setPendingAction] = useState<"stripe" | "cash" | null>(null);
 
     useEffect(() => {
         const fetchTrip = async () => {
@@ -83,7 +86,9 @@ const PurchaseProcess = () => {
             router.push(`/auth/login?callbackUrl=${encoded}`);
             return;
         }
-        setShowCashModal(true);
+        // Requiere aceptación de T&C antes de abrir el modal de efectivo
+        setPendingAction("cash");
+        setShowTermsModal(true);
     };
 
     const confirmCashPayment = async () => {
@@ -315,7 +320,10 @@ const PurchaseProcess = () => {
                         badgeLabel="Recomendado"
                         buttonLabel={`Pagar ${price} €`}
                         secure
-                        onClick={handleStripeRedirect}
+                        onClick={() => {
+                            setPendingAction("stripe");
+                            setShowTermsModal(true);
+                        }}
                     />
 
                     {type === "trip" && (
@@ -372,6 +380,20 @@ const PurchaseProcess = () => {
             </div>
 
             <CashConfirmationModal show={showCashModal} onClose={() => setShowCashModal(false)} onConfirm={confirmCashPayment} />
+            <TermsAndConditionsModal
+                show={showTermsModal}
+                onClose={() => setShowTermsModal(false)}
+                onAccept={() => {
+                    setShowTermsModal(false);
+                    if (pendingAction === "stripe") {
+                        setPendingAction(null);
+                        void handleStripeRedirect();
+                    } else if (pendingAction === "cash") {
+                        setPendingAction(null);
+                        setShowCashModal(true);
+                    }
+                }}
+            />
         </main>
     );
 };

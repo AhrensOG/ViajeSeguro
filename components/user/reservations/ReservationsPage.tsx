@@ -63,12 +63,12 @@ const ReservationsPage = () => {
                             tu reserva podría ser cancelada. Esta medida busca garantizar la seguridad de todos los pasajeros.
                         </p>
                     </div>
-                    {reservations.map((reservation) => (
-                        <ReservationCard key={reservation.id} reservation={reservation} />
+                    {reservations.map((reservation, idx) => (
+                        <ReservationCard key={`res-${reservation.id || idx}`} reservation={reservation} />
                     ))}
-                    {vehicleBookings.map((vehicleBooking) => (
+                    {vehicleBookings.map((vehicleBooking, idx) => (
                         <ReservationVehicleCard 
-                            key={vehicleBooking.id} 
+                            key={`vb-${vehicleBooking.id || idx}`} 
                             vehicleBooking={vehicleBooking} 
                             onBookingUpdate={fetchReservations}
                         />

@@ -124,7 +124,7 @@ const ReservationPriceInfo = ({ reservation }: Props) => {
                 </li>
 
                 {priceDetails.discounts.map((discount, idx) => (
-                  <li key={idx} className="flex justify-between">
+                  <li key={`${discount.description || 'desc'}-${discount.amount}-${idx}`} className="flex justify-between">
                     <span>- {discount.description}</span>
                     <span className="text-red-600">– € {discount.amount.toFixed(2).replace(".", ",")}</span>
                   </li>

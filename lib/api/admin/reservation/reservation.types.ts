@@ -18,6 +18,7 @@ export interface ReservationResponse {
     discountId?: string;
     userId?: string;
     tripId?: string;
+    cancelReason?: string | null;
     user?: {
         id: string;
         name?: string;

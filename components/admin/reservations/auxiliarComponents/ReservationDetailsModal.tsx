@@ -70,6 +70,15 @@ const ReservationDetailModal = ({ reservation, onClose }: Props) => {
                         <p>{reservation.status}</p>
                     </div>
 
+                    {reservation.status === "CANCELLED" && (
+                        <div className="md:col-span-2 p-3 rounded-md border bg-yellow-50 border-yellow-200">
+                            <label className="block text-xs font-semibold text-yellow-700 mb-1">Motivo de cancelación</label>
+                            <p className="whitespace-pre-wrap break-words text-yellow-900/80">
+                                {reservation.cancelReason?.trim() || "Sin motivo proporcionado"}
+                            </p>
+                        </div>
+                    )}
+
                     <div className="bg-custom-white-50 p-3 rounded-md border border-custom-gray-200">
                         <label className="block text-xs font-semibold text-custom-gray-500 mb-1">Fecha de creación</label>
                         <p>{new Date(reservation.createdAt).toLocaleString("es-ES")}</p>
