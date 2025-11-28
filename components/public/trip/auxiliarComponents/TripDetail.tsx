@@ -65,9 +65,17 @@ const TripDetail = ({ trip }: TripDetailProps) => {
                 />
               </div>
             )}
-            <h3 className="text-xl font-medium text-custom-black-800">
-              {fullname ?? "Viaje Seguro"}
-            </h3>
+            <div>
+              <h3 className="text-xl font-medium text-custom-black-800">
+                {fullname ?? "Viaje Seguro"}
+              </h3>
+              <p className="text-sm text-custom-gray-600 mt-1">
+                <span className="font-medium">Organizador:</span> {fullname}
+              </p>
+              <p className="text-sm text-custom-gray-600">
+                <span className="font-medium">Conductor:</span> {trip.user.driverVerified ? fullname : "Aún no hay conductor asignado"}
+              </p>
+            </div>
           </div>
         </div>
 
@@ -83,6 +91,9 @@ const TripDetail = ({ trip }: TripDetailProps) => {
         <div className="mt-4 text-custom-gray-600">
           Viaje desde <span className="capitalize">{trip.origin}</span> hacia{" "}
           <span className="capitalize">{trip.destination}</span>
+        </div>
+        <div className="mt-1 text-custom-gray-600 text-sm">
+          <span className="font-medium">Lugar de salida:</span> {trip.originLocation}
         </div>
 
         <div className="mt-6 flex items-center gap-2 text-custom-gray-600 border-t border-custom-gray-300 pt-4">

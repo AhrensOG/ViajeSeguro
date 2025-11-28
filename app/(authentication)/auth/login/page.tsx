@@ -31,8 +31,14 @@ export const metadata: Metadata = {
   },
 };
 
+import { Suspense } from "react";
+
 const LogIn = () => {
-  return <LoginPage />;
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <LoginPage />
+    </Suspense>
+  );
 };
 
 export default LogIn;

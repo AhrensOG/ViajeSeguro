@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import { Mail, Lock, User, Eye, EyeOff } from "lucide-react";
+import { Mail, Lock, User, Eye, EyeOff, Phone as PhoneIcon } from "lucide-react";
 import { BACKEND_URL } from "@/lib/constants";
 import { toast } from "sonner";
 import { useRouter, useSearchParams } from "next/navigation";
@@ -10,6 +10,7 @@ type FormData = {
     name: string;
     lastName: string;
     email: string;
+    phone: string;
     password: string;
     role: string;
     confirmPassword: string;
@@ -32,6 +33,7 @@ const RegisterForm = () => {
     const ref = searchParams.get("ref");
     const callbackUrl = searchParams.get("callbackUrl") || "/";
     const referralCode = watch("referralCode");
+    const selectedRole = "PARTNER";
 
     const handleRef = () => {
         const finalRef = ref || referralCode;
@@ -47,8 +49,9 @@ const RegisterForm = () => {
                 name: data.name,
                 lastName: data.lastName,
                 email: data.email,
+                phone: data.phone,
                 password: data.password,
-                role: "CLIENT",
+                role: selectedRole as "PARTNER",
                 referralCodeFrom: data.referralCode || null,
             };
             const res = await fetch(BACKEND_URL + "/auth/register", {
@@ -139,6 +142,26 @@ const RegisterForm = () => {
                     />
                 </div>
                 {errors.email && <p className="text-red-500 text-sm pt-1">{errors.email.message}</p>}
+            </div>
+
+            <div>
+                <label htmlFor="phone" className="block text-sm font-medium text-custom-gray-600 mb-1">
+                    Número de teléfono
+                </label>
+                <div className="relative">
+                    <PhoneIcon className="absolute left-3 top-3 h-5 w-5 text-custom-gray-500" />
+                    <input
+                        id="phone"
+                        {...register("phone", {
+                            required: "El número de teléfono es obligatorio",
+                            minLength: { value: 6, message: "Número inválido" },
+                        })}
+                        type="tel"
+                        className="block w-full pl-10 pr-3 py-2 border border-custom-gray-300 rounded-md shadow-sm outline-none focus:ring-custom-golden-600 focus:border-custom-golden-600"
+                        placeholder="Ej: +34 600 000 000"
+                    />
+                </div>
+                {errors.phone && <p className="text-red-500 text-sm pt-1">{errors.phone.message}</p>}
             </div>
 
             <div>
@@ -237,6 +260,7 @@ const RegisterForm = () => {
                     type="button"
                     onClick={() => {
                         handleRef();
+                        // role is already stored via choose-role page and appended as query param
                         signIn("google", { callbackUrl });
                     }}
                     className="w-full flex justify-center py-2 px-4 rounded-md shadow-sm hover:shadow-md text-sm font-medium text-white duration-300 mt-3 gap-2 border border-custom-gray-300 hover:bg-custom-gray-100 cursor-pointer"

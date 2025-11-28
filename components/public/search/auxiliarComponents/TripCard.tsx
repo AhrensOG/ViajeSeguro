@@ -21,13 +21,14 @@ const TripCard = ({
 
   const [int, decimal] = trip.basePrice.toFixed(2).split(".");
   // 40% de descuento y luego IVA incluido si está configurado
-  const discountedPrice = +(trip.basePrice * 0.6).toFixed(2);
+  const isAdmin = trip.user.role === "ADMIN";
+  const discountedPrice = isAdmin ? +(trip.basePrice * 0.6).toFixed(2) : trip.basePrice;
   // Frontend: IVA fijo del 21% para mostrar precio final
   const ivaRate = 21;
   const discountedWithIva = +(discountedPrice * (1 + ivaRate / 100)).toFixed(2);
   const [dInt, dDec] = discountedWithIva.toFixed(2).split(".");
   return (
-    <div className="bg-white rounded-lg shadow-md border border-custom-gray-300 overflow-hidden">
+    <div className="relative z-0 bg-white rounded-lg shadow-md border border-custom-gray-300 overflow-hidden">
       <div className="p-4 flex flex-col md:flex-row justify-between gap-4">
         <div className="flex-1">
           <div className="flex items-center max-w-sm">
@@ -38,7 +39,7 @@ const TripCard = ({
               <div className="w-3 h-3 rounded-full border-2 border-custom-golden-600 bg-white" />
             </div>
             <div className="flex-1 relative">
-              <div className="h-1 bg-custom-golden-600 w-full absolute top-1/2 -translate-y-1/2" />
+              <div className="h-1 bg-custom-golden-600 w-full absolute top-1/2 -translate-y-1/2 z-0 pointer-events-none" />
               <div className="text-center text-xs text-custom-gray-600 relative bg-white inline-block px-2 left-1/2 -translate-x-1/2">
                 {duration}
               </div>
@@ -67,14 +68,18 @@ const TripCard = ({
               {localDate}
             </span>
             {/* Promotion label */}
-            <div className="text-sm md:text-base font-semibold text-custom-golden-700 mt-1">
-              Descuento promocional del 40 %
-            </div>
+            {isAdmin && (
+              <div className="text-sm md:text-base font-semibold text-custom-golden-700 mt-1">
+                Descuento promocional del 40 %
+              </div>
+            )}
             {/* Original price (struck-through) */}
-            <div className="text-base text-custom-gray-500 line-through">
-              {int}
-              <span className="align-top"> ,{decimal}</span> €
-            </div>
+            {isAdmin && (
+              <div className="text-base text-custom-gray-500 line-through">
+                {int}
+                <span className="align-top"> ,{decimal}</span> €
+              </div>
+            )}
             {/* Discounted price (40% off) with IVA included */}
             <div className="font-bold text-3xl text-custom-black-700">
               {dInt}

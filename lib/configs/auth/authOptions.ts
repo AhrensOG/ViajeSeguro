@@ -75,6 +75,7 @@ export const authOptions: NextAuthOptions = {
   callbacks: {
     async jwt({ token, user, account }) {
       const cookie = (await cookies()).get("referralCode")?.value;
+      const desiredRoleCookie = (await cookies()).get("desiredRole")?.value;
 
       if (account?.provider === "google") {
         let userData;
@@ -83,6 +84,7 @@ export const authOptions: NextAuthOptions = {
         const res = await loginGoogle({ email, password });
 
         if (res.status === 401) {
+          const role = desiredRoleCookie === "PARTNER" ? "PARTNER" : "CLIENT";
           const res = await fetch(BACKEND_URL + "/auth/register", {
             method: "POST",
             headers: {
@@ -94,7 +96,7 @@ export const authOptions: NextAuthOptions = {
               email: user.email,
               password: account.providerAccountId,
               googleId: user.id,
-              role: "CLIENT",
+              role,
               avatarUrl: user.image,
               referralCodeFrom: cookie,
             }),

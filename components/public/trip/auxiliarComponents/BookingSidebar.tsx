@@ -75,15 +75,45 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
     };
 
     const basePrice = trip.basePrice;
-    const finalPrice = trip.priceDetails?.finalPrice ?? basePrice;
-    const hasDiscounts = !!trip.priceDetails?.discounts?.length;
-    // Mostrar promoción del 40% aunque no haya sesión/discounts
-    const promoPrice = +(basePrice * 0.6).toFixed(2);
-    const displayFinalPrice = hasDiscounts ? finalPrice : promoPrice;
+    const isAdmin = trip.user.role === "ADMIN";
+
+    // Si es admin, forzamos el cálculo del descuento en frontend si no viene del backend
+    let finalPrice = trip.priceDetails?.finalPrice;
+    let discounts = trip.priceDetails?.discounts || [];
+
+    if (isAdmin) {
+        const adminDiscountAmount = +(basePrice * 0.4).toFixed(2);
+        // Si no hay priceDetails o el precio final es igual al base (no se aplicó descuento), lo aplicamos aquí
+        if (!finalPrice || finalPrice === basePrice) {
+            finalPrice = +(basePrice - adminDiscountAmount).toFixed(2);
+            // Asegurarnos de que el descuento esté en la lista para mostrarlo
+            if (!discounts.some(d => d.key === 'PREFERENCIAL')) {
+                discounts = [
+                    ...discounts,
+                    {
+                        key: 'PREFERENCIAL',
+                        description: 'Descuento Promocional',
+                        amount: adminDiscountAmount
+                    }
+                ];
+            }
+        }
+    } else {
+        // Si no es admin, el precio final es el base (o lo que diga el backend si hubiera otros descuentos)
+        finalPrice = finalPrice ?? basePrice;
+    }
+
+    const hasDiscounts = discounts.length > 0;
+    const displayFinalPrice = finalPrice;
     const extraCost = (extraBags || 0) * EXTRA_BAG_PRICE;
     const effectivePrice = displayFinalPrice + extraCost;
     const ivaAmount = (effectivePrice * IVA) / 100;
     const totalWithIVA = effectivePrice * (1 + IVA / 100);
+    // Datos opcionales: capacidad y conteo de pasajeros si el backend los provee en esta vista
+    const capacity: number | undefined = (trip as TripWithPriceDetails & { capacity?: number }).capacity;
+    const passengersCount: number = (trip as TripWithPriceDetails & { passengers?: unknown[]; passengerCount?: number }).passengers?.length ?? (trip as TripWithPriceDetails & { passengers?: unknown[]; passengerCount?: number }).passengerCount ?? 0;
+    const seatsAvailable = typeof capacity === "number" ? Math.max(capacity - passengersCount, 0) : undefined;
+
 
     return (
         <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }} className="space-y-4">
@@ -111,7 +141,9 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
                             <ChevronRight size={16} className="text-custom-gray-500" />
                         </div>
                         <div className="text-right">
-                            <div className="text-sm text-gray-500 line-through">{basePrice.toFixed(2).replace(".", ",")} €</div>
+                            {basePrice > displayFinalPrice && (
+                                <div className="text-sm text-gray-500 line-through">{basePrice.toFixed(2).replace(".", ",")} €</div>
+                            )}
                             <div className="text-xl font-semibold text-custom-black-800">{displayFinalPrice.toFixed(2).replace(".", ",")} €</div>
                         </div>
                     </div>
@@ -146,9 +178,11 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
                             <ChevronRight size={16} className="text-custom-gray-500" />
                         </div>
                         <div className="text-right">
-                            <div className="text-sm text-gray-500 line-through">
-                                {((basePrice + extraCost) * (1 + IVA / 100)).toFixed(2).replace(".", ",")} €
-                            </div>
+                            {basePrice > displayFinalPrice && (
+                                <div className="text-sm text-gray-500 line-through">
+                                    {((basePrice + extraCost) * (1 + IVA / 100)).toFixed(2).replace(".", ",")} €
+                                </div>
+                            )}
                             <div className="text-2xl font-bold text-custom-black-800">
                                 {totalWithIVA.toFixed(2).replace(".", ",")} €
                             </div>
@@ -175,7 +209,7 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
                                 className="overflow-hidden mt-3"
                             >
                                 <ul className="space-y-1">
-                                    {trip.priceDetails?.discounts.map((discount) => {
+                                    {discounts.map((discount) => {
                                         const label = DISCOUNT_LABELS[discount.key as DiscountKey] || discount.description;
 
                                         return (
@@ -192,6 +226,12 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
                         </div>
                     )}
                 </div>
+
+                {typeof seatsAvailable === "number" && (
+                    <div className="mt-3 text-sm text-custom-gray-700">
+                        <span className="font-medium">Asientos disponibles:</span> {seatsAvailable}
+                    </div>
+                )}
 
                 {/* Nota de equipaje incluido */}
                 <p className="mt-2 text-xs text-custom-gray-600">
