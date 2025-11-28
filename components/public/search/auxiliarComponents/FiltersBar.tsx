@@ -131,7 +131,14 @@ export default function FiltersBar() {
     sp.set("origin", data.origin);
     sp.set("destination", data.destination);
     sp.set("serviceType", data.serviceType);
-    sp.set("departure", data.departure.toISOString());
+    // Normaliza a mediodía local para evitar corrimiento de día (igual que el calendario)
+    const localMidday = new Date(
+      data.departure.getFullYear(),
+      data.departure.getMonth(),
+      data.departure.getDate(),
+      12, 0, 0, 0
+    );
+    sp.set("departure", localMidday.toISOString());
 
     router.replace(`${pathname}?${sp.toString()}`, { scroll: false });
   };

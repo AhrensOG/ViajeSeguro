@@ -17,12 +17,12 @@ export default function SearchSelectorWrapper() {
     const handleSearch = ({ origin, destination, serviceType, departure }: ClientSearchFormData) => {
         const userTimeZone = DateTime.local().zoneName;
         const selectedDate = DateTime.fromJSDate(departure).setZone(userTimeZone);
-        const now = DateTime.local().setZone(userTimeZone);
-
+        // Set to local midday to avoid UTC day shift
         const dateTimeWithTime = selectedDate.set({
-            hour: now.hour,
-            minute: now.minute,
-            second: now.second,
+            hour: 12,
+            minute: 0,
+            second: 0,
+            millisecond: 0,
         });
 
         const isoStringWithTZ = dateTimeWithTime.toISO();

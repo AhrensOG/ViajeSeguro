@@ -177,9 +177,8 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
 
   return (
     <header
-      className={`h-[60px] sticky top-0 bg-custom-white-100 z-50 w-full ${
-        shadow ? "shadow-sm" : ""
-      }`}>
+      className={`h-[60px] sticky top-0 bg-custom-white-100 z-50 w-full ${shadow ? "shadow-sm" : ""
+        }`}>
       <div className="w-full h-full px-6 py-3 flex items-center justify-between">
         <Link
           href="/"
@@ -216,9 +215,8 @@ const NavBar = ({ shadow = true }: { shadow?: boolean }) => {
               onClick={() => setIsUserMenuOpen((s) => !s)}>
               <User className="h-5 w-5" />
               <ChevronDown
-                className={`h-4 w-4 ${
-                  isUserMenuOpen ? "rotate-180" : ""
-                } transition duration-300`}
+                className={`h-4 w-4 ${isUserMenuOpen ? "rotate-180" : ""
+                  } transition duration-300`}
               />
             </button>
             <AnimatePresence>

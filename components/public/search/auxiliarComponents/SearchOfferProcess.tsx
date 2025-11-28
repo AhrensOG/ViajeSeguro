@@ -7,6 +7,7 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CardReservationVehicleOfferProps } from "@/lib/api/vehicleOffer/vehicleOffers.types";
 import TripCardFallback from "@/lib/client/components/fallbacks/shared/TripCardFallback";
+import RiderRequestCTA from "./RiderRequestCTA";
 
 export default function SearchOfferProcess() {
   const searchParams = useSearchParams();
@@ -124,6 +125,10 @@ export default function SearchOfferProcess() {
         </div>
 
         <section className="flex flex-col items-start gap-4 w-full lg:w-[60%] xl:w-[60rem]">
+          {/* CTA fija al nivel de los resultados */}
+          <div className="sticky top-0 z-10 w-full bg-custom-white-100/90 backdrop-blur supports-[backdrop-filter]:bg-custom-white-100/70 pt-2 pb-3">
+            <RiderRequestCTA />
+          </div>
           <div className="flex flex-col gap-2 w-full">
             <h1 className="text-custom-gray-800 text-2xl xl:text-4xl font-bold">
               Furgonetas disponibles en Valencia

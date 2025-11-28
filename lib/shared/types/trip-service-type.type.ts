@@ -14,6 +14,7 @@ export interface TripCardType {
     name: string;
     lastName: string;
     avatarUrl?: string;
+    role?: string;
   };
 }
 
@@ -40,6 +41,7 @@ export interface Trip {
     lastName: string;
     avatarUrl?: string;
     driverVerified: boolean;
+    role?: string;
   };
 }
 

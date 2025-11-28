@@ -31,8 +31,14 @@ export const metadata: Metadata = {
   },
 };
 
+import { Suspense } from "react";
+
 const Register = () => {
-  return <RegisterPage />;
+  return (
+    <Suspense fallback={<div>Cargando...</div>}>
+      <RegisterPage />
+    </Suspense>
+  );
 };
 
 export default Register;

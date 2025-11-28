@@ -7,7 +7,6 @@ import { motion } from "framer-motion";
 import RegisterForm from "./auxiliarComponents/register/RegisterForm";
 import { Suspense } from "react";
 import RegisterFormSkeleton from "./auxiliarComponents/register/RegisterFormSkeleton";
-
 const RegisterPage = () => {
     return (
         <div className="min-h-screen flex">
@@ -63,9 +62,9 @@ const RegisterPage = () => {
                                 transition={{ duration: 0.4 }}
                                 className="p-6"
                             >
-                              <Suspense fallback={<RegisterFormSkeleton/>}>
-                                <RegisterForm />
-                              </Suspense>
+                                <Suspense fallback={<RegisterFormSkeleton />}>
+                                    <RegisterForm />
+                                </Suspense>
                             </motion.div>
 
                             {/* Additional Info */}
