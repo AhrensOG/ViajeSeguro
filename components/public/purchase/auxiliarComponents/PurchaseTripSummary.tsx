@@ -19,8 +19,8 @@ type Props = {
     extraBags?: number;
     pricePerBag?: number;
 } & ClientTripRouteCompactType & {
-        priceDetails?: PriceDetails | null;
-    };
+    priceDetails?: PriceDetails | null;
+};
 
 const PurchaseTripSummary = ({
     dateLabel,
@@ -38,7 +38,7 @@ const PurchaseTripSummary = ({
     pricePerBag = 5,
 }: Props) => {
     const [showDetails, setShowDetails] = useState(false);
-    const IVA_RATE = Number(process.env.NEXT_PUBLIC_IVA || 21) / 100;
+    const IVA_RATE = 0.21;
 
     const hasDiscounts = priceDetails && priceDetails.discounts.length > 0;
     const extras = (extraBags || 0) * (pricePerBag || 5);
