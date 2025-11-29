@@ -39,7 +39,7 @@ const PurchaseProcess = () => {
     const extrasOnly = searchParams.get("extrasOnly") === "1";
     const reservationId = searchParams.get("reservationId");
 
-    const IVA = process.env.NEXT_PUBLIC_IVA || 0;
+    const IVA = 21;
     const referralId = searchParams.get("referral");
     const id = searchParams.get("id");
 
@@ -276,7 +276,33 @@ const PurchaseProcess = () => {
         if (extrasOnly) {
             price = ((extraAmount) * (1 + Number(IVA) / 100)).toFixed(2).replace(".", ",");
         } else {
-            price = priceFormatted(trip.priceDetails?.finalPrice, trip.basePrice, Number(IVA), extraAmount);
+            const isAdmin = trip.user?.role === "ADMIN";
+            let finalPrice = trip.priceDetails?.finalPrice;
+
+            if (isAdmin) {
+                const adminDiscountAmount = +(trip.basePrice * 0.4).toFixed(2);
+                if (!finalPrice || finalPrice === trip.basePrice) {
+                    finalPrice = +(trip.basePrice - adminDiscountAmount).toFixed(2);
+                    // Inject discount into priceDetails for summary
+                    if (!trip.priceDetails) {
+                        trip.priceDetails = {
+                            basePrice: trip.basePrice,
+                            finalPrice: finalPrice,
+                            discounts: []
+                        };
+                    }
+                    if (!trip.priceDetails.discounts.some(d => d.key === 'PREFERENCIAL')) {
+                        trip.priceDetails.discounts.push({
+                            key: 'PREFERENCIAL',
+                            description: 'Descuento Promocional',
+                            amount: adminDiscountAmount
+                        });
+                    }
+                    trip.priceDetails.finalPrice = finalPrice;
+                }
+            }
+
+            price = priceFormatted(finalPrice, trip.basePrice, Number(IVA), extraAmount);
         }
     } else if (vehicleOffer?.pricePerDay !== undefined && (start || vehicleOffer.availableFrom) && (end || vehicleOffer.availableTo)) {
         const totalDays = calculateTotalDays(start || vehicleOffer.availableFrom, end || vehicleOffer.availableTo);
@@ -365,7 +391,7 @@ const PurchaseProcess = () => {
                             priceDetails={trip.priceDetails}
                             extraBags={extraBags}
                             pricePerBag={EXTRA_BAG_PRICE}
-                            // title={isVehicle ? "Resumen de tu reserva" : "Resumen de tu viaje"}
+                        // title={isVehicle ? "Resumen de tu reserva" : "Resumen de tu viaje"}
                         />
                     )}
                     {vehicleOffer && (
