@@ -4,6 +4,8 @@ import "./globals.css";
 import Providers from "@/components/public/Providers";
 import { Toaster } from "sonner";
 import CookiesModal from "@/components/public/cookies/CookiesModal";
+import GlobalRestrictionWarning from "@/components/common/GlobalRestrictionWarning";
+import GlobalBanGuard from "@/components/common/GlobalBanGuard";
 
 const montserrat = Montserrat({
   subsets: ["latin"],
@@ -24,7 +26,11 @@ export default function RootLayout({
     <html lang="es">
       <body className={`${montserrat.className} antialiased`}>
         <Toaster position="bottom-right" richColors />
-        <Providers>{children}</Providers>
+        <Providers>
+          <GlobalBanGuard />
+          <GlobalRestrictionWarning />
+          {children}
+        </Providers>
         <CookiesModal />
       </body>
     </html>

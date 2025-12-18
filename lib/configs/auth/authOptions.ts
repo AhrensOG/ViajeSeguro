@@ -51,8 +51,12 @@ export const authOptions: NextAuthOptions = {
           body: JSON.stringify({ email, password }),
         });
 
-        if (res.status === 401) {
-          return null;
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => null);
+          if (errorData && typeof errorData === 'object') {
+            throw new Error(JSON.stringify(errorData));
+          }
+          throw new Error("Authentication failed");
         }
 
         const user = await res.json();
@@ -110,14 +114,21 @@ export const authOptions: NextAuthOptions = {
             return { ...token, ...userData };
           }
         }
-        userData = await res.json();
+        if (!res.ok) {
+          const errorData = await res.json().catch(() => null);
+          if (errorData && typeof errorData === 'object') {
+            throw new Error(JSON.stringify(errorData));
+          }
+          throw new Error("Google Authentication failed");
+        }
 
+        userData = await res.json();
         return { ...token, ...userData };
       }
 
       if (user) return { ...token, ...user };
       // Si no existen tokens del backend en el JWT, devolver token tal cual
-      type BackendTokens = { expiresIn?: number; refreshToken?: string; [k: string]: unknown };
+      type BackendTokens = { expiresIn?: number; refreshToken?: string;[k: string]: unknown };
       type TokenShape = JWT & { backendTokens?: BackendTokens };
       const bt = (token as TokenShape).backendTokens;
       if (!bt) return token;
@@ -136,7 +147,7 @@ export const authOptions: NextAuthOptions = {
     },
 
     async session({ session, token }) {
-      type BackendTokens = { expiresIn?: number; refreshToken?: string; [k: string]: unknown };
+      type BackendTokens = { expiresIn?: number; refreshToken?: string;[k: string]: unknown };
       type TokenUser = {
         id: string;
         email: string;

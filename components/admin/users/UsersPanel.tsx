@@ -1,13 +1,14 @@
-import { deleteUser, fetchUsersData } from "@/lib/api/admin/user-panel";
+import { fetchUsersData, restoreUser } from "@/lib/api/admin/user-panel";
 import { SimpleUser, UserAdminResponse, UserResponse } from "@/lib/api/admin/user-panel/userPanel.types";
-import { useEffect, useState } from "react";
-import { Pencil, Trash2, Plus, Search } from "lucide-react";
+import { useCallback, useEffect, useState } from "react";
+import { Pencil, Trash2, Plus, Search, RotateCcw } from "lucide-react";
 import SkeletonTable from "../SkeletonTable";
 import UserCreateModal from "@/components/admin/users/auxiliarComponents/UserCreateModal";
 import UserEditModal from "@/components/admin/users/auxiliarComponents/UserEditModal";
 import UserDetailModal from "@/components/admin/users/auxiliarComponents/UserDetailModal";
+import UserBanModal from "@/components/admin/users/auxiliarComponents/UserBanModal";
 import { toast } from "sonner";
-import DeleteToast from "../DeleteToast";
+// import DeleteToast from "../DeleteToast"; // Replaced by Modal
 
 export default function UsersPanel() {
     const [users, setUsers] = useState<SimpleUser[]>([]);
@@ -18,6 +19,8 @@ export default function UsersPanel() {
     const [createModalIsOpen, setCreateModalIsOpen] = useState(false);
     const [editModalIsOpen, setEditModalIsOpen] = useState(false);
     const [viewModalIsOpen, setViewModalIsOpen] = useState(false);
+    const [banModalIsOpen, setBanModalIsOpen] = useState(false);
+    const [showBanned, setShowBanned] = useState(false);
 
     const formatDate = (dateString?: string) => {
         if (!dateString) return "-";
@@ -29,37 +32,41 @@ export default function UsersPanel() {
         return `${dd}/${mm}/${yyyy}`;
     };
 
-    useEffect(() => {
-        const fetchUsers = async () => {
-            try {
-                const res = await fetchUsersData();
-                if (!Array.isArray(res)) {
-                    throw new Error("La respuesta del backend no es un array de usuarios");
-                }
-                const usersResponse = res as unknown as UserResponse[];
-                const mappedUsers = usersResponse.map(
-                    (user): SimpleUser => ({
-                        id: user.id,
-                        email: user.email ?? "",
-                        avatarUrl: user.avatarUrl ?? "",
-                        lastName: user.lastName ?? "",
-                        name: user.name ?? "",
-                        role: user.role ?? "CLIENT",
-                        createdAt: user.createdAt ?? "",
-                        updatedAt: user.updatedAt ?? "",
-                        emailVerified: user.emailVerified ?? false,
-                    })
-                );
-                setUsers(mappedUsers);
-            } catch (error) {
-                console.error("Error al cargar usuarios:", error);
-            } finally {
-                setLoading(false);
+    const fetchUsers = useCallback(async () => {
+        setLoading(true);
+        try {
+            const res = await fetchUsersData(showBanned);
+            if (!Array.isArray(res)) {
+                throw new Error("La respuesta del backend no es un array de usuarios");
             }
-        };
+            const usersResponse = res as unknown as UserResponse[];
+            const mappedUsers = usersResponse.map(
+                (user): SimpleUser => ({
+                    id: user.id,
+                    email: user.email ?? "",
+                    avatarUrl: user.avatarUrl ?? "",
+                    lastName: user.lastName ?? "",
+                    name: user.name ?? "",
+                    role: user.role ?? "CLIENT",
+                    createdAt: user.createdAt ?? "",
+                    updatedAt: user.updatedAt ?? "",
+                    emailVerified: user.emailVerified ?? false,
+                    resetToken: user.resetToken,
+                    resetTokenExpires: user.resetTokenExpires,
+                    driverLicenseUrl: user.driverLicenseUrl,
+                })
+            );
+            setUsers(mappedUsers);
+        } catch (error) {
+            console.error("Error al cargar usuarios:", error);
+        } finally {
+            setLoading(false);
+        }
+    }, [showBanned]);
 
+    useEffect(() => {
         fetchUsers();
-    }, []);
+    }, [fetchUsers]);
 
     const filteredUsers = users.filter((user) => {
         const matchesSearch =
@@ -90,14 +97,31 @@ export default function UsersPanel() {
         setUsers((prevUsers) => prevUsers.map((user) => (user.id === updatedUser.id ? { ...user, ...updatedUser } : user)));
     };
 
+    const handleDeleteSuccess = (id: string) => {
+        setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+        setSelectedUser(null);
+    };
+
+    /* Old handleDelete - kept for reference or if we revert to direct delete
     const handleDelete = async (id: string): Promise<void> => {
         try {
             await deleteUser(id ?? "");
             setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
             setSelectedUser(null);
-            toast.success("Usuario eliminado exitosamente");
+            toast.success("Usuario baneado exitosamente");
         } catch {
-            toast.info("Error al eliminar el usuario");
+            toast.info("Error al banear el usuario");
+        }
+    };
+    */
+
+    const handleRestore = async (id: string): Promise<void> => {
+        try {
+            await restoreUser(id);
+            setUsers((prevUsers) => prevUsers.filter((user) => user.id !== id));
+            toast.success("Usuario desbaneado exitosamente");
+        } catch {
+            toast.error("Error al desbanear el usuario");
         }
     };
 
@@ -135,6 +159,15 @@ export default function UsersPanel() {
                 >
                     <Plus className="h-4 w-4" /> Crear nuevo
                 </button>
+                <button
+                    onClick={() => setShowBanned(!showBanned)}
+                    className={`cursor-pointer flex items-center gap-2 font-semibold px-4 py-2 rounded-md shadow-sm border ${showBanned
+                        ? "bg-red-100 text-red-700 border-red-200 hover:bg-red-200"
+                        : "bg-white text-gray-700 border-gray-300 hover:bg-gray-50"
+                        }`}
+                >
+                    {showBanned ? "Ver Usuarios Activos" : "Ver Baneados"}
+                </button>
             </div>
 
             {loading ? (
@@ -155,9 +188,8 @@ export default function UsersPanel() {
                             {filteredAndSortedUsers.map((user, index) => (
                                 <tr
                                     key={index}
-                                    className={`${
-                                        index % 2 === 0 ? "bg-custom-white-50" : "bg-custom-gray-100"
-                                    } cursor-pointer hover:bg-custom-golden-100 transition`}
+                                    className={`${index % 2 === 0 ? "bg-custom-white-50" : "bg-custom-gray-100"
+                                        } cursor-pointer hover:bg-custom-golden-100 transition`}
                                     onClick={() => handleViewUser(user)}
                                 >
                                     <td className="px-4 py-2 font-medium border-b border-r border-custom-gray-200">
@@ -181,13 +213,27 @@ export default function UsersPanel() {
                                             onClick={(e) => {
                                                 e.stopPropagation();
                                                 setSelectedUser(user);
-                                                DeleteToast(user.id as string, handleDelete);
+                                                setBanModalIsOpen(true);
+                                                // DeleteToast(user.id as string, handleDelete);
                                             }}
                                             className="cursor-pointer text-red-500 hover:text-red-700"
                                             aria-label="Eliminar"
                                         >
                                             <Trash2 className="h-4 w-4 inline-block" />
                                         </button>
+                                        {showBanned && (
+                                            <button
+                                                onClick={(e) => {
+                                                    e.stopPropagation();
+                                                    handleRestore(user.id as string);
+                                                }}
+                                                className="cursor-pointer text-green-600 hover:text-green-800"
+                                                aria-label="Desbanear"
+                                                title="Desbanear usuario"
+                                            >
+                                                <RotateCcw className="h-4 w-4 inline-block" />
+                                            </button>
+                                        )}
                                     </td>
                                 </tr>
                             ))}
@@ -200,6 +246,13 @@ export default function UsersPanel() {
                 <UserEditModal user={selectedUser as UserAdminResponse} onClose={() => setEditModalIsOpen(false)} onUpdateUser={handleUpdateUser} />
             )}
             {viewModalIsOpen && <UserDetailModal user={selectedUser as UserAdminResponse} onClose={() => setViewModalIsOpen(false)} />}
+            {banModalIsOpen && selectedUser && (
+                <UserBanModal
+                    user={selectedUser}
+                    onClose={() => setBanModalIsOpen(false)}
+                    onSuccess={handleDeleteSuccess}
+                />
+            )}
         </div>
     );
 }

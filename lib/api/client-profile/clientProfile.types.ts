@@ -13,6 +13,7 @@ export interface UserProfile {
             lastName: string;
         };
     }[];
+    driverLicenseUrl?: string;
 }
 
 export interface ChangePasswordFormValues {

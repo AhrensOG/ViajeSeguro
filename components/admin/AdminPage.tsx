@@ -10,6 +10,7 @@ import VehiclesPanel from "./vehicles/VehiclesPanel";
 import CitiesPanel from "./cities/CitiesPanel";
 import VehicleOfferPanel from "./vehicle-offer/VehicleOfferPanel";
 import VehicleBookingPanel from "./vehicle-booking/VehicleBookingPanel";
+import StatisticsPanel from "./stats/StatisticsPanel";
 
 export default function AdminPage() {
     const router = useRouter();
@@ -34,6 +35,8 @@ export default function AdminPage() {
                 return <VehicleOfferPanel />;
             case "reservas-furgonetas":
                 return <VehicleBookingPanel />;
+            case "estadísticas":
+                return <StatisticsPanel />;
             default:
                 return <div className="p-6">Sección no encontrada.</div>;
         }

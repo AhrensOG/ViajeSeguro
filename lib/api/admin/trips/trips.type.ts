@@ -64,7 +64,9 @@ export interface Passengers {
         name: string;
         lastName: string;
         email: string;
+        phone?: string;
     };
+    cancelReason?: string | null;
     qr?: {
         id: string;
         imageUrl: string;
@@ -93,7 +95,9 @@ export interface TripReservation {
         email: string;
         name: string;
         lastName: string;
+        phone?: string;
     };
+    cancelReason?: string | null;
 }
 
 export interface CreateTripRequest {

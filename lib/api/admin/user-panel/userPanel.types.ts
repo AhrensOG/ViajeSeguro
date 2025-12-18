@@ -8,6 +8,9 @@ export interface SimpleUser {
     emailVerified?: boolean;
     createdAt?: string;
     updatedAt?: string;
+    resetToken?: string;
+    resetTokenExpires?: string; // or Date
+    driverLicenseUrl?: string;
 }
 
 export interface UserResponse {
@@ -20,6 +23,9 @@ export interface UserResponse {
     createdAt: string;
     updatedAt: string;
     emailVerified: boolean;
+    resetToken?: string;
+    resetTokenExpires?: string;
+    driverLicenseUrl?: string;
 }
 
 export interface UserAdminResponse {
@@ -35,6 +41,9 @@ export interface UserAdminResponse {
     referralCode: string;
     createdAt: string;
     updatedAt: string;
+    resetToken?: string;
+    resetTokenExpires?: string;
+    driverLicenseUrl?: string;
 }
 
 export interface UserFormData {
@@ -49,4 +58,5 @@ export interface UserEditFormData {
     name: string;
     lastName: string;
     role: "CLIENT" | "DRIVER" | "ADMIN";
+    driverLicenseUrl?: string;
 }
