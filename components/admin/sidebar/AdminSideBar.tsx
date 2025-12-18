@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Coins, FileText, Users, CalendarDays, LogOut, Home, Car, Truck, MapPin } from "lucide-react";
+import { Coins, FileText, Users, CalendarDays, LogOut, Home, Car, Truck, MapPin, BarChart3 } from "lucide-react";
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
@@ -16,6 +16,7 @@ const menuItems = [
     { name: "Vehiculos", icon: <Car size={20} /> },
     { name: "Ofertas Furgonetas", icon: <Truck size={20} /> },
     { name: "Reservas Furgonetas", icon: <CalendarDays size={20} /> },
+    { name: "Estadísticas", icon: <BarChart3 size={20} /> },
 ];
 
 const AdminSideBar = ({ onSelect }: { onSelect: (itemName: string) => void }) => {
@@ -52,9 +53,8 @@ const AdminSideBar = ({ onSelect }: { onSelect: (itemName: string) => void }) =>
                     {menuItems.map((item, index) => (
                         <motion.button
                             key={item.name}
-                            className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer hover:bg-custom-golden-100 transition-all duration-200 group focus:outline-none ${
-                                item.isHome ? "mb-2 mt-1" : ""
-                            }`}
+                            className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer hover:bg-custom-golden-100 transition-all duration-200 group focus:outline-none ${item.isHome ? "mb-2 mt-1" : ""
+                                }`}
                             initial={{ opacity: 0, x: -20 }}
                             animate={{ opacity: 1, x: 0 }}
                             transition={{ delay: index * 0.05 }}
@@ -71,9 +71,8 @@ const AdminSideBar = ({ onSelect }: { onSelect: (itemName: string) => void }) =>
                         >
                             <span className="text-custom-golden-600">{item.icon}</span>
                             <motion.span
-                                className={`text-sm text-custom-black-800 whitespace-nowrap font-medium transition-all duration-200 group-hover:text-custom-golden-600 ${
-                                    !isOpen ? "opacity-0 w-0" : "opacity-100 w-auto"
-                                }`}
+                                className={`text-sm text-custom-black-800 whitespace-nowrap font-medium transition-all duration-200 group-hover:text-custom-golden-600 ${!isOpen ? "opacity-0 w-0" : "opacity-100 w-auto"
+                                    }`}
                                 aria-hidden={!isOpen}
                             >
                                 {item.name}
@@ -95,9 +94,8 @@ const AdminSideBar = ({ onSelect }: { onSelect: (itemName: string) => void }) =>
                             <LogOut size={20} />
                         </span>
                         <motion.span
-                            className={`text-sm text-custom-black-800 whitespace-nowrap font-medium transition-all duration-200 group-hover:text-custom-golden-600 ${
-                                !isOpen ? "opacity-0 w-0" : "opacity-100 w-auto"
-                            }`}
+                            className={`text-sm text-custom-black-800 whitespace-nowrap font-medium transition-all duration-200 group-hover:text-custom-golden-600 ${!isOpen ? "opacity-0 w-0" : "opacity-100 w-auto"
+                                }`}
                             aria-hidden={!isOpen}
                         >
                             Cerrar Sesión

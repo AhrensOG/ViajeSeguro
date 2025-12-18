@@ -15,6 +15,8 @@ interface FormData {
     password: string;
 }
 
+import BanTimerModal from "@/components/common/BanTimerModal";
+
 const LogInForm = () => {
     const {
         register,
@@ -23,6 +25,8 @@ const LogInForm = () => {
     } = useForm<FormData>();
 
     const [showPassword, setShowPassword] = useState(false);
+    const [bannedUntil, setBannedUntil] = useState<Date | null>(null);
+    const [isPermanent, setIsPermanent] = useState(false);
     const router = useRouter();
     const searchParams = useSearchParams();
     const callbackUrl = searchParams.get("callbackUrl") || "/";
@@ -44,7 +48,31 @@ const LogInForm = () => {
                 toast.success("¡Inicio de sesión exitoso!", { id: toastId });
                 return router.push(callbackUrl);
             }
-            toast.warning("Credenciales incorrectas. Intente nuevamente.", {
+
+            // Try to parse error as JSON to see if it's a ban
+            // NextAuth often returns errors as strings. 
+            // We'll rely on our backend throwing a JSON string or specific message.
+            if (res?.error) {
+                try {
+                    // Check if error is a JSON string (our strategy)
+                    const errorObj = JSON.parse(res.error);
+                    if (errorObj.bannedUntil) {
+                        toast.dismiss(toastId);
+                        setBannedUntil(new Date(errorObj.bannedUntil));
+                        return;
+                    }
+                    if (errorObj.permanent) {
+                        toast.dismiss(toastId);
+                        setIsPermanent(true);
+                        setBannedUntil(new Date()); // Hack to trigger modal, or change modal logic
+                        return;
+                    }
+                } catch {
+                    // Not JSON, continue
+                }
+            }
+
+            toast.warning("Credenciales incorrectas o cuenta suspendida.", {
                 id: toastId,
             });
         } catch (error) {
@@ -73,9 +101,8 @@ const LogInForm = () => {
                                 message: "Formato de email inválido",
                             },
                         })}
-                        className={`block w-full pl-10 pr-3 py-2 border ${
-                            errors.email ? "border-red-500" : "border-custom-gray-300"
-                        } rounded-md shadow-sm outline-none focus:ring-custom-golden-600 focus:border-custom-golden-600`}
+                        className={`block w-full pl-10 pr-3 py-2 border ${errors.email ? "border-red-500" : "border-custom-gray-300"
+                            } rounded-md shadow-sm outline-none focus:ring-custom-golden-600 focus:border-custom-golden-600`}
                         placeholder="tu@email.com"
                     />
                 </div>
@@ -98,9 +125,8 @@ const LogInForm = () => {
                                 message: "Mínimo 6 caracteres",
                             },
                         })}
-                        className={`block w-full pl-10 pr-10 py-2 border ${
-                            errors.password ? "border-red-500" : "border-custom-gray-300"
-                        } rounded-md shadow-sm outline-none focus:ring-custom-golden-600 focus:border-custom-golden-600`}
+                        className={`block w-full pl-10 pr-10 py-2 border ${errors.password ? "border-red-500" : "border-custom-gray-300"
+                            } rounded-md shadow-sm outline-none focus:ring-custom-golden-600 focus:border-custom-golden-600`}
                         placeholder="••••••••"
                     />
                     <button type="button" className="absolute right-3 top-2.5" onClick={() => setShowPassword(!showPassword)}>
@@ -134,6 +160,16 @@ const LogInForm = () => {
                     <span className="text-custom-gray-800">Iniciar Sesion con Google</span>
                 </button>
             </div>
+            {(bannedUntil || isPermanent) && (
+                <BanTimerModal
+                    bannedUntil={bannedUntil || new Date()}
+                    isPermanent={isPermanent}
+                    onClose={() => {
+                        setBannedUntil(null);
+                        setIsPermanent(false);
+                    }}
+                />
+            )}
         </form>
     );
 };

@@ -36,7 +36,9 @@ export interface TripDetailsResponse {
     userId: string;
     fullName: string; // nombre + apellido
     email: string;
+    phone?: string;
     status: "PENDING" | "CONFIRMED" | "CANCELLED";
+    cancelReason?: string | null;
     paymentMethod: "CASH" | "CARD" | string;
     qr: {
       id: string;

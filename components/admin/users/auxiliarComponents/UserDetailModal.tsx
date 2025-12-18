@@ -3,6 +3,8 @@
 import React, { useEffect } from "react";
 import { X } from "lucide-react";
 import { UserAdminResponse } from "@/lib/api/admin/user-panel/userPanel.types";
+import BanTimer from "@/components/common/BanTimer";
+import RestrictionTimer from "@/components/common/RestrictionTimer";
 
 interface Props {
     user: UserAdminResponse;
@@ -61,6 +63,51 @@ const UserDetailModal = ({ user, onClose }: Props) => {
                         <label className="block text-xs font-semibold text-custom-gray-500 mb-1">Actualizado</label>
                         <p>{new Date(user.updatedAt).toLocaleString()}</p>
                     </div>
+
+                    {/* Ban Timer */}
+                    {user.resetToken && user.resetToken.startsWith('BANNED:') && user.resetTokenExpires && (
+                        <div className="mt-4">
+                            <label className="block text-xs font-semibold text-red-500 mb-1">Estado: Baneado</label>
+                            <BanTimer bannedUntil={new Date(user.resetTokenExpires)} />
+                        </div>
+                    )}
+
+                    {/* Restriction Timer */}
+                    {user.driverLicenseUrl && user.driverLicenseUrl.startsWith('RESTRICTED') && (
+                        <div className="mt-4">
+                            <label className="block text-xs font-semibold text-yellow-600 mb-1">Estado: Restringido</label>
+                            <div className="bg-yellow-50 p-3 rounded-md border border-yellow-200 mb-2">
+                                <label className="block text-xs font-semibold text-yellow-700 mb-1">Restricción finaliza el</label>
+                                <p className="text-yellow-900 font-medium">
+                                    {(() => {
+                                        let date: Date | null = null;
+                                        if (user.driverLicenseUrl?.startsWith('RESTRICTED|')) {
+                                            date = new Date(user.driverLicenseUrl.split('|')[1]);
+                                        } else if (user.driverLicenseUrl?.startsWith('RESTRICTED:')) {
+                                            // Legacy format support: RESTRICTED:YYYY-MM-DDTHH:mm:ss.sssZ:ROLE
+                                            const parts = user.driverLicenseUrl.split(':');
+                                            // Join parts between "RESTRICTED" and "ROLE"
+                                            const dateStr = parts.slice(1, parts.length - 1).join(':');
+                                            date = new Date(dateStr);
+                                        }
+
+                                        return date && !isNaN(date.getTime()) ? date.toLocaleString() : 'Fecha inválida';
+                                    })()}
+                                </p>
+                            </div>
+                            <RestrictionTimer restrictedUntil={(() => {
+                                let date: Date | null = null;
+                                if (user.driverLicenseUrl?.startsWith('RESTRICTED|')) {
+                                    date = new Date(user.driverLicenseUrl.split('|')[1]);
+                                } else if (user.driverLicenseUrl?.startsWith('RESTRICTED:')) {
+                                    const parts = user.driverLicenseUrl.split(':');
+                                    const dateStr = parts.slice(1, parts.length - 1).join(':');
+                                    date = new Date(dateStr);
+                                }
+                                return date && !isNaN(date.getTime()) ? date : new Date();
+                            })()} />
+                        </div>
+                    )}
                 </div>
             </div>
         </div>

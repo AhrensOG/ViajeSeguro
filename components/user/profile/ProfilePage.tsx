@@ -10,11 +10,13 @@ import { fetchUserData, updateProfile } from "../../../lib/api/client-profile";
 import { UserProfile } from "@/lib/api/client-profile/clientProfile.types";
 import { ClipboardCopyIcon } from "lucide-react";
 import { BASE_URL } from "@/lib/constants";
+import RestrictionTimer from "@/components/common/RestrictionTimer";
 
 const ProfilePage = () => {
     const [isOpen, setIsOpen] = useState(false);
     const { data: session, status } = useSession();
     const [isLoading, setIsLoading] = useState(true);
+    const [restrictionDate, setRestrictionDate] = useState<Date | null>(null);
 
     const {
         register,
@@ -59,6 +61,24 @@ const ProfilePage = () => {
                         setReferredCount(res.referredCount);
                     }
 
+                    // Check for restriction
+                    if (res.driverLicenseUrl && res.driverLicenseUrl.startsWith("RESTRICTED")) {
+                        let date: Date | null = null;
+
+                        if (res.driverLicenseUrl.startsWith("RESTRICTED|")) {
+                            date = new Date(res.driverLicenseUrl.split("|")[1]);
+                        } else {
+                            // Legacy: RESTRICTED:Date:Role
+                            const parts = res.driverLicenseUrl.split(':');
+                            const dateStr = parts.slice(1, parts.length - 1).join(':');
+                            date = new Date(dateStr);
+                        }
+
+                        if (date && !isNaN(date.getTime()) && date > new Date()) {
+                            setRestrictionDate(date);
+                        }
+                    }
+
                     if (res.referralsTo?.length) {
                         const ref = res.referralsTo[0].referrer;
                         setValue("referredByName", `${ref.name} ${ref.lastName}`);
@@ -92,6 +112,7 @@ const ProfilePage = () => {
 
     return (
         <div className="w-full flex flex-col items-center px-0 md:px-6 my-4 pb-10 bg-white">
+            {restrictionDate && <RestrictionTimer restrictedUntil={restrictionDate} />}
             {/* Referral section */}
             <div className="w-full mb-4">
                 <ReferralCard
@@ -211,9 +232,8 @@ const ProfilePage = () => {
                 <button
                     type="submit"
                     disabled={isSubmitting}
-                    className={`mt-4 w-full py-3 rounded-sm font-semibold bg-orange-500 hover:bg-orange-600 text-white shadow-sm transition duration-200 ${
-                        isSubmitting ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
+                    className={`mt-4 w-full py-3 rounded-sm font-semibold bg-orange-500 hover:bg-orange-600 text-white shadow-sm transition duration-200 ${isSubmitting ? "opacity-50 cursor-not-allowed" : ""
+                        }`}
                 >
                     Guardar Cambios
                 </button>

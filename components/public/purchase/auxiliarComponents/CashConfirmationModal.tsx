@@ -33,10 +33,27 @@ const CashConfirmationModal = ({ show, onClose, onConfirm }: Props) => {
             </h2>
             <p className="text-sm text-gray-600 mb-4">
               Al elegir este método de pago, tu plaza será reservada
-              temporalmente. Es obligatorio pagar el importe exacto al conductor
-              el día del viaje. En caso contrario, la reserva será cancelada
-              automáticamente.
+              temporalmente.
             </p>
+
+            <div className="bg-yellow-50 border-l-4 border-yellow-400 p-4 mb-4">
+              <div className="flex">
+                <div className="flex-shrink-0">
+                  {/* Warning Icon */}
+                  <svg className="h-5 w-5 text-yellow-400" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
+                    <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                  </svg>
+                </div>
+                <div className="ml-3">
+                  <p className="text-sm text-yellow-700 font-medium">
+                    Importante: El conductor no dispone de cambio.
+                  </p>
+                  <p className="text-sm text-yellow-700">
+                    Por favor, asegúrate de llevar el  <span className="font-bold">importe exacto</span>.
+                  </p>
+                </div>
+              </div>
+            </div>
 
             <div className="flex items-start mb-6">
               <input
@@ -62,11 +79,10 @@ const CashConfirmationModal = ({ show, onClose, onConfirm }: Props) => {
               <button
                 disabled={!checked}
                 onClick={onConfirm}
-                className={`px-4 py-2 rounded-lg transition text-white ${
-                  checked
+                className={`px-4 py-2 rounded-lg transition text-white ${checked
                     ? "bg-custom-golden-600 hover:bg-custom-golden-700"
                     : "bg-gray-300 cursor-not-allowed"
-                }`}>
+                  }`}>
                 Confirmar
               </button>
             </div>

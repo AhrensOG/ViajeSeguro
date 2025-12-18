@@ -14,6 +14,7 @@ const TripDetailsPage = () => {
   const [trip, setTrip] = useState<TripDetailsResponse | null>(null);
   const [extraBagsById, setExtraBagsById] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
+  const [expandedPassengerId, setExpandedPassengerId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!id) return;
@@ -72,12 +73,13 @@ const TripDetailsPage = () => {
             return {
               id: res.id,
               userId: res.user?.id ?? "",
-              fullName: `${res.user?.name ?? ""} ${
-                res.user?.lastName ?? ""
-              }`.trim(),
+              fullName: `${res.user?.name ?? ""} ${res.user?.lastName ?? ""
+                }`.trim(),
               email: res.user?.email ?? "Sin email",
+              phone: res.user?.phone || undefined,
               paymentMethod: res.paymentMethod,
               status,
+              cancelReason: res.cancelReason ?? null,
               qr,
             };
           }),
@@ -164,7 +166,7 @@ const TripDetailsPage = () => {
               <thead className="bg-custom-golden-100 text-custom-golden-800">
                 <tr>
                   <th className="px-4 py-3">Nombre</th>
-                  <th className="px-4 py-3">Correo</th>
+                  <th className="px-4 py-3">Teléfono</th>
                   <th className="px-4 py-3">Método de pago</th>
                   <th className="px-4 py-3">Equipaje</th>
                   <th className="px-4 py-3">Estado</th>
@@ -173,39 +175,70 @@ const TripDetailsPage = () => {
               </thead>
               <tbody>
                 {trip.passengers.map((passenger) => (
-                  <tr
-                    key={passenger.id}
-                    className="border-t border-custom-gray-100 hover:bg-custom-golden-50">
-                    <td className="px-4 py-3">{passenger.fullName}</td>
-                    <td className="px-4 py-3">{passenger.email}</td>
-                    <td className="px-4 py-3">{passenger.paymentMethod}</td>
-                    <td className="px-4 py-3">{extraBagsById[passenger.id] ?? 0} maleta(s)</td>
-                    <td className="px-4 py-3">
-                      <span
-                        className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                          passenger.status === "CONFIRMED"
+                  <React.Fragment key={passenger.id}>
+                    <tr
+                      onClick={() => {
+                        if (passenger.status === "CANCELLED" && passenger.cancelReason) {
+                          setExpandedPassengerId(
+                            expandedPassengerId === passenger.id ? null : passenger.id
+                          );
+                        }
+                      }}
+                      className={`border-t border-custom-gray-100 hover:bg-custom-golden-50 ${passenger.status === "CANCELLED" ? "cursor-pointer" : ""
+                        }`}
+                    >
+                      <td className="px-4 py-3">{passenger.fullName}</td>
+                      <td className="px-4 py-3">
+                        {passenger.phone ? (
+                          <a
+                            href={`tel:${passenger.phone}`}
+                            className="text-blue-600 hover:underline"
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            {passenger.phone}
+                          </a>
+                        ) : (
+                          <span className="text-gray-400 italic">Sin teléfono</span>
+                        )}
+                      </td>
+                      <td className="px-4 py-3">{passenger.paymentMethod}</td>
+                      <td className="px-4 py-3">{extraBagsById[passenger.id] ?? 0} maleta(s)</td>
+                      <td className="px-4 py-3">
+                        <span
+                          className={`px-2 py-1 rounded-full text-xs font-semibold ${passenger.status === "CONFIRMED"
                             ? "bg-green-100 text-green-700"
                             : passenger.status === "PENDING"
-                            ? "bg-yellow-100 text-yellow-700"
-                            : "bg-red-100 text-red-700"
-                        }`}>
-                        {passenger.status}
-                      </span>
-                    </td>
-                    <td className="px-4 py-3">
-                      {passenger.qr && !passenger.qr.isDeleted ? (
-                        !passenger.qr.isValid && passenger.qr.usedAt ? (
-                          <span className="text-green-700 font-medium">
-                            Abordó
-                          </span>
+                              ? "bg-yellow-100 text-yellow-700"
+                              : "bg-red-100 text-red-700"
+                            }`}>
+                          {passenger.status}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3">
+                        {passenger.qr && !passenger.qr.isDeleted ? (
+                          !passenger.qr.isValid && passenger.qr.usedAt ? (
+                            <span className="text-green-700 font-medium">
+                              Abordó
+                            </span>
+                          ) : (
+                            <span className="text-yellow-700">Pendiente</span>
+                          )
                         ) : (
-                          <span className="text-yellow-700">Pendiente</span>
-                        )
-                      ) : (
-                        <span className="text-red-600">QR inválido</span>
-                      )}
-                    </td>
-                  </tr>
+                          <span className="text-red-600">QR inválido</span>
+                        )}
+                      </td>
+                    </tr>
+                    {expandedPassengerId === passenger.id && (
+                      <tr className="bg-red-50 border-t border-custom-gray-100">
+                        <td colSpan={6} className="px-4 py-3">
+                          <div className="flex flex-col gap-1 text-sm text-red-800">
+                            <strong>Motivo de cancelación:</strong>
+                            <p>{passenger.cancelReason}</p>
+                          </div>
+                        </td>
+                      </tr>
+                    )}
+                  </React.Fragment>
                 ))}
               </tbody>
             </table>
