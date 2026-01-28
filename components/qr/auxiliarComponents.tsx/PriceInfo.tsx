@@ -7,7 +7,9 @@ type Props = {
 };
 
 const PriceInfo = ({ reservation }: Props) => {
-  const { priceDetails, price } = reservation;
+  const { priceDetails, price, paymentMethod } = reservation;
+  if (paymentMethod !== "CASH") return null;
+
   const pricePerBag = 5;
   const extraBagsMatch = reservation.seatCode?.match(/EXTRA_BAGS:(\d+)/);
   const extraBags = extraBagsMatch ? Number(extraBagsMatch[1]) : 0;

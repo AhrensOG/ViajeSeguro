@@ -16,6 +16,8 @@ export interface TripCardType {
     avatarUrl?: string;
     role?: string;
   };
+  discountPercentage?: number;
+  discountedPrice?: number;
 }
 
 export interface SearchTripResult {

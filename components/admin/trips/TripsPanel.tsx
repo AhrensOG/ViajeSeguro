@@ -13,6 +13,8 @@ import EditTripModal from "./auxiliarComponents/EditTripModal";
 import CloneTripModal from "./auxiliarComponents/CloneTripModal";
 import DeleteToast from "../DeleteToast";
 import CityAutocomplete from "@/components/common/CityAutocomplete";
+import { getGlobalSetting, updateGlobalSetting } from "@/lib/api/admin/settings";
+import { Percent } from "lucide-react";
 
 const statusMap = {
     PENDING: "Pendiente",
@@ -32,6 +34,9 @@ export default function TripsPanel() {
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
     const [isCreateRangeModalOpen, setIsCreateRangeModalOpen] = useState(false);
     const [isCloneModalOpen, setIsCloneModalOpen] = useState(false);
+
+    const [adminDiscount, setAdminDiscount] = useState<string>("40");
+    const [isUpdatingDiscount, setIsUpdatingDiscount] = useState(false);
 
     const [search, setSearch] = useState("");
     const [filters, setFilters] = useState({
@@ -73,9 +78,18 @@ export default function TripsPanel() {
                 toast.info("Error al cargar los propietarios");
             }
         };
+        const fetchAdminDiscount = async () => {
+            try {
+                const res = (await getGlobalSetting("ADMIN_TRIP_DISCOUNT")) as { value: string };
+                if (res && res.value) setAdminDiscount(res.value);
+            } catch {
+                console.error("Error al cargar el descuento");
+            }
+        };
         fetchTrips();
         fetchDrivers();
         fetchPartners();
+        fetchAdminDiscount();
     }, []);
 
     const now = new Date();
@@ -136,11 +150,42 @@ export default function TripsPanel() {
         });
     };
 
+    const handleUpdateDiscount = async () => {
+        setIsUpdatingDiscount(true);
+        try {
+            await updateGlobalSetting("ADMIN_TRIP_DISCOUNT", adminDiscount);
+            toast.success(`Descuento de administración actualizado al ${adminDiscount}%`);
+        } catch {
+            toast.error("Error al actualizar el descuento");
+        } finally {
+            setIsUpdatingDiscount(false);
+        }
+    };
+
     return (
         <div className="w-full h-full flex flex-col overflow-hidden pb-2">
             <div className="flex flex-col sm:flex-row justify-between items-center mb-4 gap-4">
                 <h1 className="text-2xl font-bold text-custom-golden-600">Panel de Viajes</h1>
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 bg-white border border-custom-gray-300 rounded-md px-3 py-1.5 shadow-sm">
+                        <Percent className="h-4 w-4 text-custom-golden-600" />
+                        <span className="text-sm font-medium text-custom-gray-700 whitespace-nowrap">Dcto. Admin:</span>
+                        <input
+                            type="number"
+                            value={adminDiscount}
+                            onChange={(e) => setAdminDiscount(e.target.value)}
+                            className="w-16 border-none focus:ring-0 text-sm font-bold text-center"
+                            min="0"
+                            max="100"
+                        />
+                        <button
+                            onClick={handleUpdateDiscount}
+                            disabled={isUpdatingDiscount}
+                            className="text-xs bg-custom-golden-600 hover:bg-custom-golden-700 text-white px-2 py-1 rounded disabled:opacity-50 transition-colors"
+                        >
+                            {isUpdatingDiscount ? "..." : "Guardar"}
+                        </button>
+                    </div>
                     <button
                         onClick={() => setIsCreateRangeModalOpen(true)}
                         className="cursor-pointer flex items-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-4 py-2 rounded-md shadow-sm"
@@ -256,9 +301,7 @@ export default function TripsPanel() {
                                             setIsViewModalOpen(true);
                                         }}
                                         key={trip.id}
-                                        className={`$${
-                                            index % 2 === 0 ? "bg-custom-white-50" : "bg-custom-gray-100"
-                                        } hover:bg-custom-golden-100 transition cursor-pointer`}
+                                        className={`${index % 2 === 0 ? "bg-custom-white-50" : "bg-custom-gray-100"} hover:bg-custom-golden-100 transition cursor-pointer`}
                                     >
                                         <td className="px-4 py-2 font-medium border-b border-r border-custom-gray-200">{trip.origin} </td>
                                         <td className="px-4 py-2 border-b border-r border-custom-gray-200">{trip.destination}</td>

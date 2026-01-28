@@ -56,3 +56,17 @@ export async function getDiscounts(): Promise<Discounts[]> {
         throw new Error("Error al obtener los descuentos");
     }
 }
+
+export async function searchUsers(term: string) {
+    if (!term) return [];
+    const res = await fetchWithAuth(`${BACKEND_URL}/user/search?term=${encodeURIComponent(term)}`);
+    if (!Array.isArray(res)) throw new Error("La respuesta de búsqueda de usuarios no es un array");
+    return res;
+}
+
+export async function searchTripsByDate(date: string) {
+    if (!date) return [];
+    const res = await fetchWithAuth(`${BACKEND_URL}/trip/search-by-date?date=${date}`);
+    if (!Array.isArray(res)) throw new Error("La respuesta de búsqueda de viajes no es un array");
+    return res;
+}

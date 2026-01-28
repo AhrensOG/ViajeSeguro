@@ -58,6 +58,10 @@ export default function ReservationPanel() {
             date: `${new Date(trip.departure).toLocaleDateString()} ${new Date(
               trip.departure
             ).toLocaleTimeString()}`,
+            origin: trip.origin,
+            destination: trip.destination,
+            departure: trip.departure,
+            status: trip.status,
           }))
         );
         // const discounts = await getDiscountByUserId();
@@ -179,15 +183,14 @@ export default function ReservationPanel() {
             </thead>
             <tbody className="text-custom-black-800">
               {filteredReservations.map((r, index) => {
-                const guestName = `${r.user?.name ?? "Invitado"} ${
-                  r.user?.lastName ?? ""
-                }`.trim();
+                const guestName = `${r.user?.name ?? "Invitado"} ${r.user?.lastName ?? ""
+                  }`.trim();
                 const guestEmail = r.user?.email ?? "";
                 const departure = r.trip?.departure;
                 const formattedDeparture = departure
                   ? DateTime.fromISO(departure)
-                      .setLocale("es")
-                      .toFormat("cccc, dd LLL yyyy - HH:mm'hs'")
+                    .setLocale("es")
+                    .toFormat("cccc, dd LLL yyyy - HH:mm'hs'")
                   : "Fecha no disponible";
 
                 // Capitalizar la primera letra (opcional)
@@ -204,11 +207,10 @@ export default function ReservationPanel() {
                       setIsEditingModalOpen(false); // <-- cerrar modal de edición si está abierto
                     }}
                     key={r.id}
-                    className={`$${
-                      index % 2 === 0
-                        ? "bg-custom-white-50"
-                        : "bg-custom-gray-100"
-                    } cursor-pointer hover:bg-custom-golden-100 transition`}>
+                    className={`$${index % 2 === 0
+                      ? "bg-custom-white-50"
+                      : "bg-custom-gray-100"
+                      } cursor-pointer hover:bg-custom-golden-100 transition`}>
                     <td className="px-4 py-2 font-medium border-b border-r border-custom-gray-200">
                       {guestName}
                     </td>
@@ -265,8 +267,6 @@ export default function ReservationPanel() {
       )}
       {isCreateModalOpen && (
         <CreateReservationModal
-          users={users}
-          trips={trips}
           onClose={() => setIsCreateModalOpen(false)}
           onSuccess={setReservations}
         />
