@@ -3,7 +3,7 @@
 import React, { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { DateTime } from "luxon";
-import { CalendarDays, Clock } from "lucide-react";
+import { CalendarDays, Clock, QrCode } from "lucide-react";
 import { getTripById } from "@/lib/api/driver-profile/intex";
 import { TripDetailsResponse } from "@/lib/api/driver-profile/driverProfile.types";
 import { Passengers } from "@/lib/api/admin/trips/trips.type";
@@ -78,6 +78,7 @@ const TripDetailsPage = () => {
               email: res.user?.email ?? "Sin email",
               phone: res.user?.phone || undefined,
               paymentMethod: res.paymentMethod,
+              price: res.price ?? 0,
               status,
               cancelReason: res.cancelReason ?? null,
               qr,
@@ -108,8 +109,7 @@ const TripDetailsPage = () => {
     trip.originalTimeZone
   );
   const arrival = DateTime.fromISO(trip.arrival).setZone(trip.originalTimeZone);
-  const IVA = Number(process.env.NEXT_PUBLIC_IVA || 21);
-  const priceWithIva = (trip.basePrice * (1 + IVA / 100));
+
 
   return (
     <div className="w-full max-w-7xl mx-auto p-4 md:p-6">
@@ -144,105 +144,197 @@ const TripDetailsPage = () => {
           <strong>Capacidad:</strong> {trip.capacity} — <strong>Mínimo:</strong>{" "}
           {trip.minPassengers}
         </p>
-        <p className="text-sm text-custom-gray-700 mt-2">
-          <strong>Precio base:</strong> {trip.basePrice.toFixed(2)} €
-        </p>
-        <p className="text-sm text-custom-gray-700">
-          <strong>Precio con IVA ({IVA}%):</strong> {priceWithIva.toFixed(2)} €
-        </p>
+
       </div>
 
       <div className="mt-8">
         <h3 className="text-lg font-semibold text-custom-black-900 mb-3">
-          Pasajeros
+          Pasajeros ({trip.passengers.length}/{trip.capacity})
         </h3>
         {trip.passengers.length === 0 ? (
           <p className="text-sm text-custom-gray-600 italic">
             No hay pasajeros en este viaje aún.
           </p>
         ) : (
-          <div className="overflow-x-auto border border-custom-gray-200 rounded-xl bg-white">
-            <table className="min-w-full text-sm text-left">
-              <thead className="bg-custom-golden-100 text-custom-golden-800">
-                <tr>
-                  <th className="px-4 py-3">Nombre</th>
-                  <th className="px-4 py-3">Teléfono</th>
-                  <th className="px-4 py-3">Método de pago</th>
-                  <th className="px-4 py-3">Equipaje</th>
-                  <th className="px-4 py-3">Estado</th>
-                  <th className="px-4 py-3">Abordaje</th>
-                </tr>
-              </thead>
-              <tbody>
-                {trip.passengers.map((passenger) => (
-                  <React.Fragment key={passenger.id}>
-                    <tr
-                      onClick={() => {
-                        if (passenger.status === "CANCELLED" && passenger.cancelReason) {
-                          setExpandedPassengerId(
-                            expandedPassengerId === passenger.id ? null : passenger.id
-                          );
-                        }
-                      }}
-                      className={`border-t border-custom-gray-100 hover:bg-custom-golden-50 ${passenger.status === "CANCELLED" ? "cursor-pointer" : ""
-                        }`}
-                    >
-                      <td className="px-4 py-3">{passenger.fullName}</td>
-                      <td className="px-4 py-3">
-                        {passenger.phone ? (
+          <>
+            {/* Vista de Escritorio (Desktop) */}
+            <div className="hidden md:block overflow-x-auto border border-custom-gray-200 rounded-xl bg-white">
+              <table className="min-w-full text-sm text-left">
+                <thead className="bg-custom-golden-100 text-custom-golden-800">
+                  <tr>
+                    <th className="px-4 py-3">Nombre</th>
+                    <th className="px-4 py-3">Teléfono</th>
+                    <th className="px-4 py-3">Método de pago</th>
+                    <th className="px-4 py-3">Escanear</th>
+                    <th className="px-4 py-3">Equipaje</th>
+                    <th className="px-4 py-3">Estado</th>
+                    <th className="px-4 py-3">Abordaje</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {trip.passengers.map((passenger) => (
+                    <React.Fragment key={passenger.id}>
+                      <tr
+                        onClick={() => {
+                          if (passenger.status === "CANCELLED" && passenger.cancelReason) {
+                            setExpandedPassengerId(
+                              expandedPassengerId === passenger.id ? null : passenger.id
+                            );
+                          }
+                        }}
+                        className={`border-t border-custom-gray-100 hover:bg-custom-golden-50 ${passenger.status === "CANCELLED" ? "cursor-pointer" : ""
+                          }`}
+                      >
+                        <td className="px-4 py-3 font-medium text-custom-black-900">{passenger.fullName}</td>
+                        <td className="px-4 py-3">
+                          {passenger.phone ? (
+                            <a
+                              href={`tel:${passenger.phone}`}
+                              className="text-blue-600 hover:underline"
+                              onClick={(e) => e.stopPropagation()}
+                            >
+                              {passenger.phone}
+                            </a>
+                          ) : (
+                            <span className="text-gray-400 italic">Sin teléfono</span>
+                          )}
+                        </td>
+                        <td className="px-4 py-3">{passenger.paymentMethod}</td>
+                        <td className="px-4 py-3">
                           <a
-                            href={`tel:${passenger.phone}`}
-                            className="text-blue-600 hover:underline"
+                            href={`/qr/${passenger.id}/reservation`}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            {passenger.phone}
+                            <QrCode className="size-4" />
+                            <span className="underline">Verificar</span>
                           </a>
-                        ) : (
-                          <span className="text-gray-400 italic">Sin teléfono</span>
-                        )}
-                      </td>
-                      <td className="px-4 py-3">{passenger.paymentMethod}</td>
-                      <td className="px-4 py-3">{extraBagsById[passenger.id] ?? 0} maleta(s)</td>
-                      <td className="px-4 py-3">
-                        <span
-                          className={`px-2 py-1 rounded-full text-xs font-semibold ${passenger.status === "CONFIRMED"
-                            ? "bg-green-100 text-green-700"
-                            : passenger.status === "PENDING"
-                              ? "bg-yellow-100 text-yellow-700"
-                              : "bg-red-100 text-red-700"
-                            }`}>
-                          {passenger.status}
-                        </span>
-                      </td>
-                      <td className="px-4 py-3">
-                        {passenger.qr && !passenger.qr.isDeleted ? (
-                          !passenger.qr.isValid && passenger.qr.usedAt ? (
-                            <span className="text-green-700 font-medium">
-                              Abordó
-                            </span>
+                        </td>
+
+                        <td className="px-4 py-3">{extraBagsById[passenger.id] ?? 0} maleta(s)</td>
+                        <td className="px-4 py-3">
+                          <span
+                            className={`px-2 py-1 rounded-full text-xs font-semibold ${passenger.status === "CONFIRMED"
+                              ? "bg-green-100 text-green-700"
+                              : passenger.status === "PENDING"
+                                ? "bg-yellow-100 text-yellow-700"
+                                : "bg-red-100 text-red-700"
+                              }`}>
+                            {passenger.status === "CONFIRMED" ? "Confirmado" : passenger.status === "PENDING" ? "Pendiente" : "Cancelado"}
+                          </span>
+                        </td>
+                        <td className="px-4 py-3">
+                          {passenger.qr && !passenger.qr.isDeleted ? (
+                            !passenger.qr.isValid && passenger.qr.usedAt ? (
+                              <span className="text-green-700 font-medium">Abordó</span>
+                            ) : (
+                              <span className="text-yellow-700">Pendiente</span>
+                            )
                           ) : (
-                            <span className="text-yellow-700">Pendiente</span>
-                          )
-                        ) : (
-                          <span className="text-red-600">QR inválido</span>
-                        )}
-                      </td>
-                    </tr>
-                    {expandedPassengerId === passenger.id && (
-                      <tr className="bg-red-50 border-t border-custom-gray-100">
-                        <td colSpan={6} className="px-4 py-3">
-                          <div className="flex flex-col gap-1 text-sm text-red-800">
-                            <strong>Motivo de cancelación:</strong>
-                            <p>{passenger.cancelReason}</p>
-                          </div>
+                            <span className="text-red-600">QR inválido</span>
+                          )}
                         </td>
                       </tr>
-                    )}
-                  </React.Fragment>
-                ))}
-              </tbody>
-            </table>
-          </div>
+                      {expandedPassengerId === passenger.id && (
+                        <tr className="bg-red-50 border-t border-custom-gray-100">
+                          <td colSpan={7} className="px-4 py-3">
+                            <div className="flex flex-col gap-1 text-sm text-red-800">
+                              <strong>Motivo de cancelación:</strong>
+                              <p>{passenger.cancelReason}</p>
+                            </div>
+                          </td>
+                        </tr>
+                      )}
+                    </React.Fragment>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Vista de Móvil (Cards) */}
+            <div className="block md:hidden space-y-4">
+              {trip.passengers.map((passenger) => (
+                <div
+                  key={`mobile-${passenger.id}`}
+                  className={`bg-white border rounded-xl p-4 shadow-sm ${passenger.status === "CANCELLED" ? "border-red-200" : "border-custom-gray-200"}`}
+                  onClick={() => {
+                    if (passenger.status === "CANCELLED" && passenger.cancelReason) {
+                      setExpandedPassengerId(expandedPassengerId === passenger.id ? null : passenger.id);
+                    }
+                  }}
+                >
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <p className="font-bold text-custom-black-900 text-base">{passenger.fullName}</p>
+                      <p className="text-xs text-custom-gray-500">{passenger.email}</p>
+                    </div>
+                    <span
+                      className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${passenger.status === "CONFIRMED"
+                        ? "bg-green-100 text-green-700"
+                        : passenger.status === "PENDING"
+                          ? "bg-yellow-100 text-yellow-700"
+                          : "bg-red-100 text-red-700"
+                        }`}>
+                      {passenger.status === "CONFIRMED" ? "Confirmado" : passenger.status === "PENDING" ? "Pendiente" : "Cancelado"}
+                    </span>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-3 text-sm mb-4">
+                    <div>
+                      <p className="text-custom-gray-500 text-xs">Teléfono</p>
+                      {passenger.phone ? (
+                        <a href={`tel:${passenger.phone}`} className="text-blue-600 font-medium">{passenger.phone}</a>
+                      ) : (
+                        <span className="text-gray-400 italic">N/A</span>
+                      )}
+                    </div>
+                    <div>
+                      <p className="text-custom-gray-500 text-xs">Pago</p>
+                      <p className="text-custom-black-800 font-medium">{passenger.paymentMethod}</p>
+                    </div>
+                    <div>
+                      <p className="text-custom-gray-500 text-xs">Equipaje</p>
+                      <p className="text-custom-black-800 font-medium">{extraBagsById[passenger.id] ?? 0} maleta(s)</p>
+                    </div>
+                    <div>
+                      <p className="text-custom-gray-500 text-xs">Abordaje</p>
+                      {passenger.qr && !passenger.qr.isDeleted ? (
+                        !passenger.qr.isValid && passenger.qr.usedAt ? (
+                          <span className="text-green-700 font-medium">Abordó</span>
+                        ) : (
+                          <span className="text-yellow-700 font-medium">Pendiente</span>
+                        )
+                      ) : (
+                        <span className="text-red-600 font-medium">Inválido</span>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="flex gap-2">
+                    <a
+                      href={`/qr/${passenger.id}/reservation`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-blue-50 text-blue-600 rounded-lg font-semibold text-sm border border-blue-100"
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <QrCode className="size-4" />
+                      Escanear QR
+                    </a>
+                  </div>
+
+                  {expandedPassengerId === passenger.id && (
+                    <div className="mt-3 p-3 bg-red-50 rounded-lg border border-red-100 text-sm text-red-800">
+                      <strong>Motivo de cancelación:</strong>
+                      <p className="mt-1">{passenger.cancelReason}</p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </>
         )}
       </div>
     </div>

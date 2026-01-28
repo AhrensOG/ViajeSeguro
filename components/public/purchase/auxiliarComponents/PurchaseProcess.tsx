@@ -51,6 +51,7 @@ const PurchaseProcess = () => {
     const [showCashModal, setShowCashModal] = useState(false);
     const [showTermsModal, setShowTermsModal] = useState(false);
     const [pendingAction, setPendingAction] = useState<"stripe" | "cash" | null>(null);
+    const [processingPayment, setProcessingPayment] = useState(false);
 
     useEffect(() => {
         const fetchTrip = async () => {
@@ -93,6 +94,7 @@ const PurchaseProcess = () => {
 
     const confirmCashPayment = async () => {
         if ((!trip && !vehicleOffer) || !session) return;
+        setProcessingPayment(true);
 
         if (trip) {
             // Flujo SOLO equipaje en efectivo: actualizar reserva existente sin validar capacidad
@@ -110,6 +112,7 @@ const PurchaseProcess = () => {
                     });
                 } finally {
                     setShowCashModal(false);
+                    setProcessingPayment(false);
                 }
                 return;
             }
@@ -136,6 +139,7 @@ const PurchaseProcess = () => {
                 });
             } finally {
                 setShowCashModal(false);
+                setProcessingPayment(false);
             }
         }
         if (vehicleOffer) {
@@ -164,6 +168,7 @@ const PurchaseProcess = () => {
                 });
             } finally {
                 setShowCashModal(false);
+                setProcessingPayment(false);
             }
         }
     };
@@ -405,7 +410,12 @@ const PurchaseProcess = () => {
                 </div>
             </div>
 
-            <CashConfirmationModal show={showCashModal} onClose={() => setShowCashModal(false)} onConfirm={confirmCashPayment} />
+            <CashConfirmationModal
+                show={showCashModal}
+                onClose={() => setShowCashModal(false)}
+                onConfirm={confirmCashPayment}
+                loading={processingPayment}
+            />
             <TermsAndConditionsModal
                 show={showTermsModal}
                 onClose={() => setShowTermsModal(false)}

@@ -11,7 +11,7 @@ import {
 import { createCheckoutSession } from "@/lib/api/stripe";
 import { useSession } from "next-auth/react";
 import { useRouter } from "next/navigation";
-import { Check, Clock, Gift, Shield, Tag, UserPlus, X } from "lucide-react";
+import { Check, Clock, Gift, Tag, X } from "lucide-react";
 import type { JSX } from "react";
 
 interface Feature {
@@ -39,11 +39,11 @@ interface Plan {
 const plans: Plan[] = [
   {
     title: "Cliente Preferencial",
-    label: "Básico",
+    label: "Basico",
     subtitle: "Para empezar a ahorrar",
     price: "GRATIS",
-    suffix: "solo por registrarte",
-    extraNote: "Sin coste mensual - ideal para nuevos usuarios",
+    suffix: "(Al registrarte)",
+    extraNote: "Sin coste mensual, ideal para nuevos usuarios.",
     button: "Registrarme gratis",
     highlight: false,
     features: [
@@ -51,9 +51,12 @@ const plans: Plan[] = [
         icon: (
           <Tag size={18} className="min-w-[18px] mt-1 text-custom-golden-600" />
         ),
-        title: "Descuento cada vez que decidas volver con nosotros",
-        desc: "el segundo trayecto de 27,50€ a 24,75€ de forma permanente y de por vida",
-        badge: "Ahorra 2,75 en cada trayecto (ida y vuelta 5,50 € menos )",
+        title: "DESCUENTO CADA VEZ QUE VIAJAS",
+        points: [
+          "A partir del segundo trayecto disfrutaras del descuento como cliente preferente.",
+          "Acceso ilimitado a todos los trayectos con vehículos de ViajeSeguro a Barcelona o Madrid desde Valencia o viceversa.",
+          "Sin cuotas mensuales.",
+        ],
       },
       {
         icon: (
@@ -62,27 +65,37 @@ const plans: Plan[] = [
             className="min-w-[18px] mt-1 text-custom-golden-600"
           />
         ),
-        desc: "Acceso ilimitado a todos los trayectos a Barcelona o Madrid desde valencia o viceversa",
+        title: "AHORRA POR RECOMENDAR",
+        points: [
+          "Busca tu código de cliente preferencial en tu perfil y compártelo con conocidos, amigos o familiares.",
+          "Las recomendaciones se acumulan y no caducan.",
+          "Las recomendaciones se hacen efectivas en el momento que tus recomendados viajan con nosotros.",
+          "Las recomendaciones desaparecen de tu perfil al ser utilizadas.",
+          "Acumulando 10 recomendaciones efectivas SIN UTILIZAR tendrás acceso a un trayecto GRATIS con vehículos de ViajeSeguro.",
+        ],
       },
       {
         icon: (
-          <Check
+          <Clock
             size={18}
             className="min-w-[18px] mt-1 text-custom-golden-600"
           />
         ),
-        desc: "Sin compromiso mensual",
+        title: "ANULACIONES ULTRA FLEXIBLES",
+        points: [
+          "Hasta 24h antes del viaje 100% reembolsable.",
+          "Menos de 24h podrás negociar la nueva fecha de tu viaje utilizando nuestro lema “TU VIAJE, NUESTRA PRIORIDAD”",
+        ],
       },
     ],
   },
   {
-    title: "Club Lealtad",
+    title: "CLUB DE LEALTAD",
     label: "Mensual",
-    subtitle: "Para viajeros regulares",
-    price: "0,00€",
-    originalPrice: "4,90€",
+    subtitle: "Mejoramos tu ahorro",
+    price: "4,90€",
     suffix: "/mes",
-    extraNote: "¡Gratis solo por 45 días!",
+    extraNote: "ideal para viajeros frecuentes",
     button: "Unirme al Club Lealtad",
     highlight: true,
     highlightLabel: "Popular",
@@ -91,23 +104,28 @@ const plans: Plan[] = [
         icon: (
           <Tag size={18} className="min-w-[18px] mt-1 text-custom-golden-600" />
         ),
-        title: "Descuento base en viajes",
-        desc: "Viajes de 27.50€ pasan a valer 22€",
-        badge: "¡Ahorra hasta 12.10€ por viaje!",
+        title: "DESCUENTO CADA VEZ QUE VIAJAS",
+        points: [
+          "Disfrutaras del descuento como cliente preferente mas descuento por pertenecer a nuestro club exclusivo.",
+          "Elige tu asiento exclusivo dentro del vehículo.",
+          "Prioridad ante viajeros fuera del club de lealtad en todos los trayectos con vehículos de ViajeSeguro a Barcelona o Madrid desde Valencia o viceversa.",
+        ],
       },
       {
         icon: (
-          <UserPlus
+          <Gift
             size={18}
             className="min-w-[18px] mt-1 text-custom-golden-600"
           />
         ),
-        title: "Sistema de recomendaciones",
-        desc: "Recomienda hasta 3 amigos por trayecto o viaje:",
+        title: "AHORRA POR RECOMENDAR",
         points: [
-          "1 amigo: viaje a 19,80€ (ahorro de 7,70€)",
-          "2 amigos: viaje a 17,60€ (ahorro de 9,90€)",
-          "3 amigos: viaje a 15,40€ (ahorro de 12,10€)",
+          "Permaneciendo en nuestro club participaras en sorteos de UN TRAYECTOS GRATIS todos los meses.",
+          "Busca tu código de cliente preferencial en tu perfil y compártelo con conocidos, amigos o familiares.",
+          "Las recomendaciones se acumulan y no caducan.",
+          "Las recomendaciones se hacen efectivas en el momento que tus recomendados viajan con nosotros.",
+          "Las recomendaciones desaparecen de tu perfil al ser utilizadas.",
+          "Acumulando 10 recomendaciones efectivas SIN UTILIZAR tendrás acceso a un trayecto GRATIS con vehículos de ViajeSeguro.",
         ],
       },
       {
@@ -117,48 +135,21 @@ const plans: Plan[] = [
             className="min-w-[18px] mt-1 text-custom-golden-600"
           />
         ),
-        title: "Cancelaciones ultra flexibles",
-        desc: "Hasta 24 horas antes con 100% reembolso",
-      },
-      {
-        icon: (
-          <Shield
-            size={18}
-            className="min-w-[18px] mt-1 text-custom-golden-600"
-          />
-        ),
-        title: "Selección de asientos",
-        desc: "Elige tu asiento preferido en cada viaje",
-      },
-      {
-        icon: (
-          <Gift
-            size={18}
-            className="min-w-[18px] mt-1 text-custom-golden-600"
-          />
-        ),
-        title: "Beneficios aleatorios",
-        desc: "Sorpresas y descuentos exclusivos durante todo el año",
-      },
-      {
-        icon: (
-          <Check
-            size={18}
-            className="min-w-[18px] mt-1 text-custom-golden-600"
-          />
-        ),
-        title: "Beneficio exclusivo",
-        desc: "Si has recomendado a 10 personas y viajaron con nosotros gracias a ti, tu tienes un trayecto GRATIS de Valencia a Madrid o Barcelona y viceversa",
+        title: "ANULACIONES ULTRA FLEXIBLES",
+        points: [
+          "Hasta 24h antes del viaje 100% reembolsable.",
+          "Menos de 24h podrás negociar la nueva fecha de tu viaje utilizando nuestro lema “TU VIAJE, NUESTRA PRIORIDAD”",
+        ],
       },
     ],
   },
   {
-    title: "Club Fidelidad",
+    title: "CLUB DE FIDELIDAD",
     label: "Anual",
-    subtitle: "La experiencia completa",
+    subtitle: "TUS VIAJES, NUESTRA PRIORIDAD",
     price: "49,90€",
     suffix: "/año",
-    extraNote: "¡2 Meses gratis!",
+    extraNote: "ideal para viajeros FIELES",
     button: "Unirme al Club Fidelidad",
     highlight: false,
     features: [
@@ -166,23 +157,29 @@ const plans: Plan[] = [
         icon: (
           <Tag size={18} className="min-w-[18px] mt-1 text-custom-golden-600" />
         ),
-        title: "Descuento base en viajes",
-        desc: "Viajes de 27.50€ pasan a valer 22€",
-        badge: "¡Ahorra hasta 12.10€ por viaje!",
+        title: "+DESCUENTO CON VIAJESEGURO",
+        points: [
+          "DOS MESES GRATIS, Ideal para personas que realizan mas de dos trayectos al mes.",
+          "Disfrutaras de TODOS NUESTROS DESCUENTOS por pertenecer a nuestro CLUB DE VIAJEROS FIELES.",
+          "Elige tu asiento exclusivo dentro del vehículo.",
+          "Prioridad ante viajeros incluso los del club de lealtad en todos los trayectos con vehículos de ViajeSeguro a Barcelona o Madrid desde Valencia o viceversa.",
+        ],
       },
       {
         icon: (
-          <UserPlus
+          <Gift
             size={18}
             className="min-w-[18px] mt-1 text-custom-golden-600"
           />
         ),
-        title: "Sistema de recomendaciones",
-        desc: "Recomienda hasta 3 amigos por trayecto o viaje:",
+        title: "AHORRA POR RECOMENDAR",
         points: [
-          "1 amigo: viaje a 19,80€ (ahorro de 7,70€)",
-          "2 amigos: viaje a 17,60€ (ahorro de 9,90€)",
-          "3 amigos: viaje a 15,40€ (ahorro de 12,10€)",
+          "Permaneciendo en nuestro club participaras en sorteos de TRAYECTOS IDA Y REGRESO GRATIS todos los meses.",
+          "Busca tu código de cliente preferencial en tu perfil y compártelo con conocidos, amigos o familiares.",
+          "Las recomendaciones se acumulan y no caducan.",
+          "Las recomendaciones se hacen efectivas en el momento que tus recomendados viajan con nosotros.",
+          "Las recomendaciones desaparecen de tu perfil al ser utilizadas.",
+          "Acumulando 10 recomendaciones efectivas SIN UTILIZAR tendrás acceso a un trayecto GRATIS con vehículos de ViajeSeguro.",
         ],
       },
       {
@@ -192,38 +189,11 @@ const plans: Plan[] = [
             className="min-w-[18px] mt-1 text-custom-golden-600"
           />
         ),
-        title: "Cancelaciones ultra flexibles",
-        desc: "Hasta 24 horas antes con 100% reembolso",
-      },
-      {
-        icon: (
-          <Shield
-            size={18}
-            className="min-w-[18px] mt-1 text-custom-golden-600"
-          />
-        ),
-        title: "Selección de asientos",
-        desc: "Elige tu asiento preferido en cada viaje",
-      },
-      {
-        icon: (
-          <Gift
-            size={18}
-            className="min-w-[18px] mt-1 text-custom-golden-600"
-          />
-        ),
-        title: "Beneficios aleatorios",
-        desc: "Sorpresas y descuentos exclusivos durante todo el año",
-      },
-      {
-        icon: (
-          <Check
-            size={18}
-            className="min-w-[18px] mt-1 text-custom-golden-600"
-          />
-        ),
-        title: "Beneficio exclusivo",
-        desc: "Si has recomendado a 10 personas y viajaron con nosotros gracias a ti, tu tienes un trayecto GRATIS de Valencia a Madrid o Barcelona y viceversa",
+        title: "ANULACIONES ULTRA FLEXIBLES",
+        points: [
+          "Hasta 24h antes del viaje 100% reembolsable.",
+          "Menos de 24h podrás negociar la nueva fecha de tu viaje utilizando nuestro lema “TU VIAJE, NUESTRA PRIORIDAD”",
+        ],
       },
     ],
   },
@@ -253,7 +223,7 @@ const missingFeatureItems = [
 const labelToPlanType = {
   Mensual: "MONTHLY",
   Anual: "ANNUAL",
-  Básico: "BASIC",
+  Basico: "BASIC",
 };
 
 const Subscriptions = () => {
@@ -412,11 +382,10 @@ const Subscriptions = () => {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, ease: "easeOut", delay: i * 0.1 }}
-              className={`relative bg-custom-white-100 border flex flex-col transition-shadow rounded-xl overflow-hidden ${
-                plan.highlight
-                  ? "border-custom-golden-500 shadow-md hover:shadow-lg"
-                  : "border-custom-gray-300 shadow-sm hover:shadow-md"
-              }`}>
+              className={`relative bg-custom-white-100 border flex flex-col transition-shadow rounded-xl overflow-hidden ${plan.highlight
+                ? "border-custom-golden-500 shadow-md hover:shadow-lg"
+                : "border-custom-gray-300 shadow-sm hover:shadow-md"
+                }`}>
               {plan.highlight && (
                 <div className="absolute top-0 right-0 bg-custom-golden-600 text-custom-white-100 px-4 py-1 text-sm font-medium rounded-bl-xl">
                   {plan.highlightLabel}
@@ -463,11 +432,10 @@ const Subscriptions = () => {
                     </div>
                   </div>
                   <div
-                    className={`${
-                      plan.extraNote
-                        ? "text-custom-golden-700"
-                        : "text-transparent "
-                    } text-lg font-medium mt-1`}>
+                    className={`${plan.extraNote
+                      ? "text-custom-golden-700"
+                      : "text-transparent "
+                      } text-lg font-medium mt-1`}>
                     {plan.extraNote ? plan.extraNote : "-"}
                   </div>
                 </div>

@@ -109,7 +109,7 @@ const TripDetailsModal = ({ trip, onClose }: TripDetailsModalProps) => {
                             <thead className="bg-custom-golden-100 text-custom-golden-800">
                                 <tr>
                                     <th className="px-4 py-3">Nombre</th>
-                                    <th className="px-4 py-3">Correo</th>
+                                    <th className="px-4 py-3">Teléfono</th>
                                     <th className="px-4 py-3">Método de pago</th>
                                     <th className="px-4 py-3">Estado</th>
                                 </tr>
@@ -118,17 +118,24 @@ const TripDetailsModal = ({ trip, onClose }: TripDetailsModalProps) => {
                                 {trip.reservations.map((res) => (
                                     <tr key={res.id} className="border-t border-custom-gray-100 hover:bg-custom-golden-50">
                                         <td className="px-4 py-3">{`${res.user?.name ?? ""} ${res.user?.lastName ?? ""}`.trim()}</td>
-                                        <td className="px-4 py-3">{res.user?.email ?? "-"}</td>
+                                        <td className="px-4 py-3">
+                                            {res.user?.phone ? (
+                                                <a href={`tel:${res.user.phone}`} className="text-blue-600 hover:underline">
+                                                    {res.user.phone}
+                                                </a>
+                                            ) : (
+                                                <span className="text-gray-400">-</span>
+                                            )}
+                                        </td>
                                         <td className="px-4 py-3">{paymentMethodMap[res.paymentMethod]}</td>
                                         <td className="px-4 py-3">
                                             <span
-                                                className={`px-2 py-1 rounded-full text-xs font-semibold ${
-                                                    res.status === "CONFIRMED"
+                                                className={`px-2 py-1 rounded-full text-xs font-semibold ${res.status === "CONFIRMED"
                                                         ? "bg-green-100 text-green-700"
                                                         : res.status === "PENDING"
-                                                        ? "bg-yellow-100 text-yellow-700"
-                                                        : "bg-red-100 text-red-700"
-                                                }`}
+                                                            ? "bg-yellow-100 text-yellow-700"
+                                                            : "bg-red-100 text-red-700"
+                                                    }`}
                                             >
                                                 {statusMap[res.status]}
                                             </span>

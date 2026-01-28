@@ -59,6 +59,7 @@ export interface Passengers {
     id: string;
     paymentMethod: string;
     status: string;
+    price?: number;
     user?: {
         id: string;
         name: string;

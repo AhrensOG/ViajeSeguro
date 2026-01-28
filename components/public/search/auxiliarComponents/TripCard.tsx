@@ -20,9 +20,12 @@ const TripCard = ({
   const localDate = convertUTCToLocalDate(trip.departure, timeZone);
 
   const [int, decimal] = trip.basePrice.toFixed(2).split(".");
-  // 40% de descuento y luego IVA incluido si está configurado
+  // Descuento global desde el backend (o fallback 40%)
   const isAdmin = trip.user.role === "ADMIN";
-  const discountedPrice = isAdmin ? +(trip.basePrice * 0.6).toFixed(2) : trip.basePrice;
+  const discountFactor = trip.discountPercentage !== undefined ? 1 - trip.discountPercentage / 100 : 0.6;
+  const discountedPrice = isAdmin
+    ? (trip.discountedPrice ?? +(trip.basePrice * discountFactor).toFixed(2))
+    : trip.basePrice;
   // Frontend: IVA fijo del 21% para mostrar precio final
   const ivaRate = 21;
   const discountedWithIva = +(discountedPrice * (1 + ivaRate / 100)).toFixed(2);
@@ -70,7 +73,7 @@ const TripCard = ({
             {/* Promotion label */}
             {isAdmin && (
               <div className="text-sm md:text-base font-semibold text-custom-golden-700 mt-1">
-                Descuento promocional del 40 %
+                Descuento promocional
               </div>
             )}
             {/* Original price (struck-through) */}

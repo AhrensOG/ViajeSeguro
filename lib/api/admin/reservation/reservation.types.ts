@@ -40,6 +40,8 @@ export interface ReservationResponse {
 export interface UserOption {
     id: string;
     email: string;
+    name: string;
+    lastName: string;
 }
 
 export interface CreateReservationFormData {
@@ -57,6 +59,10 @@ export interface TripOption {
     id: string;
     label: string;
     date: string;
+    origin: string;
+    destination: string;
+    departure: string;
+    status: string;
 }
 
 export interface Discounts {

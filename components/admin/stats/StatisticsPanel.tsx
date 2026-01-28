@@ -5,6 +5,8 @@ import React, { useEffect, useState } from "react";
 import { fetchAdminStats, DashboardStats } from "@/lib/api/admin/stats";
 import { Users, Coins, Map, Star, CreditCard, Banknote, Loader2 } from "lucide-react";
 
+import { useRouter } from "next/navigation";
+
 /**
  * StatisticsPanel Component
  * Displays a comprehensive dashboard with key metrics for the platform.
@@ -12,6 +14,7 @@ import { Users, Coins, Map, Star, CreditCard, Banknote, Loader2 } from "lucide-r
 export default function StatisticsPanel() {
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [loading, setLoading] = useState(true);
+    const router = useRouter();
 
     useEffect(() => {
         fetchAdminStats()
@@ -55,6 +58,8 @@ export default function StatisticsPanel() {
                     icon={<Users className="w-8 h-8 text-blue-600" />}
                     bgColor="bg-blue-50"
                     borderColor="border-blue-100"
+                    onClick={() => router.push("?sec=usuarios")}
+                    className="cursor-pointer hover:bg-blue-100 transition-colors"
                 >
                     <div className="mt-2 text-sm text-custom-gray-500">
                         Conductores activos: <span className="font-semibold text-custom-black-800">{stats.totalDrivers}</span>
@@ -68,6 +73,8 @@ export default function StatisticsPanel() {
                     icon={<Map className="w-8 h-8 text-purple-600" />}
                     bgColor="bg-purple-50"
                     borderColor="border-purple-100"
+                    onClick={() => router.push("?sec=viajes")}
+                    className="cursor-pointer hover:bg-purple-100 transition-colors"
                 />
 
                 {/* Total Revenue */}
@@ -77,6 +84,8 @@ export default function StatisticsPanel() {
                     icon={<Coins className="w-8 h-8 text-emerald-600" />}
                     bgColor="bg-emerald-50"
                     borderColor="border-emerald-100"
+                    onClick={() => router.push("?sec=pagos")}
+                    className="cursor-pointer hover:bg-emerald-100 transition-colors"
                 >
                     <div className="flex gap-2 mt-2">
                         <span className="text-xs bg-white border border-gray-200 px-2 py-1 rounded text-gray-600">
@@ -92,6 +101,8 @@ export default function StatisticsPanel() {
                     icon={<Star className="w-8 h-8 text-yellow-500" />}
                     bgColor="bg-yellow-50"
                     borderColor="border-yellow-100"
+                    onClick={() => router.push("?sec=referidos")}
+                    className="cursor-pointer hover:bg-yellow-100 transition-colors"
                 />
             </div>
 
@@ -192,6 +203,8 @@ function StatCard({
     bgColor,
     borderColor,
     children,
+    onClick,
+    className = "",
 }: {
     title: string;
     value: string | number;
@@ -199,9 +212,14 @@ function StatCard({
     bgColor: string;
     borderColor: string;
     children?: React.ReactNode;
+    onClick?: () => void;
+    className?: string;
 }) {
     return (
-        <div className={`p-6 rounded-xl border ${borderColor} ${bgColor} shadow-sm transition-transform hover:-translate-y-1`}>
+        <div
+            onClick={onClick}
+            className={`p-6 rounded-xl border ${borderColor} ${bgColor} shadow-sm transition-transform hover:-translate-y-1 ${className}`}
+        >
             <div className="flex items-center justify-between mb-4">
                 <div className="p-3 bg-white rounded-lg shadow-sm">{icon}</div>
             </div>

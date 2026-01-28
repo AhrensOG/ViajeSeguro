@@ -37,6 +37,7 @@ export interface TripDetailsResponse {
     fullName: string; // nombre + apellido
     email: string;
     phone?: string;
+    price: number;
     status: "PENDING" | "CONFIRMED" | "CANCELLED";
     cancelReason?: string | null;
     paymentMethod: "CASH" | "CARD" | string;
@@ -57,5 +58,6 @@ export interface TripDetailsResponse {
     email: string;
     status: "PENDING" | "CONFIRMED" | "CANCELLED";
     paymentMethod: "CASH" | "CARD" | string;
+    price: number;
   }[];
 }
