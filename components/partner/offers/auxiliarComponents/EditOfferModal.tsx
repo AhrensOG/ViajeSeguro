@@ -92,7 +92,7 @@ const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
 
     setIsLoading(true);
     const toastId = toast.loading("Actualizando oferta de vehículo...");
-    
+
     try {
       const depositParsed = Number(String(data.depositAmount ?? "").replace(",", "."));
       if (Number.isNaN(depositParsed) || depositParsed < 0) {
@@ -207,30 +207,30 @@ const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
             )}
           </div>
 
-        {/* Fianza */}
-        <div>
-          <label className={labelClass}>Fianza (€)</label>
-          <input
-            type="number"
-            step="0.01"
-            min="0"
-            {...register("depositAmount", {
-              required: "La fianza es obligatoria",
-              min: { value: 0, message: "La fianza no puede ser negativa" },
-            })}
-            className={inputClass}
-            placeholder="200.00"
-            disabled={isLoading}
-          />
-          <p className="text-xs text-custom-gray-500 mt-1">
-            La fianza se devuelve al devolver el vehículo sin incidencias.
-          </p>
-          {errors.depositAmount && (
-            <p className="text-red-500 text-xs">
-              {errors.depositAmount.message || "Campo obligatorio"}
+          {/* Fianza */}
+          <div>
+            <label className={labelClass}>Fianza (€)</label>
+            <input
+              type="number"
+              step="0.01"
+              min="0"
+              {...register("depositAmount", {
+                required: "La fianza es obligatoria",
+                min: { value: 0, message: "La fianza no puede ser negativa" },
+              })}
+              className={inputClass}
+              placeholder="200.00"
+              disabled={isLoading}
+            />
+            <p className="text-xs text-custom-gray-500 mt-1">
+              La fianza se devuelve al devolver el vehículo sin incidencias.
             </p>
-          )}
-        </div>
+            {errors.depositAmount && (
+              <p className="text-red-500 text-xs">
+                {errors.depositAmount.message || "Campo obligatorio"}
+              </p>
+            )}
+          </div>
 
           <div>
             <label className={labelClass}>Precio por día (€)</label>
@@ -238,7 +238,7 @@ const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
               type="number"
               step="0.01"
               min="1"
-              {...register("pricePerDay", { 
+              {...register("pricePerDay", {
                 required: "El precio por día es obligatorio",
                 min: { value: 1, message: "El precio debe ser mayor a 0" }
               })}
@@ -251,6 +251,9 @@ const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
                 {errors.pricePerDay.message || "Campo obligatorio"}
               </p>
             )}
+            <p className="text-xs text-custom-gray-500 mt-1">
+              Incluye 200 km/día. El exceso se cobra a 0,50€/km.
+            </p>
           </div>
 
           <div>
@@ -259,7 +262,7 @@ const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
               type="number"
               step="0.01"
               min="0"
-              {...register("agencyFee", { 
+              {...register("agencyFee", {
                 required: "La tarifa de agencia es obligatoria",
                 min: { value: 0, message: "La tarifa debe ser mayor o igual a 0" }
               })}

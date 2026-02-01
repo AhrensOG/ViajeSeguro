@@ -36,7 +36,7 @@ export function TablaPendientesAprobacion({ rentals, onApprovalChange }: TablaPe
 
   // Filtrar solo alquileres en estado PENDING (desaparece al aprobar)
   const pendingRentals = rentals.filter(rental => rental.status === 'PENDING')
-  
+
   console.log('TablaPendientesAprobacion - Todos los rentals:', rentals.map(r => ({ id: r.id, status: r.status })))
   console.log('TablaPendientesAprobacion - Rentals filtrados:', pendingRentals.length)
 
@@ -124,20 +124,20 @@ export function TablaPendientesAprobacion({ rentals, onApprovalChange }: TablaPe
         <div className="space-y-3">
           {pendingRentals.map((rental) => {
             const isExpanded = expandedRentals.has(rental.id)
-            
+
             return (
               <div
                 key={rental.id}
                 className="group bg-white/80 backdrop-blur-sm border border-slate-200/50 rounded-2xl p-5 hover:bg-white hover:border-slate-300/60 hover:shadow-xl hover:shadow-slate-200/30 transition-all duration-300"
               >
                 {/* Header clickeable */}
-                <div 
-                  className="flex items-center justify-between cursor-pointer"
+                <div
+                  className="flex flex-col md:flex-row items-start md:items-center justify-between cursor-pointer gap-4 md:gap-0"
                   onClick={() => toggleExpanded(rental.id)}
                 >
                   {/* Información del vehículo */}
-                  <div className="flex items-center gap-4">
-                    <div className="relative">
+                  <div className="flex items-center gap-4 w-full md:w-auto">
+                    <div className="relative shrink-0">
                       <img
                         src={rental.vehicleImage || "/placeholder.svg"}
                         alt={rental.vehicleName}
@@ -145,34 +145,47 @@ export function TablaPendientesAprobacion({ rentals, onApprovalChange }: TablaPe
                       />
                       <div className="absolute -top-1 -right-1 w-4 h-4 bg-gradient-to-br from-amber-400 to-orange-500 rounded-full border-2 border-white shadow-sm"></div>
                     </div>
-                    <div className="space-y-1">
-                      <h4 className="font-bold text-slate-800 text-lg">{rental.vehicleName}</h4>
-                      <p className="text-xs text-slate-500 font-mono bg-slate-100 px-2 py-1 rounded-md">{rental.vehiclePlate}</p>
+                    <div className="space-y-1 min-w-0">
+                      <h4 className="font-bold text-slate-800 text-lg truncate pr-2">{rental.vehicleName}</h4>
+                      <p className="text-xs text-slate-500 font-mono bg-slate-100 px-2 py-1 rounded-md inline-block">{rental.vehiclePlate}</p>
                     </div>
                   </div>
 
-                  {/* Información del inquilino */}
-                  <div className="text-sm space-y-1">
-                    <p className="font-bold text-slate-800">{rental.renterName}</p>
-                    <p className="text-slate-500 text-xs">{rental.renterPhone}</p>
-                  </div>
+                  {/* Wrapper para info intermedia en móvil */}
+                  <div className="flex flex-row justify-between w-full md:w-auto md:contents">
+                    {/* Información del inquilino */}
+                    <div className="text-sm space-y-1">
+                      <p className="font-bold text-slate-800">{rental.renterName}</p>
+                      <p className="text-slate-500 text-xs">{rental.renterPhone}</p>
+                    </div>
 
-                  {/* Fechas */}
-                  <div className="text-sm text-center space-y-1">
-                    <p className="font-bold text-slate-800">{rental.startDate}</p>
-                    <p className="text-slate-500 text-xs">hasta {rental.endDate}</p>
+                    {/* Fechas */}
+                    <div className="text-sm text-right md:text-center space-y-1">
+                      <p className="font-bold text-slate-800">{rental.startDate}</p>
+                      <p className="text-slate-500 text-xs">hasta {rental.endDate}</p>
+                    </div>
                   </div>
 
                   {/* Precio y urgencia */}
-                  <div className="text-right space-y-2">
-                    <p className="font-black text-2xl bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
-                      ${rental.totalAmount}
-                    </p>
-                    <div className="flex items-center gap-2 justify-end">
-                      {getUrgencyIcon(rental.daysUntilStart)}
+                  <div className="flex flex-row justify-between items-center w-full md:w-auto md:block md:text-right">
+                    <div className="flex items-center gap-2 md:hidden">
                       <span className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
                         Pendiente
                       </span>
+                    </div>
+                    <div className="text-right space-y-1 md:space-y-2">
+                      <p className="font-black text-2xl bg-gradient-to-r from-emerald-600 to-teal-600 bg-clip-text text-transparent">
+                        ${rental.totalAmount}
+                      </p>
+                      <p className="text-[10px] text-gray-500 leading-3 mt-1">
+                        Incluye 200km/día. Exceso 0,50€/km
+                      </p>
+                      <div className="hidden md:flex items-center gap-2 justify-end">
+                        {getUrgencyIcon(rental.daysUntilStart)}
+                        <span className="bg-gradient-to-r from-amber-400 to-orange-500 text-white px-3 py-1 rounded-full text-xs font-bold shadow-md">
+                          Pendiente
+                        </span>
+                      </div>
                     </div>
                   </div>
 
@@ -233,39 +246,39 @@ export function TablaPendientesAprobacion({ rentals, onApprovalChange }: TablaPe
                         </div>
 
                         {/* Botones de acción */}
-                        <div className="flex justify-between items-center">
-                          <div className="flex gap-2">
-                            <button 
+                        <div className="flex flex-col md:flex-row justify-between items-center gap-4 mt-6">
+                          <div className="grid grid-cols-2 gap-3 w-full md:w-auto md:flex">
+                            <button
                               onClick={(e) => {
                                 e.stopPropagation()
                                 setApproveTargetId(rental.id)
                                 setShowApproveModal(true)
                               }}
                               disabled={loading === `approve-${rental.id}`}
-                              className="flex items-center gap-2 px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                              className="flex items-center justify-center gap-2 px-4 py-3 bg-green-500 text-white rounded-xl hover:bg-green-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm font-semibold"
                             >
-                              <Check className="h-4 w-4" />
-                              {loading === `approve-${rental.id}` ? 'Aprobando...' : 'Aprobar'}
+                              <Check className="h-5 w-5" />
+                              {loading === `approve-${rental.id}` ? '...' : 'Aprobar'}
                             </button>
-                            <button 
+                            <button
                               onClick={(e) => {
                                 e.stopPropagation()
                                 handleReject(rental.id)
                               }}
                               disabled={loading === `reject-${rental.id}`}
-                              className="flex items-center gap-2 px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm"
+                              className="flex items-center justify-center gap-2 px-4 py-3 bg-red-50 text-red-600 border border-red-100 rounded-xl hover:bg-red-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors shadow-sm font-semibold"
                             >
-                              <X className="h-4 w-4" />
-                              {loading === `reject-${rental.id}` ? 'Rechazando...' : 'Rechazar'}
+                              <X className="h-5 w-5" />
+                              {loading === `reject-${rental.id}` ? '...' : 'Rechazar'}
                             </button>
                           </div>
-                          
-                          <button 
+
+                          <button
                             onClick={(e) => {
                               e.stopPropagation()
                               handleCall(rental.renterPhone)
                             }}
-                            className="flex items-center gap-2 px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 transition-colors shadow-sm"
+                            className="w-full md:w-auto flex items-center justify-center gap-2 px-6 py-3 bg-slate-100 text-slate-600 rounded-xl hover:bg-slate-200 transition-colors font-medium"
                           >
                             <Phone className="h-4 w-4" />
                             Soporte Tecnico

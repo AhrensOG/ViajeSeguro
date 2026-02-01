@@ -69,10 +69,10 @@ const RentalSidebar = ({ vehicleOffer, selectedStart, selectedEnd }: RentalSideb
 
         router.push(
             `/purchase?id=${vehicleOffer.id}` +
-                `&type=vehicle` +
-                `${referral ? `&referral=${referral}` : ""}` +
-                `&start=${encodeURIComponent(startISO)}` +
-                `&end=${encodeURIComponent(endISO)}`
+            `&type=vehicle` +
+            `${referral ? `&referral=${referral}` : ""}` +
+            `&start=${encodeURIComponent(startISO)}` +
+            `&end=${encodeURIComponent(endISO)}`
         );
     };
 
@@ -143,7 +143,7 @@ const RentalSidebar = ({ vehicleOffer, selectedStart, selectedEnd }: RentalSideb
 
                 {/* Nota: explicación fija */}
                 <p className="text-[11px] leading-4 text-custom-gray-500 mt-1 mb-2">
-                    Importe final incluye la fianza (no sujeta a IVA). La fianza se devuelve al finalizar el alquiler sin incidencias.
+                    Incluye 200 km diarios. 0,50€ por km adicional. Importe final incluye fianza (no sujeta a IVA).
                 </p>
 
                 <motion.div whileHover={{ scale: canPay ? 1.02 : 1 }} whileTap={{ scale: canPay ? 0.96 : 1 }}>
@@ -151,11 +151,10 @@ const RentalSidebar = ({ vehicleOffer, selectedStart, selectedEnd }: RentalSideb
                         onClick={handleBookingClick}
                         disabled={!canPay}
                         className={`w-full py-4 mt-4 rounded-lg flex items-center justify-center
-              ${
-                  canPay
-                      ? "bg-custom-golden-600 hover:bg-custom-golden-700 text-custom-white-100"
-                      : "bg-custom-gray-300 text-custom-gray-600 cursor-not-allowed"
-              }`}
+              ${canPay
+                                ? "bg-custom-golden-600 hover:bg-custom-golden-700 text-custom-white-100"
+                                : "bg-custom-gray-300 text-custom-gray-600 cursor-not-allowed"
+                            }`}
                     >
                         <Calendar1Icon size={16} className="mr-2" />
                         Ir a pagar

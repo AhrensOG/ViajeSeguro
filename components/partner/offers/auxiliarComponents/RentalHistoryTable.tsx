@@ -55,7 +55,7 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
 
   // Mostrar TODAS las reservas independientemente del estado
   const historyRentals = rentals
-  
+
   console.log('📊 All rental history:', historyRentals)
 
   // Si no hay reservas, no renderizar el componente
@@ -124,21 +124,21 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
 
   const formatDate = (dateString: string) => {
     if (!dateString) return 'N/A'
-    
+
     try {
       // Intentar con diferentes formatos
       let date = DateTime.fromISO(dateString)
-      
+
       if (!date.isValid) {
         // Intentar como timestamp
         date = DateTime.fromMillis(Number(dateString))
       }
-      
+
       if (!date.isValid) {
         // Intentar como fecha JavaScript
         date = DateTime.fromJSDate(new Date(dateString))
       }
-      
+
       if (date.isValid) {
         return date.toFormat('dd/MM/yyyy')
       } else {
@@ -153,11 +153,11 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
 
   const calculateDays = (startDate: string, endDate: string) => {
     if (!startDate || !endDate) return 0
-    
+
     try {
       let start = DateTime.fromISO(startDate)
       let end = DateTime.fromISO(endDate)
-      
+
       // Si no son válidas, intentar otros formatos
       if (!start.isValid) {
         start = DateTime.fromJSDate(new Date(startDate))
@@ -165,7 +165,7 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
       if (!end.isValid) {
         end = DateTime.fromJSDate(new Date(endDate))
       }
-      
+
       if (start.isValid && end.isValid) {
         return Math.ceil(end.diff(start, 'days').days)
       } else {
@@ -195,19 +195,19 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
             <div key={rental.id} className="border border-gray-200 rounded-lg overflow-hidden">
               <div
                 onClick={() => toggleExpanded(rental.id)}
-                className="flex items-center justify-between p-4 hover:bg-gray-50 transition-colors cursor-pointer"
+                className="flex flex-col md:flex-row items-start md:items-center justify-between p-4 hover:bg-gray-50 transition-colors cursor-pointer gap-4"
               >
-                <div className="flex items-center gap-4">
+                <div className="flex items-center gap-4 w-full md:w-auto">
                   <img
                     src={rental.vehicleImage || "/placeholder.svg"}
                     alt={rental.vehicleName}
-                    className="w-16 h-12 object-cover rounded-md"
+                    className="w-16 h-12 object-cover rounded-md shrink-0"
                   />
-                  <div>
-                    <h4 className="font-semibold text-gray-900">{rental.vehicleName}</h4>
+                  <div className="min-w-0">
+                    <h4 className="font-semibold text-gray-900 truncate pr-2">{rental.vehicleName}</h4>
                     <div className="flex items-center gap-2 text-sm text-gray-600">
-                      <MapPin className="h-3 w-3" />
-                      {rental.location}
+                      <MapPin className="h-3 w-3 shrink-0" />
+                      <span className="truncate">{rental.location}</span>
                     </div>
                     {rental.vehiclePlate && (
                       <p className="text-xs text-gray-500">Placa: {rental.vehiclePlate}</p>
@@ -215,35 +215,53 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
                   </div>
                 </div>
 
-                <div className="flex items-center gap-6">
-                  <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center">
-                      {rental.renterAvatar ? (
-                        <img src={rental.renterAvatar} alt={rental.renterName} className="h-8 w-8 rounded-full object-cover" />
-                      ) : (
-                        <span className="text-sm font-medium text-gray-600">{rental.renterName.charAt(0)}</span>
-                      )}
+                <div className="flex flex-col md:flex-row items-start md:items-center gap-4 md:gap-6 w-full md:w-auto">
+                  <div className="flex items-center gap-3 w-full md:w-auto justify-between md:justify-start">
+                    <div className="flex items-center gap-3">
+                      <div className="h-8 w-8 bg-gray-200 rounded-full flex items-center justify-center shrink-0">
+                        {rental.renterAvatar ? (
+                          <img src={rental.renterAvatar} alt={rental.renterName} className="h-8 w-8 rounded-full object-cover" />
+                        ) : (
+                          <span className="text-sm font-medium text-gray-600">{rental.renterName.charAt(0)}</span>
+                        )}
+                      </div>
+                      <div className="text-sm">
+                        <p className="font-medium">{rental.renterName}</p>
+                        <p className="text-gray-600 text-xs md:text-sm">{rental.renterPhone}</p>
+                      </div>
                     </div>
-                    <div className="text-sm">
-                      <p className="font-medium">{rental.renterName}</p>
-                      <p className="text-gray-600">{rental.renterPhone}</p>
+
+                    <div className="text-sm text-right md:hidden">
+                      <p className="font-medium">{formatDate(rental.startDate)}</p>
+                      <p className="text-gray-600 text-xs">hasta {formatDate(rental.endDate)}</p>
                     </div>
                   </div>
 
-                  <div className="text-sm text-center">
+                  <div className="hidden md:block text-sm text-center">
                     <p className="font-medium">{formatDate(rental.startDate)}</p>
                     <p className="text-gray-600">hasta {formatDate(rental.endDate)}</p>
                   </div>
 
-                  <div className="text-right">
-                    <p className="font-bold text-green-600">${calculatePartnerEarnings(rental.totalAmount, rental.agencyFee, rental.depositAmount).toFixed(2)}</p>
-                    <p className="text-xs text-gray-400">Ganancias (sin fianza)</p>
-                    {getStatusBadge(rental.status)}
+                  <div className="flex items-center justify-between w-full md:w-auto md:block md:text-right border-t md:border-t-0 pt-3 md:pt-0 border-gray-100">
+                    <div className="md:hidden">
+                      {getStatusBadge(rental.status)}
+                    </div>
+                    <div className="text-right">
+                      <p className="font-bold text-green-600">${calculatePartnerEarnings(rental.totalAmount, rental.agencyFee, rental.depositAmount).toFixed(2)}</p>
+                      <p className="text-[10px] text-gray-500 leading-3 mt-1">
+                        Incluye 200km/día. Exceso 0,50€/km
+                      </p>
+                      <p className="text-xs text-gray-400">Ganancias</p>
+                      <div className="hidden md:block mt-1">
+                        {getStatusBadge(rental.status)}
+                      </div>
+                    </div>
                   </div>
 
                   <motion.div
                     animate={{ rotate: expandedRentals.has(rental.id) ? 180 : 0 }}
                     transition={{ duration: 0.2 }}
+                    className="hidden md:block" // Ocultar flecha en móvil para ganar espacio (el touch area es toda la tarjeta)
                   >
                     <ChevronDown className="h-5 w-5 text-gray-400" />
                   </motion.div>
@@ -320,7 +338,7 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
                           {/* Desglose detallado */}
                           <div className="bg-gray-50 p-3 rounded-lg space-y-2">
                             <h6 className="font-medium text-gray-800 text-xs uppercase tracking-wide">Desglose de Pagos</h6>
-                            
+
                             <div className="flex justify-between">
                               <span className="text-gray-600">Lo que pagó el cliente:</span>
                               <span className="font-bold text-blue-600">${rental.totalAmount}</span>
@@ -330,14 +348,14 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
                               <span className="text-gray-600">Fianza pagada por cliente:</span>
                               <span className="font-medium">${Number(rental.depositAmount || 0).toFixed(2)}</span>
                             </div>
-                            
+
                             {rental.pricePerDay && (
                               <div className="flex justify-between">
                                 <span className="text-gray-500 text-xs">Precio por día:</span>
                                 <span className="text-gray-500 text-xs">${rental.pricePerDay}</span>
                               </div>
                             )}
-                            
+
                             <div className="border-t border-gray-200 pt-2 space-y-1">
                               <div className="flex justify-between">
                                 <span className="text-gray-600">Base (sin fianza):</span>
@@ -351,7 +369,7 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
                                     : `$${(Math.max(0, Number(rental.totalAmount || 0) - Number(rental.depositAmount || 0)) * 0.21).toFixed(2)}`}
                                 </span>
                               </div>
-                              
+
                               <div className="flex justify-between">
                                 <span className="text-green-600">Partner recibe (79%):</span>
                                 <span className="font-medium text-green-600">
@@ -360,7 +378,7 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
                               </div>
                             </div>
                           </div>
-                          
+
                           {/* Total final destacado */}
                           <div className="bg-green-50 border-2 border-green-200 p-3 rounded-lg">
                             <div className="flex justify-between items-center">
@@ -425,7 +443,7 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
 
                     {/* Acciones */}
                     <div className="px-6 pb-4 flex justify-end gap-2">
-                      <button 
+                      <button
                         onClick={(e) => {
                           e.stopPropagation();
                           window.open(`tel:${rental.renterPhone}`, '_self');
@@ -435,7 +453,7 @@ export function RentalHistoryTable({ rentals }: RentalHistoryTableProps) {
                       >
                         <Phone className="h-4 w-4" />
                       </button>
-                      <button 
+                      <button
                         className="p-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
                         title="Enviar mensaje"
                       >

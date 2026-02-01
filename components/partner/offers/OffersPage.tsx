@@ -150,7 +150,7 @@ export default function OffersPage() {
     try {
       // Usar el nuevo endpoint específico para ofertas del usuario
       const response = await fetchWithAuth<VehicleOffersAdminResponse[]>(`${BACKEND_URL}/vehicle-offer/user-offers`)
-      
+
       // Transformar la respuesta de la API al formato esperado
       return response.map((offer: VehicleOffersAdminResponse): RentalOffer => ({
         id: offer.id,
@@ -197,7 +197,7 @@ export default function OffersPage() {
     loadUserVehicles()
   }, [])
 
-  
+
 
   // Cargar ofertas del usuario
   // Cargar ofertas y estadísticas al montar
@@ -261,7 +261,7 @@ export default function OffersPage() {
   const loadUpcomingBookings = useCallback(async () => {
     try {
       const bookings = await getPartnerUpcomingBookings() as BackendBooking[]
-      
+
       // Transformar datos del backend al formato del frontend
       const transformedBookings = bookings.map((booking: BackendBooking) => {
         const startDate = new Date(booking.startDate)
@@ -276,7 +276,7 @@ export default function OffersPage() {
           .filter((p) => p?.userId && p?.amount && p.userId === renterId)
           .reduce((sum: number, p) => sum + Number(p.amount || 0), 0)
         const depositAmount = Number(booking.depositAmount ?? 0)
-        
+
         return {
           id: String(booking.id),
           vehicleName: `${booking.offer.vehicle.brand} ${booking.offer.vehicle.model}`,
@@ -300,7 +300,7 @@ export default function OffersPage() {
 
       // Debug: Mostrar todos los estados recibidos
       console.log('All bookings from backend:', transformedBookings.map(b => ({ id: b.id, status: b.status })))
-      
+
       // Mapear a formas específicas para cada tabla
       const proximosAlquileresFiltered: ProximoAlquiler[] = transformedBookings
         .filter(b => b.status === 'PENDING' || b.status === 'APPROVED' || b.status === 'DELIVERED')
@@ -448,7 +448,7 @@ export default function OffersPage() {
   const handleOfferCreated = async () => {
     toast.success("¡Oferta creada exitosamente!")
     setShowCreateModal(false)
-    
+
     // Recargar ofertas después de crear una nueva
     try {
       const offers = await getUserOffers()
@@ -462,7 +462,7 @@ export default function OffersPage() {
     toast.success("¡Oferta actualizada exitosamente!")
     setShowEditModal(false)
     setSelectedOffer(null)
-    
+
     // Recargar ofertas después de actualizar
     try {
       const offers = await getUserOffers()
@@ -503,25 +503,27 @@ export default function OffersPage() {
   const hasApprovedVehicles = userVehicles.some(v => v.approvalStatus === "APPROVED")
 
   return (
-    <div className="w-full flex flex-col items-center px-0 md:px-6 my-4 pb-10 bg-white">
+    <div className="w-full flex flex-col items-center px-4 md:px-6 my-4 pb-10 bg-white">
       <div className="w-full flex flex-col justify-start items-start">
-        {/* Estadísticas - Solo mostrar si tiene vehículos aprobados */}
-        {hasApprovedVehicles && (
-          <EstadisticasDashboardAlquileres
-            totalEarnings={statistics.totalEarnings}
-            monthlyEarnings={statistics.monthlyEarnings}
-            userVehicles={userVehicles}
-            rentals={rentalHistory.map((r, idx) => ({ id: idx, endDate: r.endDate, status: r.status }))}
-            earningsGrowthPercentage={statistics.earningsGrowthPercentage}
-          />
-        )}
+        <div className="flex flex-col-reverse md:flex-col w-full gap-8 md:gap-0">
+          {/* Tabla de pendientes de aprobación */}
+          <div className="w-full max-w-none md:mb-8">
+            <TablaPendientesAprobacion
+              rentals={pendingApprovals}
+              onApprovalChange={handleApprovalChange}
+            />
+          </div>
 
-        {/* Tabla de pendientes de aprobación */}
-        <div className="w-full max-w-none">
-          <TablaPendientesAprobacion 
-            rentals={pendingApprovals} 
-            onApprovalChange={handleApprovalChange}
-          />
+          {/* Estadísticas - Solo mostrar si tiene vehículos aprobados */}
+          {hasApprovedVehicles && (
+            <EstadisticasDashboardAlquileres
+              totalEarnings={statistics.totalEarnings}
+              monthlyEarnings={statistics.monthlyEarnings}
+              userVehicles={userVehicles}
+              rentals={rentalHistory.map((r, idx) => ({ id: idx, endDate: r.endDate, status: r.status }))}
+              earningsGrowthPercentage={statistics.earningsGrowthPercentage}
+            />
+          )}
         </div>
 
         {/* Tabla de próximos alquileres */}

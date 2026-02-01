@@ -38,6 +38,11 @@ const CreateOfferModal = ({ onClose, onSuccess, userVehicles }: Props) => {
   const { data: session } = useSession();
   const [isLoading, setIsLoading] = useState(false);
 
+  // Calcular la fecha de mañana para restringir la selección
+  const tomorrow = new Date();
+  tomorrow.setDate(tomorrow.getDate() + 1);
+  const minDate = tomorrow.toISOString().split('T')[0];
+
   const {
     register,
     handleSubmit,
@@ -193,6 +198,9 @@ const CreateOfferModal = ({ onClose, onSuccess, userVehicles }: Props) => {
                 {errors.pricePerDay.message || "Campo obligatorio"}
               </p>
             )}
+            <p className="text-xs text-custom-gray-500 mt-1">
+              Incluye 200 km/día. El exceso se cobra a 0,50€/km.
+            </p>
           </div>
 
           <div>
@@ -263,7 +271,7 @@ const CreateOfferModal = ({ onClose, onSuccess, userVehicles }: Props) => {
               type="date"
               {...register("availableFrom", { required: "Selecciona la fecha de inicio" })}
               className={inputClass}
-              min={new Date().toISOString().split('T')[0]} // No permitir fechas pasadas
+              min={minDate} // Restringir a partir de mañana
               max="2099-12-31"
               disabled={isLoading}
             />
@@ -280,7 +288,7 @@ const CreateOfferModal = ({ onClose, onSuccess, userVehicles }: Props) => {
               type="date"
               {...register("availableTo", { required: "Selecciona la fecha de fin" })}
               className={inputClass}
-              min={new Date().toISOString().split('T')[0]} // No permitir fechas pasadas
+              min={watch("availableFrom") || minDate}
               max="2099-12-31"
               disabled={isLoading}
             />

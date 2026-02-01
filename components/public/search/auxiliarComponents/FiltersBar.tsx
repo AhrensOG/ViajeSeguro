@@ -171,21 +171,19 @@ export default function FiltersBar() {
       {/* Modo de transporte */}
       <div className="flex justify-start items-center gap-4 bg-custom-gray-200 p-2 border border-custom-gray-200 rounded-md md:justify-center">
         <p
-          className={`text-custom-gray-800 flex items-center gap-2 cursor-pointer md:w-full md:justify-center ${
-            mode === "car"
+          className={`text-custom-gray-800 flex items-center gap-2 cursor-pointer md:w-full md:justify-center ${mode === "car"
               ? "bg-custom-white-100 p-2 px-3 rounded-md lg:p-3"
               : ""
-          }`}
+            }`}
           onClick={() => handleModeClick("car")}>
           <Car className="h-5 w-5" />
           Transporte
         </p>
         <p
-          className={`text-custom-gray-800 flex items-center gap-2 cursor-pointer md:w-full md:justify-center ${
-            mode === "van"
+          className={`text-custom-gray-800 flex items-center gap-2 cursor-pointer md:w-full md:justify-center ${mode === "van"
               ? "bg-custom-white-100 p-2 px-3 rounded-md lg:p-3"
               : ""
-          }`}
+            }`}
           onClick={() => handleModeClick("van")}>
           <Truck className="h-5 w-5" />
           Furgonetas
@@ -198,7 +196,7 @@ export default function FiltersBar() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="bg-custom-white-100 py-4 w-full px-2 sm:px-4">
-          <div className="grid grid-cols-5 gap-4 w-full items-stretch">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 w-full items-stretch">
             <div className="w-full">
               <CustomDatePicker
                 onSelect={setPickupDate}
