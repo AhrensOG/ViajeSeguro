@@ -7,7 +7,27 @@ import { useSearchParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import { CardReservationVehicleOfferProps } from "@/lib/api/vehicleOffer/vehicleOffers.types";
 import TripCardFallback from "@/lib/client/components/fallbacks/shared/TripCardFallback";
-import RiderRequestCTA from "./RiderRequestCTA";
+
+
+interface VehicleOfferSearchResult {
+  id: string;
+  vehicle: {
+    images: string[];
+    brand: string;
+    model: string;
+    year: number;
+    capacity: number;
+    fuelType: "DIESEL" | "GASOLINE" | "ELECTRIC" | "HYBRID";
+    transmissionType: "MANUAL" | "AUTOMATIC";
+    features: string[];
+  };
+  withdrawLocation: string;
+  returnLocation: string;
+  availableFrom: string;
+  availableTo: string;
+  pricePerDay: number;
+  vehicleOfferType: string;
+}
 
 export default function SearchOfferProcess() {
   const searchParams = useSearchParams();
@@ -30,9 +50,12 @@ export default function SearchOfferProcess() {
   const availableFrom = searchParams.get("departure") || "";
   const availableTo = searchParams.get("return") || "";
 
+  const [isSuggested, setIsSuggested] = useState(false);
+
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
+      setIsSuggested(false);
 
       const hasDates = Boolean(availableFrom && availableTo);
       const hasCapacity = Number.isFinite(capacity) && capacity > 0;
@@ -47,16 +70,29 @@ export default function SearchOfferProcess() {
       setInvalidParams(false);
 
       try {
-        const data = await searchVehicleOffers({
+        let data = await searchVehicleOffers({
           capacity: capacity,
           vehicleOfferType: vehicleOfferType,
           availableFrom: availableFrom,
           availableTo: availableTo,
         });
 
+        // Lógica de fallback: si no hay resultados exactos, buscar sugerencias
+        if (!Array.isArray(data) || data.length === 0) {
+          data = await searchVehicleOffers({
+            availableFrom: availableFrom,
+            availableTo: availableTo,
+            // Omitimos capacity y vehicleOfferType para buscar cualquier opción disponible
+          });
+
+          if (Array.isArray(data) && data.length > 0) {
+            setIsSuggested(true);
+          }
+        }
+
         let dataFormated: CardReservationVehicleOfferProps[] = [];
         if (Array.isArray(data)) {
-          dataFormated = data.map((off) => ({
+          dataFormated = data.map((off: VehicleOfferSearchResult) => ({
             id: off.id,
             imageUrl: off.vehicle.images || [],
             title: `${off.vehicle.brand} ${off.vehicle.model} ${off.vehicle.year}`,
@@ -126,9 +162,7 @@ export default function SearchOfferProcess() {
 
         <section className="flex flex-col items-start gap-4 w-full lg:w-[60%] xl:w-[60rem]">
           {/* CTA fija al nivel de los resultados */}
-          <div className="sticky top-0 z-10 w-full bg-custom-white-100/90 backdrop-blur supports-[backdrop-filter]:bg-custom-white-100/70 pt-2 pb-3">
-            <RiderRequestCTA />
-          </div>
+
           <div className="flex flex-col gap-2 w-full">
             <h1 className="text-custom-gray-800 text-2xl xl:text-4xl font-bold">
               Furgonetas disponibles en Valencia
@@ -140,9 +174,19 @@ export default function SearchOfferProcess() {
                 seleccionado fecha de recogida, devolución y capacidad.
               </p>
             ) : offers.length > 0 ? (
-              <p className="text-custom-gray-600 text-sm">
-                Encontramos {offers.length} furgonetas para tus fechas
-              </p>
+              <div className="flex flex-col gap-1">
+                {isSuggested && (
+                  <p className="text-amber-600 font-medium">
+                    No encontramos vehículos con tus filtros exactos, pero...
+                  </p>
+                )}
+                <p className="text-custom-gray-600 text-sm">
+                  {isSuggested
+                    ? `Te sugerimos estas ${offers.length} opciones disponibles para tus fechas:`
+                    : `Encontramos ${offers.length} furgonetas para tus fechas`
+                  }
+                </p>
+              </div>
             ) : (
               <p className="text-custom-gray-600 text-sm">
                 No se encontraron coincidencias con los filtros actuales.

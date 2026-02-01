@@ -352,6 +352,19 @@ const ReservationVehicleCard = ({
             <div className="border-b border-custom-gray-200"></div>
 
             <div className="flex flex-col justify-center items-end gap-4 relative">
+              {/* Aviso de kilometraje destacado antes de acción de devolver/recoger */}
+              {(currentStatus === "ACTIVE" || currentStatus === "DELIVERED") && (
+                <div className="w-full rounded-md border-l-4 border-orange-500 bg-orange-50 p-4 text-sm text-orange-800 mb-2">
+                  <p className="font-bold flex items-center gap-2">
+                    <Info className="h-4 w-4" />
+                    Importante: Política de Kilometraje
+                  </p>
+                  <p className="mt-1 ml-6">
+                    Recuerda que el alquiler incluye <strong>200 km por día</strong>.
+                    Cualquier exceso se cobrará a <strong>0,50€ por km adicional</strong> al momento de la devolución.
+                  </p>
+                </div>
+              )}
               {/* Botón de confirmar recogida cuando estado es DELIVERED */}
               {currentStatus === "DELIVERED" && (
                 <div className="w-full flex justify-center">

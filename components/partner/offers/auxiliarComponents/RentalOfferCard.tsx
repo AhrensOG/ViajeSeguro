@@ -124,6 +124,9 @@ export function RentalOfferCard({ offer, onEdit, onView, onDelete }: RentalOffer
           <div>
             <p className="text-2xl font-bold text-custom-golden-600">€{offer.pricePerDay}</p>
             <p className="text-sm text-gray-600">por día</p>
+            <p className="text-[10px] text-gray-500 leading-3 mt-1 max-w-[120px]">
+              Incluye 200km/día. Exceso 0,50€/km
+            </p>
           </div>
           <div className="text-right">
             <p className="text-sm font-medium text-gray-900">

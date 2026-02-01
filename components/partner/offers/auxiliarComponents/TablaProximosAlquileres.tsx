@@ -36,15 +36,15 @@ export function TablaProximosAlquileres({ rentals, onRentalUpdate }: TablaProxim
   // Filtrar alquileres aprobados o entregados desde hoy en adelante
   const confirmedRentals = rentals.filter(rental => {
     // Estados válidos para mostrar (solo APPROVED/CONFIRMED y DELIVERED; excluir PENDING)
-    const isApproved = rental.status === 'approved' || 
-                      rental.status === 'confirmed' ||
-                      rental.status === 'APPROVED'
-    const isDelivered = rental.status === 'DELIVERED' || 
-                       rental.status === 'delivered'
-    
+    const isApproved = rental.status === 'approved' ||
+      rental.status === 'confirmed' ||
+      rental.status === 'APPROVED'
+    const isDelivered = rental.status === 'DELIVERED' ||
+      rental.status === 'delivered'
+
     // Fecha de hoy o futura (usar daysUntilStart ya calculado)
     const isTodayOrFuture = rental.daysUntilStart >= 0
-    
+
     // Debug para verificar filtrado
     console.log('TablaProximosAlquileres Filter:', {
       id: rental.id,
@@ -55,7 +55,7 @@ export function TablaProximosAlquileres({ rentals, onRentalUpdate }: TablaProxim
       isTodayOrFuture,
       willShow: (isApproved || isDelivered) && isTodayOrFuture
     })
-    
+
     return (isApproved || isDelivered) && isTodayOrFuture
   })
 
@@ -134,106 +134,109 @@ export function TablaProximosAlquileres({ rentals, onRentalUpdate }: TablaProxim
           <div className="space-y-3">
             {confirmedRentals.map((rental) => {
               const isDelivered = rental.status === 'DELIVERED' || rental.status === 'delivered' || deliveredRentals.has(rental.id);
-              
+
               return (
-              <div key={rental.id} className="flex items-center gap-4 p-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors">
-                {/* Imagen del vehículo */}
-                <div className="flex-shrink-0">
-                  <img
-                    src={rental.vehicleImage || "/placeholder-vehicle.jpg"}
-                    alt={rental.vehicleName}
-                    className="w-16 h-16 object-cover rounded-lg border border-gray-200"
-                  />
-                </div>
-
-                {/* Información del vehículo */}
-                <div className="flex-1 min-w-0">
-                  <h4 className="font-semibold text-gray-900 truncate">{rental.vehicleName}</h4>
-                  <p className="text-sm text-gray-600">Placa: {rental.vehiclePlate}</p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <MapPin className="h-4 w-4 text-gray-400" />
-                    <span className="text-sm text-gray-600 truncate">{rental.location}</span>
+                <div key={rental.id} className="flex items-center gap-4 p-4 border-b border-gray-100 last:border-b-0 hover:bg-gray-50 transition-colors">
+                  {/* Imagen del vehículo */}
+                  <div className="flex-shrink-0">
+                    <img
+                      src={rental.vehicleImage || "/placeholder-vehicle.jpg"}
+                      alt={rental.vehicleName}
+                      className="w-16 h-16 object-cover rounded-lg border border-gray-200"
+                    />
                   </div>
-                </div>
 
-                {/* Información del cliente */}
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2">
-                    {rental.renterAvatar && (
-                      <img
-                        src={rental.renterAvatar}
-                        alt={rental.renterName}
-                        className="w-8 h-8 rounded-full"
-                      />
-                    )}
-                    <div>
-                      <p className="font-medium text-gray-900">{rental.renterName}</p>
-                      <p className="text-sm text-gray-600">{rental.renterPhone}</p>
+                  {/* Información del vehículo */}
+                  <div className="flex-1 min-w-0">
+                    <h4 className="font-semibold text-gray-900 truncate">{rental.vehicleName}</h4>
+                    <p className="text-sm text-gray-600">Placa: {rental.vehiclePlate}</p>
+                    <div className="flex items-center gap-2 mt-1">
+                      <MapPin className="h-4 w-4 text-gray-400" />
+                      <span className="text-sm text-gray-600 truncate">{rental.location}</span>
+                    </div>
+                  </div>
+
+                  {/* Información del cliente */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      {rental.renterAvatar && (
+                        <img
+                          src={rental.renterAvatar}
+                          alt={rental.renterName}
+                          className="w-8 h-8 rounded-full"
+                        />
+                      )}
+                      <div>
+                        <p className="font-medium text-gray-900">{rental.renterName}</p>
+                        <p className="text-sm text-gray-600">{rental.renterPhone}</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Fechas y duración */}
+                  <div className="flex-1 min-w-0 text-center">
+                    <p className="text-sm font-medium text-gray-900">
+                      {rental.startDate} - {rental.endDate}
+                    </p>
+                    <div className="mt-1">
+                      {getStatusBadge(rental.daysUntilStart)}
+                    </div>
+                  </div>
+
+                  {/* Precio total */}
+                  <div className="flex-shrink-0 text-right">
+                    <p className="font-semibold text-lg text-gray-900">€{rental.totalAmount.toFixed(2)}</p>
+                    <p className="text-[10px] text-gray-500 leading-3 mt-1 mb-1">
+                      200km/día incluidos<br />Exceso 0,50€/km
+                    </p>
+                    <p className="text-sm text-gray-600">Total</p>
+                  </div>
+
+                  <div className="flex-shrink-0">
+
+                    {/* Acciones */}
+                    <div className="flex flex-col sm:flex-row gap-2">
+                      <button
+                        onClick={() => handleCall(rental.renterPhone)}
+                        className="flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+                        title="Llamar al cliente"
+                      >
+                        <Phone className="h-4 w-4" />
+                      </button>
+                      {/* Solo mostrar botón de entrega si NO está entregado */}
+                      {!isDelivered && (
+                        <button
+                          onClick={() => openCaptureFlow(rental.id)}
+                          disabled={loadingDelivery === rental.id}
+                          className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:scale-105 min-w-[140px] sm:min-w-[160px]"
+                          title="Marcar vehículo como entregado al cliente"
+                        >
+                          {loadingDelivery === rental.id ? (
+                            <>
+                              <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
+                              <span className="text-sm font-medium hidden sm:inline">Entregando...</span>
+                            </>
+                          ) : (
+                            <>
+                              <CheckCircle className="h-5 w-5" />
+                              <span className="text-sm font-medium hidden sm:inline">Marcar Entregado</span>
+                              <span className="text-xs font-medium sm:hidden">Entregar</span>
+                            </>
+                          )}
+                        </button>
+                      )}
+
+                      {/* Mostrar estado entregado si ya fue entregado */}
+                      {isDelivered && (
+                        <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-lg shadow-md min-w-[140px] sm:min-w-[160px] animate-pulse" title="Vehículo entregado exitosamente">
+                          <CheckCircle className="h-5 w-5" />
+                          <span className="text-sm font-medium hidden sm:inline">✅ Entregado</span>
+                          <span className="text-xs font-medium sm:hidden">✅ OK</span>
+                        </div>
+                      )}
                     </div>
                   </div>
                 </div>
-
-                {/* Fechas y duración */}
-                <div className="flex-1 min-w-0 text-center">
-                  <p className="text-sm font-medium text-gray-900">
-                    {rental.startDate} - {rental.endDate}
-                  </p>
-                  <div className="mt-1">
-                    {getStatusBadge(rental.daysUntilStart)}
-                  </div>
-                </div>
-
-                {/* Precio total */}
-                <div className="flex-shrink-0 text-right">
-                  <p className="font-semibold text-lg text-gray-900">€{rental.totalAmount.toFixed(2)}</p>
-                  <p className="text-sm text-gray-600">Total</p>
-                </div>
-
-                <div className="flex-shrink-0">
-
-                  {/* Acciones */}
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <button 
-                      onClick={() => handleCall(rental.renterPhone)}
-                      className="flex items-center justify-center w-8 h-8 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-                      title="Llamar al cliente"
-                    >
-                      <Phone className="h-4 w-4" />
-                    </button>
-                    {/* Solo mostrar botón de entrega si NO está entregado */}
-                    {!isDelivered && (
-                      <button 
-                        onClick={() => openCaptureFlow(rental.id)}
-                        disabled={loadingDelivery === rental.id}
-                        className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-green-600 to-green-700 text-white rounded-lg hover:from-green-700 hover:to-green-800 transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed shadow-md hover:shadow-lg transform hover:scale-105 min-w-[140px] sm:min-w-[160px]"
-                        title="Marcar vehículo como entregado al cliente"
-                      >
-                        {loadingDelivery === rental.id ? (
-                          <>
-                            <div className="animate-spin rounded-full h-4 w-4 border-2 border-white border-t-transparent"></div>
-                            <span className="text-sm font-medium hidden sm:inline">Entregando...</span>
-                          </>
-                        ) : (
-                          <>
-                            <CheckCircle className="h-5 w-5" />
-                            <span className="text-sm font-medium hidden sm:inline">Marcar Entregado</span>
-                            <span className="text-xs font-medium sm:hidden">Entregar</span>
-                          </>
-                        )}
-                      </button>
-                    )}
-                    
-                    {/* Mostrar estado entregado si ya fue entregado */}
-                    {isDelivered && (
-                      <div className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-emerald-600 to-emerald-700 text-white rounded-lg shadow-md min-w-[140px] sm:min-w-[160px] animate-pulse" title="Vehículo entregado exitosamente">
-                        <CheckCircle className="h-5 w-5" />
-                        <span className="text-sm font-medium hidden sm:inline">✅ Entregado</span>
-                        <span className="text-xs font-medium sm:hidden">✅ OK</span>
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
               );
             })}
           </div>

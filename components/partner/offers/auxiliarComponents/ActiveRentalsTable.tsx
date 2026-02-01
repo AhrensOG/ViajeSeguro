@@ -44,10 +44,10 @@ export function ActiveRentalsTable({ rentals }: ActiveRentalsTableProps) {
   })
 
   // Filtrar reservas con estado ACTIVE y RETURNED
-  const activeRentals = visibleRentals.filter(rental => 
+  const activeRentals = visibleRentals.filter(rental =>
     rental.status === 'ACTIVE' || rental.status === 'RETURNED'
   )
-  
+
   console.log('🎯 Filtered ACTIVE and RETURNED rentals:', activeRentals)
 
   // Si no hay reservas activas o devueltas, no mostrar
@@ -156,18 +156,21 @@ export function ActiveRentalsTable({ rentals }: ActiveRentalsTableProps) {
 
                 <div className="text-right">
                   <p className="font-bold text-blue-600">${rental.totalAmount}</p>
+                  <p className="text-[10px] text-gray-500 leading-3 mt-1 mb-1 max-w-[120px]">
+                    200km/día incluidos<br />Exceso 0,50€/km
+                  </p>
                   {getStatusBadge(rental.status)}
                 </div>
 
                 <div className="flex gap-2">
-                  <button 
+                  <button
                     onClick={() => handleCall(rental.renterPhone)}
                     className="p-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
                   >
                     <Phone className="h-4 w-4" />
                   </button>
                   {rental.status === "RETURNED" && (
-                    <button 
+                    <button
                       onClick={(e) => {
                         e.stopPropagation();
                         openCaptureFlow(rental.id);
