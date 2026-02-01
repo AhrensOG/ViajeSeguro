@@ -9,6 +9,26 @@ import { CardReservationVehicleOfferProps } from "@/lib/api/vehicleOffer/vehicle
 import TripCardFallback from "@/lib/client/components/fallbacks/shared/TripCardFallback";
 
 
+interface VehicleOfferSearchResult {
+  id: string;
+  vehicle: {
+    images: string[];
+    brand: string;
+    model: string;
+    year: number;
+    capacity: number;
+    fuelType: "DIESEL" | "GASOLINE" | "ELECTRIC" | "HYBRID";
+    transmissionType: "MANUAL" | "AUTOMATIC";
+    features: string[];
+  };
+  withdrawLocation: string;
+  returnLocation: string;
+  availableFrom: string;
+  availableTo: string;
+  pricePerDay: number;
+  vehicleOfferType: string;
+}
+
 export default function SearchOfferProcess() {
   const searchParams = useSearchParams();
 
@@ -72,7 +92,7 @@ export default function SearchOfferProcess() {
 
         let dataFormated: CardReservationVehicleOfferProps[] = [];
         if (Array.isArray(data)) {
-          dataFormated = data.map((off: any) => ({
+          dataFormated = data.map((off: VehicleOfferSearchResult) => ({
             id: off.id,
             imageUrl: off.vehicle.images || [],
             title: `${off.vehicle.brand} ${off.vehicle.model} ${off.vehicle.year}`,
