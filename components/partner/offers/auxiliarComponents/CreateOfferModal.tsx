@@ -269,7 +269,34 @@ const CreateOfferModal = ({ onClose, onSuccess, userVehicles }: Props) => {
             <label className={labelClass}>Disponible desde</label>
             <input
               type="date"
-              {...register("availableFrom", { required: "Selecciona la fecha de inicio" })}
+              {...register("availableFrom", {
+                required: "Selecciona la fecha de inicio",
+                validate: (value) => {
+                  if (!value) return true;
+                  const now = new Date();
+                  // Reset hours to compare dates properly at start of day
+                  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                  // selectedDate from input "YYYY-MM-DD" is treated as UTC usually, we need to be careful.
+                  // safer: compare YYYY-MM-DD strings or construct local date.
+                  // Let's rely on the textual comparison which is safer for "YYYY-MM-DD" if we align timezones, 
+                  // but simplest regarding the User Request:
+
+                  const tomorrow = new Date(today);
+                  tomorrow.setDate(tomorrow.getDate() + 1);
+
+                  // Reset selection to midnight local time to compare with tomorrow midnight
+                  // Input date "2023-01-01" parsed as date is UTC midnight usually? No, "2023-01-01" in Date() constructor is UTC.
+                  // "2023-01-01T00:00:00" is local.
+                  const selectedLocal = new Date(value + 'T00:00:00');
+
+                  if (selectedLocal < tomorrow) {
+                    const todayStr = today.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+                    const tomorrowStr = tomorrow.toLocaleDateString('es-ES', { day: 'numeric', month: 'long' });
+                    return `Tiene que poner la fecha de mañana, o sea si hoy es ${todayStr}, tiene que poner ${tomorrowStr}`;
+                  }
+                  return true;
+                }
+              })}
               className={inputClass}
               min={minDate} // Restringir a partir de mañana
               max="2099-12-31"
