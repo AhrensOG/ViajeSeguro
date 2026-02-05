@@ -27,6 +27,7 @@ interface VehicleOfferSearchResult {
   availableTo: string;
   pricePerDay: number;
   vehicleOfferType: string;
+  dailyMileageLimit?: number;
 }
 
 export default function SearchOfferProcess() {
@@ -106,6 +107,7 @@ export default function SearchOfferProcess() {
             dateEnd: off.availableTo,
             pricePerDay: off.pricePerDay,
             vehicleOfferType: off.vehicleOfferType,
+            dailyMileageLimit: off.dailyMileageLimit,
             requestedStartDate: availableFrom,
             requestedEndDate: availableTo,
             requestedOfferType: vehicleOfferType,

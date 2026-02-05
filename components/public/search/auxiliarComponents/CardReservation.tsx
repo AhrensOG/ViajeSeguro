@@ -1,5 +1,4 @@
 import { CardReservationVehicleOfferProps } from "@/lib/api/vehicleOffer/vehicleOffers.types";
-import { calculateTotalDays } from "@/lib/functions";
 import { ArrowRight, Fuel, MapPin, Settings, Users } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
@@ -136,15 +135,9 @@ export default function CardReservation(props: CardProps) {
             <span className="text-sm text-custom-gray-500 font-medium">/ día</span>
           </div>
           <p className="text-[10px] text-custom-gray-500 text-right mt-1 max-w-[150px] leading-3">
-            Incluye 200km/día.<br />Exceso 0,50€/km
+            Incluye {props.dailyMileageLimit || 200}km/día.<br />Exceso 0,50€/km
           </p>
-          <p className="text-sm text-custom-gray-500 text-right mt-1">
-            Total aprox:{" "}
-            <span className="font-semibold text-custom-gray-700">
-              {(Number(pricePerDay) * calculateTotalDays(dateStart, dateEnd)).toFixed(2)}€
-            </span>
-            {" "}x {calculateTotalDays(dateStart, dateEnd)} días
-          </p>
+
         </div>
 
         <div className="flex flex-col gap-2 mt-auto">

@@ -39,6 +39,7 @@ type FormData = {
     availableTo: string;
     agencyFee: string;
     depositAmount: string;
+    dailyMileageLimit: string;
     vehicleOfferType: "WITH_DRIVER" | "WITHOUT_DRIVER";
     vehicleId: string;
     ownerId: string;
@@ -61,6 +62,7 @@ const EditVehicleOfferModal = ({ onClose, offer, afterEdit, vehicles, owners }: 
             pricePerDay: offer.pricePerDay.toString(),
             agencyFee: offer.agencyFee.toString(),
             depositAmount: offer.depositAmount.toString(),
+            dailyMileageLimit: (offer.dailyMileageLimit ?? 200).toString(),
             withdrawLocation: offer.withdrawLocation,
             returnLocation: offer.returnLocation,
             availableFrom: new Date(offer.availableFrom).toISOString().split("T")[0],
@@ -94,6 +96,7 @@ const EditVehicleOfferModal = ({ onClose, offer, afterEdit, vehicles, owners }: 
                 availableTo: new Date(data.availableTo),
                 agencyFee: Number(data.agencyFee),
                 depositAmount: Number(data.depositAmount),
+                dailyMileageLimit: Number(data.dailyMileageLimit),
                 vehicleOfferType: data.vehicleOfferType,
                 vehicleId: data.vehicleId,
                 ownerId: data.ownerId,
@@ -253,6 +256,26 @@ const EditVehicleOfferModal = ({ onClose, offer, afterEdit, vehicles, owners }: 
                             className={inputClass}
                         />
                         {errors.depositAmount && <p className="text-red-500 text-xs">{errors.depositAmount.message || "Campo obligatorio"}</p>}
+                    </div>
+
+                    <div>
+                        <label className={labelClass}>Kilómetros por día</label>
+                        <input
+                            type="text"
+                            inputMode="decimal"
+                            {...register("dailyMileageLimit", {
+                                required: "El límite de kilometraje es obligatorio",
+                                validate: (value) => /^[0-9]+$/.test(value) || "Debe ser un número entero",
+                                min: { value: 1, message: "Debe ser al menos 1 km" },
+                            })}
+                            onInput={(e) => {
+                                const input = e.target as HTMLInputElement;
+                                input.value = input.value.replace(/[^0-9]/g, "");
+                            }}
+                            className={inputClass}
+                            placeholder="200"
+                        />
+                        {errors.dailyMileageLimit && <p className="text-red-500 text-xs">{errors.dailyMileageLimit.message || "Campo obligatorio"}</p>}
                     </div>
 
                     <div>

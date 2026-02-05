@@ -27,6 +27,7 @@ type FormData = {
   conditions?: string;
   // Nuevo campo para fianza (solo UI por ahora)
   depositAmount: string;
+  dailyMileageLimit: string;
 };
 
 const inputClass =
@@ -49,7 +50,12 @@ const CreateOfferModal = ({ onClose, onSuccess, userVehicles }: Props) => {
     formState: { errors },
     setValue,
     watch,
-  } = useForm<FormData>();
+  } = useForm<FormData>({
+    defaultValues: {
+      dailyMileageLimit: "200",
+      depositAmount: "", // Explicit default
+    }
+  });
 
   const pricePerDay = watch("pricePerDay");
 
@@ -89,6 +95,7 @@ const CreateOfferModal = ({ onClose, onSuccess, userVehicles }: Props) => {
         availableTo: new Date(data.availableTo),
         agencyFee: Number(String(data.agencyFee ?? "").replace(",", ".")),
         depositAmount: depositParsed,
+        dailyMileageLimit: Number(data.dailyMileageLimit),
         vehicleOfferType: data.vehicleOfferType,
         vehicleId: data.vehicleId,
         ownerId: session.user.id, // El propietario es siempre el usuario autenticado
@@ -243,6 +250,29 @@ const CreateOfferModal = ({ onClose, onSuccess, userVehicles }: Props) => {
             {errors.depositAmount && (
               <p className="text-red-500 text-xs">
                 {errors.depositAmount.message || "Campo obligatorio"}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className={labelClass}>Kilómetros por día</label>
+            <input
+              type="number"
+              min="1"
+              {...register("dailyMileageLimit", {
+                required: "El límite de kilometraje es obligatorio",
+                min: { value: 1, message: "Debe ser al menos 1 km" },
+              })}
+              className={inputClass}
+              placeholder="Ej: 200"
+              disabled={isLoading}
+            />
+            <p className="text-xs text-custom-gray-500 mt-1">
+              Límite diario incluido en el precio.
+            </p>
+            {errors.dailyMileageLimit && (
+              <p className="text-red-500 text-xs">
+                {errors.dailyMileageLimit.message || "Campo obligatorio"}
               </p>
             )}
           </div>

@@ -20,6 +20,7 @@ interface ActiveRental {
   totalAmount: number
   status: "ACTIVE" | "RETURNED" | "overdue" | "ending-soon"
   location: string
+  dailyMileageLimit?: number
 }
 
 interface ActiveRentalsTableProps {
@@ -157,7 +158,7 @@ export function ActiveRentalsTable({ rentals }: ActiveRentalsTableProps) {
                 <div className="text-right">
                   <p className="font-bold text-blue-600">${rental.totalAmount}</p>
                   <p className="text-[10px] text-gray-500 leading-3 mt-1 mb-1 max-w-[120px]">
-                    200km/día incluidos<br />Exceso 0,50€/km
+                    {rental.dailyMileageLimit || 200}km/día incluidos<br />Exceso 0,50€/km
                   </p>
                   {getStatusBadge(rental.status)}
                 </div>

@@ -331,6 +331,7 @@ const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
               <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-4">
                 {imageFiles.map((file, index) => (
                   <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-custom-gray-200">
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={URL.createObjectURL(file)}
                       alt={`Preview ${index}`}

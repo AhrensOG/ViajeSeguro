@@ -22,6 +22,7 @@ export interface VehicleOfferWithVehicle {
     vehicleOfferType: string;
     // Campo opcional: fianza definida por el partner (si el backend la provee)
     depositAmount?: number;
+    dailyMileageLimit?: number;
     bookings?: {
         id: string;
         startDate: string;
@@ -38,6 +39,7 @@ export interface CreateVehicleBookingPayload {
     paymentMethod: string;
     referrerId?: string;
     totalPrice: number;
+    prepaidExtraMileage?: number;
 }
 
 export interface ResponseForQrPage {

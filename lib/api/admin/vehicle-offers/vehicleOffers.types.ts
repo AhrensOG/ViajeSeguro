@@ -8,6 +8,7 @@ export interface VehicleOffersAdminResponse {
     availableTo: Date;
     agencyFee: number;
     depositAmount: number;
+    dailyMileageLimit?: number; // Added
     available: string;
     vehicleOfferType: string;
     conditions: string;
@@ -53,6 +54,7 @@ export interface UpdateVehicleOfferRequest {
     availableTo?: Date;
     agencyFee?: number;
     depositAmount?: number;
+    dailyMileageLimit?: number;
     available?: string;
     vehicleOfferType?: string;
     conditions?: string;
@@ -94,6 +96,7 @@ export interface CreateVehicleOfferRequest {
     availableTo: Date;
     agencyFee: number;
     depositAmount: number;
+    dailyMileageLimit: number;
     available: string;
     vehicleOfferType: string;
     conditions?: string;

@@ -29,6 +29,7 @@ interface RentalOffer {
   vehicleImage: string
   pricePerDay: number
   depositAmount?: number
+  dailyMileageLimit?: number
   withdrawLocation: string
   returnLocation: string
   availableFrom: string
@@ -159,6 +160,7 @@ export default function OffersPage() {
         vehicleImage: offer.vehicle.images?.[0] || "",
         pricePerDay: offer.pricePerDay,
         depositAmount: offer.depositAmount,
+        dailyMileageLimit: offer.dailyMileageLimit,
         withdrawLocation: offer.withdrawLocation,
         returnLocation: offer.returnLocation,
         availableFrom: offer.availableFrom.toString(),
@@ -585,6 +587,7 @@ export default function OffersPage() {
             pricePerDay: selectedOffer.pricePerDay,
             agencyFee: selectedOffer.pricePerDay * 0.22, // Calcular tarifa de agencia
             depositAmount: selectedOffer.depositAmount,
+            dailyMileageLimit: selectedOffer.dailyMileageLimit,
             vehicleOfferType: selectedOffer.vehicleOfferType,
             availableFrom: selectedOffer.availableFrom,
             availableTo: selectedOffer.availableTo,

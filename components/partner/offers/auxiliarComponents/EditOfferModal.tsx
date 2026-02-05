@@ -19,6 +19,7 @@ interface Props {
     pricePerDay: number;
     agencyFee: number;
     depositAmount?: number;
+    dailyMileageLimit?: number;
     vehicleOfferType: "WITH_DRIVER" | "WITHOUT_DRIVER";
     availableFrom: string;
     availableTo: string;
@@ -33,6 +34,7 @@ type FormData = {
   pricePerDay: string;
   agencyFee: string;
   depositAmount: string;
+  dailyMileageLimit: string;
   vehicleOfferType: "WITH_DRIVER" | "WITHOUT_DRIVER";
   availableFrom: string;
   availableTo: string;
@@ -62,6 +64,7 @@ const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
       pricePerDay: offer.pricePerDay.toString(),
       agencyFee: offer.agencyFee.toString(),
       depositAmount: (offer.depositAmount ?? 0).toString(),
+      dailyMileageLimit: (offer.dailyMileageLimit ?? 200).toString(),
       vehicleOfferType: offer.vehicleOfferType,
       availableFrom: new Date(offer.availableFrom).toISOString().split('T')[0],
       availableTo: new Date(offer.availableTo).toISOString().split('T')[0],
@@ -101,10 +104,18 @@ const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
         return;
       }
 
+      const mileageParsed = Number(data.dailyMileageLimit);
+      if (Number.isNaN(mileageParsed) || mileageParsed < 1) {
+        toast.error("El límite de kilometraje debe ser mayor a 0", { id: toastId });
+        setIsLoading(false);
+        return;
+      }
+
       // Construir payload solo con cambios relevantes para evitar modificar fechas pasadas
       const payload: UpdateVehicleOfferRequest = {
         vehicleId: data.vehicleId,
         depositAmount: depositParsed,
+        dailyMileageLimit: mileageParsed,
       };
 
       const originalAgencyFee = Number(offer.agencyFee);
@@ -252,8 +263,31 @@ const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
               </p>
             )}
             <p className="text-xs text-custom-gray-500 mt-1">
-              Incluye 200 km/día. El exceso se cobra a 0,50€/km.
+              Incluye {watch("dailyMileageLimit") || 200} km/día. El exceso se cobra a 0,50€/km.
             </p>
+          </div>
+
+          <div>
+            <label className={labelClass}>Kilómetros por día</label>
+            <input
+              type="number"
+              min="1"
+              {...register("dailyMileageLimit", {
+                required: "El límite de kilometraje es obligatorio",
+                min: { value: 1, message: "Debe ser al menos 1 km" },
+              })}
+              className={inputClass}
+              placeholder="200"
+              disabled={isLoading}
+            />
+            <p className="text-xs text-custom-gray-500 mt-1">
+              Define cuántos km incluye el precio base por día.
+            </p>
+            {errors.dailyMileageLimit && (
+              <p className="text-red-500 text-xs">
+                {errors.dailyMileageLimit.message || "Campo obligatorio"}
+              </p>
+            )}
           </div>
 
           <div>
