@@ -42,6 +42,8 @@ const PurchaseProcess = () => {
     const IVA = 21;
     const referralId = searchParams.get("referral");
     const id = searchParams.get("id");
+    const extraMileageParam = searchParams.get("extraMileage");
+    const prepaidExtraMileage = extraMileageParam ? Number(extraMileageParam) : 0;
 
     const [trip, setTrip] = useState<TripWithPriceDetails | null>(null);
     const [vehicleOffer, setVehicleOffer] = useState<VehicleOfferWithVehicle | null>(null);
@@ -151,8 +153,10 @@ const PurchaseProcess = () => {
                 endDate: new Date(end || vehicleOffer.availableTo),
                 status: "PENDING",
                 paymentMethod: "CASH",
+
                 referrerId: referralId || undefined,
-                totalPrice: totalPrice,
+                totalPrice: totalPrice + (prepaidExtraMileage * 0.30),
+                prepaidExtraMileage: prepaidExtraMileage,
             };
 
             try {
@@ -244,11 +248,12 @@ const PurchaseProcess = () => {
                     status: 'PENDING',
                     paymentMethod: 'STRIPE',
                     totalPrice: String(finalPrice),
+                    prepaidExtraMileage: String(prepaidExtraMileage),
                 };
                 if (referralId) vehicleMetadataStrings.referrerId = String(referralId);
 
                 const data = await createCheckoutSession({
-                    amount: Math.round(((finalPrice * (1 + Number(IVA) / 100)) + deposit) * 100),
+                    amount: Math.round(((finalPrice * (1 + Number(IVA) / 100)) + deposit + (prepaidExtraMileage * 0.30 * 1.21)) * 100),
                     metadata: (vehicleMetadataStrings as unknown) as CreateVehicleBookingPayload,
                 });
 

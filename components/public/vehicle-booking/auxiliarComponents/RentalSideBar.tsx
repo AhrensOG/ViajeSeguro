@@ -31,6 +31,7 @@ const RentalSidebar = ({ vehicleOffer, selectedStart, selectedEnd }: RentalSideb
     const [referral, setReferral] = useState("");
     const { data: session } = useSession();
     const [showModal, setShowModal] = useState(false);
+    const [extraMileage, setExtraMileage] = useState(0);
     const router = useRouter();
 
     const basePrice = vehicleOffer.pricePerDay;
@@ -40,7 +41,7 @@ const RentalSidebar = ({ vehicleOffer, selectedStart, selectedEnd }: RentalSideb
         return diffDaysInclusive(selectedStart, selectedEnd);
     }, [selectedStart, selectedEnd]);
 
-    const total = useMemo(() => basePrice * days, [basePrice, days]);
+    const total = useMemo(() => (basePrice * days) + (extraMileage * 0.30), [basePrice, days, extraMileage]);
     const iva = useMemo(() => total * (IVA / 100), [total]);
     const final = useMemo(() => total + iva, [total, iva]);
     // Mostrar siempre la fianza con fallback de 600€ hasta que el backend la provea
@@ -72,7 +73,8 @@ const RentalSidebar = ({ vehicleOffer, selectedStart, selectedEnd }: RentalSideb
             `&type=vehicle` +
             `${referral ? `&referral=${referral}` : ""}` +
             `&start=${encodeURIComponent(startISO)}` +
-            `&end=${encodeURIComponent(endISO)}`
+            `&end=${encodeURIComponent(endISO)}` +
+            `&extraMileage=${extraMileage}`
         );
     };
 
@@ -143,8 +145,35 @@ const RentalSidebar = ({ vehicleOffer, selectedStart, selectedEnd }: RentalSideb
 
                 {/* Nota: explicación fija */}
                 <p className="text-[11px] leading-4 text-custom-gray-500 mt-1 mb-2">
-                    Incluye 200 km diarios. 0,50€ por km adicional. Importe final incluye fianza (no sujeta a IVA).
+                    Incluye {vehicleOffer.dailyMileageLimit || 200} km diarios. 0,50€ por km adicional (post-pago). <br />
+                    Puedes pre-contratar km extra a 0,30€/km.
                 </p>
+
+                <div className="bg-white p-3 rounded-md border border-custom-gray-200 mb-4">
+                    <label className="text-sm font-medium text-custom-gray-700 block mb-1">
+                        ¿Planeas hacer más kilómetros?
+                    </label>
+                    <div className="flex gap-3 items-center">
+                        <button
+                            onClick={() => setExtraMileage(Math.max(0, extraMileage - 10))}
+                            className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300 transition"
+                        >
+                            -
+                        </button>
+                        <span className="font-semibold text-custom-black-800 w-12 text-center">
+                            {extraMileage}
+                        </span>
+                        <button
+                            onClick={() => setExtraMileage(extraMileage + 10)}
+                            className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300 transition"
+                        >
+                            +
+                        </button>
+                        <span className="text-xs text-custom-gray-500 ml-2">
+                            (+{(extraMileage * 0.30).toFixed(2)}€)
+                        </span>
+                    </div>
+                </div>
 
                 <motion.div whileHover={{ scale: canPay ? 1.02 : 1 }} whileTap={{ scale: canPay ? 0.96 : 1 }}>
                     <button
@@ -163,7 +192,7 @@ const RentalSidebar = ({ vehicleOffer, selectedStart, selectedEnd }: RentalSideb
             </div>
 
             <AuthRequiredModal show={showModal} onClose={() => setShowModal(false)} onConfirm={handleBookingClick} />
-        </motion.div>
+        </motion.div >
     );
 };
 

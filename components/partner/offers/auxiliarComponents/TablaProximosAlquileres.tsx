@@ -2,7 +2,7 @@
 /* eslint-disable @next/next/no-img-element */
 
 import { Clock, MapPin, Phone, CheckCircle } from "lucide-react"
-import { markBookingAsDelivered, saveDeliveryPhotos } from "@/lib/api/vehicle-booking"
+import { markBookingAsDelivered } from "@/lib/api/vehicle-booking"
 import { toast } from "sonner"
 import { useState } from "react"
 import DeliveryCaptureModal from "./DeliveryCaptureModal"
@@ -88,19 +88,11 @@ export function TablaProximosAlquileres({ rentals, onRentalUpdate }: TablaProxim
     setCaptureOpen(true)
   }
 
-  const handleCaptureComplete = async (urls: string[]) => {
+  const handleCaptureComplete = async () => {
     if (!selectedBookingId) return
     try {
       setLoadingDelivery(selectedBookingId)
-      // Guardar URLs de fotos de entrega antes de marcar entregado
-      try {
-        await saveDeliveryPhotos(selectedBookingId, urls)
-      } catch (e: unknown) {
-        console.warn('saveDeliveryPhotos failed, proceeding anyway:', e)
-        toast.message("Fotos subidas", {
-          description: "No se pudieron registrar en el servidor, pero se continuará con la entrega."
-        })
-      }
+
       await markBookingAsDelivered(selectedBookingId)
       // Actualizar UI local
       setDeliveredRentals(prev => new Set([...prev, selectedBookingId]))

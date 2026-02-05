@@ -47,6 +47,7 @@ export interface CardReservationVehicleOfferProps {
     dateEnd: string;
     // totalPrice: string;
     pricePerDay: number;
+    dailyMileageLimit?: number;
     vehicleOfferType: string;
     requestedStartDate: string;
     requestedEndDate: string;

@@ -27,8 +27,8 @@ const CAPTURE_STEPS: GuidedStep[] = [
   { key: "odometer_photo", label: "Odómetro (kilometraje)", hint: "Enfoca el tablero para que los números se vean nítidos" },
   { key: "fuel_photo", label: "Nivel de combustible", hint: "Enfoca el indicador para que se aprecie claramente" },
   { key: "front_photo", label: "Frente del vehículo", hint: "Toma la foto de frente, manteniendo el vehículo centrado" },
-  { key: "rear_photo", label: "Parte trasera", hint: "Toma la foto desde atrás, con buena iluminación" },
   { key: "left_side_photo", label: "Lateral izquierdo", hint: "Fotografía el lado izquierdo completo del vehículo" },
+  { key: "rear_photo", label: "Parte trasera", hint: "Toma la foto desde atrás, con buena iluminación" },
   { key: "right_side_photo", label: "Lateral derecho", hint: "Fotografía el lado derecho completo del vehículo" },
   { key: "interior_photo", label: "Interior", hint: "Incluye asientos delanteros y tablero si es posible" },
   { key: "detail_photo", label: "Detalle adicional", hint: "Cualquier marca o detalle que quieras dejar registrado" },
@@ -45,7 +45,7 @@ export default function DeliveryCaptureModal({ isOpen, bookingId, onClose, onCom
   const [cameraError, setCameraError] = useState<string | null>(null);
 
   const MAX_PHOTOS = CAPTURE_STEPS.length;
-  const MIN_PHOTOS = CAPTURE_STEPS.length; // ahora requerimos todas las fotos de la guía
+  const MIN_PHOTOS = CAPTURE_STEPS.length - 1; // El paso 8 (detalle) es opcional
 
   useEffect(() => {
     if (!isOpen || !bookingId) return;
@@ -79,7 +79,7 @@ export default function DeliveryCaptureModal({ isOpen, bookingId, onClose, onCom
         streamRef.current = null;
       }
       if (videoEl) {
-        try { videoEl.pause(); } catch {}
+        try { videoEl.pause(); } catch { }
         (videoEl as HTMLVideoElement & { srcObject?: MediaStream | null }).srcObject = null;
       }
       // IMPORTANTE: No resetear estados aquí, porque este cleanup corre al cambiar stepIndex
@@ -134,9 +134,15 @@ export default function DeliveryCaptureModal({ isOpen, bookingId, onClose, onCom
 
   const handleUploadAndContinue = async () => {
     if (!bookingId) return;
-    const missing = capturedByStep.filter((f) => !f).length;
-    if (missing > 0) {
-      toast.error("Debes completar todas las fotos requeridas antes de continuar");
+    // Solo requerimos 7 fotos (excluyendo detalle)
+    // El detalle es el índice 7 (CAPTURE_STEPS.length - 1)
+
+    // Verificamos si falta alguna de las primeras 7 fotos
+    const mandatoryPhotos = capturedByStep.slice(0, MIN_PHOTOS);
+    const missing = mandatoryPhotos.some(f => !f);
+
+    if (missing) {
+      toast.error("Debes completar todas las fotos obligatorias antes de continuar");
       return;
     }
     try {
@@ -163,11 +169,14 @@ export default function DeliveryCaptureModal({ isOpen, bookingId, onClose, onCom
 
   if (!isOpen) return null;
 
+  const currentStepIsOptional = stepIndex === CAPTURE_STEPS.length - 1; // Último paso es opcional
+  const title = phase === 'OWNER_POST' ? "Registro fotográfico de devolución" : "Registro fotográfico de entrega";
+
   return (
     <div className="fixed inset-0 z-[100] flex items-center justify-center bg-black/60 p-4">
       <div className="w-full max-w-2xl bg-white rounded-2xl shadow-2xl overflow-hidden">
         <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100">
-          <h3 className="text-xl font-semibold text-gray-900">Registro fotográfico de entrega</h3>
+          <h3 className="text-xl font-semibold text-gray-900">{title}</h3>
           <button onClick={onClose} className="p-2 rounded-lg hover:bg-gray-50" aria-label="Cerrar">
             <X className="h-5 w-5" />
           </button>
@@ -233,7 +242,10 @@ export default function DeliveryCaptureModal({ isOpen, bookingId, onClose, onCom
                   <p className="text-sm font-semibold text-gray-900">Paso {stepIndex + 1} de {CAPTURE_STEPS.length}</p>
                   <span className="text-xs text-orange-700 px-2 py-1 rounded-full bg-white border border-orange-200">{CAPTURE_STEPS[stepIndex].label}</span>
                 </div>
-                <p className="mt-2 text-sm text-gray-800">{CAPTURE_STEPS[stepIndex].hint}</p>
+                <p className="mt-2 text-sm text-gray-800">
+                  {CAPTURE_STEPS[stepIndex].hint}
+                  {currentStepIsOptional && <span className="block font-bold mt-1 text-orange-700">(Este paso es opcional)</span>}
+                </p>
               </div>
 
               {/* Cámara */}
@@ -252,6 +264,16 @@ export default function DeliveryCaptureModal({ isOpen, bookingId, onClose, onCom
                         >
                           <Camera className="h-5 w-5" /> Capturar foto
                         </button>
+
+                        {/* Botón Omitir para paso opcional */}
+                        {currentStepIsOptional && (
+                          <button
+                            onClick={handleUploadAndContinue}
+                            className="px-5 py-2.5 bg-gray-700/80 backdrop-blur-sm text-white rounded-full hover:bg-gray-600 text-sm font-medium"
+                          >
+                            Omitir y Finalizar
+                          </button>
+                        )}
                       </div>
                     </>
                   ) : (
@@ -289,12 +311,12 @@ export default function DeliveryCaptureModal({ isOpen, bookingId, onClose, onCom
           )}
         </div>
 
-        {stepIndex >= 0 && capturedByStep.filter(Boolean).length === MIN_PHOTOS && (
+        {stepIndex >= 0 && capturedByStep.filter(Boolean).length >= MIN_PHOTOS && (
           <div className="flex items-center justify-between gap-3 px-6 py-4 border-t border-gray-100">
             <div className="text-xs text-gray-500">Revisa que todas las fotos se vean claras antes de continuar.</div>
             <button
               onClick={handleUploadAndContinue}
-              disabled={isUploading || capturedByStep.filter(Boolean).length < MIN_PHOTOS}
+              disabled={isUploading}
               className="flex items-center gap-2 px-5 py-2.5 bg-orange-600 text-white rounded-lg hover:bg-orange-700 disabled:opacity-50 shadow-sm"
             >
               {isUploading ? (
