@@ -29,6 +29,7 @@ type FormData = {
   withdrawLocation: string;
   returnLocation: string;
   conditions?: string;
+  depositAmount: string;
 };
 
 const inputClass =
@@ -59,7 +60,7 @@ const CreateVehicleOfferModal = ({
       const vehicle = vehicles.find((v) => v.id === selectedVehicleId);
       if (vehicle) {
         setSelectedVehicle(vehicle);
-        
+
         // Solo buscar y asignar owner si NO es vehículo de Viaje Seguro
         if (vehicle.provider !== "VS") {
           const owner = owners.find((o) => o.id === vehicle.ownerId);
@@ -84,8 +85,12 @@ const CreateVehicleOfferModal = ({
   const submit: SubmitHandler<FormData> = async (data) => {
     const toastId = toast.loading("Creando oferta de vehículo...");
     try {
-      // Nota: Mientras no exista un campo en el formulario, usamos un valor por defecto coherente con el front (fianza = 600€)
-      const DEFAULT_DEPOSIT = 600;
+      const depositParsed = Number(String(data.depositAmount ?? "").replace(",", "."));
+      if (Number.isNaN(depositParsed) || depositParsed < 0) {
+        toast.error("La fianza debe ser un número válido mayor o igual a 0", { id: toastId });
+        return;
+      }
+
       const payload: CreateVehicleOfferRequest = {
         pricePerDay: Number(data.pricePerDay),
         withdrawLocation: data.withdrawLocation,
@@ -94,7 +99,7 @@ const CreateVehicleOfferModal = ({
         availableFrom: new Date(data.availableFrom),
         availableTo: new Date(data.availableTo),
         agencyFee: Number(data.agencyFee),
-        depositAmount: DEFAULT_DEPOSIT,
+        depositAmount: depositParsed,
         vehicleOfferType: data.vehicleOfferType,
         vehicleId: data.vehicleId,
         ownerId: data.ownerId,
@@ -246,6 +251,34 @@ const CreateVehicleOfferModal = ({
             {errors.agencyFee && (
               <p className="text-red-500 text-xs">
                 {errors.agencyFee.message || "Campo obligatorio"}
+              </p>
+            )}
+          </div>
+
+          <div>
+            <label className={labelClass}>Fianza (€)</label>
+            <input
+              type="text"
+              inputMode="decimal"
+              {...register("depositAmount", {
+                required: "La fianza es obligatoria",
+                validate: (value) =>
+                  /^[0-9]*[.,]?[0-9]{0,2}$/.test(value) ||
+                  "Formato inválido (usa solo números)",
+              })}
+              onInput={(e) => {
+                const input = e.target as HTMLInputElement;
+                input.value = input.value
+                  .replace(",", ".")
+                  .replace(/[^0-9.]/g, "")
+                  .replace(/(\..*?)\..*/g, "$1");
+              }}
+              className={inputClass}
+              placeholder="Ej: 300.00"
+            />
+            {errors.depositAmount && (
+              <p className="text-red-500 text-xs">
+                {errors.depositAmount.message || "Campo obligatorio"}
               </p>
             )}
           </div>
