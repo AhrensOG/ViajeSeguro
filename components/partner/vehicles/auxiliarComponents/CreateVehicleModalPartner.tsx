@@ -34,7 +34,7 @@ const labelClass =
  * Usa strings literales igual que CreateVehicleModal
  */
 const FEATURES: { value: string; label: string }[] = [
-  { value: "GPS", label: "GPS" }, 
+  { value: "GPS", label: "GPS" },
   { value: "AIR_CONDITIONING", label: "Aire acondicionado" },
   { value: "BLUETOOTH", label: "Bluetooth" },
   { value: "REAR_CAMERA", label: "Cámara trasera" },
@@ -46,7 +46,7 @@ const FEATURES: { value: string; label: string }[] = [
 const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
   // ESTADO DEL COMPONENTE
   const { data: session } = useSession(); // Obtiene datos del usuario logueado
-  const [imageFiles, setImageFiles] = useState<FileList | null>(null); // Almacena archivos de imagen seleccionados
+  const [imageFiles, setImageFiles] = useState<File[]>([]); // Almacena archivos de imagen seleccionados
 
   // CONFIGURACIÓN DEL FORMULARIO CON REACT-HOOK-FORM
   const {
@@ -54,6 +54,26 @@ const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
     handleSubmit, // Función para manejar el envío del formulario
     formState: { errors }, // Objeto con errores de validación
   } = useForm<CreateVehicleDto>();
+
+  // Función para manejar la selección de imágenes
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      const newFiles = Array.from(e.target.files);
+
+      // Validar máximo de imágenes (10)
+      if (imageFiles.length + newFiles.length > 10) {
+        toast.error("Solo puedes subir un máximo de 10 imágenes.");
+        return;
+      }
+
+      setImageFiles((prev) => [...prev, ...newFiles]);
+    }
+  };
+
+  // Función para eliminar una imagen seleccionada
+  const removeImage = (indexToRemove: number) => {
+    setImageFiles((prev) => prev.filter((_, index) => index !== indexToRemove));
+  };
 
   /**
    * FUNCIÓN DE ENVÍO DEL FORMULARIO - CONECTADA AL BACKEND
@@ -63,13 +83,17 @@ const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
    */
   const submit = async (data: CreateVehicleDto) => {
     const toastId = toast.loading("Registrando vehículo...");
-    
+
     try {
-      // Upload de imágenes (opcional, igual que CreateVehicleModal)
+      if (imageFiles.length === 0) {
+        toast.error("Debes subir al menos una imagen del vehículo", { id: toastId });
+        return;
+      }
+
+      // Upload de imágenes
       let uploadedUrls: string[] = [];
-      if (imageFiles && imageFiles?.length > 0) {
-        const filesArray = Array.from(imageFiles);
-        uploadedUrls = await uploadFiles(filesArray, "Vehiculos");
+      if (imageFiles.length > 0) {
+        uploadedUrls = await uploadFiles(imageFiles, "Vehiculos");
       }
 
       // Obtener ID del usuario de la sesión
@@ -95,7 +119,7 @@ const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
       onSuccess((prev) => [...prev, vehicle]);
       onClose();
       toast.success("Vehículo creado exitosamente", { id: toastId });
-      
+
     } catch (error) {
       toast.error(error instanceof Error ? error.message : "Error al crear el vehículo", { id: toastId });
     }
@@ -281,17 +305,53 @@ const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
             </div>
           </div>
 
+          {/* SECCIÓN IMÁGENES */}
           <div className="col-span-full">
-            <label className={labelClass}>Imágenes</label>
-            <input
-              type="file"
-              multiple
-              accept="image/*"
-              className="block w-full text-sm text-custom-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-custom-golden-600 file:text-white hover:file:bg-custom-golden-700"
-              onChange={(e) => setImageFiles(e.target.files)}
-            />
-            <p className="text-xs text-custom-gray-500 mt-1">
-              Sube al menos una imagen clara del vehículo (máx. 10).
+            <label className={labelClass}>Imágenes del vehículo</label>
+
+            {/* Input de archivo oculto + Botón de subida personalizado o Input visible */}
+            <div className="mt-2">
+              <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 border border-custom-gray-300 rounded-md shadow-sm text-sm font-medium text-custom-gray-700 bg-white hover:bg-custom-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-golden-500">
+                <span>Seleccionar imágenes</span>
+                <input
+                  type="file"
+                  multiple
+                  accept="image/*"
+                  className="hidden"
+                  onChange={handleImageChange}
+                />
+              </label>
+              <span className="ml-3 text-xs text-custom-gray-500">
+                {imageFiles.length} / 10 imágenes seleccionadas
+              </span>
+            </div>
+
+            {/* Grid de Previsualización */}
+            {imageFiles.length > 0 && (
+              <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-4">
+                {imageFiles.map((file, index) => (
+                  <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-custom-gray-200">
+                    <img
+                      src={URL.createObjectURL(file)}
+                      alt={`Preview ${index}`}
+                      className="w-full h-full object-cover"
+                      onLoad={(e) => URL.revokeObjectURL((e.target as HTMLImageElement).src)}
+                    />
+                    <button
+                      type="button"
+                      onClick={() => removeImage(index)}
+                      className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-1 opacity-0 group-hover:opacity-100 transition-opacity"
+                      aria-label="Eliminar imagen"
+                    >
+                      <X className="size-3" />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            <p className="text-xs text-custom-gray-500 mt-2">
+              Sube al menos una imagen clara del vehículo. Format: jpg, png, webp.
             </p>
           </div>
 
@@ -315,5 +375,6 @@ const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
     </div>
   );
 };
+
 
 export default CreateVehicleModalPartner;
