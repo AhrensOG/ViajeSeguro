@@ -4,11 +4,12 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import CustomDatePicker from "./CustomDatePicker";
+import CityAutocomplete from "@/components/common/CityAutocomplete";
 
 export default function SearchFormVehicle() {
   const router = useRouter();
 
-  // const [origin, setOrigin] = useState(""); // ⬅️ Select de origen
+  const [location, setLocation] = useState("");
   const [departureDate, setDepartureDate] = useState<Date | undefined>(
     undefined
   );
@@ -17,7 +18,7 @@ export default function SearchFormVehicle() {
   const [hasDriver, setHasDriver] = useState(false); // false = sin conductor
 
   const handleSubmit = () => {
-    if (!departureDate || !returnDate) return;
+    if (!departureDate || !returnDate || !location) return;
 
     const departure = departureDate.toISOString();
     const returnIso = returnDate.toISOString();
@@ -30,7 +31,7 @@ export default function SearchFormVehicle() {
       capacity,
       mode: "van",
       serviceType: vehicleOfferType,
-      origin: "Valencia", // si querés que sea dinámico, reactivá el select `origin`
+      origin: location,
     });
 
     router.push(`/search?${params.toString()}`);
@@ -73,29 +74,25 @@ export default function SearchFormVehicle() {
           </select>
         </div>
         {/* Origen */}
-        {/* <div className="flex flex-col gap-2 p-2 w-full items-center">
-                    <label htmlFor="origin" className="text-custom-black-800 py-2">
-                        Origen
-                    </label>
-                    <div className="flex items-center gap-2 w-full border border-gray-300 rounded-md p-3 bg-white">
-                        <MapPin className="text-custom-gray-500  h-5 w-5" />
-                        <select
-                            id="origin"
-                            name="origin"
-                            value={origin}
-                            onChange={(e) => setOrigin(e.target.value)}
-                            className="w-full outline-none bg-transparent text-custom-black-800"
-                        >
-                            <option value="" disabled>
-                                Seleccionar origen
-                            </option>
-                            <option value="Valencia">Valencia</option>
-                            <option value="Madrid">Madrid</option>
-                            <option value="Barcelona">Barcelona</option>
-                            <option value="Sevilla">Sevilla</option>
-                        </select>
-                    </div>
-                </div> */}
+        <div className="flex flex-col gap-2 p-2 w-full items-center">
+          <label className="text-custom-black-800 py-2">
+            Origen / Provincia
+          </label>
+          <CityAutocomplete
+            value={location}
+            onChange={(val, meta) => {
+              if (meta?.payload?.name) {
+                setLocation(meta.payload.name);
+              } else {
+                const city = (val || "").split(",")[0]?.trim();
+                setLocation(city || val);
+              }
+            }}
+            placeholder={"Elige tu ubicación"}
+            allowFreeText
+            className="w-full"
+          />
+        </div>
       </div>
 
       {/* Tipo de servicio */}
@@ -104,20 +101,18 @@ export default function SearchFormVehicle() {
         <div className="flex flex-col md:grid md:grid-cols-2 gap-4 w-full">
           <button
             onClick={() => setHasDriver(false)}
-            className={`flex flex-col py-3 px-6 rounded-md border cursor-pointer transition ${
-              !hasDriver
+            className={`flex flex-col py-3 px-6 rounded-md border cursor-pointer transition ${!hasDriver
                 ? "bg-custom-golden-600 text-custom-white-100 border-custom-golden-700 hover:bg-custom-golden-700"
                 : "bg-transparent text-custom-black-700 border border-custom-gray-300 hover:bg-custom-gray-100"
-            }`}>
+              }`}>
             Sin conductor
           </button>
           <button
             onClick={() => setHasDriver(true)}
-            className={`flex flex-col py-3 px-6 rounded-md border cursor-pointer transition ${
-              hasDriver
+            className={`flex flex-col py-3 px-6 rounded-md border cursor-pointer transition ${hasDriver
                 ? "bg-custom-golden-600 text-custom-white-100 border-custom-golden-700 hover:bg-custom-golden-700"
                 : "bg-transparent text-custom-black-700 border border-custom-gray-300 hover:bg-custom-gray-100"
-            }`}>
+              }`}>
             Con conductor
           </button>
         </div>
@@ -126,7 +121,11 @@ export default function SearchFormVehicle() {
       {/* Botón buscar */}
       <button
         onClick={handleSubmit}
-        className="px-6 py-3 rounded-md border cursor-pointer duration-300 bg-custom-golden-600 hover:bg-custom-golden-700 text-custom-white-100 w-full">
+        disabled={!departureDate || !returnDate || !location}
+        className={`px-6 py-3 rounded-md border text-custom-white-100 w-full transition duration-300 ${(!departureDate || !returnDate || !location)
+            ? "bg-custom-gray-400 cursor-not-allowed border-custom-gray-400"
+            : "bg-custom-golden-600 hover:bg-custom-golden-700 cursor-pointer border-custom-golden-600"
+          }`}>
         Buscar Furgonetas
       </button>
     </motion.section>

@@ -12,6 +12,8 @@ import { toast } from "sonner";
 import DeleteToast from "../DeleteToast";
 import { fetchSimpleVehicles } from "@/lib/api/admin/vehicle-offers";
 import CustomSelect from "./auxiliarComponents/CustomSelect";
+import { TablaPendientesAprobacionAdmin } from "./auxiliarComponents/TablaPendientesAprobacionAdmin";
+import { ActiveRentalsTableAdmin } from "./auxiliarComponents/ActiveRentalsTableAdmin";
 
 const statusMap = {
     PENDING: "Pendiente",
@@ -42,6 +44,7 @@ export default function VehicleBookingPanel() {
         endDate: "",
         maxPrice: "",
     });
+    const [activeTab, setActiveTab] = useState<"all" | "pending" | "active">("all");
 
     useEffect(() => {
         const getBookings = async () => {
@@ -121,8 +124,40 @@ export default function VehicleBookingPanel() {
                 </button>
             </div>
 
-            {/* Filtros */}
-            <div className="grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-3 bg-custom-white-100 p-4 border border-custom-gray-300 rounded-md mb-4">
+            {/* Tabs */}
+            <div className="flex overflow-x-auto whitespace-nowrap border-b border-custom-gray-300 mb-4 pb-1 custom-scrollbar">
+                <button
+                    onClick={() => setActiveTab("all")}
+                    className={`shrink-0 px-3 sm:px-4 py-2 text-sm sm:text-base font-medium transition-colors ${activeTab === "all" ? "text-custom-golden-600 border-b-2 border-custom-golden-600" : "text-custom-gray-500 hover:text-custom-gray-700"}`}
+                >
+                    Historial Completo
+                </button>
+                <button
+                    onClick={() => setActiveTab("pending")}
+                    className={`shrink-0 px-3 sm:px-4 py-2 text-sm sm:text-base font-medium transition-colors ${activeTab === "pending" ? "text-custom-golden-600 border-b-2 border-custom-golden-600" : "text-custom-gray-500 hover:text-custom-gray-700"} flex items-center gap-2`}
+                >
+                    Pendientes
+                    {bookings.filter(b => b.status === 'PENDING').length > 0 && (
+                        <span className="bg-red-500 text-white text-xs px-2 py-0.5 rounded-full">
+                            {bookings.filter(b => b.status === 'PENDING').length}
+                        </span>
+                    )}
+                </button>
+                <button
+                    onClick={() => setActiveTab("active")}
+                    className={`shrink-0 px-3 sm:px-4 py-2 text-sm sm:text-base font-medium transition-colors ${activeTab === "active" ? "text-custom-golden-600 border-b-2 border-custom-golden-600" : "text-custom-gray-500 hover:text-custom-gray-700"} flex items-center gap-2`}
+                >
+                    Alquileres Activos (VS)
+                    {bookings.filter(b => (b.status === 'APPROVED' || b.status === 'DELIVERED' || b.status === 'ACTIVE' || b.status === 'RETURNED') && b.offer.vehicle.provider === 'VS').length > 0 && (
+                        <span className="bg-green-500 text-white text-xs px-2 py-0.5 rounded-full">
+                            {bookings.filter(b => (b.status === 'APPROVED' || b.status === 'DELIVERED' || b.status === 'ACTIVE' || b.status === 'RETURNED') && b.offer.vehicle.provider === 'VS').length}
+                        </span>
+                    )}
+                </button>
+            </div>
+
+            {/* Filtros - Solo visibles en tab All */}
+            <div className={`grid grid-cols-1 md:grid-cols-4 lg:grid-cols-6 gap-3 bg-custom-white-100 p-4 border border-custom-gray-300 rounded-md mb-4 ${activeTab !== "all" ? "hidden" : ""}`}>
                 <div className="relative col-span-2">
                     <input
                         type="text"
@@ -198,89 +233,108 @@ export default function VehicleBookingPanel() {
             {loading ? (
                 <SkeletonTable rows={5} />
             ) : (
-                <div className="flex-1 w-full bg-custom-white-100 rounded-xl shadow-sm border border-custom-gray-200 overflow-auto">
-                    <table className="min-w-full text-sm text-left table-fixed border-separate border-spacing-0">
-                        <thead className="bg-custom-golden-100 text-custom-golden-700 uppercase text-xs">
-                            <tr>
-                                <th className="px-4 py-2 border-b border-r border-custom-gray-300">Cliente</th>
-                                <th className="px-4 py-2 border-b border-r border-custom-gray-300">Email</th>
-                                <th className="px-4 py-2 border-b border-r border-custom-gray-300">Inicio</th>
-                                <th className="px-4 py-2 border-b border-r border-custom-gray-300">Destino</th>
-                                <th className="px-4 py-2 border-b border-r border-custom-gray-300">Vehículo</th>
-                                <th className="px-4 py-2 border-b border-r border-custom-gray-300">Desde</th>
-                                <th className="px-4 py-2 border-b border-r border-custom-gray-300">Hasta</th>
-                                <th className="px-4 py-2 border-b border-r border-custom-gray-300">Estado</th>
-                                <th className="px-4 py-2 border-b border-r border-custom-gray-300">Total</th>
-                                <th className="px-4 py-2 border-b border-custom-gray-300 text-center">Acciones</th>
-                            </tr>
-                        </thead>
-                        <tbody className="text-custom-black-800">
-                            {filtered.map((b, index) => (
-                                <tr
-                                    onClick={() => {
-                                        setSelectedBooking(b);
-                                        setShowDetails(true);
-                                    }}
-                                    key={b.id}
-                                    className={`${
-                                        index % 2 === 0 ? "bg-custom-white-50" : "bg-custom-gray-100"
-                                    } hover:bg-custom-golden-100 transition cursor-pointer`}
-                                >
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200 font-medium">
-                                        {b.renter.name} {b.renter.lastName}
-                                    </td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">{b.renter.email}</td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">{b.offer.withdrawLocation}</td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">{b.offer.returnLocation}</td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">
-                                        {b.offer.vehicle.brand} {b.offer.vehicle.model} ({b.offer.vehicle.year}) - {b.offer.vehicle.plate}
-                                    </td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">
-                                        {new Date(b.startDate).toLocaleDateString("es-ES")}
-                                    </td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">
-                                        {new Date(b.endDate).toLocaleDateString("es-ES")}
-                                    </td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">
-                                        {statusMap[b.status as keyof typeof statusMap]}
-                                    </td>
-                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">€{b.totalPrice.toFixed(2)}</td>
-                                    <td
-                                        onClick={(e) => e.stopPropagation()}
-                                        className="px-4 py-2 border-b border-custom-gray-200 text-center space-x-2"
-                                    >
-                                        <button
+                <>
+                    {activeTab === "all" && (
+                        <div className="flex-1 w-full bg-custom-white-100 rounded-xl shadow-sm border border-custom-gray-200 overflow-auto">
+                            <table className="min-w-full text-sm text-left table-fixed border-separate border-spacing-0">
+                                <thead className="bg-custom-golden-100 text-custom-golden-700 uppercase text-xs">
+                                    <tr>
+                                        <th className="px-4 py-2 border-b border-r border-custom-gray-300">Cliente</th>
+                                        <th className="px-4 py-2 border-b border-r border-custom-gray-300">Email</th>
+                                        <th className="px-4 py-2 border-b border-r border-custom-gray-300">Inicio</th>
+                                        <th className="px-4 py-2 border-b border-r border-custom-gray-300">Destino</th>
+                                        <th className="px-4 py-2 border-b border-r border-custom-gray-300">Vehículo</th>
+                                        <th className="px-4 py-2 border-b border-r border-custom-gray-300">Desde</th>
+                                        <th className="px-4 py-2 border-b border-r border-custom-gray-300">Hasta</th>
+                                        <th className="px-4 py-2 border-b border-r border-custom-gray-300">Estado</th>
+                                        <th className="px-4 py-2 border-b border-r border-custom-gray-300">Total</th>
+                                        <th className="px-4 py-2 border-b border-custom-gray-300 text-center">Acciones</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="text-custom-black-800">
+                                    {filtered.map((b, index) => (
+                                        <tr
                                             onClick={() => {
                                                 setSelectedBooking(b);
-                                                setShowEdit(true);
+                                                setShowDetails(true);
                                             }}
-                                            className="text-custom-golden-600 hover:text-custom-golden-700 cursor-pointer"
+                                            key={b.id}
+                                            className={`${index % 2 === 0 ? "bg-custom-white-50" : "bg-custom-gray-100"
+                                                } hover:bg-custom-golden-100 transition cursor-pointer`}
                                         >
-                                            <Pencil className="h-4 w-4 inline-block" />
-                                        </button>
-                                        <button
-                                            onClick={(e) => {
-                                                e.stopPropagation();
-                                                setSelectedBooking(b);
-                                                DeleteToast(b.id, handleDelete);
-                                            }}
-                                            className="text-red-500 hover:text-red-700 cursor-pointer"
-                                        >
-                                            <Trash2 className="h-4 w-4 inline-block" />
-                                        </button>
-                                    </td>
-                                </tr>
-                            ))}
-                            {filtered.length === 0 && (
-                                <tr>
-                                    <td colSpan={10} className="text-center py-4 text-custom-gray-500">
-                                        No se encontraron reservas.
-                                    </td>
-                                </tr>
-                            )}
-                        </tbody>
-                    </table>
-                </div>
+                                            <td className="px-4 py-2 border-b border-r border-custom-gray-200 font-medium">
+                                                {b.renter.name} {b.renter.lastName}
+                                            </td>
+                                            <td className="px-4 py-2 border-b border-r border-custom-gray-200">{b.renter.email}</td>
+                                            <td className="px-4 py-2 border-b border-r border-custom-gray-200">{b.offer.withdrawLocation}</td>
+                                            <td className="px-4 py-2 border-b border-r border-custom-gray-200">{b.offer.returnLocation}</td>
+                                            <td className="px-4 py-2 border-b border-r border-custom-gray-200">
+                                                {b.offer.vehicle.brand} {b.offer.vehicle.model} ({b.offer.vehicle.year}) - {b.offer.vehicle.plate}
+                                            </td>
+                                            <td className="px-4 py-2 border-b border-r border-custom-gray-200">
+                                                {new Date(b.startDate).toLocaleDateString("es-ES")}
+                                            </td>
+                                            <td className="px-4 py-2 border-b border-r border-custom-gray-200">
+                                                {new Date(b.endDate).toLocaleDateString("es-ES")}
+                                            </td>
+                                            <td className="px-4 py-2 border-b border-r border-custom-gray-200">
+                                                {statusMap[b.status as keyof typeof statusMap] || b.status}
+                                            </td>
+                                            <td className="px-4 py-2 border-b border-r border-custom-gray-200">€{b.totalPrice.toFixed(2)}</td>
+                                            <td
+                                                onClick={(e) => e.stopPropagation()}
+                                                className="px-4 py-2 border-b border-custom-gray-200 text-center space-x-2"
+                                            >
+                                                <button
+                                                    onClick={() => {
+                                                        setSelectedBooking(b);
+                                                        setShowEdit(true);
+                                                    }}
+                                                    className="text-custom-golden-600 hover:text-custom-golden-700 cursor-pointer"
+                                                >
+                                                    <Pencil className="h-4 w-4 inline-block" />
+                                                </button>
+                                                <button
+                                                    onClick={(e) => {
+                                                        e.stopPropagation();
+                                                        setSelectedBooking(b);
+                                                        DeleteToast(b.id, handleDelete);
+                                                    }}
+                                                    className="text-red-500 hover:text-red-700 cursor-pointer"
+                                                >
+                                                    <Trash2 className="h-4 w-4 inline-block" />
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    ))}
+                                    {filtered.length === 0 && (
+                                        <tr>
+                                            <td colSpan={10} className="text-center py-4 text-custom-gray-500">
+                                                No se encontraron reservas.
+                                            </td>
+                                        </tr>
+                                    )}
+                                </tbody>
+                            </table>
+                        </div>
+                    )}
+                    {activeTab === "pending" && (
+                        <TablaPendientesAprobacionAdmin
+                            rentals={bookings}
+                            onApprovalChange={(rentalId, newStatus) => {
+                                setBookings(prev => prev.map(b => b.id === rentalId ? { ...b, status: newStatus } : b));
+                            }}
+                        />
+                    )}
+                    {activeTab === "active" && (
+                        <ActiveRentalsTableAdmin
+                            rentals={bookings.filter(b => b.offer.vehicle.provider === 'VS')}
+                            onRentalUpdate={(updatedRental) => {
+                                setBookings(prev => prev.map(b => b.id === updatedRental.id ? updatedRental : b));
+                            }}
+                        />
+                    )}
+                </>
             )}
 
             {showDetails && selectedBooking && (

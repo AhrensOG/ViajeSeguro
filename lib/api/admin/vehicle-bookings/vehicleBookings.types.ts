@@ -42,6 +42,7 @@ export interface VehicleBookingResponseAdmin {
             transmissionType: "MANUAL" | "AUTOMATIC";
             features: string[];
             plate: string;
+            provider: string;
         };
     };
     renter: {
@@ -97,4 +98,5 @@ export interface SimpleVehicle {
     brand: string;
     year: number;
     plate: string;
+    provider: string;
 }

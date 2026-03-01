@@ -61,13 +61,13 @@ const Routes = () => {
       animate={isInView && { opacity: 1, y: 0 }}
       transition={{ duration: 0.8, ease: "easeOut" }}
       id="rutas"
-      className="py-24 ">
+      className="py-12 md:py-24">
       <div className="container mx-auto px-6">
         <motion.h2
           initial={{ opacity: 0, y: -20 }}
           animate={isInView && { opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-4xl font-extrabold text-center text-custom-black-800 mb-12">
+          className="text-3xl md:text-4xl font-extrabold text-center text-custom-black-800 mb-8 md:mb-12">
           Rutas de viaje compartido disponibles
         </motion.h2>
 
@@ -80,11 +80,10 @@ const Routes = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={isInView && { opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: index * 0.2 }}
-                  className={`flex items-center justify-between pb-4 ${
-                    index !== routes.length - 1
+                  className={`flex flex-col sm:flex-row sm:items-center justify-between gap-4 sm:gap-0 pb-4 ${index !== routes.length - 1
                       ? "border-b border-custom-gray-500"
                       : ""
-                  }`}>
+                    }`}>
                   <div className="flex items-center">
                     <div className="w-12 h-12  rounded-full flex items-center justify-center mr-4">
                       <MapPin
@@ -100,7 +99,7 @@ const Routes = () => {
                     </div>
                   </div>
 
-                  <div className="text-right">
+                  <div className="text-left sm:text-right pl-16 sm:pl-0">
                     <span className="text-lg font-bold text-custom-golden-600">
                       {route.price}
                     </span>

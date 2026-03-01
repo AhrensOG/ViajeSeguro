@@ -48,13 +48,13 @@ const services: Service[] = [
 
 const Services = () => {
   return (
-    <section id="servicios" className="py-24 ">
+    <section id="servicios" className="py-12 md:py-24">
       <div className="container mx-auto px-6">
         <motion.h2
           initial={{ opacity: 0, y: -20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="text-4xl font-extrabold text-center text-custom-black-800 mb-12">
+          className="text-3xl md:text-4xl font-extrabold text-center text-custom-black-800 mb-8 md:mb-12">
           Nuestros Servicios
         </motion.h2>
 

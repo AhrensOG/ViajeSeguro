@@ -49,6 +49,8 @@ export interface ResponseForQrPage {
     status: "PENDING" | "APPROVED" | "COMPLETED" | "FINISHED" | "DECLINED" | "CANCELLED" | "DELIVERED" | "ACTIVE";
     isDeleted: boolean;
     paymentMethod: "CASH" | "STRIPE";
+    agencyFee?: number;
+    pricePerDay?: number;
     offer: {
         id: string;
         withdrawLocation: string;
@@ -83,6 +85,8 @@ export interface ResponseForProfilePage {
     status: "PENDING" | "APPROVED" | "COMPLETED" | "FINISHED" | "DECLINED" | "CANCELLED" | "DELIVERED" | "ACTIVE";
     isDeleted: boolean;
     paymentMethod: "CASH" | "STRIPE";
+    agencyFee?: number;
+    pricePerDay?: number;
     totalPrice: number;
     offer: {
         id: string;

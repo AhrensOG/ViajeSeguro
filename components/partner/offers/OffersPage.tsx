@@ -246,7 +246,7 @@ export default function OffersPage() {
   // Función para cargar próximos alquileres
   interface BackendBookingPayment { userId?: string; amount?: number }
   interface BackendBookingOfferVehicle { brand: string; model: string; year: number; images?: string[]; plate?: string }
-  interface BackendBookingOffer { vehicle: BackendBookingOfferVehicle; withdrawLocation: string; returnLocation: string }
+  interface BackendBookingOffer { vehicle: BackendBookingOfferVehicle; withdrawLocation: string; returnLocation: string; agencyFee: number; pricePerDay: number }
   interface BackendBookingRenter { id?: string; name: string; lastName: string; phone?: string }
   interface BackendBooking {
     id: number | string;
@@ -258,6 +258,8 @@ export default function OffersPage() {
     totalPrice: number;
     status: string;
     depositAmount?: number;
+    agencyFee: number;
+    pricePerDay: number;
   }
 
   const loadUpcomingBookings = useCallback(async () => {
@@ -279,6 +281,9 @@ export default function OffersPage() {
           .reduce((sum: number, p) => sum + Number(p.amount || 0), 0)
         const depositAmount = Number(booking.depositAmount ?? 0)
 
+        // Use snapped fee if available (>0), otherwise fallback to offer's fee (legacy bookings)
+        const effectiveAgencyFee = booking.agencyFee > 0 ? booking.agencyFee : booking.offer.agencyFee
+
         return {
           id: String(booking.id),
           vehicleName: `${booking.offer.vehicle.brand} ${booking.offer.vehicle.model}`,
@@ -297,6 +302,8 @@ export default function OffersPage() {
           status: booking.status,
           location: booking.offer.withdrawLocation,
           depositAmount,
+          agencyFee: effectiveAgencyFee,
+          pricePerDay: booking.pricePerDay > 0 ? booking.pricePerDay : booking.offer.pricePerDay,
         }
       })
 

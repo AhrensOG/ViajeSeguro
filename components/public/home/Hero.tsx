@@ -14,14 +14,16 @@ const Hero = () => {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, ease: "easeOut" }}
                     className="mx-auto font-extrabold mb-3 sm:mb-4 
-                               text-xl sm:text-2xl md:text-5xl 
+                               text-lg sm:text-2xl md:text-5xl 
                                leading-snug sm:leading-snug md:leading-tight 
-                               max-w-[20rem] sm:max-w-2xl md:max-w-4xl 
+                               max-w-[18rem] sm:max-w-2xl md:max-w-4xl 
                                break-words"
                 >
-                    <span className="block text-4xl sm:text-5xl md:text-7xl text-custom-golden-600">Viaje Seguro</span>
-                    <span className="block mt-2 text-3xl sm:text-4xl md:text-6xl font-semibold">
-                         la plataforma más fácil para alquilar vehículos y compartir viajes por toda España, como pasajero o conductor
+                    <span className="block text-3xl sm:text-5xl md:text-7xl">
+                        <span className="text-[#101010]">Viaje</span> <span className="text-custom-golden-600">Seguro</span>
+                    </span>
+                    <span className="block mt-2 text-xl sm:text-3xl md:text-5xl font-semibold">
+                        la plataforma más fácil para alquilar vehículos y compartir viajes por toda España, como pasajero o conductor
                     </span>
                 </motion.h1>
 

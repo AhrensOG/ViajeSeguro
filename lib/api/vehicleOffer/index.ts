@@ -6,6 +6,7 @@ export interface VehicleSearch {
     vehicleOfferType?: string;
     availableFrom: string;
     availableTo: string;
+    location?: string;
 }
 
 export const searchVehicleOffers = async (query: VehicleSearch) => {
@@ -13,6 +14,7 @@ export const searchVehicleOffers = async (query: VehicleSearch) => {
 
     if (query.capacity) params.append("capacity", String(query.capacity));
     if (query.vehicleOfferType) params.append("vehicleOfferType", query.vehicleOfferType);
+    if (query.location) params.append("location", query.location);
     params.append("availableFrom", query.availableFrom);
     params.append("availableTo", query.availableTo);
 

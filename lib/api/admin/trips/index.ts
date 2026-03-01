@@ -5,22 +5,22 @@ import { BACKEND_URL } from "@/lib/constants";
 type WeekKey = 'mon' | 'tue' | 'wed' | 'thu' | 'fri' | 'sat' | 'sun';
 
 export interface CreateTripsBulkPayload {
-  origin: string;
-  destination: string;
-  originalTimeZone: string;
-  basePrice: number;
-  capacity?: number;
-  minPassengers?: number;
-  visible?: boolean;
-  status?: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'FINISHED' | string;
-  originLocation?: string;
-  destinationLocation?: string;
-  driverId: string;
-  dateStart: string; // YYYY-MM-DD
-  dateEnd: string;   // YYYY-MM-DD
-  departureTime: string; // HH:mm
-  arrivalTime: string;   // HH:mm
-  weekdays?: WeekKey[];
+    origin: string;
+    destination: string;
+    originalTimeZone: string;
+    basePrice: number;
+    capacity?: number;
+    minPassengers?: number;
+    visible?: boolean;
+    status?: 'PENDING' | 'CONFIRMED' | 'CANCELLED' | 'FINISHED' | string;
+    originLocation?: string;
+    destinationLocation?: string;
+    driverId: string;
+    dateStart: string; // YYYY-MM-DD
+    dateEnd: string;   // YYYY-MM-DD
+    departureTime: string; // HH:mm
+    arrivalTime: string;   // HH:mm
+    weekdays?: WeekKey[];
 }
 
 export async function createTrip(data: CreateTripRequest): Promise<TripResponse> {
@@ -104,5 +104,19 @@ export async function deleteTrip(id: string) {
         return res;
     } catch {
         throw new Error("Error al eliminar el viaje");
+    }
+}
+
+export async function cancelTripPartner(id: string) {
+    try {
+        const res = await fetchWithAuth(`${BACKEND_URL}/trip/${id}/cancel-by-partner`, {
+            method: "PATCH",
+        });
+        if (!res) {
+            throw new Error("Error al cancelar el viaje");
+        }
+        return res;
+    } catch {
+        throw new Error("Error al cancelar el viaje");
     }
 }
