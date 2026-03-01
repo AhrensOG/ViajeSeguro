@@ -50,6 +50,7 @@ export default function SearchOfferProcess() {
 
   const availableFrom = searchParams.get("departure") || "";
   const availableTo = searchParams.get("return") || "";
+  const location = searchParams.get("origin") || "";
 
   const [isSuggested, setIsSuggested] = useState(false);
 
@@ -76,6 +77,7 @@ export default function SearchOfferProcess() {
           vehicleOfferType: vehicleOfferType,
           availableFrom: availableFrom,
           availableTo: availableTo,
+          location: location,
         });
 
         // Lógica de fallback: si no hay resultados exactos, buscar sugerencias
@@ -83,7 +85,8 @@ export default function SearchOfferProcess() {
           data = await searchVehicleOffers({
             availableFrom: availableFrom,
             availableTo: availableTo,
-            // Omitimos capacity y vehicleOfferType para buscar cualquier opción disponible
+            location: location,
+            // Omitimos capacity y vehicleOfferType para buscar cualquier opción disponible en la misma zona
           });
 
           if (Array.isArray(data) && data.length > 0) {
@@ -126,7 +129,7 @@ export default function SearchOfferProcess() {
     };
 
     fetchData();
-  }, [availableFrom, availableTo, capacity, vehicleOfferType, searchParams]);
+  }, [availableFrom, availableTo, capacity, vehicleOfferType, location, searchParams]);
 
   if (loading) {
     return (
@@ -138,7 +141,7 @@ export default function SearchOfferProcess() {
           <section className="flex flex-col items-start gap-4 w-full lg:w-[60%] xl:w-[60rem]">
             <div className="flex flex-col gap-2 w-full">
               <h1 className="text-custom-gray-800 text-2xl xl:text-4xl font-bold">
-                Furgonetas disponibles en Valencia
+                Furgonetas disponibles en {location || "tu zona"}
               </h1>
               <p className="text-custom-gray-600 text-md lg:text-lg">
                 Buscando ofertas...
@@ -167,7 +170,7 @@ export default function SearchOfferProcess() {
 
           <div className="flex flex-col gap-2 w-full">
             <h1 className="text-custom-gray-800 text-2xl xl:text-4xl font-bold">
-              Furgonetas disponibles en Valencia
+              Furgonetas disponibles en {location || "tu zona"}
             </h1>
 
             {invalidParams ? (
