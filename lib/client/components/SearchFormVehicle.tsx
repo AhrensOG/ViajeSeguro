@@ -6,16 +6,25 @@ import { motion } from "framer-motion";
 import CustomDatePicker from "./CustomDatePicker";
 import CityAutocomplete from "@/components/common/CityAutocomplete";
 
+const vehicleCategories = [
+  { id: "car", label: "Coche" },
+  { id: "van", label: "Furgoneta" },
+  { id: "truck", label: "Camión" },
+  { id: "moto", label: "Moto" },
+  { id: "boat", label: "Barco" },
+  { id: "yacht", label: "Yate" },
+  { id: "other", label: "Otros" },
+];
+
 export default function SearchFormVehicle() {
   const router = useRouter();
 
   const [location, setLocation] = useState("");
-  const [departureDate, setDepartureDate] = useState<Date | undefined>(
-    undefined
-  );
+  const [departureDate, setDepartureDate] = useState<Date | undefined>(undefined);
   const [returnDate, setReturnDate] = useState<Date | undefined>(undefined);
   const [capacity, setCapacity] = useState("1");
-  const [hasDriver, setHasDriver] = useState(false); // false = sin conductor
+  const [hasDriver, setHasDriver] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("car"); // solo visual, sin tocar lógica
 
   const handleSubmit = () => {
     if (!departureDate || !returnDate || !location) return;
@@ -43,7 +52,27 @@ export default function SearchFormVehicle() {
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: -10 }}
       transition={{ duration: 0.5 }}
-      className="flex flex-col items-center justify-center gap-5 bg-custom-white-100 p-2 md:p-8 rounded-lg w-full md:m-auto">
+      className="flex flex-col items-center justify-center gap-5 bg-custom-white-100 p-2 md:p-8 rounded-lg w-full md:m-auto"
+    >
+      {/* Selector de categoría */}
+      <div className="flex flex-col gap-2 w-full">
+        <label className="text-custom-black-800 text-sm font-medium" htmlFor="vehicleCategory">
+          Categoría de vehículo
+        </label>
+        <select
+          id="vehicleCategory"
+          value={selectedCategory}
+          onChange={(e) => setSelectedCategory(e.target.value)}
+          className="w-full outline-none border border-gray-300 rounded-md p-3 focus:ring-1 focus:ring-amber-500 focus:border-transparent"
+        >
+          {vehicleCategories.map((cat) => (
+            <option key={cat.id} value={cat.id}>
+              {cat.label}
+            </option>
+          ))}
+        </select>
+      </div>
+
       {/* Fechas y capacidad */}
       <div className="flex flex-col md:grid md:grid-cols-3 gap-6 w-full text-custom-black-800">
         <div className="flex flex-col gap-2 p-2 w-full items-center">
@@ -65,7 +94,8 @@ export default function SearchFormVehicle() {
             name="capacity"
             value={capacity}
             onChange={(e) => setCapacity(e.target.value)}
-            className="w-full outline-none border border-gray-300 rounded-md p-3 ring-offset-amber-300 focus:ring-1 focus:ring-amber-500 focus:border-transparent">
+            className="w-full outline-none border border-gray-300 rounded-md p-3 ring-offset-amber-300 focus:ring-1 focus:ring-amber-500 focus:border-transparent"
+          >
             {Array.from({ length: 9 }, (_, i) => i + 1).map((n) => (
               <option key={n} value={String(n)}>
                 {n} {n === 1 ? "Persona" : "Personas"}
@@ -102,17 +132,19 @@ export default function SearchFormVehicle() {
           <button
             onClick={() => setHasDriver(false)}
             className={`flex flex-col py-3 px-6 rounded-md border cursor-pointer transition ${!hasDriver
-                ? "bg-custom-golden-600 text-custom-white-100 border-custom-golden-700 hover:bg-custom-golden-700"
-                : "bg-transparent text-custom-black-700 border border-custom-gray-300 hover:bg-custom-gray-100"
-              }`}>
+              ? "bg-custom-golden-600 text-custom-white-100 border-custom-golden-700 hover:bg-custom-golden-700"
+              : "bg-transparent text-custom-black-700 border border-custom-gray-300 hover:bg-custom-gray-100"
+              }`}
+          >
             Sin conductor
           </button>
           <button
             onClick={() => setHasDriver(true)}
             className={`flex flex-col py-3 px-6 rounded-md border cursor-pointer transition ${hasDriver
-                ? "bg-custom-golden-600 text-custom-white-100 border-custom-golden-700 hover:bg-custom-golden-700"
-                : "bg-transparent text-custom-black-700 border border-custom-gray-300 hover:bg-custom-gray-100"
-              }`}>
+              ? "bg-custom-golden-600 text-custom-white-100 border-custom-golden-700 hover:bg-custom-golden-700"
+              : "bg-transparent text-custom-black-700 border border-custom-gray-300 hover:bg-custom-gray-100"
+              }`}
+          >
             Con conductor
           </button>
         </div>
@@ -122,11 +154,12 @@ export default function SearchFormVehicle() {
       <button
         onClick={handleSubmit}
         disabled={!departureDate || !returnDate || !location}
-        className={`px-6 py-3 rounded-md border text-custom-white-100 w-full transition duration-300 ${(!departureDate || !returnDate || !location)
-            ? "bg-custom-gray-400 cursor-not-allowed border-custom-gray-400"
-            : "bg-custom-golden-600 hover:bg-custom-golden-700 cursor-pointer border-custom-golden-600"
-          }`}>
-        Buscar Furgonetas
+        className={`px-6 py-3 rounded-md border text-custom-white-100 w-full transition duration-300 ${!departureDate || !returnDate || !location
+          ? "bg-custom-gray-400 cursor-not-allowed border-custom-gray-400"
+          : "bg-custom-golden-600 hover:bg-custom-golden-700 cursor-pointer border-custom-golden-600"
+          }`}
+      >
+        Buscar Vehículos
       </button>
     </motion.section>
   );

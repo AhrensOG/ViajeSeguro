@@ -29,6 +29,7 @@ interface Plan {
   price: string;
   suffix?: string;
   extraNote?: string;
+  subNote?: string;
   button: string;
   highlight?: boolean;
   highlightLabel?: string;
@@ -93,9 +94,9 @@ const plans: Plan[] = [
     title: "CLUB DE LEALTAD",
     label: "Mensual",
     subtitle: "Mejoramos tu ahorro",
-    price: "4,90€",
-    suffix: "/mes",
+    price: "",
     extraNote: "ideal para viajeros frecuentes",
+    subNote: "Recomendado para más de dos trayectos al mes",
     button: "Unirme al Club Lealtad",
     highlight: true,
     highlightLabel: "Popular",
@@ -147,9 +148,9 @@ const plans: Plan[] = [
     title: "CLUB DE FIDELIDAD",
     label: "Anual",
     subtitle: "TUS VIAJES, NUESTRA PRIORIDAD",
-    price: "49,90€",
-    suffix: "/año",
+    price: "",
     extraNote: "ideal para viajeros FIELES",
+    subNote: "Recomendado para más de dos trayectos a la semana",
     button: "Unirme al Club Fidelidad",
     highlight: false,
     features: [
@@ -398,7 +399,7 @@ const Subscriptions = () => {
                 <h3 className="text-2xl font-bold">{plan.title}</h3>
                 <p className="text-custom-gray-600">{plan.subtitle}</p>
                 <div className="mt-4">
-                  <div className="flex flex-col items-baseline gap-2">
+                  {plan.price ? (
                     <div className="flex items-baseline gap-2">
                       <span className="text-4xl font-bold text-custom-black-800">
                         {plan.price}
@@ -409,35 +410,20 @@ const Subscriptions = () => {
                         </span>
                       )}
                     </div>
-                    <div className="flex items-baseline gap-2">
-                      {plan.originalPrice ? (
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-lg line-through text-custom-gray-500">
-                            {plan.originalPrice}
-                          </span>
-                          <span className="text-custom-gray-600">
-                            {plan.suffix}
-                          </span>
-                        </div>
-                      ) : (
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-lg line-through text-transparent">
-                            {plan.originalPrice}
-                          </span>
-                          <span className="text-transparent">
-                            {plan.suffix}
-                          </span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  <div
-                    className={`${plan.extraNote
-                      ? "text-custom-golden-700"
-                      : "text-transparent "
-                      } text-lg font-medium mt-1`}>
-                    {plan.extraNote ? plan.extraNote : "-"}
-                  </div>
+                  ) : null}
+                  {plan.extraNote ? (
+                    <p
+                      className="text-2xl font-bold text-custom-golden-700 mt-2 leading-tight"
+                      style={{ fontFamily: "inherit" }}
+                    >
+                      {plan.extraNote}
+                    </p>
+                  ) : null}
+                  {plan.subNote ? (
+                    <p className="text-sm text-custom-gray-500 mt-1 font-medium">
+                      {plan.subNote}
+                    </p>
+                  ) : null}
                 </div>
               </div>
               <div className="px-6 pt-4 pb-6 border-t border-b border-custom-gray-200 flex-grow">

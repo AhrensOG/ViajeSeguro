@@ -53,11 +53,13 @@ export default function SearchOfferProcess() {
   const location = searchParams.get("origin") || "";
 
   const [isSuggested, setIsSuggested] = useState(false);
+  const [suggestionMessage, setSuggestionMessage] = useState("");
 
   useEffect(() => {
     const fetchData = async () => {
       setLoading(true);
       setIsSuggested(false);
+      setSuggestionMessage("");
 
       const hasDates = Boolean(availableFrom && availableTo);
       const hasCapacity = Number.isFinite(capacity) && capacity > 0;
@@ -72,6 +74,7 @@ export default function SearchOfferProcess() {
       setInvalidParams(false);
 
       try {
+        // Primera búsqueda: con todos los filtros exactos
         let data = await searchVehicleOffers({
           capacity: capacity,
           vehicleOfferType: vehicleOfferType,
@@ -80,17 +83,25 @@ export default function SearchOfferProcess() {
           location: location,
         });
 
-        // Lógica de fallback: si no hay resultados exactos, buscar sugerencias
+        // Lógica de sugerencias: si no hay resultados exactos, buscar sugerencias
         if (!Array.isArray(data) || data.length === 0) {
-          data = await searchVehicleOffers({
+          // Buscar sugerencias: sin límite de capacidad, pero manteniendo ubicación y fechas
+          const suggestions = await searchVehicleOffers({
             availableFrom: availableFrom,
             availableTo: availableTo,
             location: location,
-            // Omitimos capacity y vehicleOfferType para buscar cualquier opción disponible en la misma zona
           });
 
-          if (Array.isArray(data) && data.length > 0) {
+          if (Array.isArray(suggestions) && suggestions.length > 0) {
+            data = suggestions;
             setIsSuggested(true);
+            
+            // Mensaje de sugerencia específico
+            if (location) {
+              setSuggestionMessage(`No encontramos vehículos con ${capacity} pasajeros en ${location}, pero temos estas opciones disponibles:`);
+            } else {
+              setSuggestionMessage(`No encontramos vehículos con ${capacity} pasajeros, pero temos estas opciones disponibles:`);
+            }
           }
         }
 
@@ -141,7 +152,7 @@ export default function SearchOfferProcess() {
           <section className="flex flex-col items-start gap-4 w-full lg:w-[60%] xl:w-[60rem]">
             <div className="flex flex-col gap-2 w-full">
               <h1 className="text-custom-gray-800 text-2xl xl:text-4xl font-bold">
-                Furgonetas disponibles en {location || "tu zona"}
+                Vehículos disponibles en {location || "tu zona"}
               </h1>
               <p className="text-custom-gray-600 text-md lg:text-lg">
                 Buscando ofertas...
@@ -170,7 +181,7 @@ export default function SearchOfferProcess() {
 
           <div className="flex flex-col gap-2 w-full">
             <h1 className="text-custom-gray-800 text-2xl xl:text-4xl font-bold">
-              Furgonetas disponibles en {location || "tu zona"}
+              Vehículos disponibles en {location || "tu zona"}
             </h1>
 
             {invalidParams ? (
@@ -180,15 +191,15 @@ export default function SearchOfferProcess() {
               </p>
             ) : offers.length > 0 ? (
               <div className="flex flex-col gap-1">
-                {isSuggested && (
+                {isSuggested && suggestionMessage && (
                   <p className="text-amber-600 font-medium">
-                    No encontramos vehículos con tus filtros exactos, pero...
+                    {suggestionMessage}
                   </p>
                 )}
                 <p className="text-custom-gray-600 text-sm">
                   {isSuggested
                     ? `Te sugerimos estas ${offers.length} opciones disponibles para tus fechas:`
-                    : `Encontramos ${offers.length} furgonetas para tus fechas`
+                    : `Encontramos ${offers.length} ${offers.length === 1 ? 'vehículo' : 'vehículos'} para tus fechas`
                   }
                 </p>
               </div>

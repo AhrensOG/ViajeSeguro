@@ -38,6 +38,8 @@ const PurchaseProcess = () => {
     const EXTRA_BAG_PRICE = 5;
     const extrasOnly = searchParams.get("extrasOnly") === "1";
     const reservationId = searchParams.get("reservationId");
+    const numPassengersParam = searchParams.get("numPassengers");
+    const numPassengers = numPassengersParam ? Math.max(1, Number(numPassengersParam)) : 1;
 
     const IVA = 21;
     const referralId = searchParams.get("referral");
@@ -54,6 +56,17 @@ const PurchaseProcess = () => {
     const [showTermsModal, setShowTermsModal] = useState(false);
     const [pendingAction, setPendingAction] = useState<"stripe" | "cash" | null>(null);
     const [processingPayment, setProcessingPayment] = useState(false);
+    const [passengersFromStorage, setPassengersFromStorage] = useState<string[]>([]);
+
+    // Read companion names saved by BookingSidebar
+    useEffect(() => {
+        try {
+            const raw = sessionStorage.getItem("tripPassengers");
+            if (raw) setPassengersFromStorage(JSON.parse(raw));
+        } catch {
+            // ignore
+        }
+    }, []);
 
     useEffect(() => {
         const fetchTrip = async () => {
@@ -120,12 +133,13 @@ const PurchaseProcess = () => {
             }
             const payload: CreateReservationPayload = {
                 tripId: trip.id,
-                // Mantiene la lógica actual (sin IVA en cash) pero suma equipaje adicional
-                price: (trip.priceDetails?.finalPrice ?? trip.basePrice) + extraBags * EXTRA_BAG_PRICE,
+                // Price = (finalPrice + extras) * numPassengers
+                price: ((trip.priceDetails?.finalPrice ?? trip.basePrice) + extraBags * EXTRA_BAG_PRICE) * numPassengers,
                 status: "PENDING",
                 paymentMethod: "CASH",
                 referralId: referralId || undefined,
                 seatCode: `EXTRA_BAGS:${extraBags}`,
+                passengers: passengersFromStorage,
             };
 
             try {
@@ -215,17 +229,18 @@ const PurchaseProcess = () => {
             }
             const payload: CreateReservationPayload = {
                 tripId: trip.id,
-                // Para Stripe, la app ya enviaba precio con IVA: ahora sumamos equipaje y luego IVA
-                price: ((trip.priceDetails?.finalPrice ?? trip.basePrice) + extraBags * EXTRA_BAG_PRICE) * (1 + Number(IVA) / 100),
+                // Para Stripe, precio incluye IVA y se multiplica por número de pasajeros
+                price: ((trip.priceDetails?.finalPrice ?? trip.basePrice) + extraBags * EXTRA_BAG_PRICE) * numPassengers * (1 + Number(IVA) / 100),
                 status: "PENDING",
                 paymentMethod: "STRIPE",
                 referralId: referralId || undefined,
                 seatCode: `EXTRA_BAGS:${extraBags}`,
+                passengers: passengersFromStorage,
             };
             try {
                 const data = await createCheckoutSession({
-                    amount: Math.round(((trip.priceDetails?.finalPrice ?? trip.basePrice) + extraBags * EXTRA_BAG_PRICE) * (1 + Number(IVA) / 100) * 100),
-                    metadata: ({ ...payload, userId: String(session.user.id) } as unknown) as CreateReservationPayload,
+                    amount: Math.round(((trip.priceDetails?.finalPrice ?? trip.basePrice) + extraBags * EXTRA_BAG_PRICE) * numPassengers * (1 + Number(IVA) / 100) * 100),
+                    metadata: ({ ...payload, userId: String(session.user.id), passengers: JSON.stringify(passengersFromStorage) } as unknown) as CreateReservationPayload,
                 });
                 if (data.url) {
                     window.location.href = data.url;

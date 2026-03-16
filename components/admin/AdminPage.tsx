@@ -1,5 +1,6 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import AdminSideBar from "./sidebar/AdminSideBar";
 import UsersPanel from "./users/UsersPanel";
@@ -12,11 +13,36 @@ import VehicleOfferPanel from "./vehicle-offer/VehicleOfferPanel";
 import VehicleBookingPanel from "./vehicle-booking/VehicleBookingPanel";
 import StatisticsPanel from "./stats/StatisticsPanel";
 import ReferralsPanel from "./referrals/ReferralsPanel";
+import { getAllReservations } from "@/lib/api/admin/reservation/intex";
+import { fetchVehicleBookingsAdmin } from "@/lib/api/admin/vehicle-bookings/index";
 
 export default function AdminPage() {
     const router = useRouter();
     const searchParams = useSearchParams();
     const sec = searchParams.get("sec") || "usuarios";
+
+    const [pendingCounts, setPendingCounts] = useState({ reservas: 0, reservasFurgonetas: 0 });
+
+    useEffect(() => {
+        const fetchCounts = async () => {
+            try {
+                const [reservations, vehicleBookings] = await Promise.all([
+                    getAllReservations(),
+                    fetchVehicleBookingsAdmin(),
+                ]);
+                const pendingReservations = Array.isArray(reservations)
+                    ? reservations.filter((r: { status: string }) => r.status === "PENDING").length
+                    : 0;
+                const pendingVehicleBookings = Array.isArray(vehicleBookings)
+                    ? vehicleBookings.filter((r: { status: string }) => r.status === "PENDING").length
+                    : 0;
+                setPendingCounts({ reservas: pendingReservations, reservasFurgonetas: pendingVehicleBookings });
+            } catch {
+                // Si falla el fetch, simplemente no mostramos badges
+            }
+        };
+        fetchCounts();
+    }, [sec]);
 
     const renderSection = () => {
         switch (sec) {
@@ -52,6 +78,7 @@ export default function AdminPage() {
                     const secParam = itemName.toLowerCase();
                     router.push(`?sec=${secParam}`);
                 }}
+                counts={pendingCounts}
             />
             <div className="grow p-4 pb-0 overflow-auto">{renderSection()}</div>
         </main>

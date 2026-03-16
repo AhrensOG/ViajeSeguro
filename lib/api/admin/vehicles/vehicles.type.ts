@@ -15,6 +15,7 @@ export interface Vehicle {
     ownerId: string;
     approvalStatus: VehicleApprovalStatus;
     rejectionReason?: string;
+    province?: string;
     createdAt: string;
     updatedAt?: string;
     owner?: {
@@ -54,6 +55,7 @@ export interface CreateVehicleDto {
     transmissionType: "MANUAL" | "AUTOMATIC";
     features?: FeatureEnum[];
     images?: string[];
+    province?: string;
 }
 
 export enum ServiceType {

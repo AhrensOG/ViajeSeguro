@@ -10,6 +10,7 @@ export type CreateReservationPayload = {
     status: ReservationStatus;
     paymentMethod: ReservationPaymentMethods;
     referralId?: string;
+    passengers?: string[];
 };
 
 export type ReservationConfirmationResponse = {
@@ -68,4 +69,5 @@ export type ReservationResponse = {
     priceDetails: PriceDetails;
     qr: Qr[] | [];
     user: User;
+    passengers?: string[];
 };
