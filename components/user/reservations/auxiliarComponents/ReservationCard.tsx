@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { DateTime } from "luxon";
-import { CalendarDays, Clock, AlertTriangle, CheckCircle2, XCircle, ChevronDown } from "lucide-react";
+import { CalendarDays, Clock, AlertTriangle, CheckCircle2, XCircle, ChevronDown, Users, User } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ReservationResponse } from "@/lib/api/reservation/reservation.types";
 import ReservationPriceInfo from "./ReservationPriceInfo";
@@ -87,6 +87,26 @@ const ReservationCard = ({ reservation }: Props) => {
                     </span>
                 </div>
             </div>
+
+            {/* Pasajeros — visible siempre en la cabecera */}
+            {(() => {
+                const companions = reservation.passengers ?? [];
+                const total = 1 + companions.length;
+                return (
+                    <div className="flex items-center gap-2 flex-wrap">
+                        <span className="inline-flex items-center gap-1.5 bg-custom-golden-50 border border-custom-golden-200 text-custom-golden-800 text-xs font-semibold px-3 py-1 rounded-full">
+                            <Users className="size-3.5" />
+                            {total} {total === 1 ? "pasajero" : "pasajeros"}
+                        </span>
+                        {companions.map((name, idx) => (
+                            <span key={idx} className="inline-flex items-center gap-1 text-xs bg-custom-gray-100 text-custom-gray-700 px-2 py-1 rounded-full border border-custom-gray-200">
+                                <User className="size-3" />
+                                {name || `Acompañante ${idx + 1}`}
+                            </span>
+                        ))}
+                    </div>
+                );
+            })()}
 
             {/* Indicador de interacción */}
             <p className="text-xs text-custom-gray-500 italic">Toca para ver más detalles de tu reserva</p>

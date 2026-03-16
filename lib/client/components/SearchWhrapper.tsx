@@ -2,7 +2,6 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Car, Truck } from "lucide-react";
 import { AnimatePresence, motion } from "framer-motion";
 import { DateTime } from "luxon";
 
@@ -57,7 +56,6 @@ export default function SearchSelectorWrapper() {
                         }`}
                     onClick={() => setActiveMode("car")}
                 >
-                    <Car className="h-6 w-6" />
                     Viaje Compartido
                 </p>
                 <p
@@ -65,7 +63,6 @@ export default function SearchSelectorWrapper() {
                         }`}
                     onClick={() => setActiveMode("van")}
                 >
-                    <Truck className="h-6 w-6" />
                     Alquiler de Vehículos
                 </p>
             </div>

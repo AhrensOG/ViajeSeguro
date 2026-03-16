@@ -141,6 +141,7 @@ export default function VehiclesPanel() {
                                 <th className="px-4 py-2 border-b border-r border-custom-gray-300">Combustible</th>
                                 <th className="px-4 py-2 border-b border-r border-custom-gray-300">Transmisión</th>
                                 <th className="px-4 py-2 border-b border-r border-custom-gray-300">Proveedor</th>
+                                <th className="px-4 py-2 border-b border-r border-custom-gray-300">Provincia</th>
                                 <th className="px-4 py-2 border-b border-r border-custom-gray-300">Asientos</th>
                                 <th className="px-4 py-2 border-b border-r border-custom-gray-300">Propietario</th>
                                 <th className="px-4 py-2 border-b border-custom-gray-300 text-center">Acciones</th>
@@ -170,6 +171,7 @@ export default function VehiclesPanel() {
                                         {transmissionTypeMap[vehicle.transmissionType]}
                                     </td>
                                     <td className="px-4 py-2 border-b border-r border-custom-gray-200">{providerMap[vehicle.provider]}</td>
+                                    <td className="px-4 py-2 border-b border-r border-custom-gray-200">{vehicle.province || "—"}</td>
                                     <td className="px-4 py-2 border-b border-r border-custom-gray-200">{vehicle.allowSeatSelection ? "Sí" : "No"}</td>
                                     <td className="px-4 py-2 border-b border-r border-custom-gray-200">
                                         {vehicle.owner?.name} {vehicle.owner?.lastName && `- ${vehicle.owner.lastName}`}

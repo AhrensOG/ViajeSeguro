@@ -6,20 +6,30 @@ import { Coins, FileText, Users, CalendarDays, LogOut, Home, Car, Truck, MapPin,
 import { signOut } from "next-auth/react";
 import { useRouter } from "next/navigation";
 
-const menuItems = [
+type BadgeKey = "reservas" | "reservasFurgonetas";
+
+const menuItems: { name: string; icon: React.ReactNode; isHome?: boolean; badgeKey?: BadgeKey }[] = [
     { name: "Inicio", icon: <Home size={20} />, isHome: true },
     { name: "Usuarios", icon: <Users size={20} /> },
     { name: "Ciudades", icon: <MapPin size={20} /> },
-    { name: "Reservas", icon: <FileText size={20} /> },
+    { name: "Reservas", icon: <FileText size={20} />, badgeKey: "reservas" },
     { name: "Pagos", icon: <Coins size={20} /> },
     { name: "Viajes", icon: <CalendarDays size={20} /> },
     { name: "Vehiculos", icon: <Car size={20} /> },
     { name: "Ofertas Furgonetas", icon: <Truck size={20} /> },
-    { name: "Reservas Furgonetas", icon: <CalendarDays size={20} /> },
+    { name: "Reservas Furgonetas", icon: <CalendarDays size={20} />, badgeKey: "reservasFurgonetas" },
     { name: "Estadísticas", icon: <BarChart3 size={20} /> },
 ];
 
-const AdminSideBar = ({ onSelect }: { onSelect: (itemName: string) => void }) => {
+type Counts = Record<BadgeKey, number>;
+
+const AdminSideBar = ({
+    onSelect,
+    counts,
+}: {
+    onSelect: (itemName: string) => void;
+    counts?: Partial<Counts>;
+}) => {
     const [isOpen, setIsOpen] = useState(false);
     const router = useRouter();
 
@@ -50,35 +60,54 @@ const AdminSideBar = ({ onSelect }: { onSelect: (itemName: string) => void }) =>
 
                 {/* Menu Items */}
                 <div className="flex flex-col flex-1 space-y-1 px-2">
-                    {menuItems.map((item, index) => (
-                        <motion.button
-                            key={item.name}
-                            className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer hover:bg-custom-golden-100 transition-all duration-200 group focus:outline-none ${item.isHome ? "mb-2 mt-1" : ""
-                                }`}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: index * 0.05 }}
-                            onClick={() => {
-                                if (item.isHome) {
-                                    router.push("/");
-                                } else {
-                                    const slug = item.name.toLowerCase().replace(/\s+/g, "-");
-                                    onSelect(slug);
-                                }
-                            }}
-                            type="button"
-                            aria-label={item.name}
-                        >
-                            <span className="text-custom-golden-600">{item.icon}</span>
-                            <motion.span
-                                className={`text-sm text-custom-black-800 whitespace-nowrap font-medium transition-all duration-200 group-hover:text-custom-golden-600 ${!isOpen ? "opacity-0 w-0" : "opacity-100 w-auto"
+                    {menuItems.map((item, index) => {
+                        const badgeCount = item.badgeKey && counts ? (counts[item.badgeKey] ?? 0) : 0;
+                        return (
+                            <motion.button
+                                key={item.name}
+                                className={`flex items-center gap-3 px-3 py-2 rounded-md cursor-pointer hover:bg-custom-golden-100 transition-all duration-200 group focus:outline-none ${item.isHome ? "mb-2 mt-1" : ""
                                     }`}
-                                aria-hidden={!isOpen}
+                                initial={{ opacity: 0, x: -20 }}
+                                animate={{ opacity: 1, x: 0 }}
+                                transition={{ delay: index * 0.05 }}
+                                onClick={() => {
+                                    if (item.isHome) {
+                                        router.push("/");
+                                    } else {
+                                        const slug = item.name.toLowerCase().replace(/\s+/g, "-");
+                                        onSelect(slug);
+                                    }
+                                }}
+                                type="button"
+                                aria-label={item.name}
                             >
-                                {item.name}
-                            </motion.span>
-                        </motion.button>
-                    ))}
+                                {/* Icon with badge */}
+                                <span className="relative text-custom-golden-600 shrink-0">
+                                    {item.icon}
+                                    {badgeCount > 0 && (
+                                        <span
+                                            className="absolute -top-1.5 -right-1.5 bg-red-500 text-white text-[9px] font-bold rounded-full min-w-[16px] h-4 flex items-center justify-center px-0.5 z-10 leading-none"
+                                            aria-label={`${badgeCount} pendiente${badgeCount !== 1 ? "s" : ""}`}
+                                        >
+                                            {badgeCount > 99 ? "99+" : badgeCount}
+                                        </span>
+                                    )}
+                                </span>
+                                <motion.span
+                                    className={`text-sm text-custom-black-800 whitespace-nowrap font-medium transition-all duration-200 group-hover:text-custom-golden-600 ${!isOpen ? "opacity-0 w-0" : "opacity-100 w-auto"
+                                        }`}
+                                    aria-hidden={!isOpen}
+                                >
+                                    {item.name}
+                                    {badgeCount > 0 && isOpen && (
+                                        <span className="ml-2 inline-flex items-center justify-center bg-red-500 text-white text-[9px] font-bold rounded-full min-w-[18px] h-[18px] px-1 leading-none">
+                                            {badgeCount > 99 ? "99+" : badgeCount}
+                                        </span>
+                                    )}
+                                </motion.span>
+                            </motion.button>
+                        );
+                    })}
 
                     {/* Logout */}
                     <motion.button

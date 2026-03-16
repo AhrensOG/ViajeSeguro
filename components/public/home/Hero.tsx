@@ -20,7 +20,7 @@ const Hero = () => {
                                break-words"
                 >
                     <span className="block text-3xl sm:text-5xl md:text-7xl">
-                        <span className="text-[#101010]">Viaje</span> <span className="text-custom-golden-600">Seguro</span>
+                        <span className="text-[#101010]">Viaje</span><span className="text-custom-golden-600">Seguro</span>
                     </span>
                     <span className="block mt-2 text-xl sm:text-3xl md:text-5xl font-semibold">
                         la plataforma más fácil para alquilar vehículos y compartir viajes por toda España, como pasajero o conductor

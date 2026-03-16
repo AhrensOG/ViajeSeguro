@@ -1,6 +1,6 @@
 "use client";
 
-import { Car, Truck, Users } from "lucide-react";
+import { Users } from "lucide-react";
 import { useState } from "react";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import SearchForm from "@/lib/client/components/SearchForm";
@@ -29,6 +29,7 @@ export default function FiltersBar() {
     searchParams.get("capacity") || ""
   );
   const [origin] = useState<string>(searchParams.get("origin") || "");
+  const [province, setProvince] = useState<string>(searchParams.get("province") || "");
   const serviceTypeParam = searchParams.get("serviceType");
   const initialVanServiceType: "WITH_DRIVER" | "WITHOUT_DRIVER" =
     serviceTypeParam === "WITHOUT_DRIVER" ? "WITHOUT_DRIVER" : "WITH_DRIVER";
@@ -156,12 +157,14 @@ export default function FiltersBar() {
       return;
     }
 
+    const originValue = province || origin;
+    
     updateSearchParams({
       mode: "van",
       departure: pickupDate,
       return: returnDate,
       capacity,
-      origin: pickupDate.toISOString(),
+      origin: originValue,
       serviceType,
     } as unknown as ClientSearchFormData);
   };
@@ -176,8 +179,7 @@ export default function FiltersBar() {
               : ""
             }`}
           onClick={() => handleModeClick("car")}>
-          <Car className="h-5 w-5" />
-          Transporte
+          Viaje Compartido
         </p>
         <p
           className={`text-custom-gray-800 flex items-center gap-2 cursor-pointer md:w-full md:justify-center ${mode === "van"
@@ -185,8 +187,7 @@ export default function FiltersBar() {
               : ""
             }`}
           onClick={() => handleModeClick("van")}>
-          <Truck className="h-5 w-5" />
-          Furgonetas
+          Alquiler de Vehículos
         </p>
       </div>
 
@@ -196,7 +197,7 @@ export default function FiltersBar() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
           className="bg-custom-white-100 py-4 w-full px-2 sm:px-4">
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 w-full items-stretch">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-6 gap-4 w-full items-stretch">
             <div className="w-full">
               <CustomDatePicker
                 onSelect={setPickupDate}
@@ -225,6 +226,66 @@ export default function FiltersBar() {
                   onChange={(e) => setCapacity(e.target.value)}
                 />
               </div>
+            </div>
+
+            <div className="w-full">
+              <select
+                value={province}
+                onChange={(e) => setProvince(e.target.value)}
+                className="h-full w-full border border-custom-gray-300 bg-custom-white-100 px-4 py-3 rounded-lg shadow-sm text-custom-gray-800 focus:ring-1 focus:ring-custom-golden-600 transition">
+                <option value="">Provincia</option>
+                <option value="Álava">Álava</option>
+                <option value="Albacete">Albacete</option>
+                <option value="Alicante">Alicante</option>
+                <option value="Almería">Almería</option>
+                <option value="Asturias">Asturias</option>
+                <option value="Ávila">Ávila</option>
+                <option value="Badajoz">Badajoz</option>
+                <option value="Barcelona">Barcelona</option>
+                <option value="Burgos">Burgos</option>
+                <option value="Cáceres">Cáceres</option>
+                <option value="Cádiz">Cádiz</option>
+                <option value="Cantabria">Cantabria</option>
+                <option value="Castellón">Castellón</option>
+                <option value="Ceuta">Ceuta</option>
+                <option value="Ciudad Real">Ciudad Real</option>
+                <option value="Córdoba">Córdoba</option>
+                <option value="Cuenca">Cuenca</option>
+                <option value="Gerona">Gerona</option>
+                <option value="Granada">Granada</option>
+                <option value="Guadalajara">Guadalajara</option>
+                <option value="Guipúzcoa">Guipúzcoa</option>
+                <option value="Huelva">Huelva</option>
+                <option value="Huesca">Huesca</option>
+                <option value="Islas Baleares">Islas Baleares</option>
+                <option value="Jaén">Jaén</option>
+                <option value="La Coruña">La Coruña</option>
+                <option value="La Rioja">La Rioja</option>
+                <option value="Las Palmas">Las Palmas</option>
+                <option value="León">León</option>
+                <option value="Lleida">Lleida</option>
+                <option value="Lugo">Lugo</option>
+                <option value="Madrid">Madrid</option>
+                <option value="Málaga">Málaga</option>
+                <option value="Melilla">Melilla</option>
+                <option value="Murcia">Murcia</option>
+                <option value="Navarra">Navarra</option>
+                <option value="Orense">Orense</option>
+                <option value="Palencia">Palencia</option>
+                <option value="Pontevedra">Pontevedra</option>
+                <option value="Salamanca">Salamanca</option>
+                <option value="Segovia">Segovia</option>
+                <option value="Sevilla">Sevilla</option>
+                <option value="Soria">Soria</option>
+                <option value="Tarragona">Tarragona</option>
+                <option value="Teruel">Teruel</option>
+                <option value="Toledo">Toledo</option>
+                <option value="Valencia">Valencia</option>
+                <option value="Valladolid">Valladolid</option>
+                <option value="Vizcaya">Vizcaya</option>
+                <option value="Zamora">Zamora</option>
+                <option value="Zaragoza">Zaragoza</option>
+              </select>
             </div>
 
             {/* <div className="w-full">

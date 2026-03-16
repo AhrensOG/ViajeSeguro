@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { Calendar1Icon, ChevronDown, ChevronRight } from "lucide-react";
+import { Calendar1Icon, ChevronDown, ChevronRight, Minus, Plus, Users } from "lucide-react";
 import TripRouteCompact from "../../../../lib/client/components/TripRouteCompact";
 import { TripWithPriceDetails } from "@/lib/shared/types/trip-service-type.type";
 import { useEffect, useState } from "react";
@@ -32,11 +32,31 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
     const router = useRouter();
     const pathname = usePathname();
     const searchParams = useSearchParams();
-    // Frontend: IVA fijo para mostrar precios finales
     const IVA = 21;
     const [referral, setReferral] = useState("");
     const { extraBags } = useTripOptions();
     const EXTRA_BAG_PRICE = 5;
+
+    // --- Multiple passengers state ---
+    const capacity: number | undefined = (trip as TripWithPriceDetails & { capacity?: number }).capacity;
+    const passengersCount: number =
+        (trip as TripWithPriceDetails & { passengers?: unknown[]; passengerCount?: number }).passengers?.length ??
+        (trip as TripWithPriceDetails & { passengers?: unknown[]; passengerCount?: number }).passengerCount ??
+        0;
+    const seatsAvailable = typeof capacity === "number" ? Math.max(capacity - passengersCount, 0) : undefined;
+    const maxPassengers = seatsAvailable ?? 10;
+
+    const [numPassengers, setNumPassengers] = useState(1);
+    const [companionNames, setCompanionNames] = useState<string[]>([]);
+
+    useEffect(() => {
+        const companions = numPassengers - 1;
+        setCompanionNames((prev) => {
+            if (prev.length === companions) return prev;
+            if (prev.length < companions) return [...prev, ...Array(companions - prev.length).fill("")];
+            return prev.slice(0, companions);
+        });
+    }, [numPassengers]);
 
     const departureTime = convertUTCToLocalTime(trip.departure, trip.originalTimeZone);
     const arrivalTime = convertUTCToLocalTime(trip.arrival, trip.originalTimeZone);
@@ -49,10 +69,9 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
             if (!session) return;
             try {
                 const res = await getDiscountByUserId();
-                if (res) {
-                    setReferral(res.id);
-                }
+                if (res) setReferral(res.id);
             } catch {
+                // ignore
             }
         };
         fetchDiscounts();
@@ -65,58 +84,53 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
     };
 
     const handleBookingClick = () => {
-        // Solo pedimos login si no hay sesión
         if (!session) {
             setShowModal(true);
             return;
         }
-        // Si hay sesión, continuamos aunque falte priceDetails (se recalcula en backend)
-        router.push(`/purchase?id=${trip.id}&&referral=${referral}&&type=trip&&extraBags=${extraBags}`);
+        const companions = companionNames.filter((n) => n.trim() !== "");
+        sessionStorage.setItem("tripPassengers", JSON.stringify(companions));
+        sessionStorage.setItem("tripNumPassengers", String(numPassengers));
+        router.push(
+            `/purchase?id=${trip.id}&&referral=${referral}&&type=trip&&extraBags=${extraBags}&&numPassengers=${numPassengers}`
+        );
     };
 
     const basePrice = trip.basePrice;
     const isAdmin = trip.user.role === "ADMIN";
 
-    // Si es admin, forzamos el cálculo del descuento en frontend si no viene del backend
     let finalPrice = trip.priceDetails?.finalPrice;
     let discounts = trip.priceDetails?.discounts || [];
 
     if (isAdmin) {
         const adminDiscountAmount = +(basePrice * 0.4).toFixed(2);
-        // Si no hay priceDetails o el precio final es igual al base (no se aplicó descuento), lo aplicamos aquí
         if (!finalPrice || finalPrice === basePrice) {
             finalPrice = +(basePrice - adminDiscountAmount).toFixed(2);
-            // Asegurarnos de que el descuento esté en la lista para mostrarlo
-            if (!discounts.some(d => d.key === 'PREFERENCIAL')) {
+            if (!discounts.some((d) => d.key === "PREFERENCIAL")) {
                 discounts = [
                     ...discounts,
-                    {
-                        key: 'PREFERENCIAL',
-                        description: 'Descuento Promocional',
-                        amount: adminDiscountAmount
-                    }
+                    { key: "PREFERENCIAL", description: "Descuento Promocional", amount: adminDiscountAmount },
                 ];
             }
         }
     } else {
-        // Si no es admin, el precio final es el base (o lo que diga el backend si hubiera otros descuentos)
         finalPrice = finalPrice ?? basePrice;
     }
 
     const hasDiscounts = discounts.length > 0;
     const displayFinalPrice = finalPrice;
     const extraCost = (extraBags || 0) * EXTRA_BAG_PRICE;
-    const effectivePrice = displayFinalPrice + extraCost;
+    const effectivePrice = (displayFinalPrice + extraCost) * numPassengers;
     const ivaAmount = (effectivePrice * IVA) / 100;
     const totalWithIVA = effectivePrice * (1 + IVA / 100);
-    // Datos opcionales: capacidad y conteo de pasajeros si el backend los provee en esta vista
-    const capacity: number | undefined = (trip as TripWithPriceDetails & { capacity?: number }).capacity;
-    const passengersCount: number = (trip as TripWithPriceDetails & { passengers?: unknown[]; passengerCount?: number }).passengers?.length ?? (trip as TripWithPriceDetails & { passengers?: unknown[]; passengerCount?: number }).passengerCount ?? 0;
-    const seatsAvailable = typeof capacity === "number" ? Math.max(capacity - passengersCount, 0) : undefined;
-
 
     return (
-        <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4, delay: 0.3 }} className="space-y-4">
+        <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.4, delay: 0.3 }}
+            className="space-y-4"
+        >
             <div className="p-6 bg-custom-white-100 shadow-sm rounded-lg border border-custom-gray-300">
                 <h2 className="text-xl font-bold text-custom-black-900 mb-4 capitalize">{dateLabel}</h2>
                 <TripRouteCompact
@@ -130,8 +144,58 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
                     size="md"
                 />
 
-                <div className="flex items-center gap-3 mt-4 mb-6">
+                <div className="flex items-center gap-3 mt-4 mb-4">
                     <span className="font-medium">{fullname ?? "Conductor"}</span>
+                </div>
+
+                {/* Passenger selector */}
+                <div className="mb-4 p-3 bg-custom-gray-50 rounded-lg border border-custom-gray-200">
+                    <p className="text-sm font-medium text-custom-black-800 mb-3 flex items-center gap-2">
+                        <Users size={16} className="text-custom-golden-700" />
+                        Número de pasajeros
+                    </p>
+                    <div className="flex items-center gap-3 mb-3">
+                        <button
+                            onClick={() => setNumPassengers((n) => Math.max(1, n - 1))}
+                            className="w-8 h-8 rounded-full border border-custom-gray-300 flex items-center justify-center hover:bg-custom-gray-100 transition-colors disabled:opacity-40"
+                            disabled={numPassengers <= 1}
+                            aria-label="Reducir pasajeros"
+                        >
+                            <Minus size={14} />
+                        </button>
+                        <span className="text-lg font-semibold w-8 text-center">{numPassengers}</span>
+                        <button
+                            onClick={() => setNumPassengers((n) => Math.min(maxPassengers, n + 1))}
+                            className="w-8 h-8 rounded-full border border-custom-gray-300 flex items-center justify-center hover:bg-custom-gray-100 transition-colors disabled:opacity-40"
+                            disabled={numPassengers >= maxPassengers}
+                            aria-label="Aumentar pasajeros"
+                        >
+                            <Plus size={14} />
+                        </button>
+                        {typeof seatsAvailable === "number" && (
+                            <span className="text-xs text-custom-gray-500">({seatsAvailable} disponibles)</span>
+                        )}
+                    </div>
+
+                    {companionNames.length > 0 && (
+                        <div className="space-y-2">
+                            <p className="text-xs text-custom-gray-600 font-medium">Nombre de los acompañantes:</p>
+                            {companionNames.map((name, idx) => (
+                                <input
+                                    key={idx}
+                                    type="text"
+                                    value={name}
+                                    onChange={(e) => {
+                                        const updated = [...companionNames];
+                                        updated[idx] = e.target.value;
+                                        setCompanionNames(updated);
+                                    }}
+                                    placeholder={`Acompañante ${idx + 1}`}
+                                    className="w-full border border-custom-gray-300 rounded-md px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-custom-golden-500 bg-white"
+                                />
+                            ))}
+                        </div>
+                    )}
                 </div>
 
                 <div className="border-t border-b border-custom-gray-300 py-4 my-4">
@@ -142,21 +206,33 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
                         </div>
                         <div className="text-right">
                             {basePrice > displayFinalPrice && (
-                                <div className="text-sm text-gray-500 line-through">{basePrice.toFixed(2).replace(".", ",")} €</div>
+                                <div className="text-sm text-gray-500 line-through">
+                                    {(basePrice * numPassengers).toFixed(2).replace(".", ",")} €
+                                </div>
                             )}
-                            <div className="text-xl font-semibold text-custom-black-800">{displayFinalPrice.toFixed(2).replace(".", ",")} €</div>
+                            <div className="text-xl font-semibold text-custom-black-800">
+                                {(displayFinalPrice * numPassengers).toFixed(2).replace(".", ",")} €
+                                {numPassengers > 1 && (
+                                    <span className="text-xs text-custom-gray-500 ml-1">
+                                        ({numPassengers} × {displayFinalPrice.toFixed(2).replace(".", ",")} €)
+                                    </span>
+                                )}
+                            </div>
                         </div>
                     </div>
 
-                    {/* Equipaje adicional */}
                     <div className="flex items-center justify-between mb-1">
                         <div className="flex items-center gap-2">
                             <span className="font-medium">Equipaje adicional</span>
                             <ChevronRight size={16} className="text-custom-gray-500" />
                         </div>
                         <div className="text-right">
-                            <div className="text-sm text-custom-gray-600">{extraBags} x {EXTRA_BAG_PRICE.toFixed(2).replace(".", ",")} €</div>
-                            <div className="text-base font-semibold text-custom-black-800">{extraCost.toFixed(2).replace(".", ",")} €</div>
+                            <div className="text-sm text-custom-gray-600">
+                                {extraBags} x {EXTRA_BAG_PRICE.toFixed(2).replace(".", ",")} €
+                            </div>
+                            <div className="text-base font-semibold text-custom-black-800">
+                                {extraCost.toFixed(2).replace(".", ",")} €
+                            </div>
                         </div>
                     </div>
 
@@ -180,7 +256,9 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
                         <div className="text-right">
                             {basePrice > displayFinalPrice && (
                                 <div className="text-sm text-gray-500 line-through">
-                                    {((basePrice + extraCost) * (1 + IVA / 100)).toFixed(2).replace(".", ",")} €
+                                    {(((basePrice * numPassengers) + extraCost) * (1 + IVA / 100))
+                                        .toFixed(2)
+                                        .replace(".", ",")} €
                                 </div>
                             )}
                             <div className="text-2xl font-bold text-custom-black-800">
@@ -196,24 +274,26 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
                                 className="text-sm text-custom-golden-700 hover:underline flex items-center gap-1"
                             >
                                 Ver detalles de descuentos
-                                <ChevronDown size={16} className={`${showDiscountDetails ? "rotate-180" : ""} transition-transform`} />
+                                <ChevronDown
+                                    size={16}
+                                    className={`${showDiscountDetails ? "rotate-180" : ""} transition-transform`}
+                                />
                             </button>
-
                             <motion.div
                                 initial={false}
-                                animate={{
-                                    height: showDiscountDetails ? "auto" : 0,
-                                    opacity: showDiscountDetails ? 1 : 0,
-                                }}
+                                animate={{ height: showDiscountDetails ? "auto" : 0, opacity: showDiscountDetails ? 1 : 0 }}
                                 transition={{ duration: 0.3, ease: "easeInOut" }}
                                 className="overflow-hidden mt-3"
                             >
                                 <ul className="space-y-1">
                                     {discounts.map((discount) => {
-                                        const label = DISCOUNT_LABELS[discount.key as DiscountKey] || discount.description;
-
+                                        const label =
+                                            DISCOUNT_LABELS[discount.key as DiscountKey] || discount.description;
                                         return (
-                                            <li key={discount.key} className="flex items-center justify-between text-sm text-custom-gray-500">
+                                            <li
+                                                key={discount.key}
+                                                className="flex items-center justify-between text-sm text-custom-gray-500"
+                                            >
                                                 <span className="text-custom-gray-700">{label}</span>
                                                 <span className="text-custom-golden-700 font-semibold">
                                                     -{discount.amount.toFixed(2).replace(".", ",")} €
@@ -227,13 +307,6 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
                     )}
                 </div>
 
-                {typeof seatsAvailable === "number" && (
-                    <div className="mt-3 text-sm text-custom-gray-700">
-                        <span className="font-medium">Asientos disponibles:</span> {seatsAvailable}
-                    </div>
-                )}
-
-                {/* Nota de equipaje incluido */}
                 <p className="mt-2 text-xs text-custom-gray-600">
                     Este viaje incluye 1 equipaje de mano y 1 maleta.
                 </p>
@@ -244,13 +317,16 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
                         className="w-full bg-custom-golden-600 hover:bg-custom-golden-700 text-custom-white-100 py-4 mt-4 rounded-lg flex items-center justify-center"
                     >
                         <Calendar1Icon size={16} className="mr-2" />
-                        Ir a pagar
+                        {numPassengers > 1 ? `Ir a pagar (${numPassengers} pasajeros)` : "Ir a pagar"}
                     </button>
                 </motion.div>
             </div>
 
-            {/* Modal para login */}
-            <AuthRequiredModal show={showModal} onClose={() => setShowModal(false)} onConfirm={handleLoginRedirect} />
+            <AuthRequiredModal
+                show={showModal}
+                onClose={() => setShowModal(false)}
+                onConfirm={handleLoginRedirect}
+            />
         </motion.div>
     );
 };
