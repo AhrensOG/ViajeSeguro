@@ -2,8 +2,8 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { fetchAdminStats, fetchReferralStats, DashboardStats, ReferralStats } from "@/lib/api/admin/stats";
-import { Users, Coins, Map, Star, CreditCard, Banknote, Loader2, UserPlus, CheckCircle, XCircle, Clock } from "lucide-react";
+import { fetchAdminStats, fetchReferralStats, fetchSubscriptionStats, DashboardStats, ReferralStats, SubscriptionStats } from "@/lib/api/admin/stats";
+import { Users, Coins, Map, Star, CreditCard, Banknote, Loader2, UserPlus, CheckCircle, XCircle, Clock, Calendar, DollarSign } from "lucide-react";
 
 import { useRouter } from "next/navigation";
 
@@ -14,18 +14,22 @@ import { useRouter } from "next/navigation";
 export default function StatisticsPanel() {
     const [stats, setStats] = useState<DashboardStats | null>(null);
     const [referralStats, setReferralStats] = useState<ReferralStats | null>(null);
+    const [subscriptionStats, setSubscriptionStats] = useState<SubscriptionStats | null>(null);
     const [loading, setLoading] = useState(true);
     const [showReferrals, setShowReferrals] = useState(false);
+    const [showSubscriptions, setShowSubscriptions] = useState(false);
     const router = useRouter();
 
     useEffect(() => {
         Promise.all([
             fetchAdminStats(),
-            fetchReferralStats()
+            fetchReferralStats(),
+            fetchSubscriptionStats()
         ])
-            .then(([statsData, referralData]) => {
+            .then(([statsData, referralData, subscriptionData]) => {
                 setStats(statsData);
                 setReferralStats(referralData);
+                setSubscriptionStats(subscriptionData);
             })
             .catch((err) => console.error(err))
             .finally(() => setLoading(false));
@@ -330,6 +334,158 @@ export default function StatisticsPanel() {
                                             </td>
                                             <td className="px-4 py-3 text-sm text-custom-gray-500">
                                                 {new Date(referral.createdAt).toLocaleDateString('es-ES')}
+                                            </td>
+                                        </tr>
+                                    ))}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                )}
+            </div>
+
+            {/* Subscriptions Section */}
+            <div className="mt-8">
+                <div className="flex items-center justify-between mb-6">
+                    <h3 className="text-xl font-bold text-custom-black-900 flex items-center gap-2">
+                        <Calendar className="w-5 h-5 text-custom-golden-600" />
+                        Suscripciones
+                    </h3>
+                    <button
+                        onClick={() => setShowSubscriptions(!showSubscriptions)}
+                        className="text-custom-golden-600 font-medium hover:underline"
+                    >
+                        {showSubscriptions ? "Ocultar detalles" : "Ver detalles"}
+                    </button>
+                </div>
+
+                {/* Subscription Stats Summary */}
+                {subscriptionStats && (
+                    <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
+                        <div className="bg-white rounded-xl border border-custom-gray-200 p-4">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-blue-50 rounded-lg">
+                                    <Users className="w-5 h-5 text-blue-600" />
+                                </div>
+                                <div>
+                                    <p className="text-sm text-custom-gray-500">Total Suscripciones</p>
+                                    <p className="text-2xl font-bold text-custom-black-900">{subscriptionStats.stats.totalSubscriptions}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl border border-custom-gray-200 p-4">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-green-50 rounded-lg">
+                                    <CheckCircle className="w-5 h-5 text-green-600" />
+                                </div>
+                                <div>
+                                    <p className="text-sm text-custom-gray-500">Activas</p>
+                                    <p className="text-2xl font-bold text-custom-black-900">{subscriptionStats.stats.activeSubscriptions}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl border border-custom-gray-200 p-4">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-indigo-50 rounded-lg">
+                                    <Calendar className="w-5 h-5 text-indigo-600" />
+                                </div>
+                                <div>
+                                    <p className="text-sm text-custom-gray-500">Mensuales</p>
+                                    <p className="text-2xl font-bold text-custom-black-900">{subscriptionStats.stats.monthlyPlanCount}</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="bg-white rounded-xl border border-custom-gray-200 p-4">
+                            <div className="flex items-center gap-3">
+                                <div className="p-2 bg-purple-50 rounded-lg">
+                                    <DollarSign className="w-5 h-5 text-purple-600" />
+                                </div>
+                                <div>
+                                    <p className="text-sm text-custom-gray-500">Anuales</p>
+                                    <p className="text-2xl font-bold text-custom-black-900">{subscriptionStats.stats.annualPlanCount}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                )}
+
+                {/* Subscription Details Table */}
+                {showSubscriptions && subscriptionStats && (
+                    <div className="bg-white rounded-xl border border-custom-gray-200 overflow-hidden">
+                        <div className="overflow-x-auto">
+                            <table className="w-full">
+                                <thead className="bg-gray-50 border-b border-custom-gray-200">
+                                    <tr>
+                                        <th className="px-4 py-3 text-left text-xs font-semibold text-custom-gray-600 uppercase">Usuario</th>
+                                        <th className="px-4 py-3 text-center text-xs font-semibold text-custom-gray-600 uppercase">Plan</th>
+                                        <th className="px-4 py-3 text-center text-xs font-semibold text-custom-gray-600 uppercase">Estado</th>
+                                        <th className="px-4 py-3 text-left text-xs font-semibold text-custom-gray-600 uppercase">Inicio</th>
+                                        <th className="px-4 py-3 text-left text-xs font-semibold text-custom-gray-600 uppercase">Fin</th>
+                                        <th className="px-4 py-3 text-right text-xs font-semibold text-custom-gray-600 uppercase">Último Pago</th>
+                                    </tr>
+                                </thead>
+                                <tbody className="divide-y divide-custom-gray-100">
+                                    {subscriptionStats.subscriptions.map((sub) => (
+                                        <tr key={sub.id} className="hover:bg-gray-50">
+                                            <td className="px-4 py-3">
+                                                <div>
+                                                    <p className="font-medium text-custom-black-900">
+                                                        {sub.user.name} {sub.user.lastName}
+                                                    </p>
+                                                    <p className="text-xs text-custom-gray-500">{sub.user.email}</p>
+                                                </div>
+                                            </td>
+                                            <td className="px-4 py-3 text-center">
+                                                {sub.plan === 'MONTHLY' && (
+                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-indigo-100 text-indigo-800">
+                                                        Mensual
+                                                    </span>
+                                                )}
+                                                {sub.plan === 'ANNUAL' && (
+                                                    <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-purple-100 text-purple-800">
+                                                        Anual
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-3 text-center">
+                                                {sub.status === 'ACTIVE' && (
+                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                                                        <CheckCircle className="w-3 h-3" /> Activa
+                                                    </span>
+                                                )}
+                                                {sub.status === 'INACTIVE' && (
+                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-yellow-100 text-yellow-800">
+                                                        <Clock className="w-3 h-3" /> Inactiva
+                                                    </span>
+                                                )}
+                                                {sub.status === 'EXPIRED' && (
+                                                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-xs font-medium bg-red-100 text-red-800">
+                                                        <XCircle className="w-3 h-3" /> Expirada
+                                                    </span>
+                                                )}
+                                            </td>
+                                            <td className="px-4 py-3 text-sm text-custom-gray-500">
+                                                {new Date(sub.startDate).toLocaleDateString('es-ES')}
+                                            </td>
+                                            <td className="px-4 py-3 text-sm text-custom-gray-500">
+                                                {new Date(sub.endDate).toLocaleDateString('es-ES')}
+                                            </td>
+                                            <td className="px-4 py-3 text-right">
+                                                {sub.lastPayment ? (
+                                                    <div>
+                                                        <p className="font-medium text-custom-black-900">
+                                                            {sub.lastPayment.amount.toFixed(2)}€
+                                                        </p>
+                                                        <p className="text-xs text-custom-gray-500">
+                                                            {sub.lastPayment.method} - {new Date(sub.lastPayment.date).toLocaleDateString('es-ES')}
+                                                        </p>
+                                                    </div>
+                                                ) : (
+                                                    <span className="text-sm text-custom-gray-400">—</span>
+                                                )}
                                             </td>
                                         </tr>
                                     ))}

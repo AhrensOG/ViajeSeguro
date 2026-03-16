@@ -58,3 +58,40 @@ export async function fetchAdminStats() {
 export async function fetchReferralStats() {
     return await fetchWithAuth<ReferralStats>(`${BACKEND_URL}/stats/referrals`);
 }
+
+export interface SubscriptionInfo {
+    id: string;
+    plan: "MONTHLY" | "ANNUAL";
+    status: "ACTIVE" | "INACTIVE" | "EXPIRED";
+    startDate: string;
+    endDate: string;
+    createdAt: string;
+    user: {
+        id: string;
+        name: string;
+        lastName: string;
+        email: string;
+    };
+    lastPayment?: {
+        amount: number;
+        date: string;
+        method: string;
+        status: string;
+    };
+}
+
+export interface SubscriptionStats {
+    stats: {
+        totalSubscriptions: number;
+        activeSubscriptions: number;
+        inactiveSubscriptions: number;
+        monthlyPlanCount: number;
+        annualPlanCount: number;
+        totalRevenueFromSubscriptions: number;
+    };
+    subscriptions: SubscriptionInfo[];
+}
+
+export async function fetchSubscriptionStats() {
+    return await fetchWithAuth<SubscriptionStats>(`${BACKEND_URL}/stats/subscriptions`);
+}
