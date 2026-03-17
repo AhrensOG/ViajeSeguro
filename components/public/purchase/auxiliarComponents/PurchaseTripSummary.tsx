@@ -18,6 +18,7 @@ type Props = {
     price: number;
     extraBags?: number;
     pricePerBag?: number;
+    numPassengers?: number;
 } & ClientTripRouteCompactType & {
     priceDetails?: PriceDetails | null;
 };
@@ -36,13 +37,15 @@ const PurchaseTripSummary = ({
     priceDetails,
     extraBags = 0,
     pricePerBag = 5,
+    numPassengers = 1,
 }: Props) => {
     const [showDetails, setShowDetails] = useState(false);
     const IVA_RATE = 0.21;
 
     const hasDiscounts = priceDetails && priceDetails.discounts.length > 0;
+    const pricePerPerson = (priceDetails?.finalPrice ?? price);
     const extras = (extraBags || 0) * (pricePerBag || 5);
-    const subtotal = (priceDetails?.finalPrice ?? price) + extras; // base + extras
+    const subtotal = (pricePerPerson + extras) * numPassengers;
     const totalWithIVA = subtotal * (1 + IVA_RATE);
     const ivaAmount = subtotal * IVA_RATE;
 
@@ -87,7 +90,7 @@ const PurchaseTripSummary = ({
                 </motion.div>
             </button>
 
-            <AnimatePresence>
+                    <AnimatePresence>
                 {showDetails && (
                     <motion.div
                         id="cost-details"
@@ -98,9 +101,16 @@ const PurchaseTripSummary = ({
                         className="overflow-hidden mt-2 text-sm text-custom-gray-600 space-y-1"
                     >
                         <div className="flex justify-between">
-                            <span>Precio base (sin IVA):</span>
-                            <span>{(priceDetails?.finalPrice ?? price).toFixed(2).replace(".", ",")} €</span>
+                            <span>Precio por persona (sin IVA):</span>
+                            <span>{pricePerPerson.toFixed(2).replace(".", ",")} €</span>
                         </div>
+
+                        {numPassengers > 1 && (
+                            <div className="flex justify-between text-custom-gray-500">
+                                <span>x {numPassengers} pasajeros:</span>
+                                <span>{(pricePerPerson * numPassengers).toFixed(2).replace(".", ",")} €</span>
+                            </div>
+                        )}
 
                         <div className="flex justify-between">
                             <span>Equipaje adicional:</span>

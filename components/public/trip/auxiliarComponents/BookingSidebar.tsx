@@ -12,6 +12,7 @@ import { convertUTCToLocalTime, formatFullDate, getDurationString } from "@/lib/
 import { useSession } from "next-auth/react";
 import { getDiscountByUserId } from "@/lib/api/trip";
 import { useTripOptions } from "./TripOptionsContext";
+import { toast } from "sonner";
 
 type BookingSidebarProps = {
     trip: TripWithPriceDetails;
@@ -48,6 +49,29 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
 
     const [numPassengers, setNumPassengers] = useState(1);
     const [companionNames, setCompanionNames] = useState<string[]>([]);
+
+    useEffect(() => {
+        const savedPassengers = sessionStorage.getItem("tripPassengers");
+        const savedNumPassengers = sessionStorage.getItem("tripNumPassengers");
+        
+        if (savedPassengers) {
+            try {
+                const parsed = JSON.parse(savedPassengers);
+                if (Array.isArray(parsed)) {
+                    setCompanionNames(parsed);
+                }
+            } catch {
+                // ignore
+            }
+        }
+        
+        if (savedNumPassengers) {
+            const parsed = parseInt(savedNumPassengers, 10);
+            if (!isNaN(parsed) && parsed > 0) {
+                setNumPassengers(parsed);
+            }
+        }
+    }, []);
 
     useEffect(() => {
         const companions = numPassengers - 1;
@@ -87,6 +111,13 @@ const BookingSidebar = ({ trip }: BookingSidebarProps) => {
         if (!session) {
             setShowModal(true);
             return;
+        }
+        if (numPassengers > 1) {
+            const filledNames = companionNames.filter((n) => n.trim() !== "").length;
+            if (filledNames < numPassengers - 1) {
+                toast.error("Debes completar los nombres de todos los pasajeros");
+                return;
+            }
         }
         const companions = companionNames.filter((n) => n.trim() !== "");
         sessionStorage.setItem("tripPassengers", JSON.stringify(companions));
