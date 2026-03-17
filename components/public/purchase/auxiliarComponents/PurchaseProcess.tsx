@@ -288,11 +288,6 @@ const PurchaseProcess = () => {
 
     const tripSummary = trip ? getSummaryFromTrip(trip) : null;
 
-    const priceFormatted = (finalPrice: number | undefined, basePrice: number, IVA: number, extra: number) => {
-        const price = (finalPrice !== undefined ? finalPrice : basePrice) + extra;
-        return (price * (1 + Number(IVA) / 100)).toFixed(2).replace(".", ",");
-    };
-
     let price: string = "0,00";
 
     if (trip) {
@@ -327,7 +322,9 @@ const PurchaseProcess = () => {
                 }
             }
 
-            price = priceFormatted(finalPrice, trip.basePrice, Number(IVA), extraAmount);
+            const pricePerPerson = (finalPrice !== undefined ? finalPrice : trip.basePrice) + extraAmount;
+            const totalPrice = pricePerPerson * numPassengers;
+            price = (totalPrice * (1 + Number(IVA) / 100)).toFixed(2).replace(".", ",");
         }
     } else if (vehicleOffer?.pricePerDay !== undefined && (start || vehicleOffer.availableFrom) && (end || vehicleOffer.availableTo)) {
         const totalDays = calculateTotalDays(start || vehicleOffer.availableFrom, end || vehicleOffer.availableTo);
