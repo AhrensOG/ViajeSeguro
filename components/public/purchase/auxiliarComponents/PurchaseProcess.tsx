@@ -416,6 +416,7 @@ const PurchaseProcess = () => {
                             priceDetails={trip.priceDetails}
                             extraBags={extraBags}
                             pricePerBag={EXTRA_BAG_PRICE}
+                            numPassengers={numPassengers}
                         // title={isVehicle ? "Resumen de tu reserva" : "Resumen de tu viaje"}
                         />
                     )}
