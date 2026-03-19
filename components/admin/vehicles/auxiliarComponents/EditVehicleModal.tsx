@@ -16,6 +16,7 @@ interface Props {
     owners: User[];
     onClose: () => void;
     onSuccess: (updated: Vehicle) => void;
+    isAdmin?: boolean;
 }
 
 const FEATURES: { value: string; label: string }[] = [
@@ -29,7 +30,7 @@ const inputClass =
     "w-full border border-custom-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-custom-golden-400 shadow-sm transition";
 const labelClass = "block text-[0.75rem] font-semibold text-custom-gray-600 mb-1 uppercase tracking-wide";
 
-const EditVehicleModal = ({ vehicle, owners, onClose, onSuccess }: Props) => {
+const EditVehicleModal = ({ vehicle, owners, onClose, onSuccess, isAdmin = false }: Props) => {
     const {
         register,
         handleSubmit,
@@ -395,18 +396,20 @@ const EditVehicleModal = ({ vehicle, owners, onClose, onSuccess }: Props) => {
                         </select>
                     </div>
 
-                    <div>
-                        <label className={labelClass}>Dueño del vehículo</label>
-                        <select {...register("ownerId", { required: true })} className={inputClass}>
-                            <option value="">Selecciona un dueño</option>
-                            {owners.map((owner) => (
-                                <option key={owner.id} value={owner.id}>
-                                    {owner.name} {owner.lastName} - {owner.email}
-                                </option>
-                            ))}
-                        </select>
-                        {errors.ownerId && <p className="text-red-500 text-xs">Campo obligatorio</p>}
-                    </div>
+                    {!isAdmin && (
+                        <div>
+                            <label className={labelClass}>Dueño del vehículo</label>
+                            <select {...register("ownerId", { required: true })} className={inputClass}>
+                                <option value="">Selecciona un dueño</option>
+                                {owners.map((owner) => (
+                                    <option key={owner.id} value={owner.id}>
+                                        {owner.name} {owner.lastName} - {owner.email}
+                                    </option>
+                                ))}
+                            </select>
+                            {errors.ownerId && <p className="text-red-500 text-xs">Campo obligatorio</p>}
+                        </div>
+                    )}
 
                     <div className="col-span-full">
                         <label className={labelClass}>Características</label>
