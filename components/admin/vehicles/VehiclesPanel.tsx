@@ -11,6 +11,7 @@ import EditVehicleModal from "./auxiliarComponents/EditVehicleModal";
 import VehicleDetailsModal from "./auxiliarComponents/VehicleDetailsModal";
 import { deleteVehicle, getOwners, getVehicles } from "@/lib/api/admin/vehicles";
 import { User } from "@/lib/api/reservation/reservation.types";
+import { useSession } from "next-auth/react";
 
 const transmissionTypeMap = {
     MANUAL: "Manual",
@@ -49,11 +50,14 @@ const getApprovalStatusBadge = (status: VehicleApprovalStatus) => {
 };
 
 export default function VehiclesPanel() {
+    const { data: session } = useSession();
     const [vehicles, setVehicles] = useState<Vehicle[]>([]);
     const [owners, setOwners] = useState<User[]>([]);
     const [loading, setLoading] = useState(true);
     const [loadingOwners, setLoadingOwners] = useState(true);
     const [search, setSearch] = useState("");
+
+    const isAdmin = session?.user?.role === "ADMIN";
 
     const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
     const [isEditModalOpen, setIsEditModalOpen] = useState(false);
@@ -232,6 +236,7 @@ export default function VehiclesPanel() {
                     owners={owners}
                     onSuccess={handleUpdateVehicle}
                     vehicle={selectedVehicle}
+                    isAdmin={isAdmin}
                 />
             )}
             {isViewModalOpen && selectedVehicle && <VehicleDetailsModal onClose={() => setIsViewModalOpen(false)} vehicle={selectedVehicle} />}
