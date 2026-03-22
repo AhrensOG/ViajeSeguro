@@ -123,8 +123,18 @@ const RentalSidebar = ({ vehicleOffer, selectedStart, selectedEnd }: RentalSideb
                             <span className="font-medium">Importe</span>
                             <ChevronRight size={16} className="text-custom-gray-500" />
                         </div>
-                        <span className="text-xl font-semibold text-custom-black-800">{(canPay ? total : 0).toFixed(2).replace(".", ",")} €</span>
+                        <span className="text-xl font-semibold text-custom-black-800">{(canPay ? total - (extraMileage * 0.30) : 0).toFixed(2).replace(".", ",")} €</span>
                     </div>
+
+                    {extraMileage > 0 && (
+                        <div className="flex items-center justify-between mb-2 text-green-600">
+                            <div className="flex items-center gap-2">
+                                <span className="font-medium">Km extra ({extraMileage} km)</span>
+                                <ChevronRight size={16} className="text-green-500" />
+                            </div>
+                            <span className="text-xl font-semibold">+{(extraMileage * 0.30).toFixed(2).replace(".", ",")} €</span>
+                        </div>
+                    )}
 
                     <div className="flex items-center justify-between mb-2">
                         <div className="flex items-center gap-2">
@@ -160,17 +170,22 @@ const RentalSidebar = ({ vehicleOffer, selectedStart, selectedEnd }: RentalSideb
                         >
                             -
                         </button>
-                        <span className="font-semibold text-custom-black-800 w-12 text-center">
-                            {extraMileage}
-                        </span>
+                        <input
+                            type="number"
+                            min="0"
+                            value={extraMileage === 0 ? "" : extraMileage}
+                            onChange={(e) => setExtraMileage(e.target.value === "" ? 0 : parseInt(e.target.value) || 0)}
+                            placeholder="0"
+                            className="font-semibold text-custom-black-800 w-20 text-center border border-gray-300 rounded px-2 py-1 appearance-none [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none [-moz-appearance]_textfield:appearance-none"
+                        />
                         <button
                             onClick={() => setExtraMileage(extraMileage + 10)}
                             className="w-8 h-8 flex items-center justify-center bg-gray-200 rounded-full hover:bg-gray-300 transition"
                         >
                             +
                         </button>
-                        <span className="text-xs text-custom-gray-500 ml-2">
-                            (+{(extraMileage * 0.30).toFixed(2)}€)
+                        <span className="text-xs text-custom-gray-500 ml-1">
+                            km (+{(extraMileage * 0.30).toFixed(2)}€)
                         </span>
                     </div>
                 </div>
