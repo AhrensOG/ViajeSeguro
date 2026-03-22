@@ -173,7 +173,7 @@ export function EditVehicleModalUser({ vehicle, isOpen, onClose, onSuccess }: Ed
             </div>
             <div>
               <label className={labelClass}>Provincia</label>
-              <select {...register("province")} className={inputClass}>
+              <select {...register("province", { required: true })} className={inputClass}>
                 <option value="">Selecciona una provincia</option>
                 <option value="Álava">Álava</option>
                 <option value="Albacete">Albacete</option>
@@ -227,6 +227,7 @@ export function EditVehicleModalUser({ vehicle, isOpen, onClose, onSuccess }: Ed
                 <option value="Zamora">Zamora</option>
                 <option value="Zaragoza">Zaragoza</option>
               </select>
+              {errors.province && <p className="text-red-500 text-xs">Campo obligatorio</p>}
             </div>
           </div>
 

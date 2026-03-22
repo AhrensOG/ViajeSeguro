@@ -275,7 +275,7 @@ const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
 
           <div>
             <label className={labelClass}>Provincia</label>
-            <select {...register("province")} className={inputClass}>
+            <select {...register("province", { required: true })} className={inputClass}>
               <option value="">Selecciona una provincia</option>
               <option value="Álava">Álava</option>
               <option value="Albacete">Albacete</option>
@@ -329,6 +329,7 @@ const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
               <option value="Zamora">Zamora</option>
               <option value="Zaragoza">Zaragoza</option>
             </select>
+            {errors.province && <p className="text-red-500 text-xs">Campo obligatorio</p>}
           </div>
 
           {/* provider y owner NO se muestran; se fijan en el submit */}

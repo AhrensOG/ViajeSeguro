@@ -11,19 +11,27 @@ interface PurchaseVehicleSummaryProps {
     start: string;
     end: string;
     originalTimeZone: string;
+    prepaidExtraMileage?: number;
 }
 
-const PurchaseVehicleSummary = ({ vehicleOffer, start, end, originalTimeZone }: PurchaseVehicleSummaryProps) => {
+const PurchaseVehicleSummary = ({ vehicleOffer, start, end, originalTimeZone, prepaidExtraMileage = 0 }: PurchaseVehicleSummaryProps) => {
     const [showDetails, setShowDetails] = useState(false);
     const IVA_RATE = 0.21;
 
     const from = DateTime.fromISO(start || vehicleOffer.availableFrom).setZone(originalTimeZone);
     const to = DateTime.fromISO(end || vehicleOffer.availableTo).setZone(originalTimeZone);
     const totalDays = Math.max(1, Math.ceil(to.diff(from, "days").days));
-    const basePrice = vehicleOffer.pricePerDay * totalDays;
-    const totalWithIVA = basePrice * (1 + IVA_RATE);
-    const ivaAmount = totalWithIVA - basePrice;
-    // Fianza: usar valor real si está presente; fallback 600 mientras tanto
+    
+    const basePricePerDay = vehicleOffer.pricePerDay;
+    const dailyMileageLimit = vehicleOffer.dailyMileageLimit || 200;
+    const extraKmPrice = 0.30;
+    
+    const basePrice = basePricePerDay * totalDays;
+    const extraKmCost = prepaidExtraMileage * extraKmPrice;
+    const subtotal = basePrice + extraKmCost;
+    const ivaAmount = subtotal * IVA_RATE;
+    const totalWithIVA = subtotal + ivaAmount;
+    
     const deposit = typeof vehicleOffer.depositAmount === "number" ? vehicleOffer.depositAmount : 600;
     const totalWithIvaAndDeposit = totalWithIVA + deposit;
 
@@ -92,7 +100,7 @@ const PurchaseVehicleSummary = ({ vehicleOffer, start, end, originalTimeZone }: 
                     >
                         <div className="flex justify-between">
                             <span>Precio por día:</span>
-                            <span>{vehicleOffer.pricePerDay.toFixed(2).replace(".", ",")} €</span>
+                            <span>{basePricePerDay.toFixed(2).replace(".", ",")} €</span>
                         </div>
 
                         <div className="flex justify-between">
@@ -101,8 +109,20 @@ const PurchaseVehicleSummary = ({ vehicleOffer, start, end, originalTimeZone }: 
                         </div>
 
                         <div className="flex justify-between">
+                            <span>Km incluidos:</span>
+                            <span>{dailyMileageLimit} km/día ({dailyMileageLimit * totalDays} km total)</span>
+                        </div>
+
+                        {prepaidExtraMileage > 0 && (
+                            <div className="flex justify-between text-green-600">
+                                <span>Km extra pre-contratados ({prepaidExtraMileage} km):</span>
+                                <span>+{extraKmCost.toFixed(2).replace(".", ",")} €</span>
+                            </div>
+                        )}
+
+                        <div className="flex justify-between">
                             <span>Precio base (sin IVA):</span>
-                            <span>{basePrice.toFixed(2).replace(".", ",")} €</span>
+                            <span>{subtotal.toFixed(2).replace(".", ",")} €</span>
                         </div>
 
                         <div className="flex justify-between">
@@ -111,13 +131,25 @@ const PurchaseVehicleSummary = ({ vehicleOffer, start, end, originalTimeZone }: 
                         </div>
 
                         <div className="flex justify-between">
-                            <span>Fianza:</span>
-                            <span>{deposit.toFixed(2).replace(".", ",")} €</span>
+                            <span>Subtotal:</span>
+                            <span>{totalWithIVA.toFixed(2).replace(".", ",")} €</span>
                         </div>
 
-                        <div className="flex justify-between font-medium">
+                        <div className="flex justify-between bg-amber-50 -mx-2 px-2 py-1 rounded">
+                            <span className="font-medium">Fianza (devuelta al final):</span>
+                            <span className="font-medium">{deposit.toFixed(2).replace(".", ",")} €</span>
+                        </div>
+
+                        <div className="flex justify-between font-bold text-custom-black-800 mt-2 pt-2 border-t border-gray-300">
                             <span>Total (incluye fianza):</span>
                             <span>{totalWithIvaAndDeposit.toFixed(2).replace(".", ",")} €</span>
+                        </div>
+                        
+                        <div className="mt-3 p-3 bg-blue-50 rounded text-xs text-blue-700 space-y-1">
+                            <p className="font-semibold">Información importante:</p>
+                            <p>• Km adicionales post-pago: 0,50 €/km</p>
+                            <p>• La fianza se devuelve al entregar el vehículo sin daños</p>
+                            <p>• Incluye seguro básico</p>
                         </div>
                     </motion.div>
                 )}

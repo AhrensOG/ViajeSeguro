@@ -328,7 +328,9 @@ const PurchaseProcess = () => {
         }
     } else if (vehicleOffer?.pricePerDay !== undefined && (start || vehicleOffer.availableFrom) && (end || vehicleOffer.availableTo)) {
         const totalDays = calculateTotalDays(start || vehicleOffer.availableFrom, end || vehicleOffer.availableTo);
-        const totalPrice = vehicleOffer.pricePerDay * totalDays;
+        const baseVehiclePrice = vehicleOffer.pricePerDay * totalDays;
+        const extraKmCost = prepaidExtraMileage * 0.30;
+        const totalPrice = baseVehiclePrice + extraKmCost;
         const deposit = typeof vehicleOffer.depositAmount === 'number' ? vehicleOffer.depositAmount : 600;
         const priceWithIvaAndDeposit = (totalPrice * (1 + Number(IVA) / 100)) + deposit;
         price = priceWithIvaAndDeposit.toFixed(2).replace('.', ',');
@@ -423,6 +425,7 @@ const PurchaseProcess = () => {
                             start={start || vehicleOffer.availableFrom}
                             end={end || vehicleOffer.availableTo}
                             originalTimeZone={vehicleOffer.originalTimeZone}
+                            prepaidExtraMileage={prepaidExtraMileage}
                         />
                     )}
                 </div>
