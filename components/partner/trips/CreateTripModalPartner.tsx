@@ -183,7 +183,7 @@ export default function CreateTripModalPartner({ onClose, onSuccess }: Props) {
           <div className="col-span-full">
             <AddressFields
               label="Dirección de origen"
-              value={form.originLocation}
+              value={form.originLocation || ""}
               onChange={(value) => setForm((prev) => ({ ...prev, originLocation: value }))}
             />
           </div>
@@ -191,7 +191,7 @@ export default function CreateTripModalPartner({ onClose, onSuccess }: Props) {
           <div className="col-span-full">
             <AddressFields
               label="Dirección de destino"
-              value={form.destinationLocation}
+              value={form.destinationLocation || ""}
               onChange={(value) => setForm((prev) => ({ ...prev, destinationLocation: value }))}
             />
           </div>

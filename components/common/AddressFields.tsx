@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, useRef, useCallback, memo } from "react";
-import { MapPin, Loader2, X } from "lucide-react";
+import { MapPin, Loader2 } from "lucide-react";
 import { searchAddresses, type AddressSuggestion } from "@/lib/api/geo/addresses";
 
 interface AddressFieldsProps {
