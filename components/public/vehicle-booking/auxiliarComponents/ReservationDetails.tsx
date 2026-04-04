@@ -7,18 +7,18 @@ import { computeFreeSegments, normalizeBooked, Interval, findSegmentForDate } fr
 import CustomDatePickerVehicle from "@/lib/client/components/CustomDatePickerVehicle";
 
 interface Booking {
-    startDate: string; // ISO
-    endDate: string; // ISO
+    startDate: string;
+    endDate: string;
 }
 
 interface ReservationDetailsProps {
     serviceType: string;
     withdrawLocation: string;
-    dateStart?: string; // ISO opcional
-    dateEnd?: string; // ISO opcional
+    dateStart?: string;
+    dateEnd?: string;
     originalTimeZone: string;
-    availabilityStart: string; // ISO
-    availabilityEnd: string; // ISO
+    availabilityStart: string;
+    availabilityEnd: string;
     bookings: Booking[];
     onChangeStart?: (date?: Date) => void;
     onChangeEnd?: (date?: Date) => void;
@@ -38,7 +38,6 @@ export default function ReservationDetails(props: ReservationDetailsProps) {
         [availabilityStart, availabilityEnd]
     );
 
-    // Interválicos reservados normalizados (para pintar/ bloquear)
     const bookedIntervals: Interval[] = useMemo(
         () =>
             normalizeBooked(
@@ -51,10 +50,8 @@ export default function ReservationDetails(props: ReservationDetailsProps) {
         [bookings, availability]
     );
 
-    // Segmentos libres (lo único seleccionable)
     const freeSegments = useMemo(() => computeFreeSegments(availability, bookedIntervals), [availability, bookedIntervals]);
 
-    // Opciones de horas disponibles
     const timeOptions = useMemo(() => {
         const times = [];
         for (let h = 8; h <= 22; h++) {
@@ -79,11 +76,9 @@ export default function ReservationDetails(props: ReservationDetailsProps) {
         return newDate;
     };
 
-    // Estado local de selección
     const [pickStart, setPickStart] = useState<Date | undefined>(dateStart ? new Date(dateStart) : undefined);
     const [pickEnd, setPickEnd] = useState<Date | undefined>(dateEnd ? new Date(dateEnd) : undefined);
 
-    // Disabled global: fuera de disponibilidad + reservas
     const baseDisabled: Matcher[] = useMemo(() => {
         const out: Matcher[] = [
             { before: availability.from },
@@ -93,41 +88,31 @@ export default function ReservationDetails(props: ReservationDetailsProps) {
         return out;
     }, [availability, bookedIntervals]);
 
-    // Para la entrega, además de lo anterior, limitamos al segmento libre de pickStart
     const disabledForEnd: Matcher[] = useMemo(() => {
         const rules: Matcher[] = [...baseDisabled];
         if (pickStart) {
             const seg = findSegmentForDate(pickStart, freeSegments);
             if (seg) {
-                // Entrega no puede ser antes del inicio
                 rules.push({ before: startOfDay(pickStart) });
-                // Entrega no puede exceder su segmento libre
                 rules.push({ after: seg.to });
             } else {
-                // Si por algún motivo el inicio no cae en un segmento válido, bloqueamos todo
                 rules.push({ from: availability.from, to: availability.to });
             }
         }
         return rules;
     }, [baseDisabled, pickStart, freeSegments, availability.from, availability.to]);
 
-    // Handlers
     const handleSelectStart = (d: Date) => {
-        // Solo permitir si cae dentro de un segmento libre
         const seg = findSegmentForDate(d, freeSegments);
-        if (!seg) {
-            return;
-        }
+        if (!seg) return;
 
         const dateWithTime = applyTimeToDate(d, pickTime);
         setPickStart(dateWithTime);
 
-        // Si la entrega actual no está dentro del mismo segmento o es anterior, la reseteamos
         if (!pickEnd || pickEnd < dateWithTime || !findSegmentForDate(pickEnd, [seg])) {
             setPickEnd(undefined);
             onChangeEnd?.(undefined);
         } else {
-            // Sincronizar la hora de entrega también
             const endWithTime = applyTimeToDate(pickEnd, pickTime);
             setPickEnd(endWithTime);
             onChangeEnd?.(endWithTime);
@@ -141,8 +126,6 @@ export default function ReservationDetails(props: ReservationDetailsProps) {
         if (!seg) return;
 
         const dateWithTime = applyTimeToDate(d, pickTime);
-
-        // Validar que la entrega está en el mismo segmento y no antes del inicio
         const sameSegment = !!findSegmentForDate(dateWithTime, [seg]);
         const validOrder = dateWithTime >= startOfDay(pickStart);
 
@@ -167,33 +150,22 @@ export default function ReservationDetails(props: ReservationDetailsProps) {
     };
 
     return (
-        <article className="flex flex-col md:flex-row gap-4 w-full md:h-[17rem] m-1 p-6 border rounded-md border-custom-gray-300 shadow-sm flex-wrap">
-            <h3 className="text-custom-gray-800 font-bold text-2xl w-full">Detalles de tu Reserva</h3>
+        <article className="w-full p-4 md:p-6 border rounded-lg border-custom-gray-300 shadow-sm bg-white">
+            <h3 className="text-custom-gray-800 font-bold text-xl mb-4">Detalles de tu Reserva</h3>
 
-            {/* <div className="flex gap-2 items-center w-full md:w-[45%]">
-                <Calendar className="size-6 text-custom-golden-600" />
-                <p className="text-custom-gray-600 text-lg flex flex-col">
-                    <span>Recodiga:</span>
-                    {dateStart ? convertUTCToLocalDate(dateStart, originalTimeZone) : "—"}
-                </p>
-            </div>
-            <div className="flex gap-2 items-center w-full md:w-[45%]">
-                <Calendar className="size-6 text-custom-golden-600" />
-                <p className="text-custom-gray-600 text-lg flex flex-col">{dateEnd ? convertUTCToLocalDate(dateEnd, originalTimeZone) : "—"}</p>
-            </div> */}
-
-            {/* Recogida */}
-            <div className="flex gap-2 items-center w-full md:w-[45%]">
-                <div className="flex-1">
-                    <p className="text-custom-gray-600 text-lg flex flex-col mb-1">
-                        <span>Recogida:</span>
-                    </p>
-                    <div className="flex gap-2">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6">
+                {/* Recogida */}
+                <div className="space-y-2">
+                    <label className="text-custom-gray-600 text-sm font-medium flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs font-bold">1</span>
+                        Fecha y hora de recogida
+                    </label>
+                    <div className="flex flex-col sm:flex-row gap-2">
                         <div className="flex-1">
                             <CustomDatePickerVehicle
                                 value={pickStart}
                                 onSelect={handleSelectStart}
-                                placeholder="Fecha de recogida"
+                                placeholder="Fecha"
                                 disabled={baseDisabled}
                                 fromDate={availability.from}
                                 toDate={availability.to}
@@ -202,7 +174,7 @@ export default function ReservationDetails(props: ReservationDetailsProps) {
                         <select
                             value={pickTime}
                             onChange={(e) => handleTimeChange(e.target.value)}
-                            className="border border-custom-gray-300 rounded-lg px-3 py-2 bg-custom-white-100 text-custom-gray-800 shadow-sm focus:ring-1 focus:ring-custom-golden-600 outline-none cursor-pointer"
+                            className="sm:w-24 border border-gray-300 rounded-lg px-3 py-2 bg-white text-gray-700 shadow-sm focus:ring-2 focus:ring-amber-500 focus:border-transparent cursor-pointer"
                         >
                             {timeOptions.map((t) => (
                                 <option key={t} value={t}>
@@ -212,55 +184,59 @@ export default function ReservationDetails(props: ReservationDetailsProps) {
                         </select>
                     </div>
                 </div>
-            </div>
 
-            {/* Entrega */}
-            <div className="flex gap-2 items-center w-full md:w-[45%]">
-                <div className="flex-1">
-                    <p className="text-custom-gray-600 text-lg flex flex-col mb-1">
-                        <span>Entrega:</span>
-                    </p>
-                    <CustomDatePickerVehicle
-                        value={pickEnd}
-                        onSelect={handleSelectEnd}
-                        placeholder="Fecha de entrega"
-                        disabled={disabledForEnd}
-                        fromDate={availability.from}
-                        toDate={availability.to}
-                    />
+                {/* Entrega */}
+                <div className="space-y-2">
+                    <label className="text-custom-gray-600 text-sm font-medium flex items-center gap-2">
+                        <span className="w-6 h-6 rounded-full bg-amber-100 text-amber-600 flex items-center justify-center text-xs font-bold">2</span>
+                        Fecha y hora de entrega
+                    </label>
+                    <div className="flex flex-col sm:flex-row gap-2 items-start">
+                        <div className="flex-1">
+                            <CustomDatePickerVehicle
+                                value={pickEnd}
+                                onSelect={handleSelectEnd}
+                                placeholder="Fecha"
+                                disabled={disabledForEnd}
+                                fromDate={availability.from}
+                                toDate={availability.to}
+                            />
+                        </div>
+                        {pickEnd && (
+                            <div className="sm:w-24 px-3 py-2 bg-gray-100 rounded-lg text-gray-700 text-sm text-center">
+                                {pickTime}
+                            </div>
+                        )}
+                    </div>
                     {pickEnd && (
-                        <p className="text-sm text-amber-600 mt-2 italic font-medium">
+                        <p className="text-xs text-amber-600 italic">
                             * La entrega deberás realizarla también a las {pickTime} hs.
                         </p>
                     )}
                 </div>
-            </div>
 
-            {/* Ubicación */}
-            <div className="flex gap-2 items-center w-full md:w-[45%]">
-                <MapPin className="size-6 text-custom-golden-600" />
-                <p className="text-custom-gray-600 text-lg flex flex-col">
-                    <span>Ubicación:</span>
-                    {withdrawLocation}
-                </p>
-            </div>
-
-            {/* Tipo de servicio */}
-            <div className="flex gap-2 items-center w-full md:w-[45%]">
-                <Truck className="size-6 text-custom-golden-600" />
-                <p className="text-custom-gray-600 text-lg flex flex-col">
-                    <span>Tipo de servicio:</span>
-                    {serviceType === "WITH_DRIVER" ? "Con conductor" : "Sin conductor"}
-                </p>
-            </div>
-
-            {/* Vista local opcional */}
-            {/* {(pickStart || pickEnd) && (
-                <div className="w-full text-sm text-custom-gray-500 mt-2">
-                    {pickStart && <div>Recogida (local): {convertUTCToLocalDate(pickStart.toISOString(), originalTimeZone)}</div>}
-                    {pickEnd && <div>Entrega (local): {convertUTCToLocalDate(pickEnd.toISOString(), originalTimeZone)}</div>}
+                {/* Ubicación */}
+                <div className="space-y-2">
+                    <label className="text-custom-gray-600 text-sm font-medium flex items-center gap-2">
+                        <MapPin className="w-4 h-4 text-amber-600" />
+                        Ubicación de recogida
+                    </label>
+                    <div className="px-3 py-2 bg-gray-50 rounded-lg border border-gray-200 text-gray-800">
+                        {withdrawLocation}
+                    </div>
                 </div>
-            )} */}
+
+                {/* Tipo de servicio */}
+                <div className="space-y-2">
+                    <label className="text-custom-gray-600 text-sm font-medium flex items-center gap-2">
+                        <Truck className="w-4 h-4 text-amber-600" />
+                        Tipo de servicio
+                    </label>
+                    <div className="px-3 py-2 bg-gray-50 rounded-lg border border-gray-200 text-gray-800">
+                        {serviceType === "WITH_DRIVER" ? "Con conductor" : "Sin conductor"}
+                    </div>
+                </div>
+            </div>
         </article>
     );
 }

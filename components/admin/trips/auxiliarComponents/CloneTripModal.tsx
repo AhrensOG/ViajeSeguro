@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { createTrip } from "@/lib/api/admin/trips";
 import { CreateTripRequest, Driver, Partner, TripResponse, TripServiceType } from "@/lib/api/admin/trips/trips.type";
 import { convertUtcToDatetimeLocalInput } from "@/lib/functions";
+import AddressFields from "@/components/common/AddressFields";
 
 interface Props {
   onClose: () => void;
@@ -167,14 +168,20 @@ export default function CloneTripModal({ onClose, onSuccess, drivers, trip }: Pr
             <input name="originalTimeZone" type="text" value={form.originalTimeZone as string} onChange={handleChange} className={inputClass} required />
           </div>
 
-          <div>
-            <label className={labelClass}>Ubicación exacta de origen</label>
-            <input name="originLocation" type="text" value={form.originLocation as string} onChange={handleChange} className={inputClass} />
+          <div className="col-span-full">
+            <AddressFields
+              label="Dirección de origen"
+              value={form.originLocation}
+              onChange={(value) => setForm((prev) => ({ ...prev, originLocation: value }))}
+            />
           </div>
 
-          <div>
-            <label className={labelClass}>Ubicación exacta de destino</label>
-            <input name="destinationLocation" type="text" value={form.destinationLocation as string} onChange={handleChange} className={inputClass} />
+          <div className="col-span-full">
+            <AddressFields
+              label="Dirección de destino"
+              value={form.destinationLocation}
+              onChange={(value) => setForm((prev) => ({ ...prev, destinationLocation: value }))}
+            />
           </div>
 
           <div>

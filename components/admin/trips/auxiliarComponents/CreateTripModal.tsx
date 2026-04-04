@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { createTrip } from "@/lib/api/admin/trips";
 import { CreateTripRequest, Driver, Partner, TripResponse, TripServiceType, TripStatus } from "@/lib/api/admin/trips/trips.type";
 import CityAutocomplete from "@/components/common/CityAutocomplete";
+import AddressFields from "@/components/common/AddressFields";
 import { DateTime } from "luxon";
 
 interface Props {
@@ -216,7 +217,7 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
                         />
                     </div>
 
-                    {["departure", "arrival", "originalTimeZone", "originLocation", "destinationLocation"].map((name) => (
+                    {["departure", "arrival", "originalTimeZone"].map((name) => (
                         <div key={name}>
                             <label className={labelClass}>{name}</label>
                             <input
@@ -233,6 +234,22 @@ const CreateTripModal = ({ onClose, onSuccess, drivers }: Props) => {
                             />
                         </div>
                     ))}
+
+                    <div className="col-span-full">
+                        <AddressFields
+                            label="Dirección de origen"
+                            value={form.originLocation}
+                            onChange={(value) => setForm((prev) => ({ ...prev, originLocation: value }))}
+                        />
+                    </div>
+
+                    <div className="col-span-full">
+                        <AddressFields
+                            label="Dirección de destino"
+                            value={form.destinationLocation}
+                            onChange={(value) => setForm((prev) => ({ ...prev, destinationLocation: value }))}
+                        />
+                    </div>
 
                     <div className="col-span-full mt-6">
                         <h3 className="text-base font-semibold text-custom-golden-600 mb-1">Configuración del viaje</h3>

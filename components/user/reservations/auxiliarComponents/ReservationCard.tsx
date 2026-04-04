@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { DateTime } from "luxon";
-import { CalendarDays, Clock, AlertTriangle, CheckCircle2, XCircle, ChevronDown, Users, User } from "lucide-react";
+import { CalendarDays, Clock, AlertTriangle, CheckCircle2, XCircle, ChevronDown, Users, User, MapPin } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ReservationResponse } from "@/lib/api/reservation/reservation.types";
 import ReservationPriceInfo from "./ReservationPriceInfo";
@@ -77,9 +77,29 @@ const ReservationCard = ({ reservation }: Props) => {
                 <h2 className="text-xl font-bold text-custom-black-900 capitalize mb-1">
                     {trip.origin} → {trip.destination}
                 </h2>
-                <p className="text-sm text-custom-gray-600 capitalize">
-                    {trip.originLocation} — {trip.destinationLocation}
-                </p>
+                <div className="flex items-center gap-1 flex-wrap">
+                    <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(trip.originLocation)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-1 text-blue-600 hover:text-blue-800 underline cursor-pointer capitalize"
+                    >
+                        <MapPin className="size-3" />
+                        {trip.originLocation}
+                    </a>
+                    <span className="text-gray-400 mx-1">—</span>
+                    <a
+                        href={`https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(trip.destinationLocation)}`}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={(e) => e.stopPropagation()}
+                        className="flex items-center gap-1 text-blue-600 hover:text-blue-800 underline cursor-pointer capitalize"
+                    >
+                        <MapPin className="size-3" />
+                        {trip.destinationLocation}
+                    </a>
+                </div>
                 <div className="flex items-center gap-2 mt-2 text-custom-gray-600 text-sm">
                     <Clock className="size-4" />
                     <span>
