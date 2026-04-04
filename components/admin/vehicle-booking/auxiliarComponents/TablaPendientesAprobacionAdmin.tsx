@@ -1,5 +1,4 @@
 "use client"
-/* eslint-disable @next/next/no-img-element */
 
 import { MapPin, AlertTriangle, Check, X, ChevronDown } from "lucide-react"
 import { useState } from "react"

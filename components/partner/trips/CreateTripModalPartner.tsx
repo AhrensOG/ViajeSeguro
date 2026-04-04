@@ -8,6 +8,7 @@ import { CreateTripRequest, TripResponse, TripServiceType, TripStatus } from "@/
 import { DateTime } from "luxon";
 import { useSession } from "next-auth/react";
 import CityAutocomplete from "@/components/common/CityAutocomplete";
+import AddressFields from "@/components/common/AddressFields";
 
 interface Props {
   onClose: () => void;
@@ -161,7 +162,7 @@ export default function CreateTripModalPartner({ onClose, onSuccess }: Props) {
             />
           </div>
 
-          {["departure", "arrival", "originalTimeZone", "originLocation", "destinationLocation"].map((name) => (
+          {["departure", "arrival", "originalTimeZone"].map((name) => (
             <div key={name}>
               <label className={labelClass}>{name}</label>
               <input
@@ -178,6 +179,22 @@ export default function CreateTripModalPartner({ onClose, onSuccess }: Props) {
               />
             </div>
           ))}
+
+          <div className="col-span-full">
+            <AddressFields
+              label="Dirección de origen"
+              value={form.originLocation || ""}
+              onChange={(value) => setForm((prev) => ({ ...prev, originLocation: value }))}
+            />
+          </div>
+
+          <div className="col-span-full">
+            <AddressFields
+              label="Dirección de destino"
+              value={form.destinationLocation || ""}
+              onChange={(value) => setForm((prev) => ({ ...prev, destinationLocation: value }))}
+            />
+          </div>
 
           <div className="col-span-full mt-6">
             <h3 className="text-base font-semibold text-custom-golden-600 mb-1">Configuración del viaje</h3>

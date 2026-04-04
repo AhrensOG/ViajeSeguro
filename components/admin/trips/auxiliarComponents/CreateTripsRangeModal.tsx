@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { createTripsBulk } from "@/lib/api/admin/trips";
 import { Driver, TripResponse } from "@/lib/api/admin/trips/trips.type";
 import CityAutocomplete from "@/components/common/CityAutocomplete";
+import AddressFields from "@/components/common/AddressFields";
 
 interface Props {
   onClose: () => void;
@@ -240,14 +241,20 @@ export default function CreateTripsRangeModal({ onClose, onSuccess, drivers }: P
             <input name="minPassengers" type="text" value={form.minPassengers} onChange={handleChange} className={inputClass} />
           </div>
 
-          <div>
-            <label className={labelClass}>Ubicación exacta de origen</label>
-            <input name="originLocation" type="text" value={form.originLocation} onChange={handleChange} className={inputClass} />
+          <div className="col-span-full">
+            <AddressFields
+              label="Dirección de origen"
+              value={form.originLocation}
+              onChange={(value) => setForm((prev) => ({ ...prev, originLocation: value }))}
+            />
           </div>
 
-          <div>
-            <label className={labelClass}>Ubicación exacta de destino</label>
-            <input name="destinationLocation" type="text" value={form.destinationLocation} onChange={handleChange} className={inputClass} />
+          <div className="col-span-full">
+            <AddressFields
+              label="Dirección de destino"
+              value={form.destinationLocation}
+              onChange={(value) => setForm((prev) => ({ ...prev, destinationLocation: value }))}
+            />
           </div>
 
           <div className="col-span-full flex justify-end gap-3 mt-8">

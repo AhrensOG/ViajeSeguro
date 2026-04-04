@@ -5,6 +5,7 @@ import { updateTrip } from "@/lib/api/admin/trips";
 import { CreateTripRequest, Driver, Partner, TripResponse, TripServiceType, TripStatus, UpdateTripRequest } from "@/lib/api/admin/trips/trips.type";
 import { convertUtcToDatetimeLocalInput } from "@/lib/functions";
 import CityAutocomplete from "@/components/common/CityAutocomplete";
+import AddressFields from "@/components/common/AddressFields";
 
 interface Props {
     onClose: () => void;
@@ -244,19 +245,19 @@ const EditTripModal = ({ onClose, onSuccess, drivers, trip }: Props) => {
                         />
                     </div>
 
-                    <div>
-                        <label className={labelClass}>Ubicación exacta de origen</label>
-                        <input name="originLocation" type="text" value={form.originLocation} onChange={handleChange} className={inputClass} />
+                    <div className="col-span-full">
+                        <AddressFields
+                            label="Dirección de origen"
+                            value={form.originLocation}
+                            onChange={(value) => setForm((prev) => ({ ...prev, originLocation: value }))}
+                        />
                     </div>
 
-                    <div>
-                        <label className={labelClass}>Ubicación exacta de destino</label>
-                        <input
-                            name="destinationLocation"
-                            type="text"
+                    <div className="col-span-full">
+                        <AddressFields
+                            label="Dirección de destino"
                             value={form.destinationLocation}
-                            onChange={handleChange}
-                            className={inputClass}
+                            onChange={(value) => setForm((prev) => ({ ...prev, destinationLocation: value }))}
                         />
                     </div>
 

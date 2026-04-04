@@ -91,12 +91,10 @@ const HeroMinimal = () => {
   const handleSearch = mode === "trip" ? handleTripSearch : handleVehicleSearch;
 
   return (
-    <section className="relative bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900 min-h-[85vh] flex items-center justify-center overflow-hidden">
-      <div className="absolute inset-0 opacity-20">
+    <section className="relative bg-gray-100 min-h-[85vh] flex items-center justify-center overflow-hidden">
+      <div className="absolute inset-0">
         <div className="absolute inset-0 bg-[url('/main/iniciovs.jpeg')] bg-cover bg-center" />
       </div>
-      
-      <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-transparent to-transparent" />
 
       <div className="relative z-10 container mx-auto px-4 py-12">
         <motion.div
@@ -105,10 +103,10 @@ const HeroMinimal = () => {
           transition={{ duration: 0.6 }}
           className="text-center mb-6"
         >
-          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-4">
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 mb-4">
             <span className="text-[#101010]">Viaje</span><span className="text-custom-golden-600">Seguro</span>
-            <span className="block text-2xl md:text-3xl mt-2 text-slate-300 font-normal">
-              Desde 20€ • Madrid • Barcelona • Valencia
+            <span className="block text-2xl md:text-3xl mt-2 text-gray-900 font-normal">
+              Desde 20€ • Viajes por toda España
             </span>
           </h1>
         </motion.div>
@@ -261,12 +259,12 @@ const HeroMinimal = () => {
           transition={{ duration: 0.6, delay: 0.4 }}
           className="text-center mt-6"
         >
-          <p className="text-slate-400 text-sm">
-            <span className="text-amber-400 font-medium">✓</span> Sin cancelación hasta 24h antes
-            <span className="mx-3">|</span>
-            <span className="text-amber-400 font-medium">✓</span> Pago fácil en efectivo
-            <span className="mx-3">|</span>
-            <span className="text-amber-400 font-medium">✓</span> Support 24/7
+          <p className="text-white text-sm drop-shadow-lg">
+            <span className="text-amber-400 font-bold">✓</span> Sin cancelación hasta 24h antes
+            <span className="mx-3 text-white/60">|</span>
+            <span className="text-amber-400 font-bold">✓</span> Pago fácil en efectivo
+            <span className="mx-3 text-white/60">|</span>
+            <span className="text-amber-400 font-bold">✓</span> Support 24/7
           </p>
         </motion.div>
       </div>
