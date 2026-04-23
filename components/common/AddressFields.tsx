@@ -27,6 +27,7 @@ const parseAddress = (address: string): AddressParts => {
   let province = "";
   let postalCode = "";
 
+  // Primer elemento: intentar separar calle y numero
   if (parts.length >= 1) {
     const firstPart = parts[0];
     const numberMatch = firstPart.match(/^(.+?)\s+(\d+[a-zA-Z]?|[s/n])\s*$/);
@@ -38,9 +39,45 @@ const parseAddress = (address: string): AddressParts => {
     }
   }
   
-  if (parts.length >= 2) city = parts[1];
-  if (parts.length >= 3) province = parts[2];
-  if (parts.length >= 4) postalCode = parts[3];
+  // Segundo elemento
+  if (parts.length >= 2) {
+    const secondPart = parts[1];
+    const numOnlyMatch = secondPart.match(/^(\d+[a-zA-Z]?)$/);
+    if (numOnlyMatch) {
+      number = numOnlyMatch[1];
+    } else {
+      city = secondPart;
+    }
+  }
+  
+  //Tercer elemento -> ciudad o provincia
+  if (parts.length >= 3) {
+    const thirdPart = parts[2];
+    const isPostalCode = thirdPart.match(/^\d{5}$/);
+    if (isPostalCode) {
+      postalCode = thirdPart;
+    } else if (!city) {
+      city = thirdPart;
+    } else {
+      province = thirdPart;
+    }
+  }
+  
+  // Cuarto elemento
+  if (parts.length >= 4) {
+    const fourthPart = parts[3];
+    const isPostal = fourthPart.match(/^\d{5}$/);
+    if (isPostal) {
+      postalCode = fourthPart;
+    } else {
+      province = fourthPart;
+    }
+  }
+  
+  // Quinto elemento
+  if (parts.length >= 5) {
+    postalCode = parts[4];
+  }
 
   return { street, number, city, province, postalCode };
 };
