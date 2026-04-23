@@ -5,6 +5,7 @@ import Footer from "@/components/public/navigation/Footer";
 import TripProcess2 from "./TripProcess2";
 import { Suspense } from "react";
 import TripProcessFallback from "@/lib/client/components/fallbacks/trip/TripProcessFallback";
+import AuthPromptModal from "@/components/common/AuthPromptModal";
 
 const TripPage2 = () => {
   return (
@@ -14,6 +15,7 @@ const TripPage2 = () => {
         <TripProcess2 />
       </Suspense>
       <Footer />
+      <AuthPromptModal delay={10} />
     </div>
   );
 };

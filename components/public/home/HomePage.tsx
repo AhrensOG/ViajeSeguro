@@ -10,6 +10,7 @@ import Footer from "../navigation/Footer";
 import Subscriptions from "./Subscriptions";
 import SearchWrapper from "@/lib/client/components/SearchWhrapper";
 import ReferralBanner from "@/components/common/ReferralBanner";
+import AuthPromptModal from "@/components/common/AuthPromptModal";
 
 const HomePage = () => {
     return (
@@ -24,6 +25,7 @@ const HomePage = () => {
             <CTA />
             <Contact />
             <Footer />
+            <AuthPromptModal delay={15} />
         </div>
     );
 };
