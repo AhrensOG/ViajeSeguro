@@ -2,30 +2,29 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, User, LogIn } from "lucide-react";
+import { User, LogIn } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 
 interface AuthPromptModalProps {
-  delay?: number; // seconds before showing
+  delay?: number;
 }
 
 export default function AuthPromptModal({ delay = 5 }: AuthPromptModalProps) {
   const { data: session } = useSession();
   const [show, setShow] = useState(false);
-  const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
-    if (session || dismissed) return;
+    if (session) return;
 
     const timer = setTimeout(() => {
       setShow(true);
     }, delay * 1000);
 
     return () => clearTimeout(timer);
-  }, [session, dismissed, delay]);
+  }, [session, delay]);
 
-  if (session || dismissed) return null;
+  if (session) return null;
 
   return (
     <AnimatePresence>
@@ -36,26 +35,16 @@ export default function AuthPromptModal({ delay = 5 }: AuthPromptModalProps) {
           exit={{ opacity: 0 }}
           className="fixed inset-0 z-50 flex items-center justify-center p-4"
         >
-          {/* Backdrop */}
-          <div 
-            className="absolute inset-0 bg-black/50 backdrop-blur-sm"
-            onClick={() => setDismissed(true)}
-          />
+          {/* Backdrop sin click para cerrar */}
+          <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
           
-          {/* Modal */}
+          {/* Modal sin botón de cerrar */}
           <motion.div
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
             exit={{ scale: 0.9, y: 20 }}
             className="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-6"
           >
-            <button
-              onClick={() => setDismissed(true)}
-              className="absolute top-3 right-3 p-1 text-gray-400 hover:text-gray-600 transition"
-            >
-              <X className="w-5 h-5" />
-            </button>
-
             <div className="text-center">
               <div className="w-16 h-16 bg-amber-100 rounded-full flex items-center justify-center mx-auto mb-4">
                 <User className="w-8 h-8 text-amber-600" />
@@ -66,7 +55,7 @@ export default function AuthPromptModal({ delay = 5 }: AuthPromptModalProps) {
               </h2>
               
               <p className="text-gray-600 mb-6">
-                Inicia sesión o regístrate para reservar viajes, obtener descuentos exclusivos y más beneficios.
+                Inicia sesión o regístrate para continuarnavengando y reservar viajes.
               </p>
 
               <div className="space-y-3">
@@ -86,13 +75,6 @@ export default function AuthPromptModal({ delay = 5 }: AuthPromptModalProps) {
                   Regístrate gratis
                 </Link>
               </div>
-
-              <button
-                onClick={() => setDismissed(true)}
-                className="mt-4 text-sm text-gray-500 hover:text-gray-700 transition"
-              >
-                Maybe later
-              </button>
             </div>
           </motion.div>
         </motion.div>
