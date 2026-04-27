@@ -45,7 +45,7 @@ const RegisterPage = () => {
                                     href="/auth/login"
                                     className={`flex-1 py-4 text-center font-medium transition-colors text-custom-gray-600 hover:text-custom-gray-800`}
                                 >
-                                    Iniciar sesión
+                                    Ya tengo cuenta
                                 </Link>
                                 <span
                                     className={`flex-1 py-4 text-center font-medium transition-colors text-custom-golden-600 border-b-2 border-custom-golden-600`}
@@ -62,6 +62,14 @@ const RegisterPage = () => {
                                 transition={{ duration: 0.4 }}
                                 className="p-6"
                             >
+                                {/* Ya tengo cuenta button */}
+                                <Link
+                                    href="/auth/login"
+                                    className="w-full mb-4 py-3 border-2 border-gray-200 text-gray-700 font-medium rounded-xl hover:border-amber-500 hover:text-amber-600 transition flex items-center justify-center gap-2"
+                                >
+                                    Ya tengo cuenta
+                                </Link>
+                                
                                 <Suspense fallback={<RegisterFormSkeleton />}>
                                     <RegisterForm />
                                 </Suspense>

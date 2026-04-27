@@ -10,11 +10,16 @@ interface CustomDatePickerProps {
     onSelect: (date: Date) => void;
     value?: Date;
     placeholder?: string;
+    fromDate?: Date;
 }
 
-const CustomDatePicker = ({ onSelect, value, placeholder }: CustomDatePickerProps) => {
+const CustomDatePicker = ({ onSelect, value, placeholder, fromDate }: CustomDatePickerProps) => {
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(value || undefined);
     const [isOpen, setIsOpen] = useState<boolean>(false);
+
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const minDate = fromDate || today;
 
     const handleSelect = (date?: Date) => {
         if (date) {
@@ -39,7 +44,17 @@ const CustomDatePicker = ({ onSelect, value, placeholder }: CustomDatePickerProp
 
             {isOpen && (
                 <div className="absolute top-full left-0 mt-2 bg-custom-white-100 border border-custom-gray-300 rounded-lg shadow-lg z-10 p-4">
-                    <DayPicker mode="single" selected={selectedDate} onSelect={handleSelect} className="text-custom-gray-800" />
+                    <DayPicker 
+                        mode="single" 
+                        selected={selectedDate} 
+                        onSelect={handleSelect} 
+                        className="text-custom-gray-800 [&_.rdp-day_button:not([disabled])]:text-custom-gray-800"
+                        fromDate={minDate}
+                        style={{
+                            "--rdp-day-height": "36px",
+                            "--rdp-day-width": "36px",
+                        } as React.CSSProperties}
+                    />
                 </div>
             )}
         </div>

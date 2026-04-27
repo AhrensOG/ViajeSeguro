@@ -46,3 +46,19 @@ html {
         opacity: 0.8;
     }
 }
+
+/* Hide past dates in react-day-picker calendar */
+.rdp-day[data-disabled] {
+    visibility: hidden !important;
+    pointer-events: none;
+}
+
+.rdp-day button[disabled] {
+    visibility: hidden !important;
+    pointer-events: none;
+}
+
+.rdp-button[data-disabled] {
+    visibility: hidden !important;
+    pointer-events: none;
+}

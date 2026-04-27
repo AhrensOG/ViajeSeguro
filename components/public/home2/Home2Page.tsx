@@ -8,6 +8,7 @@ import HowItWorks from "./HowItWorks";
 import PaymentMethods from "./PaymentMethods";
 import CTAMinimal from "./CTAMinimal";
 import Footer from "../navigation/Footer";
+import AuthPromptModal from "@/components/common/AuthPromptModal";
 import { motion } from "framer-motion";
 import { Car, ArrowRight } from "lucide-react";
 import Link from "next/link";
@@ -60,6 +61,7 @@ const Home2Page = () => {
       <PaymentMethods />
       <CTAMinimal />
       <Footer />
+      <AuthPromptModal delay={2} />
     </div>
   );
 };

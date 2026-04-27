@@ -27,9 +27,11 @@ const parseAddress = (address: string): AddressParts => {
   let province = "";
   let postalCode = "";
 
+  // Primer elemento: intentar separar calle y numero (formatos: "Calle 15", "Calle 15-b", "Calle 10-17", "Calle s/n")
   if (parts.length >= 1) {
     const firstPart = parts[0];
-    const numberMatch = firstPart.match(/^(.+?)\s+(\d+[a-zA-Z]?|[s/n])\s*$/);
+    // Regex más flexible: acepta números, letras, guiones, "s/n", rangos
+    const numberMatch = firstPart.match(/^(.+?)\s+([\d]+[\s\-]?[\d]*[a-zA-Z]?|[sSnN/]+|[kK][mM]?\.?\s*\d+|[bB][iI][sS]?)\s*$/i);
     if (numberMatch) {
       street = numberMatch[1].trim();
       number = numberMatch[2].trim();
@@ -38,9 +40,46 @@ const parseAddress = (address: string): AddressParts => {
     }
   }
   
-  if (parts.length >= 2) city = parts[1];
-  if (parts.length >= 3) province = parts[2];
-  if (parts.length >= 4) postalCode = parts[3];
+  // Segundo elemento: puede ser número (con letras, guiones) o ciudad
+  if (parts.length >= 2) {
+    const secondPart = parts[1];
+    // Acepta: 15, 15B, 15-b, 10-17, s/n, bis, km 5
+    const flexibleNumberMatch = secondPart.match(/^([\d]+[\s\-]?[\d]*[a-zA-Z]?|[sSnN/]+|[kK][mM]?\.?\s*\d+|[bB][iI][sS]?)$/i);
+    if (flexibleNumberMatch) {
+      number = flexibleNumberMatch[1];
+    } else {
+      city = secondPart;
+    }
+  }
+  
+  //Tercer elemento -> ciudad o provincia
+  if (parts.length >= 3) {
+    const thirdPart = parts[2];
+    const isPostalCode = thirdPart.match(/^\d{5}$/);
+    if (isPostalCode) {
+      postalCode = thirdPart;
+    } else if (!city) {
+      city = thirdPart;
+    } else {
+      province = thirdPart;
+    }
+  }
+  
+  // Cuarto elemento
+  if (parts.length >= 4) {
+    const fourthPart = parts[3];
+    const isPostal = fourthPart.match(/^\d{5}$/);
+    if (isPostal) {
+      postalCode = fourthPart;
+    } else {
+      province = fourthPart;
+    }
+  }
+  
+  // Quinto elemento
+  if (parts.length >= 5) {
+    postalCode = parts[4];
+  }
 
   return { street, number, city, province, postalCode };
 };

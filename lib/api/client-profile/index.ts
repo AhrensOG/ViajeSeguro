@@ -60,3 +60,17 @@ export async function changePassword(values: ChangePasswordFormValues): Promise<
         console.error("Error al cambiar la contraseña:", error);
     }
 }
+
+export async function updateProfileAvatar(avatarUrl: string): Promise<void> {
+    try {
+        await fetchWithAuth(`${BACKEND_URL}/user/profile-avatar`, {
+            method: "PATCH",
+            body: JSON.stringify({
+                avatarUrl,
+            }),
+        });
+    } catch (error) {
+        console.error("Error al actualizar el avatar:", error);
+        throw new Error(`Error al actualizar la foto de perfil: ${error instanceof Error ? error.message : String(error)}`);
+    }
+}

@@ -3,6 +3,7 @@ export interface UserProfile {
     name: string;
     lastName: string;
     phone?: string;
+    avatarUrl?: string | null;
     referralCode: string;
     referralCodeFrom?: string;
     referredByName?: string | null;
