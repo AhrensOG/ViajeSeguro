@@ -134,7 +134,6 @@ export default function CalendarMonth({
           const key = toKey(item.day, item.month, item.year);
           const isSelected = selectedDate === key;
           const c = counts[key] || 0;
-          const isFromNextMonth = !item.isCurrentMonth;
 
           return (
             <button
@@ -147,26 +146,17 @@ export default function CalendarMonth({
                   ? "border-custom-gray-100 bg-gray-50 opacity-40 cursor-not-allowed"
                   : isSelected
                   ? "border-custom-golden-600 bg-custom-golden-50"
-                  : isFromNextMonth
-                  ? "border-purple-200 bg-purple-50 hover:bg-purple-100"
                   : c > 0
                   ? "border-blue-200 hover:bg-blue-50"
                   : "border-custom-gray-200 hover:bg-gray-50")
               }
               title={past ? "Fecha pasada" : c > 0 ? `${c} viajes` : "Sin viajes"}
             >
-              <div className="relative">
-                <div className={"text-sm font-semibold " + (past ? "text-custom-gray-400" : isFromNextMonth ? "text-purple-700" : "text-custom-black-700")}>
+              <div className={"text-sm font-semibold " + (past ? "text-custom-gray-400" : "text-custom-black-700")}>
                   {item.day}
                 </div>
-                {isFromNextMonth && (
-                  <div className="absolute -top-3 -right-3 text-[8px] bg-purple-500 text-white rounded-full w-4 h-4 flex items-center justify-center">
-                    +
-                  </div>
-                )}
-              </div>
               {!past && (
-                <div className={"mt-1 text-xs leading-tight font-medium text-center px-1 " + (c > 0 ? "text-blue-700" : isFromNextMonth ? "text-purple-600" : "text-custom-gray-600")}>
+                <div className={"mt-1 text-xs leading-tight font-medium text-center px-1 " + (c > 0 ? "text-blue-700" : "text-custom-gray-600")}>
                   Viajes del día <span className="font-bold">{c}</span>
                 </div>
               )}
