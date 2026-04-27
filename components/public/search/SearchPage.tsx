@@ -14,7 +14,7 @@ export default function SearchPage() {
                 {/* <SearchProcess /> */}
                 <SearchWrapper />
             </Suspense>
-            <AuthPromptModal delay={10} />
+            <AuthPromptModal delay={2} />
         </div>
     );
 }

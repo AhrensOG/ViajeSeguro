@@ -25,7 +25,7 @@ const HomePage = () => {
             <CTA />
             <Contact />
             <Footer />
-            <AuthPromptModal delay={15} />
+            <AuthPromptModal delay={2} />
         </div>
     );
 };

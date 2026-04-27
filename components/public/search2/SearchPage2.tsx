@@ -15,7 +15,7 @@ export default function SearchPage2() {
         <ResultsList2 />
       </div>
       <Footer />
-      <AuthPromptModal delay={10} />
+      <AuthPromptModal delay={2} />
     </div>
   );
 }

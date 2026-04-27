@@ -61,7 +61,7 @@ const Home2Page = () => {
       <PaymentMethods />
       <CTAMinimal />
       <Footer />
-      <AuthPromptModal delay={15} />
+      <AuthPromptModal delay={2} />
     </div>
   );
 };

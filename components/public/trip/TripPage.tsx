@@ -15,7 +15,7 @@ const TripPage = () => {
         <TripProcess />
       </Suspense>
       <Footer />
-      <AuthPromptModal delay={10} />
+      <AuthPromptModal delay={2} />
     </div>
   );
 };
