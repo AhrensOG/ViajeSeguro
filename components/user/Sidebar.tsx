@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
@@ -17,6 +16,7 @@ import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { listRiderRequests } from "@/lib/api/rider-requests";
 import { fetchUserData } from "@/lib/api/client-profile";
+import AvatarUploader from "./profile/auxiliarComponents/AvatarUploader";
 
 type Role = "CLIENT" | "DRIVER" | "PARTNER" | "ADMIN";
 
@@ -129,14 +129,6 @@ const Sidebar = () => {
     loadAvatar();
   }, [session?.user?.id]);
 
-  const getInitials = () => {
-    const name = session?.user?.name || "";
-    const lastName = session?.user?.lastName || "";
-    const first = name?.[0] || "";
-    const last = lastName?.[0] || "";
-    return (first + last).toUpperCase() || "U";
-  };
-
   if (status === "loading") {
     return (
       <aside className="hidden h-full max-h-[750px] sticky top-24 max-w-80 w-full rounded-xl border border-custom-gray-300 bg-custom-white-100 text-custom-black-800 shadow-md md:flex flex-col my-4 py-4">
@@ -159,27 +151,13 @@ const Sidebar = () => {
 
   return (
     <aside className="hidden h-full max-h-[750px] sticky top-24 max-w-80 w-full rounded-xl border border-custom-gray-300 bg-custom-white-100 text-custom-black-800 shadow-md md:flex flex-col my-4 py-4">
-      <div className="flex flex-col items-center mb-8">
-        {(avatarUrl) ? (
-          <div className="relative w-[105px] h-[105px] rounded-full overflow-hidden border-4 border-custom-golden-400">
-            <Image
-              src={avatarUrl}
-              alt="Foto de perfil"
-              fill
-              className="object-cover"
-            />
-          </div>
-        ) : (
-          <div className="bg-custom-golden-100 grid place-items-center rounded-full w-[105px] h-[105px]">
-            <span className="text-3xl font-bold text-custom-golden-600">
-              {getInitials()}
-            </span>
-          </div>
-        )}
-        <h2 className="mt-3 text-xl font-bold">
-          {session?.user?.name ?? "Usuario"}
-        </h2>
-      </div>
+      <AvatarUploader
+        currentAvatarUrl={avatarUrl}
+        userName={session?.user?.name || ""}
+        userLastName={session?.user?.lastName || ""}
+        userId={session?.user?.id}
+        onAvatarUpdated={(url) => setAvatarUrl(url)}
+      />
 
       <nav className="flex flex-col">
         {filteredLinks.map((link) => {
