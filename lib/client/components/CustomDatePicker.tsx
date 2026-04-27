@@ -49,7 +49,7 @@ const CustomDatePicker = ({ onSelect, value, placeholder, fromDate }: CustomDate
                         selected={selectedDate} 
                         onSelect={handleSelect} 
                         className="text-custom-gray-800"
-                        disabled={(date) => date < minDate}
+                        fromDate={minDate}
                     />
                 </div>
             )}
