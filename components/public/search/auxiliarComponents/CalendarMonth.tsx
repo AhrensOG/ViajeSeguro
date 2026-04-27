@@ -35,10 +35,6 @@ export default function CalendarMonth({
     month: "long",
   });
 
-  const grid: (number | null)[] = [];
-  for (let i = 0; i < (startWeekday === 0 ? 6 : startWeekday - 1); i++) grid.push(null);
-  for (let d = 1; d <= daysInMonth; d++) grid.push(d);
-
   const toKey = (d: number) => {
     const mm = String(month + 1).padStart(2, "0");
     const dd = String(d).padStart(2, "0");
@@ -56,6 +52,20 @@ export default function CalendarMonth({
     const prevYear = month === 0 ? year - 1 : year;
     const lastDayPrevMonth = new Date(prevYear, prevMonth + 1, 0);
     return lastDayPrevMonth < today;
+  };
+
+  const getGrid = () => {
+    const grid: (number | null)[] = [];
+    const firstWeekday = startWeekday === 0 ? 7 : startWeekday;
+    for (let i = 1; i < firstWeekday; i++) grid.push(null);
+    
+    const startDay = isCurrentMonth() ? today.getDate() : 1;
+    for (let d = startDay; d <= daysInMonth; d++) grid.push(d);
+    return grid;
+  };
+
+  const isCurrentMonth = () => {
+    return today.getFullYear() === year && today.getMonth() === month;
   };
 
   return (
@@ -79,7 +89,7 @@ export default function CalendarMonth({
         ))}
       </div>
       <div className="grid grid-cols-7 gap-3">
-        {grid.map((day, idx) => {
+        {getGrid().map((day, idx) => {
           if (day === null) return <div key={idx} />;
           const past = isPastDay(day);
           const key = toKey(day);
