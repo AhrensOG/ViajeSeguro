@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ArrowRight } from "lucide-react";
 import { useSession } from "next-auth/react";
+import { useRouter } from "next/navigation";
 
 interface AuthPromptModalProps {
   delay?: number;
@@ -13,6 +14,7 @@ const MODAL_SHOWN_KEY = "authPromptShown";
 
 export default function AuthPromptModal({ delay = 5 }: AuthPromptModalProps) {
   const { data: session } = useSession();
+  const router = useRouter();
   const [show, setShow] = useState(false);
 
   useEffect(() => {
@@ -62,7 +64,7 @@ export default function AuthPromptModal({ delay = 5 }: AuthPromptModalProps) {
               </p>
 
               <button
-                onClick={() => setShow(false)}
+                onClick={() => router.push("/auth/register")}
                 className="flex items-center justify-center gap-2 w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold rounded-xl transition"
               >
                 Continuar
