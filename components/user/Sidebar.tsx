@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import Image from "next/image";
 import { usePathname } from "next/navigation";
 import { useSession, signOut } from "next-auth/react";
 import {
@@ -15,6 +16,7 @@ import {
 import type { ReactNode } from "react";
 import { useEffect, useState } from "react";
 import { listRiderRequests } from "@/lib/api/rider-requests";
+import { fetchUserData } from "@/lib/api/client-profile";
 
 type Role = "CLIENT" | "DRIVER" | "PARTNER" | "ADMIN";
 
@@ -91,6 +93,7 @@ const Sidebar = () => {
   const pathname = usePathname();
   const { data: session, status } = useSession();
   const [newRRCount, setNewRRCount] = useState<number>(0);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
   const userRole = (session?.user?.role as Role | undefined) ?? undefined;
 
@@ -98,8 +101,6 @@ const Sidebar = () => {
     link.roles.includes(userRole as Role)
   );
 
-  // IMPORTANT: Hooks must be called unconditionally on every render.
-  // Load badge count here before any early returns.
   useEffect(() => {
     const loadCount = async () => {
       try {
@@ -115,11 +116,34 @@ const Sidebar = () => {
     if (userRole === "PARTNER") loadCount();
   }, [userRole]);
 
+  useEffect(() => {
+    const loadAvatar = async () => {
+      if (!session?.user?.id) return;
+      try {
+        const profile = await fetchUserData(session.user.id);
+        setAvatarUrl(profile.avatarUrl || null);
+      } catch {
+        setAvatarUrl(null);
+      }
+    };
+    loadAvatar();
+  }, [session?.user?.id]);
+
+  const getInitials = () => {
+    const name = session?.user?.name || "";
+    const lastName = session?.user?.lastName || "";
+    const first = name?.[0] || "";
+    const last = lastName?.[0] || "";
+    return (first + last).toUpperCase() || "U";
+  };
+
   if (status === "loading") {
     return (
       <aside className="hidden h-full max-h-[750px] sticky top-24 max-w-80 w-full rounded-xl border border-custom-gray-300 bg-custom-white-100 text-custom-black-800 shadow-md md:flex flex-col my-4 py-4">
         <div className="flex flex-col items-center mb-8 animate-pulse">
-          <div className="bg-custom-gray-200 rounded-full w-[105px] h-[105px]" />
+          <div className="bg-custom-golden-100 rounded-full w-[105px] h-[105px] flex items-center justify-center">
+            <span className="text-3xl font-bold text-custom-golden-600">U</span>
+          </div>
           <div className="mt-3 h-6 w-40 bg-custom-gray-200 rounded" />
         </div>
         <nav className="flex flex-col gap-2 px-2">
@@ -136,9 +160,22 @@ const Sidebar = () => {
   return (
     <aside className="hidden h-full max-h-[750px] sticky top-24 max-w-80 w-full rounded-xl border border-custom-gray-300 bg-custom-white-100 text-custom-black-800 shadow-md md:flex flex-col my-4 py-4">
       <div className="flex flex-col items-center mb-8">
-        <div className="bg-custom-gray-200 grid place-items-center rounded-full w-[105px] h-[105px]">
-          <User className="w-10 h-10 text-custom-gray-600" />
-        </div>
+        {(avatarUrl) ? (
+          <div className="relative w-[105px] h-[105px] rounded-full overflow-hidden border-4 border-custom-golden-400">
+            <Image
+              src={avatarUrl}
+              alt="Foto de perfil"
+              fill
+              className="object-cover"
+            />
+          </div>
+        ) : (
+          <div className="bg-custom-golden-100 grid place-items-center rounded-full w-[105px] h-[105px]">
+            <span className="text-3xl font-bold text-custom-golden-600">
+              {getInitials()}
+            </span>
+          </div>
+        )}
         <h2 className="mt-3 text-xl font-bold">
           {session?.user?.name ?? "Usuario"}
         </h2>
