@@ -10,8 +10,6 @@ interface AuthPromptModalProps {
   delay?: number;
 }
 
-const MODAL_SHOWN_KEY = "authPromptShown";
-
 export default function AuthPromptModal({ delay = 5 }: AuthPromptModalProps) {
   const { data: session } = useSession();
   const router = useRouter();
@@ -20,12 +18,8 @@ export default function AuthPromptModal({ delay = 5 }: AuthPromptModalProps) {
   useEffect(() => {
     if (session) return;
 
-    const hasBeenShown = localStorage.getItem(MODAL_SHOWN_KEY);
-    if (hasBeenShown) return;
-
     const timer = setTimeout(() => {
       setShow(true);
-      localStorage.setItem(MODAL_SHOWN_KEY, "true");
     }, delay * 1000);
 
     return () => clearTimeout(timer);
