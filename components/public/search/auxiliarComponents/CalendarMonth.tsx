@@ -59,13 +59,27 @@ export default function CalendarMonth({
     const firstWeekday = startWeekday === 0 ? 7 : startWeekday;
     for (let i = 1; i < firstWeekday; i++) grid.push(null);
     
-    const startDay = isCurrentMonth() ? today.getDate() : 1;
-    for (let d = startDay; d <= daysInMonth; d++) grid.push(d);
+    const isCurrentMonthNow = today.getFullYear() === year && today.getMonth() === month;
+    const startDay = isCurrentMonthNow ? today.getDate() : 1;
+    
+    let dayCounter = startDay;
+    let currentMonth = month;
+    
+    while (grid.filter(Boolean).length < 31) {
+      if (dayCounter > daysInMonth) {
+        dayCounter = 1;
+        currentMonth++;
+        if (currentMonth > 11) {
+          currentMonth = 0;
+        }
+      }
+      if (grid.filter(Boolean).length < 31) {
+        grid.push(dayCounter);
+        dayCounter++;
+      }
+    }
+    
     return grid;
-  };
-
-  const isCurrentMonth = () => {
-    return today.getFullYear() === year && today.getMonth() === month;
   };
 
   return (
