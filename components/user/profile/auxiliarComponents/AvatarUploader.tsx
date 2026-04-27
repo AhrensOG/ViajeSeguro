@@ -105,7 +105,7 @@ const AvatarUploader = ({
               src={displayUrl}
               alt="Foto de perfil"
               fill
-              className="object-cover"
+              className="object-cover rounded-full"
             />
           ) : (
             <div className="w-full h-full flex items-center justify-center bg-custom-golden-100">
