@@ -2,13 +2,15 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { User, LogIn } from "lucide-react";
+import { User, ArrowRight } from "lucide-react";
 import Link from "next/link";
 import { useSession } from "next-auth/react";
 
 interface AuthPromptModalProps {
   delay?: number;
 }
+
+const MODAL_SHOWN_KEY = "authPromptShown";
 
 export default function AuthPromptModal({ delay = 5 }: AuthPromptModalProps) {
   const { data: session } = useSession();
@@ -17,8 +19,14 @@ export default function AuthPromptModal({ delay = 5 }: AuthPromptModalProps) {
   useEffect(() => {
     if (session) return;
 
+    // Verificar si ya se mostró el modal antes
+    const hasBeenShown = localStorage.getItem(MODAL_SHOWN_KEY);
+    if (hasBeenShown) return;
+
     const timer = setTimeout(() => {
       setShow(true);
+      // Marcar como mostrado
+      localStorage.setItem(MODAL_SHOWN_KEY, "true");
     }, delay * 1000);
 
     return () => clearTimeout(timer);
@@ -38,7 +46,7 @@ export default function AuthPromptModal({ delay = 5 }: AuthPromptModalProps) {
           {/* Backdrop sin click para cerrar */}
           <div className="absolute inset-0 bg-black/70 backdrop-blur-sm" />
           
-          {/* Modal sin botón de cerrar */}
+          {/* Modal con un solo botón Continuar */}
           <motion.div
             initial={{ scale: 0.9, y: 20 }}
             animate={{ scale: 1, y: 0 }}
@@ -55,25 +63,25 @@ export default function AuthPromptModal({ delay = 5 }: AuthPromptModalProps) {
               </h2>
               
               <p className="text-gray-600 mb-6">
-                Inicia sesión o regístrate para continuarnavengando y reservar viajes.
+                Regístrate o inicia sesión para obtener descuentos exclusivos y reservar tus viajes.
               </p>
 
-              <div className="space-y-3">
-                <Link
-                  href="/auth/login"
-                  className="flex items-center justify-center gap-2 w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold rounded-xl transition"
-                >
-                  <LogIn className="w-5 h-5" />
-                  Iniciar sesión
-                </Link>
-                
+              <div className="flex flex-col gap-3">
                 <Link
                   href="/auth/register"
-                  className="flex items-center justify-center gap-2 w-full py-3 border-2 border-gray-200 hover:border-amber-500 text-gray-700 font-semibold rounded-xl transition"
+                  className="flex items-center justify-center gap-2 w-full py-3 bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold rounded-xl transition"
                 >
                   <User className="w-5 h-5" />
                   Regístrate gratis
                 </Link>
+                
+                <button
+                  onClick={() => setShow(false)}
+                  className="flex items-center justify-center gap-2 w-full py-3 border-2 border-gray-200 hover:border-amber-500 text-gray-700 font-semibold rounded-xl transition"
+                >
+                  Continuar
+                  <ArrowRight className="w-5 h-5" />
+                </button>
               </div>
             </div>
           </motion.div>
