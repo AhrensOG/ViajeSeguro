@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import ChangePasswordModal from "./auxiliarComponents/ChangePasswordModal";
+import AvatarUploader from "./auxiliarComponents/AvatarUploader";
 import { useSession } from "next-auth/react";
 import SkeletonProfile from "@/lib/client/components/fallbacks/profile/SkeletonProfile";
 import ReferralCard from "@/components/common/ReferralCard";
@@ -17,6 +18,7 @@ const ProfilePage = () => {
     const { data: session, status } = useSession();
     const [isLoading, setIsLoading] = useState(true);
     const [restrictionDate, setRestrictionDate] = useState<Date | null>(null);
+    const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
 
     const {
         register,
@@ -56,6 +58,7 @@ const ProfilePage = () => {
                     setValue("lastName", res.lastName);
                     setValue("phone", res.phone || "");
                     setValue("referralCode", res.referralCode || "");
+                    setAvatarUrl(res.avatarUrl || null);
 
                     if (typeof res.referredCount === "number") {
                         setReferredCount(res.referredCount);
@@ -113,6 +116,14 @@ const ProfilePage = () => {
     return (
         <div className="w-full flex flex-col items-center px-0 md:px-6 my-4 pb-10 bg-white">
             {restrictionDate && <RestrictionTimer restrictedUntil={restrictionDate} />}
+            {/* Avatar section */}
+            <AvatarUploader
+                currentAvatarUrl={avatarUrl}
+                userName={session.user.name || ""}
+                userLastName={session.user.lastName || ""}
+                userId={session.user.id}
+                onAvatarUpdated={(url) => setAvatarUrl(url)}
+            />
             {/* Referral section */}
             <div className="w-full mb-4">
                 <ReferralCard
