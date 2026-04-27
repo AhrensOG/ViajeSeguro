@@ -62,6 +62,14 @@ const RegisterPage = () => {
                                 transition={{ duration: 0.4 }}
                                 className="p-6"
                             >
+                                {/* Ya tengo cuenta button */}
+                                <Link
+                                    href="/auth/login"
+                                    className="w-full mb-4 py-3 border-2 border-gray-200 text-gray-700 font-medium rounded-xl hover:border-amber-500 hover:text-amber-600 transition flex items-center justify-center gap-2"
+                                >
+                                    Ya tengo cuenta
+                                </Link>
+                                
                                 <Suspense fallback={<RegisterFormSkeleton />}>
                                     <RegisterForm />
                                 </Suspense>
