@@ -48,8 +48,12 @@ const CustomDatePicker = ({ onSelect, value, placeholder, fromDate }: CustomDate
                         mode="single" 
                         selected={selectedDate} 
                         onSelect={handleSelect} 
-                        className="text-custom-gray-800"
+                        className="text-custom-gray-800 [&_.rdp-day_button:not([disabled])]:text-custom-gray-800"
                         fromDate={minDate}
+                        style={{
+                            "--rdp-day-height": "36px",
+                            "--rdp-day-width": "36px",
+                        } as React.CSSProperties}
                     />
                 </div>
             )}
