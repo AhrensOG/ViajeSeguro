@@ -45,7 +45,7 @@ const RegisterPage = () => {
                                     href="/auth/login"
                                     className={`flex-1 py-4 text-center font-medium transition-colors text-custom-gray-600 hover:text-custom-gray-800`}
                                 >
-                                    Iniciar sesión
+                                    Ya tengo cuenta
                                 </Link>
                                 <span
                                     className={`flex-1 py-4 text-center font-medium transition-colors text-custom-golden-600 border-b-2 border-custom-golden-600`}
