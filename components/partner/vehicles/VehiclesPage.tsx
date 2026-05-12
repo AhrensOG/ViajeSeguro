@@ -56,9 +56,9 @@ export default function VehiclesPage() {
   // Si está cargando, mostrar loading
   if (loading) {
     return (
-      <div className="w-full flex flex-col items-center px-0 md:px-6 my-4 pb-10 bg-white">
+      <div className="w-full flex flex-col items-center px-0 md:px-6 my-4 pb-10 bg-gradient-to-b from-gray-50 to-white">
         <div className="flex items-center justify-center h-64">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-custom-golden-600"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-600"></div>
         </div>
       </div>
     );
@@ -67,7 +67,7 @@ export default function VehiclesPage() {
   // Si tiene vehículos, mostrar la grilla
   if (vehicles.length > 0) {
     return (
-      <div className="w-full flex flex-col px-0 md:px-6 my-4 pb-10 bg-white">
+      <div className="w-full flex flex-col px-0 md:px-6 my-4 pb-10 bg-gradient-to-b from-gray-50 to-white">
         <VehiclesGrid 
           vehicles={vehicles} 
           onRegisterClick={() => setOpenModal(true)}
@@ -87,7 +87,7 @@ export default function VehiclesPage() {
 
   // Si no tiene vehículos, mostrar la vista original
   return (
-    <div className="w-full flex flex-col items-center px-0 md:px-6 my-4 pb-10 bg-white">
+    <div className="w-full flex flex-col items-center px-0 md:px-6 my-4 pb-10 bg-gradient-to-b from-gray-50 to-white">
       {/* Header + CTA */}
       <div className="w-full flex flex-col gap-3">
         <div className="w-full flex items-center justify-between">

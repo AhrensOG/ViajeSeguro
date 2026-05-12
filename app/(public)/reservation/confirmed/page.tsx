@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import ReservationConfirmedPage from "@/components/public/reservation/confirmed/ReservationConfirmedPage";
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "Reserva confirmada",
+  robots: { index: false, follow: false },
+};
 
 export default function ReservationConfirmed() {
   return (

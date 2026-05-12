@@ -1,6 +1,6 @@
 "use client";
 
-import { AlertTriangle } from "lucide-react";
+import { CheckCircle2, AlertTriangle } from "lucide-react";
 import { formatDateTime } from "@/lib/functions";
 
 type Props = {
@@ -9,29 +9,45 @@ type Props = {
 
 const BookingQrStatusInfo = ({ booking }: Props) => {
     const qr = booking.qrCode[0];
+    const isValid = qr?.isValid && !qr.usedAt;
 
     return (
-        <section className="bg-custom-gray-100 p-4 rounded-lg text-sm">
-            <p className="font-medium text-custom-black-900 mb-1">Estado del código QR:</p>
-
-            {qr?.isValid && !qr.usedAt ? (
-                <p className="flex items-center gap-2 text-custom-gray-700">
-                    Este código es válido.
-                    <span className="text-green-600 font-medium">Aún no fue escaneado.</span>
-                </p>
-            ) : (
-                <div className="flex flex-col gap-2 text-red-600 font-medium mt-1">
-                    <span className="flex gap-2">
-                        <AlertTriangle className="size-4" />
-                        Estado del código QR:
-                    </span>
-                    {qr?.usedAt ? (
-                        <span className="text-red-500 font-medium">Ya fue escaneado el {formatDateTime(qr.usedAt)}</span>
+        <section className={`rounded-xl border overflow-hidden ${
+            isValid ? "border-emerald-200" : "border-red-200"
+        }`}>
+            <div className={`px-4 py-3 border-b ${isValid ? "bg-emerald-50 border-emerald-200" : "bg-red-50 border-red-200"}`}>
+                <div className="flex items-center gap-2">
+                    {isValid ? (
+                        <CheckCircle2 className="size-4 text-emerald-600" />
                     ) : (
-                        <span className="text-red-500 font-medium">El código QR no está activo.</span>
+                        <AlertTriangle className="size-4 text-red-600" />
                     )}
+                    <span className={`font-semibold text-sm ${isValid ? "text-emerald-700" : "text-red-700"}`}>
+                        Código QR
+                    </span>
                 </div>
-            )}
+            </div>
+
+            <div className="p-4 text-sm">
+                {isValid ? (
+                    <div className="flex items-center gap-2 text-emerald-700">
+                        <CheckCircle2 className="size-5" />
+                        <span className="font-medium">Válido — aún no fue escaneado</span>
+                    </div>
+                ) : (
+                    <div className="space-y-1">
+                        <div className="flex items-center gap-2 text-red-700 font-medium">
+                            <AlertTriangle className="size-5" />
+                            <span>No activo</span>
+                        </div>
+                        {qr?.usedAt ? (
+                            <p className="text-xs text-red-500">Ya fue escaneado el {formatDateTime(qr.usedAt)}</p>
+                        ) : (
+                            <p className="text-xs text-red-500">El código QR no está activo.</p>
+                        )}
+                    </div>
+                )}
+            </div>
         </section>
     );
 };

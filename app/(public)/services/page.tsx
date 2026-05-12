@@ -1,22 +1,20 @@
 import type { Metadata } from "next";
 import ServicesPage from "@/components/public/services/ServicesPage";
-import React from "react";
 
 export const metadata: Metadata = {
-  title: "Servicios de viaje compartido | ViajeSeguro – Publica y reserva",
+  title: "Viaje Compartido Barcelona Valencia | ViajeSeguro",
   description:
-    "Publica tu viaje, reserva plaza y valora a conductores en ViajeSeguro. Asistencia 24/7 y sistema de confianza para tu carpooling.",
+    "Elige entre coche compartido desde 20€, semiexclusivo o exclusivo. Recogida en tu zona en Barcelona y Valencia. Reserva online.",
   keywords: [
+    "viaje compartido Barcelona",
+    "coche compartido Valencia",
     "servicios viaje compartido",
-    "publicar viaje",
-    "reservar plaza",
-    "valoraciones",
-    "asistencia 24/7",
+    "carpooling",
   ],
   openGraph: {
-    title: "Servicios de viaje compartido | ViajeSeguro",
+    title: "Viaje Compartido Barcelona Valencia | ViajeSeguro",
     description:
-      "Publica tu ruta, reserva plazas y disfruta de asistencia 24/7. El carpooling nunca fue tan fácil.",
+      "Elige entre coche compartido desde 20€, semiexclusivo o exclusivo. Recogida en tu zona en Barcelona y Valencia.",
     url: "https://viajeseguro.site/services",
     type: "website",
     images: [
@@ -24,17 +22,18 @@ export const metadata: Metadata = {
         url: "https://viajeseguro.site/main/plaza.jpeg",
         width: 1200,
         height: 630,
-        alt: "Formulario para publicar viaje compartido en ViajeSeguro",
+        alt: "Servicios de viaje compartido en ViajeSeguro",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "Servicios de viaje compartido | ViajeSeguro",
+    title: "Viaje Compartido Barcelona Valencia | ViajeSeguro",
     description:
-      "Publica tu ruta, reserva plazas y disfruta de asistencia 24/7. El carpooling nunca fue tan fácil.",
-    images: ["https://viajeseguro.site/main/plaza.jpeg",],
+      "Elige entre coche compartido desde 20€, semiexclusivo o exclusivo. Recogida en tu zona en Barcelona y Valencia.",
+    images: ["https://viajeseguro.site/main/plaza.jpeg"],
   },
+  alternates: { canonical: "https://viajeseguro.site/services" },
 };
 
 const Services = () => {

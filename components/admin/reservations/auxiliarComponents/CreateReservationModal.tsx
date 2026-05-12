@@ -17,6 +17,16 @@ type FormState = {
     seatCode?: string;
 };
 
+const SOURCES = [
+    { value: "", label: "Seleccionar origen..." },
+    { value: "WhatsApp", label: "WhatsApp" },
+    { value: "Recomendado", label: "Recomendado" },
+    { value: "BlaBlaCar", label: "BlaBlaCar" },
+    { value: "Llamada", label: "Llamada telefónica" },
+    { value: "Instagram", label: "Instagram" },
+    { value: "Otro", label: "Otro" },
+];
+
 const CreateReservationModal = ({ onClose, onSuccess }: Props) => {
     const [form, setForm] = useState<FormState>({
         userId: "",
@@ -28,6 +38,7 @@ const CreateReservationModal = ({ onClose, onSuccess }: Props) => {
 
     const [isCourtesy, setIsCourtesy] = useState(false);
     const [customPrice, setCustomPrice] = useState<string>("");
+    const [source, setSource] = useState("");
 
     // --- User Autocomplete State ---
     const [userSearchTerm, setUserSearchTerm] = useState("");
@@ -178,7 +189,8 @@ const CreateReservationModal = ({ onClose, onSuccess }: Props) => {
             status: form.status,
             paymentMethod: form.paymentMethod,
             seatCode: form.seatCode || undefined,
-            price: finalPrice, // Enviamos el precio si existe
+            price: finalPrice,
+            notes: source ? `Origen: ${source}` : undefined,
         });
     };
 
@@ -399,6 +411,21 @@ const CreateReservationModal = ({ onClose, onSuccess }: Props) => {
                             {["STRIPE", "CASH", "OTHER"].map((method) => (
                                 <option key={method} value={method}>
                                     {method}
+                                </option>
+                            ))}
+                        </select>
+                    </div>
+
+                    <div>
+                        <label className="block text-xs font-semibold text-custom-gray-500 mb-1">Origen del cliente</label>
+                        <select
+                            value={source}
+                            onChange={(e) => setSource(e.target.value)}
+                            className="w-full border border-custom-gray-300 rounded-md px-4 py-2"
+                        >
+                            {SOURCES.map((s) => (
+                                <option key={s.value} value={s.value}>
+                                    {s.label}
                                 </option>
                             ))}
                         </select>

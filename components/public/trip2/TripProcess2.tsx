@@ -46,7 +46,7 @@ const TripProcess2 = () => {
     }
 
     if (error) {
-        return <NotFoundMessage message="No se encontró ningún viaje relacionado" actionHref="/home2" actionLabel="Volver" />;
+        return <NotFoundMessage message="No se encontró ningún viaje relacionado" actionHref="/" actionLabel="Volver" />;
     }
 
     return (
@@ -59,7 +59,7 @@ const TripProcess2 = () => {
                     className="mb-6"
                 >
                     <Link 
-                        href="/home2"
+                        href="/"
                         className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" />

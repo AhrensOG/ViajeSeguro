@@ -7,7 +7,7 @@ export default function DriverPageLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <div className={`min-h-screen flex flex-col`}>
+    <div className={`min-h-screen flex flex-col bg-gradient-to-b from-gray-50 to-white`}>
       <NavBar />
 
       <div className={`flex justify-center items-start grow pt-16 px-4`}>

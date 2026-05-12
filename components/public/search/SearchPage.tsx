@@ -3,7 +3,6 @@ import NavBar from "../navigation/NavBar";
 import SearchProcessFallback from "@/lib/client/components/fallbacks/search/SearchProcessFallback";
 import SearchWrapper from "./auxiliarComponents/SearchWrapper";
 import FiltersBar from "./auxiliarComponents/FiltersBar";
-import AuthPromptModal from "@/components/common/AuthPromptModal";
 
 export default function SearchPage() {
     return (
@@ -14,7 +13,6 @@ export default function SearchPage() {
                 {/* <SearchProcess /> */}
                 <SearchWrapper />
             </Suspense>
-            <AuthPromptModal delay={2} />
         </div>
     );
 }

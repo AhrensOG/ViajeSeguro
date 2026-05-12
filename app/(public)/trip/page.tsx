@@ -1,7 +1,14 @@
+import type { Metadata } from "next";
 import TripPage from "@/components/public/trip/TripPage";
-import React from "react";
 
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "Detalles del viaje",
+  description:
+    "Información completa del viaje compartido: ruta, horarios, precio y plazas disponibles. Reserva tu plaza en ViajeSeguro.",
+  robots: { index: false, follow: true },
+};
 
 const Trip = () => {
   return (

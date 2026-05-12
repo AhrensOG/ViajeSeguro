@@ -13,7 +13,6 @@ const redirect = (req: NextRequest, to: string) =>
 const PUBLIC_ROUTES = [
   "/",
   "/auth/",
-  "/home2",
   "/about",
   "/contact",
   "/cookies",

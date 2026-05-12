@@ -1,0 +1,15 @@
+# *
+User-agent: *
+Allow: /
+
+# *
+User-agent: *
+Disallow: /auth/
+Disallow: /api/
+Disallow: /admin/
+
+# Host
+Host: https://viajeseguro.site
+
+# Sitemaps
+Sitemap: https://viajeseguro.site/sitemap.xml

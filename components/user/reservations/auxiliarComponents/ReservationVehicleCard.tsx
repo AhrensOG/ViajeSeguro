@@ -172,16 +172,16 @@ const ReservationVehicleCard = ({
   return (
     <div
       onClick={() => setOpenCard(!openCard)}
-      className="w-full rounded-2xl border border-custom-gray-200 shadow-md bg-custom-white-100 p-6 flex flex-col gap-4 cursor-pointer transition hover:shadow-lg">
+      className="w-full rounded-2xl border border-gray-200 shadow-sm bg-white p-6 flex flex-col gap-4 cursor-pointer transition hover:shadow-md">
       {/* Cabecera */}
       <div className="flex flex-col md:flex-row items-center justify-between">
-        <div className="flex items-center gap-2 text-custom-golden-700">
+        <div className="flex items-center gap-2 text-amber-600">
           <Truck className="size-5" />
           <span className="font-semibold text-sm">Alquiler de Furgoneta</span>
         </div>
-        <div className="flex items-center gap-2 text-custom-gray-500">
+        <div className="flex items-center gap-2 text-gray-500">
           <span className="text-sm font-medium">
-            ID: <span className="text-custom-black-700">{id}</span>
+            ID: <span className="text-gray-700">{id}</span>
           </span>
           <motion.div
             animate={{ rotate: openCard ? 180 : 0 }}
@@ -202,28 +202,28 @@ const ReservationVehicleCard = ({
           />
         </div>
         <div className="flex flex-col justify-between h-[15rem] md:h-[10rem] grow-1 ">
-          <h3 className="text-2xl font-bold text-custom-black-800 w-full h-[4rem] md:h-[3rem]">
+          <h3 className="text-2xl font-bold text-gray-800 w-full h-[4rem] md:h-[3rem]">
             {brand} {model} {year}
           </h3>
           <div className="flex gap-4 md:gap-0 flex-wrap grow-1 md:justify-between">
-            <p className="text-sm text-custom-gray-700 flex items-center gap-1 md:w-[49%]">
+            <p className="text-sm text-gray-700 flex items-center gap-1 md:w-[49%]">
               <CalendarDays className="size-4" /> {formattedStart} -{" "}
               {formattedEnd} ({days} días)
             </p>
-            <p className="text-sm text-custom-gray-700 flex items-center gap-1 md:w-[49%]">
+            <p className="text-sm text-gray-700 flex items-center gap-1 md:w-[49%]">
               <MapIcon className="size-4" /> Local {returnLocation}
             </p>
-            <p className="text-sm text-custom-gray-700 flex items-center gap-1 md:w-[49%]">
+            <p className="text-sm text-gray-700 flex items-center gap-1 md:w-[49%]">
               <Users className="size-4" /> {capacity} personas
             </p>
-            <p className="text-sm text-custom-gray-700 flex items-center gap-1 md:w-[49%]">
+            <p className="text-sm text-gray-700 flex items-center gap-1 md:w-[49%]">
               <Fuel className="size-4" /> {fuelTypeMap[fuelType]}
             </p>
-            <p className="text-sm text-custom-gray-700 flex items-center gap-1 md:w-[49%]">
+            <p className="text-sm text-gray-700 flex items-center gap-1 md:w-[49%]">
               <Settings className="size-4" />{" "}
               {transmissionTypeMap[transmissionType]}
             </p>
-            <p className="text-sm text-custom-gray-700 flex items-center gap-1 md:w-[49%]">
+            <p className="text-sm text-gray-700 flex items-center gap-1 md:w-[49%]">
               <Truck className="size-4" />{" "}
               {vehicleOfferType === "WITH_DRIVER"
                 ? "Con conductor"
@@ -232,14 +232,14 @@ const ReservationVehicleCard = ({
           </div>
         </div>
         <div className="flex flex-row-reverse md:flex-col gap-4 md:gap-2 md:w-[10rem] md:h-full justify-center md:justify-end items-center md:items-start ">
-          <h3 className="text-2xl font-bold text-custom-black-800">
+          <h3 className="text-2xl font-bold text-gray-800">
             {totalWithIva.toFixed(2)}€
           </h3>
-          <p className="text-sm text-custom-gray-600">Precio total</p>
+          <p className="text-sm text-gray-600">Precio total</p>
         </div>
       </div>
 
-      <p className="text-xs text-custom-gray-500 italic">
+      <p className="text-xs text-gray-500 italic">
         Toca para ver más detalles de tu reserva
       </p>
 
@@ -310,46 +310,46 @@ const ReservationVehicleCard = ({
             )}
 
 
-            <div className="border-b border-custom-gray-200"></div>
+            <div className="border-b border-gray-200"></div>
 
             <div className="flex flex-col gap-2 space-y-4">
-              <div className="flex justify-between text-sm text-custom-gray-700 w-full">
+              <div className="flex justify-between text-sm text-gray-700 w-full">
                 <p>Importe Por día:</p>
                 <p>{pricePerDay.toFixed(2)}€</p>
               </div>
-              <div className="flex justify-between text-sm text-custom-gray-700 w-full">
+              <div className="flex justify-between text-sm text-gray-700 w-full">
                 <p>Sub total:</p>
                 <p>{subTotal.toFixed(2)}€</p>
               </div>
-              <div className="flex justify-between text-sm text-custom-gray-700 w-full">
+              <div className="flex justify-between text-sm text-gray-700 w-full">
                 <p>IVA ({ivaPercent}%):</p>
                 <p>{ivaAmount.toFixed(2)}€</p>
               </div>
-              <div className="flex justify-between text-sm text-custom-gray-700 w-full">
+              <div className="flex justify-between text-sm text-gray-700 w-full">
                 <div
                   className="flex items-center gap-2"
                   title="La fianza es un importe retenido como garantía. Se devuelve íntegramente al devolver el vehículo sin incidencias (daños, combustible, multas o retrasos). Puede retenerse total o parcialmente según las condiciones de la oferta y la revisión al finalizar el alquiler."
                 >
                   <p>Fianza:</p>
-                  <Info className="h-3.5 w-3.5 text-custom-gray-500" />
+                  <Info className="h-3.5 w-3.5 text-gray-500" />
                 </div>
                 <p>{deposit.toFixed(2)}€</p>
               </div>
-              <div className="flex justify-between text-custom-gray-700 w-full text-lg font-bold">
+              <div className="flex justify-between text-gray-700 w-full text-lg font-bold">
                 <p>Importe Final:</p>
                 <p>{(totalWithIva + deposit).toFixed(2)}€</p>
               </div>
-              <p className="text-[11px] leading-4 text-custom-gray-500 text-end">
+              <p className="text-[11px] leading-4 text-gray-500 text-end">
                 Importe final incluye la fianza (no sujeta a IVA).
               </p>
-              {/* <p className="text-sm text-custom-golden-600 text-end w-full hover:underline cursor-pointer">Ver detalle de descuentos</p> */}
+              {/* <p className="text-sm text-amber-600 text-end w-full hover:underline cursor-pointer">Ver detalle de descuentos</p> */}
             </div>
 
-            <div className="border-b border-custom-gray-200"></div>
+            <div className="border-b border-gray-200"></div>
 
             {/* QR intencionalmente no visible en esta card (alquiler de vehículos) */}
 
-            <div className="border-b border-custom-gray-200"></div>
+            <div className="border-b border-gray-200"></div>
 
             <div className="flex flex-col justify-center items-end gap-4 relative">
               {/* Aviso de kilometraje destacado antes de acción de devolver/recoger */}
@@ -436,7 +436,7 @@ const ReservationVehicleCard = ({
                           animate={{ opacity: 1, y: 0 }}
                           exit={{ opacity: 0, y: -10 }}
                           transition={{ duration: 0.3 }}
-                          className="bg-[#f3f4f6] border border-gray-300 p-4 rounded-xl text-sm text-gray-700">
+                          className="bg-gray-100 border border-gray-300 p-4 rounded-xl text-sm text-gray-700">
                           <p className="mb-2">
                             Al cancelar tu reserva podrías perder tu lugar. La
                             disponibilidad es limitada y no garantizamos que

@@ -13,9 +13,8 @@ interface Route {
 }
 
 const routes: Route[] = [
-  { from: "Valencia", to: "Madrid", duration: "3.5h", price: 20 },
+  { from: "Barcelona", to: "Valencia", duration: "3.5h", price: 20 },
   { from: "Valencia", to: "Barcelona", duration: "3.5h", price: 20 },
-  { from: "Madrid", to: "Barcelona", duration: "6h", price: 40 },
 ];
 
 const RoutesCompact = () => {
@@ -30,7 +29,7 @@ const RoutesCompact = () => {
       serviceType: "SIMPLE_TRIP",
       mode: "car",
     });
-    router.push(`/search?${params.toString()}`);
+    router.push(`/search2?${params.toString()}`);
   };
 
   return (
@@ -44,12 +43,12 @@ const RoutesCompact = () => {
           className="text-center mb-10"
         >
           <h2 className="text-3xl font-bold text-slate-800 mb-2">
-            Rutas más populares
+            Barcelona ↔ Valencia
           </h2>
-          <p className="text-slate-500">Los mejores precios en los trayectos más demandados</p>
+          <p className="text-slate-500">Viajes directos • Desde 20€ por plaza</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
           {routes.map((route, index) => (
             <motion.div
               key={index}
@@ -58,7 +57,7 @@ const RoutesCompact = () => {
               viewport={{ once: true }}
               transition={{ duration: 0.5, delay: index * 0.1 }}
               onClick={() => handleRouteSearch(route.from, route.to)}
-              className="group bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-xl p-6 cursor-pointer hover:border-amber-400 hover:shadow-xl transition-all"
+              className="group bg-gradient-to-br from-slate-50 to-white border border-slate-200 rounded-xl p-8 cursor-pointer hover:border-amber-400 hover:shadow-xl transition-all"
             >
               <div className="flex items-center justify-between mb-4">
                 <div className="flex items-center gap-2">
@@ -68,13 +67,13 @@ const RoutesCompact = () => {
                 </div>
               </div>
 
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1 text-slate-500 text-sm">
+                  <div className="flex items-center justify-between">
+                <div className="flex items-center gap-1.5 text-slate-500 text-sm">
                   <Clock className="w-4 h-4" />
                   {route.duration}
                 </div>
                 <div className="text-right">
-                  <span className="text-2xl font-bold text-amber-600">desde {route.price}€</span>
+                  <span className="text-3xl font-bold text-amber-600">{route.price}€</span>
                   <p className="text-xs text-slate-400">por plaza</p>
                 </div>
               </div>

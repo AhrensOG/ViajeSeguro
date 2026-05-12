@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import ForgotPasswordPage from '@/components/public/auth/ForgotPasswordPage'
-import React from 'react'
+
+export const metadata: Metadata = {
+  title: "Recuperar contraseña",
+  robots: { index: false, follow: false },
+};
 
 const ForgotPassword = () => {
   return (

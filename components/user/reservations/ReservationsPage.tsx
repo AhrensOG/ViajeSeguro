@@ -97,7 +97,7 @@ const ReservationsPage = () => {
     };
 
     return (
-        <div className="w-full flex flex-col items-center px-0 md:px-6 my-4 pb-10 bg-white">
+        <div className="w-full flex flex-col items-center px-0 md:px-6 my-4 pb-10 bg-gradient-to-b from-gray-50 to-white">
             <div className="w-full flex flex-col justify-start items-start">
                 <h1 className="text-xl font-semibold text-gray-900 mb-2">Mis reservas</h1>
             </div>
@@ -105,8 +105,8 @@ const ReservationsPage = () => {
             {loading ? (
                 <div className="flex flex-col justify-center items-center w-full gap-4">
                     <div className="w-full h-[72px] bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md text-sm mb-4 space-y-2">
-                        <div className="h-2 w-[90%] bg-custom-gray-300 rounded" />
-                        <div className="h-2 w-[80%] bg-custom-gray-300 rounded" />
+                        <div className="h-2 w-[90%] bg-gray-300 rounded" />
+                        <div className="h-2 w-[80%] bg-gray-300 rounded" />
                     </div>
                     {Array.from({ length: 3 }).map((_, i) => (
                         <ReservationCardFallback key={i} />
@@ -122,12 +122,12 @@ const ReservationsPage = () => {
                     </div>
 
                     {/* Filtros Premium */}
-                    <div className="w-full flex flex-wrap gap-2 mb-6 p-1 bg-custom-gray-50 rounded-xl">
+                    <div className="w-full flex flex-wrap gap-2 mb-6 p-1 bg-gray-50 rounded-xl">
                         {[
                             { id: "UPCOMING", label: "Próximos", color: "text-blue-700 bg-blue-50 border-blue-200" },
                             { id: "FINISHED", label: "Finalizados", color: "text-emerald-700 bg-emerald-50 border-emerald-200" },
                             { id: "CANCELLED", label: "Cancelados", color: "text-red-700 bg-red-50 border-red-200" },
-                            { id: "ALL", label: "Todos", color: "text-custom-gray-700 bg-custom-white-100 border-custom-gray-200" }
+                            { id: "ALL", label: "Todos", color: "text-gray-700 bg-white border-gray-200" }
                         ].map((tab) => {
                             const count = countItems(tab.id as typeof activeTab);
                             const isActive = activeTab === tab.id;
@@ -137,11 +137,11 @@ const ReservationsPage = () => {
                                     onClick={() => setActiveTab(tab.id as typeof activeTab)}
                                     className={`flex items-center gap-2 px-4 py-2 rounded-lg text-sm font-semibold transition-all border ${isActive
                                         ? `${tab.color} border-current shadow-sm scale-105 z-10`
-                                        : "bg-white text-custom-gray-500 border-transparent hover:border-custom-gray-200"
+                                        : "bg-white text-gray-500 border-transparent hover:border-gray-200"
                                         }`}
                                 >
                                     {tab.label}
-                                    <span className={`px-1.5 py-0.5 rounded-full text-xs ${isActive ? "bg-white/50" : "bg-custom-gray-100"}`}>
+                                    <span className={`px-1.5 py-0.5 rounded-full text-xs ${isActive ? "bg-white/50" : "bg-gray-100"}`}>
                                         {count}
                                     </span>
                                 </button>
@@ -151,7 +151,7 @@ const ReservationsPage = () => {
 
                     {filterItems(myRequests, (m) => m.departureAt).length > 0 && (
                         <div className="w-full">
-                            <h2 className="text-lg font-semibold text-custom-gray-800 mb-2">Mis viajes armados</h2>
+                            <h2 className="text-lg font-semibold text-gray-700 mb-2">Mis viajes armados</h2>
                             <div className="space-y-3">
                                 {filterItems(myRequests, (m) => m.departureAt).map((req) => {
                                     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -170,22 +170,22 @@ const ReservationsPage = () => {
                                             >
                                                 <div>
                                                     <div className="text-sm font-semibold text-blue-800">Armar tu viaje</div>
-                                                    <div className="text-sm text-custom-black-800 font-semibold flex items-center gap-2">
+                                                    <div className="text-sm text-gray-900 font-semibold flex items-center gap-2">
                                                         <span className="truncate max-w-[220px] md:max-w-[320px]">{req.origin}</span>
                                                         <span className="opacity-60">→</span>
                                                         <span className="truncate max-w-[220px] md:max-w-[320px]">{req.destination}</span>
                                                     </div>
-                                                    <div className="text-xs text-custom-gray-700">Salida: {date} · {time}</div>
+                                                    <div className="text-xs text-gray-500">Salida: {date} · {time}</div>
                                                 </div>
-                                                <span className={`text-xs font-medium ${expanded ? "text-blue-700" : "text-custom-gray-700"}`}>
+                                                <span className={`text-xs font-medium ${expanded ? "text-blue-700" : "text-gray-500"}`}>
                                                     {expanded ? "Ocultar" : "Ver más"}
                                                 </span>
                                             </button>
                                             {expanded && (
-                                                <div className="px-4 py-3 md:px-5 space-y-2 text-sm text-custom-gray-800 bg-white">
+                                                <div className="px-4 py-3 md:px-5 space-y-2 text-sm text-gray-700 bg-white">
                                                     <div className="flex flex-wrap gap-4">
                                                         <div><span className="font-semibold">Postulados:</span> {typeof joinedCount === 'number' ? joinedCount : '—'}</div>
-                                                        <div><span className="font-semibold">Capacidad:</span> {req.maxPassengers}{typeof available === 'number' && <span className="ml-1 text-xs text-custom-gray-600">({available} disp.)</span>}</div>
+                                                        <div><span className="font-semibold">Capacidad:</span> {req.maxPassengers}{typeof available === 'number' && <span className="ml-1 text-xs text-gray-400">({available} disp.)</span>}</div>
                                                         <div><span className="font-semibold">Plazas que ocupas:</span> {req.seatsRequested}</div>
                                                         <div><span className="font-semibold">Conductor:</span> {hasDriver ? 'Asignado' : 'Sin asignar'}</div>
                                                         <div><span className="font-semibold">Estado:</span> {req.status || 'Abierta'}</div>
@@ -209,7 +209,7 @@ const ReservationsPage = () => {
 
                     {filterItems(joinedRequests, (j) => j.departureAt).length > 0 && (
                         <div className="w-full">
-                            <h2 className="text-lg font-semibold text-custom-gray-800 mb-2">Viajes a los que me uní</h2>
+                            <h2 className="text-lg font-semibold text-gray-700 mb-2">Viajes a los que me uní</h2>
                             <div className="space-y-3">
                                 {filterItems(joinedRequests, (j) => j.departureAt).map((req) => {
                                     const tz = Intl.DateTimeFormat().resolvedOptions().timeZone;
@@ -228,22 +228,22 @@ const ReservationsPage = () => {
                                             >
                                                 <div>
                                                     <div className="text-sm font-semibold text-blue-800">Armar tu viaje</div>
-                                                    <div className="text-sm text-custom-black-800 font-semibold flex items-center gap-2">
+                                                    <div className="text-sm text-gray-900 font-semibold flex items-center gap-2">
                                                         <span className="truncate max-w-[220px] md:max-w-[320px]">{req.origin}</span>
                                                         <span className="opacity-60">→</span>
                                                         <span className="truncate max-w-[220px] md:max-w-[320px]">{req.destination}</span>
                                                     </div>
-                                                    <div className="text-xs text-custom-gray-700">Salida: {date} · {time}</div>
+                                                    <div className="text-xs text-gray-500">Salida: {date} · {time}</div>
                                                 </div>
-                                                <span className={`text-xs font-medium ${expanded ? "text-blue-700" : "text-custom-gray-700"}`}>
+                                                <span className={`text-xs font-medium ${expanded ? "text-blue-700" : "text-gray-500"}`}>
                                                     {expanded ? "Ocultar" : "Ver más"}
                                                 </span>
                                             </button>
                                             {expanded && (
-                                                <div className="px-4 py-3 md:px-5 space-y-2 text-sm text-custom-gray-800 bg-white">
+                                                <div className="px-4 py-3 md:px-5 space-y-2 text-sm text-gray-700 bg-white">
                                                     <div className="flex flex-wrap gap-4">
                                                         <div><span className="font-semibold">Postulados:</span> {typeof joinedCount === 'number' ? joinedCount : '—'}</div>
-                                                        <div><span className="font-semibold">Capacidad:</span> {req.maxPassengers}{typeof available === 'number' && <span className="ml-1 text-xs text-custom-gray-600">({available} disp.)</span>}</div>
+                                                        <div><span className="font-semibold">Capacidad:</span> {req.maxPassengers}{typeof available === 'number' && <span className="ml-1 text-xs text-gray-400">({available} disp.)</span>}</div>
                                                         <div><span className="font-semibold">Conductor:</span> {hasDriver ? 'Asignado' : 'Sin asignar'}</div>
                                                     </div>
                                                     <div className="pt-1 text-right">
@@ -275,8 +275,8 @@ const ReservationsPage = () => {
                     ))}
 
                     {countItems(activeTab) === 0 && (
-                        <div className="w-full flex flex-col items-center justify-center py-10 text-custom-gray-500">
-                            <div className="bg-custom-gray-100 p-4 rounded-full mb-4">
+                        <div className="w-full flex flex-col items-center justify-center py-10 text-gray-500">
+                            <div className="bg-gray-100 p-4 rounded-full mb-4">
                                 <Search className="w-8 h-8 opacity-20" />
                             </div>
                             <p className="font-medium">No se encontraron reservas en esta categoría.</p>
@@ -290,3 +290,5 @@ const ReservationsPage = () => {
 };
 
 export default ReservationsPage;
+
+

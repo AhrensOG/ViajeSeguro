@@ -1,21 +1,20 @@
 import type { Metadata } from "next";
 import AboutPage from "@/components/public/about/AboutPage";
-import React from "react";
 
 export const metadata: Metadata = {
-  title: "Sobre Nosotros | ViajeSeguro – Plataforma de coche compartido",
+  title: "Sobre ViajeSeguro – Coche Compartido Barcelona Valencia",
   description:
-    "Conoce la misión, valores y equipo de ViajeSeguro. Más de 5.000 usuarios confían en nuestro viaje compartido entre Madrid, Barcelona y Valencia.",
+    "Conoce la historia de ViajeSeguro, fundada en 2019. Coche compartido entre Barcelona y Valencia desde 20€.",
   keywords: [
     "sobre nosotros",
     "misión ViajeSeguro",
     "equipo ViajeSeguro",
-    "coche compartido",
+    "coche compartido Barcelona Valencia",
   ],
   openGraph: {
-    title: "Sobre Nosotros | ViajeSeguro – Coche compartido en España",
+    title: "Sobre ViajeSeguro – Coche Compartido Barcelona Valencia",
     description:
-      "Descubre nuestra misión, valores y equipo que hacen posible el carpooling seguro en ViajeSeguro.",
+      "Conoce la historia de ViajeSeguro, fundada en 2019. Coche compartido entre Barcelona y Valencia desde 20€.",
     url: "https://viajeseguro.site/about",
     type: "website",
     images: [
@@ -29,11 +28,12 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Sobre Nosotros | ViajeSeguro – Coche compartido en España",
+    title: "Sobre ViajeSeguro – Coche Compartido Barcelona Valencia",
     description:
-      "Descubre nuestra misión, valores y equipo que hacen posible el carpooling seguro en ViajeSeguro.",
+      "Conoce la historia de ViajeSeguro, fundada en 2019. Coche compartido entre Barcelona y Valencia desde 20€.",
     images: ["https://viajeseguro.site/main/plaza.jpeg"],
   },
+  alternates: { canonical: "https://viajeseguro.site/about" },
 };
 
 const About = () => {

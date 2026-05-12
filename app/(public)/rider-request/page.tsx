@@ -1,6 +1,12 @@
+import type { Metadata } from "next";
 import RiderRequestPage from "@/components/public/rider-request/RiderRequestPage";
 
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "Solicitud de viaje",
+  robots: { index: false, follow: false },
+};
 
 export default function Page() {
   return (

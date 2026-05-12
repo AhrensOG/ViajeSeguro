@@ -28,7 +28,6 @@ type LinkItem = {
 };
 
 const ALL_LINKS: LinkItem[] = [
-  // CLIENT & PARTNER
   {
     name: "Perfil",
     href: "/dashboard/user/profile",
@@ -47,8 +46,6 @@ const ALL_LINKS: LinkItem[] = [
     icon: <CreditCard className="size-5" />,
     roles: ["CLIENT", "PARTNER"],
   },
-
-  // DRIVER
   {
     name: "Perfil",
     href: "/dashboard/driver/profile",
@@ -61,8 +58,6 @@ const ALL_LINKS: LinkItem[] = [
     icon: <CalendarDays className="size-5" />,
     roles: ["DRIVER"],
   },
-
-  // PARTNER
   {
     name: "Mis vehículos",
     href: "/dashboard/partner/vehicles",
@@ -131,16 +126,16 @@ const Sidebar = () => {
 
   if (status === "loading") {
     return (
-      <aside className="hidden h-full max-h-[750px] sticky top-24 max-w-80 w-full rounded-xl border border-custom-gray-300 bg-custom-white-100 text-custom-black-800 shadow-md md:flex flex-col my-4 py-4">
+      <aside className="hidden h-full max-h-[750px] sticky top-24 max-w-80 w-full rounded-2xl border border-gray-200 bg-white shadow-sm md:flex flex-col my-4 py-4">
         <div className="flex flex-col items-center mb-8 animate-pulse">
-          <div className="bg-custom-golden-100 rounded-full w-[105px] h-[105px] flex items-center justify-center">
-            <span className="text-3xl font-bold text-custom-golden-600">U</span>
+          <div className="bg-amber-50 rounded-full w-[105px] h-[105px] flex items-center justify-center">
+            <span className="text-3xl font-bold text-amber-500">U</span>
           </div>
-          <div className="mt-3 h-6 w-40 bg-custom-gray-200 rounded" />
+          <div className="mt-3 h-6 w-40 bg-gray-100 rounded" />
         </div>
         <nav className="flex flex-col gap-2 px-2">
           {[...Array(3)].map((_, i) => (
-            <div key={i} className="h-12 bg-custom-gray-200 rounded" />
+            <div key={i} className="h-12 bg-gray-100 rounded-xl" />
           ))}
         </nav>
       </aside>
@@ -150,7 +145,7 @@ const Sidebar = () => {
   if (!userRole) return null;
 
   return (
-    <aside className="hidden h-full max-h-[750px] sticky top-24 max-w-80 w-full rounded-xl border border-custom-gray-300 bg-custom-white-100 text-custom-black-800 shadow-md md:flex flex-col my-4 py-4">
+    <aside className="hidden h-full max-h-[750px] sticky top-24 max-w-80 w-full rounded-2xl border border-gray-200 bg-white shadow-sm md:flex flex-col my-4 py-4">
       <AvatarUploader
         currentAvatarUrl={avatarUrl}
         userName={session?.user?.name || ""}
@@ -159,7 +154,7 @@ const Sidebar = () => {
         onAvatarUpdated={(url) => setAvatarUrl(url)}
       />
 
-      <nav className="flex flex-col">
+      <nav className="flex flex-col px-2">
         {filteredLinks.map((link) => {
           const isActive =
             pathname === link.href || pathname.startsWith(link.href + "/");
@@ -167,16 +162,16 @@ const Sidebar = () => {
             <Link
               key={link.href}
               href={link.href}
-              className={`flex items-center text-base font-semibold gap-3 p-5 transition-all border-l-8 hover:border-custom-golden-600 hover:bg-custom-golden-100 hover:text-custom-golden-700 ${
+              className={`flex items-center text-sm font-medium gap-3 px-4 py-3.5 rounded-xl transition-all my-0.5 ${
                 isActive
-                  ? "border-custom-golden-600 text-custom-golden-700"
-                  : "border-transparent"
+                  ? "bg-amber-50 text-amber-700 border border-amber-200"
+                  : "text-gray-600 hover:bg-gray-50 hover:text-gray-900 border border-transparent"
               }`}>
               {link.icon}
               <span className="flex items-center gap-2">
                 {link.name}
                 {link.href === "/dashboard/partner/rider-requests" && newRRCount > 0 && (
-                  <span className="inline-flex items-center justify-center text-xs font-bold text-white bg-red-600 rounded-full min-w-[20px] h-[20px] px-1">
+                  <span className="inline-flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full min-w-[20px] h-[20px] px-1">
                     {newRRCount}
                   </span>
                 )}
@@ -185,12 +180,15 @@ const Sidebar = () => {
           );
         })}
 
-        <button
-          onClick={() => signOut({ callbackUrl: "/auth/login" })}
-          className="flex items-center text-base font-semibold gap-3 p-5 transition-all border-l-8 border-transparent hover:border-custom-golden-600 hover:bg-custom-golden-100 hover:text-custom-golden-700">
-          <LogOut className="size-5" />
-          Cerrar sesión
-        </button>
+        <div className="border-t border-gray-100 mt-2 pt-2 px-2">
+          <button
+            onClick={() => signOut({ callbackUrl: "/auth/login" })}
+            className="flex items-center text-sm font-medium gap-3 w-full px-4 py-3.5 rounded-xl text-gray-600 hover:bg-red-50 hover:text-red-600 transition-all border border-transparent hover:border-red-200"
+          >
+            <LogOut className="size-5" />
+            Cerrar sesión
+          </button>
+        </div>
       </nav>
     </aside>
   );

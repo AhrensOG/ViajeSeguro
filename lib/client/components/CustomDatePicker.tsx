@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { DayPicker } from "react-day-picker";
 import "react-day-picker/dist/style.css";
 import { CalendarDays } from "lucide-react";
@@ -16,10 +16,23 @@ interface CustomDatePickerProps {
 const CustomDatePicker = ({ onSelect, value, placeholder, fromDate }: CustomDatePickerProps) => {
     const [selectedDate, setSelectedDate] = useState<Date | undefined>(value || undefined);
     const [isOpen, setIsOpen] = useState<boolean>(false);
+    const containerRef = useRef<HTMLDivElement>(null);
 
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     const minDate = fromDate || today;
+
+    useEffect(() => {
+        const handleClickOutside = (e: MouseEvent) => {
+            if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
+                setIsOpen(false);
+            }
+        };
+        if (isOpen) {
+            document.addEventListener("mousedown", handleClickOutside);
+        }
+        return () => document.removeEventListener("mousedown", handleClickOutside);
+    }, [isOpen]);
 
     const handleSelect = (date?: Date) => {
         if (date) {
@@ -30,14 +43,14 @@ const CustomDatePicker = ({ onSelect, value, placeholder, fromDate }: CustomDate
     };
 
     return (
-        <div className="relative w-full">
+        <div className="relative w-full" ref={containerRef}>
             <button
                 type="button"
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-full border border-custom-gray-300 bg-custom-white-100 px-4 py-2 rounded-md text-left text-custom-gray-700 focus:outline-none focus:ring-2 focus:ring-custom-golden-400 transition flex items-center justify-between"
+                className="w-full border border-gray-200 bg-white px-4 py-3 rounded-xl text-left text-gray-700 focus:outline-none focus:ring-2 focus:ring-amber-400 transition flex items-center justify-between"
             >
                 <div className="flex items-center gap-3">
-                    <CalendarDays className="h-5 w-5 text-custom-gray-600" />
+                    <CalendarDays className="h-5 w-5 text-gray-400" />
                     <span className="text-sm">{selectedDate ? formatDateToDDMMYYYY(selectedDate) : placeholder || "Fecha"}</span>
                 </div>
             </button>

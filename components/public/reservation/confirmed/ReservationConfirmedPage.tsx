@@ -165,7 +165,7 @@ function ReservationConfirmedContent() {
               </Link>
               
               <Link
-                href="/home2"
+                href="/"
                 className="block w-full bg-gray-100 hover:bg-gray-200 text-gray-700 font-medium py-3 px-4 rounded-xl transition-colors"
               >
                 Volver al inicio

@@ -90,7 +90,7 @@ export function RentalBookingsSection({ className }: RentalBookingsSectionProps)
       <div className={`space-y-4 ${className}`}>
         <h2 className="text-2xl font-bold text-gray-900">Solicitudes de Alquiler</h2>
         <div className="flex justify-center py-8">
-          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-custom-golden-500"></div>
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-amber-500"></div>
         </div>
       </div>
     )

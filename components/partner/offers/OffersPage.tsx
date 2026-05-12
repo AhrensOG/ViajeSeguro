@@ -497,9 +497,9 @@ export default function OffersPage() {
 
   if (isLoadingVehicles || isLoadingOffers) {
     return (
-      <div className="w-full flex flex-col items-center px-0 md:px-6 my-4 pb-10 bg-white">
+      <div className="w-full flex flex-col items-center px-0 md:px-6 my-4 pb-10 bg-gradient-to-b from-gray-50 to-white">
         <div className="w-full flex flex-col justify-center items-center py-20">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-custom-golden-500"></div>
+          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-500"></div>
           <p className="mt-4 text-gray-600">
             {isLoadingVehicles ? "Cargando tus vehículos..." : "Cargando tus ofertas..."}
           </p>
@@ -512,7 +512,7 @@ export default function OffersPage() {
   const hasApprovedVehicles = userVehicles.some(v => v.approvalStatus === "APPROVED")
 
   return (
-    <div className="w-full flex flex-col items-center px-4 md:px-6 my-4 pb-10 bg-white">
+    <div className="w-full flex flex-col items-center px-4 md:px-6 my-4 pb-10 bg-gradient-to-b from-gray-50 to-white">
       <div className="w-full flex flex-col justify-start items-start">
         <div className="flex flex-col-reverse md:flex-col w-full gap-8 md:gap-0">
           {/* Tabla de pendientes de aprobación */}

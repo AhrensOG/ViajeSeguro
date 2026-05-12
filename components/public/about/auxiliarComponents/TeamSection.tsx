@@ -61,7 +61,7 @@ const TeamSection = () => {
               <div className="relative h-48">
                 <Image
                   src={member.image}
-                  alt={`Foto de ${member.name}`}
+                  alt={`${member.name} - ${member.role} en ViajeSeguro`}
                   fill
                   className="object-cover"
                 />

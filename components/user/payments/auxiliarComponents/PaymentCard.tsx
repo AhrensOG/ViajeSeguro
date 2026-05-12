@@ -32,16 +32,16 @@ const PaymentCard = ({ payment }: Props) => {
     return (
         <div
             onClick={() => setOpenCard(!openCard)}
-            className="w-full rounded-2xl border border-custom-gray-200 shadow-md bg-custom-white-100 p-6 flex flex-col gap-4 cursor-pointer transition hover:shadow-lg"
+            className="w-full rounded-2xl border border-gray-200 shadow-sm bg-white p-6 flex flex-col gap-4 cursor-pointer transition hover:shadow-md"
         >
             <div className="flex items-center justify-between">
-                <div className="flex items-center gap-2 text-custom-golden-700">
+                <div className="flex items-center gap-2 text-amber-700">
                     <CalendarDays className="size-5" />
                     <span className="font-semibold text-sm">{formattedDate}</span>
                 </div>
-                <div className="flex items-center gap-2 text-custom-gray-500">
+                <div className="flex items-center gap-2 text-gray-500">
                     <span className="text-sm font-medium">
-                        ID: <span className="text-custom-black-700">{payment.id.slice(-6)}</span>
+                        ID: <span className="text-gray-700">{payment.id.slice(-6)}</span>
                     </span>
                     <motion.div animate={{ rotate: openCard ? 180 : 0 }} transition={{ duration: 0.3 }}>
                         <ChevronDown size={18} />
@@ -50,9 +50,9 @@ const PaymentCard = ({ payment }: Props) => {
             </div>
 
             <div>
-                <h2 className="text-xl font-bold text-custom-black-900 capitalize mb-1">{payment.subscriptionName || "Pago de servicio"}</h2>
-                <p className="text-sm text-custom-gray-600 capitalize">Método: {payment.method || payment.paymentMethod || "No especificado"}</p>
-                <div className="flex items-center mt-2 text-custom-gray-600 text-sm">
+                <h2 className="text-xl font-bold text-gray-900 capitalize mb-1">{payment.subscriptionName || "Pago de servicio"}</h2>
+                <p className="text-sm text-gray-600 capitalize">Método: {payment.method || payment.paymentMethod || "No especificado"}</p>
+                <div className="flex items-center mt-2 text-gray-600 text-sm">
                     <div className="flex items-center gap-2">
                         <h4 className="font-semibold">Importe</h4>
                         <ChevronRight className="size-4" />
@@ -61,7 +61,7 @@ const PaymentCard = ({ payment }: Props) => {
                 </div>
             </div>
 
-            <p className="text-xs text-custom-gray-500 italic">Toca para ver más detalles de tu pago</p>
+            <p className="text-xs text-gray-500 italic">Toca para ver más detalles de tu pago</p>
 
             <AnimatePresence>
                 {openCard && (
@@ -74,11 +74,11 @@ const PaymentCard = ({ payment }: Props) => {
                         transition={{ duration: 0.3 }}
                         className="overflow-hidden flex flex-col gap-6 mt-2"
                     >
-                        <div className="rounded-xl border border-custom-gray-200 bg-[#f9fafb] p-4 text-sm">
-                            <p className="font-semibold text-custom-black-900 mb-1">Estado del pago</p>
+                        <div className="rounded-xl border border-gray-200 bg-[#f9fafb] p-4 text-sm">
+                            <p className="font-semibold text-gray-900 mb-1">Estado del pago</p>
 
                             {payment.status === "PENDING" && (
-                                <p className="text-custom-gray-700">
+                                <p className="text-gray-700">
                                     Este pago está pendiente. Por favor, completa el proceso para validar tu suscripción o servicio.
                                 </p>
                             )}
@@ -96,9 +96,9 @@ const PaymentCard = ({ payment }: Props) => {
                             )}
                         </div>
 
-                        <div className="rounded-xl border border-custom-gray-200 bg-[#f9fafb] p-4 text-sm">
-                            <p className="font-semibold text-custom-black-900 mb-1">Fecha del pago</p>
-                            <p className="text-custom-gray-700">
+                        <div className="rounded-xl border border-gray-200 bg-[#f9fafb] p-4 text-sm">
+                            <p className="font-semibold text-gray-900 mb-1">Fecha del pago</p>
+                            <p className="text-gray-700">
                                 {formattedDate} a las {createdTime}
                             </p>
                         </div>
@@ -108,7 +108,7 @@ const PaymentCard = ({ payment }: Props) => {
                                 onClick={() => {
                                     toast.info("Pronto estara disponible la descarga de tu comprobante.");
                                 }}
-                                className="flex items-center gap-2 bg-custom-golden-500 hover:bg-custom-golden-600 text-white font-medium py-2 px-4 rounded-xl transition"
+                                className="flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-white font-medium py-2 px-4 rounded-xl transition"
                             >
                                 <Download className="size-5" />
                                 Descargar comprobante

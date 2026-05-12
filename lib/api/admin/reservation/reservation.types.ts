@@ -53,6 +53,7 @@ export interface CreateReservationFormData {
     discountId?: string;
     id?: string;
     userId?: string;
+    notes?: string;
 }
 
 export interface TripOption {

@@ -16,9 +16,9 @@ interface EditVehicleModalUserProps {
 
 // ESTILOS REUTILIZABLES PARA EL FORMULARIO
 const inputClass =
-  "w-full border border-custom-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-custom-golden-400 shadow-sm transition";
+  "w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 shadow-sm transition";
 const labelClass =
-  "block text-[0.75rem] font-semibold text-custom-gray-600 mb-1 uppercase tracking-wide";
+  "block text-[0.75rem] font-semibold text-gray-600 mb-1 uppercase tracking-wide";
 
 const FEATURES: { value: FeatureEnum; label: string }[] = [
   { value: FeatureEnum.GPS, label: "GPS" },
@@ -104,7 +104,7 @@ export function EditVehicleModalUser({ vehicle, isOpen, onClose, onSuccess }: Ed
       <div className="bg-white rounded-xl shadow-2xl w-full max-w-2xl max-h-[90vh] overflow-y-auto">
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-gray-200">
-          <h2 className="text-xl font-bold text-custom-golden-600">
+          <h2 className="text-xl font-bold text-amber-600">
             Editar Vehículo
           </h2>
           <button
@@ -310,7 +310,7 @@ export function EditVehicleModalUser({ vehicle, isOpen, onClose, onSuccess }: Ed
                     id={feature.value}
                     checked={watchedFeatures.includes(feature.value)}
                     onChange={(e) => handleFeatureChange(feature.value, e.target.checked)}
-                    className="w-4 h-4 text-custom-golden-600 border-gray-300 rounded focus:ring-custom-golden-500"
+                    className="w-4 h-4 text-amber-600 border-gray-300 rounded focus:ring-amber-500"
                   />
                   <label htmlFor={feature.value} className="text-sm text-gray-700">
                     {feature.label}
@@ -344,7 +344,7 @@ export function EditVehicleModalUser({ vehicle, isOpen, onClose, onSuccess }: Ed
             <button
               type="submit"
               disabled={loading}
-              className="px-6 py-2 bg-custom-golden-600 hover:bg-custom-golden-700 text-white rounded-lg transition-colors disabled:opacity-50"
+              className="px-6 py-2 bg-amber-600 hover:bg-amber-700 text-white rounded-lg transition-colors disabled:opacity-50"
             >
               {loading ? "Guardando..." : "Guardar Cambios"}
             </button>

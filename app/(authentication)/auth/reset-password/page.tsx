@@ -1,7 +1,12 @@
+import type { Metadata } from "next";
 import ResetPasswordPage from "@/components/public/auth/ResetPasswordPage";
-import React from "react";
 
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "Restablecer contraseña",
+  robots: { index: false, follow: false },
+};
 
 const ResetPassword = () => {
     return (

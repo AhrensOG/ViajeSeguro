@@ -1,44 +1,23 @@
 import type { Metadata } from "next";
-import HomePage from "@/components/public/home/HomePage";
+import Home2Page from "@/components/public/home2/Home2Page";
 
 export const metadata: Metadata = {
-  title:
-    "ViajeSeguro – Plataforma de coche compartido Madrid • Barcelona • Valencia",
+  title: "Coche Compartido Barcelona y Valencia | ViajeSeguro",
   description:
-    "Únete a ViajeSeguro, tu plataforma de viaje compartido (carpooling) entre Madrid, Barcelona y Valencia. Comparte gastos y viaja seguro.",
-  keywords: [
-    "coche compartido",
-    "viaje compartido",
-    "carpooling",
-    "Madrid",
-    "Barcelona",
-    "Valencia",
-    "ViajeSeguro",
-  ],
+    "Viaja en coche compartido entre Barcelona y Valencia desde 20€. Conductor profesional, sin cancelaciones, seguro incluido. Reserva en minutos.",
   openGraph: {
-    title: "ViajeSeguro – Plataforma de coche compartido en España",
+    title: "Coche Compartido Barcelona y Valencia | ViajeSeguro",
     description:
-      "Comparte tu viaje Madrid–Barcelona–Valencia, ahorra gastos y conoce gente nueva.",
-    url: "https://viajeseguro.site/",
-    type: "website",
-    images: [
-      {
-        url: "https://viajeseguro.site/main/nuestrahistoria.png",
-        width: 1200,
-        height: 630,
-        alt: "Grupo de pasajeros disfrutando de un coche compartido ViajeSeguro",
-      },
-    ],
+      "Viaja en coche compartido entre Barcelona y Valencia desde 20€. Conductor profesional, sin cancelaciones, seguro incluido.",
+    url: "https://viajeseguro.site",
   },
   twitter: {
-    card: "summary_large_image",
-    title: "ViajeSeguro – Plataforma de coche compartido en España",
+    title: "Coche Compartido Barcelona y Valencia | ViajeSeguro",
     description:
-      "Comparte tu viaje Madrid–Barcelona–Valencia, ahorra gastos y conoce gente nueva.",
-    images: ["https://viajeseguro.site/main/nuestrahistoria.png"],
+      "Viaja en coche compartido entre Barcelona y Valencia desde 20€. Conductor profesional, sin cancelaciones, seguro incluido.",
   },
 };
 
 export default function Home() {
-  return <HomePage />;
+  return <Home2Page />;
 }

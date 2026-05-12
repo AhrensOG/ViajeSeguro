@@ -24,7 +24,7 @@ const CTAMinimal = () => {
           </p>
           
           <button
-            onClick={() => router.push("/home2")}
+            onClick={() => router.push("/")}
             className="inline-flex items-center gap-2 bg-amber-500 hover:bg-amber-600 text-slate-900 font-semibold px-8 py-4 rounded-full transition-all hover:shadow-lg hover:shadow-amber-500/25"
           >
             Buscar viaje

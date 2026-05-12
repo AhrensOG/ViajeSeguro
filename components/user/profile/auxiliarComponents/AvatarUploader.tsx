@@ -99,7 +99,7 @@ const AvatarUploader = ({
   return (
     <div className="flex flex-col items-center py-6">
       <div className="relative">
-        <div className="w-28 h-28 rounded-full overflow-hidden bg-custom-gray-100 border-4 border-custom-golden-400 shadow-md flex items-center justify-center">
+        <div className="w-28 h-28 rounded-full overflow-hidden bg-gray-100 border-4 border-amber-200 shadow-md flex items-center justify-center">
           {displayUrl ? (
             <Image
               src={displayUrl}
@@ -108,8 +108,8 @@ const AvatarUploader = ({
               className="object-cover rounded-full"
             />
           ) : (
-            <div className="w-full h-full flex items-center justify-center bg-custom-golden-100">
-              <span className="text-3xl font-bold text-custom-golden-600">
+            <div className="w-full h-full flex items-center justify-center bg-amber-50">
+              <span className="text-3xl font-bold text-amber-600">
                 {getInitials()}
               </span>
             </div>
@@ -120,7 +120,7 @@ const AvatarUploader = ({
           type="button"
           onClick={handleClick}
           disabled={isUploading}
-          className="absolute bottom-0 right-0 w-10 h-10 rounded-full bg-custom-golden-500 hover:bg-custom-golden-600 text-white flex items-center justify-center shadow-lg transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
+          className="absolute bottom-0 right-0 w-10 h-10 rounded-full bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white flex items-center justify-center shadow-lg transition transform hover:scale-105 disabled:opacity-50 disabled:cursor-not-allowed"
         >
           {isUploading ? (
             <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
@@ -143,7 +143,7 @@ const AvatarUploader = ({
           <button
             onClick={handleCancel}
             disabled={isUploading}
-            className="px-4 py-2 rounded-lg border border-custom-gray-300 text-custom-gray-600 hover:bg-gray-50 transition flex items-center gap-2"
+            className="px-4 py-2 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 transition flex items-center gap-2 text-sm"
           >
             <X className="w-4 h-4" />
             Cancelar
@@ -151,7 +151,7 @@ const AvatarUploader = ({
           <button
             onClick={handleUpload}
             disabled={isUploading}
-            className="px-4 py-2 rounded-lg bg-custom-golden-500 hover:bg-custom-golden-600 text-white transition flex items-center gap-2"
+            className="px-4 py-2 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white transition flex items-center gap-2 text-sm font-medium shadow-sm"
           >
             <Upload className="w-4 h-4" />
             {isUploading ? "Subiendo..." : "Guardar"}
@@ -160,7 +160,7 @@ const AvatarUploader = ({
       ) : (
         <button
           onClick={handleClick}
-          className="mt-3 text-sm text-custom-gray-600 hover:text-custom-golden-600 transition"
+          className="mt-3 text-sm text-gray-500 hover:text-amber-600 transition-colors font-medium"
         >
           Cambiar foto de perfil
         </button>

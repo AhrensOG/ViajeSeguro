@@ -5,6 +5,7 @@ import { markQrAsUsed } from "@/lib/api/qr";
 import { toast } from "sonner";
 import { fetchVehicleBookingWhitDetails, markBookingAsPaid } from "@/lib/api/vehicle-booking";
 import { ResponseForQrPage } from "@/lib/api/vehicle-booking/vehicleBooking.types";
+import { KeyRound, CheckCircle2, ShieldCheck } from "lucide-react";
 
 type Props = {
     booking: ResponseForQrPage;
@@ -51,34 +52,75 @@ const BookingPaymentInfo = ({ booking, setBooking }: Props) => {
         }
     };
 
+    if (qrUsed) {
+        return (
+            <section className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 flex items-center gap-3">
+                <div className="p-2 bg-emerald-100 rounded-full">
+                    <CheckCircle2 className="size-6 text-emerald-600" />
+                </div>
+                <div>
+                    <p className="font-semibold text-emerald-800">Vehículo entregado</p>
+                    <p className="text-xs text-emerald-600">El QR ya fue escaneado y el vehículo fue entregado.</p>
+                </div>
+            </section>
+        );
+    }
+
+    if (!qrValid) {
+        return (
+            <section className="rounded-xl border border-red-200 bg-red-50 p-4 flex items-center gap-3">
+                <div className="p-2 bg-red-100 rounded-full">
+                    <ShieldCheck className="size-6 text-red-600" />
+                </div>
+                <div>
+                    <p className="font-semibold text-red-800">QR no válido</p>
+                    <p className="text-xs text-red-600">No se puede confirmar la entrega con este código.</p>
+                </div>
+            </section>
+        );
+    }
+
     return (
-        <section className="text-sm bg-custom-gray-100 p-4 rounded-lg flex flex-col gap-3">
-            {/* Método de pago */}
-            <div className="flex justify-between items-center">
-                <span className="text-custom-gray-600">Método de pago:</span>
-                <span className="font-medium text-custom-black-900">{isCash ? "Efectivo" : "Stripe"}</span>
-            </div>
+        <section className="rounded-xl border border-gray-200 overflow-hidden">
+            <div className="p-4 space-y-4">
+                {isCash && (
+                    <label className="flex items-center gap-3 px-3 py-3 bg-amber-50 border border-amber-200 rounded-lg cursor-pointer hover:bg-amber-100/50 transition-colors">
+                        <input
+                            type="checkbox"
+                            checked={paid}
+                            onChange={() => setPaid(!paid)}
+                            className="w-4 h-4 rounded border-gray-300 text-amber-600 focus:ring-amber-500"
+                        />
+                        <div>
+                            <span className="text-sm font-medium text-amber-800">El cliente abonó en efectivo</span>
+                            <p className="text-xs text-amber-600">Marca solo si recibiste el pago</p>
+                        </div>
+                    </label>
+                )}
 
-            {/* Checkbox solo si es efectivo y aún no fue usado */}
-            {isCash && qrValid && !qrUsed && (
-                <label className="flex items-center gap-2 text-custom-gray-700 mt-2">
-                    <input type="checkbox" checked={paid} onChange={() => setPaid(!paid)} className="w-4 h-4" />
-                    El cliente abonó antes de retirar el vehículo
-                </label>
-            )}
-
-            {/* Botón de confirmación */}
-            {qrValid && !qrUsed && (
                 <button
                     disabled={loading || (isCash && !paid)}
                     onClick={handleConfirmDelivery}
-                    className={`w-full text-sm font-semibold py-2 px-4 rounded-lg transition ${
-                        !isCash || paid ? "bg-green-600 text-white hover:bg-green-700" : "bg-gray-300 text-gray-600 cursor-not-allowed"
+                    className={`w-full flex items-center justify-center gap-2 text-sm font-bold py-3.5 px-4 rounded-xl transition-all shadow-sm ${
+                        !isCash || paid
+                            ? "bg-emerald-600 hover:bg-emerald-700 text-white hover:shadow-md active:scale-[0.98]"
+                            : "bg-gray-200 text-gray-500 cursor-not-allowed"
                     }`}
                 >
-                    {loading ? "Confirmando..." : "Confirmar entrega del vehículo"}
+                    {loading ? (
+                        <>Confirmando...</>
+                    ) : (
+                        <>
+                            <KeyRound className="size-5" />
+                            Confirmar entrega del vehículo
+                        </>
+                    )}
                 </button>
-            )}
+
+                <p className="text-xs text-gray-400 text-center">
+                    Al confirmar, el QR quedará marcado como usado y el vehículo se marcará como entregado.
+                </p>
+            </div>
         </section>
     );
 };
