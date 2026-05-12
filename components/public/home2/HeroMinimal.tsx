@@ -65,7 +65,9 @@ const HeroMinimal = () => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 text-lg md:text-xl text-white/90 font-light">
             <span>Barcelona ↔ Valencia</span>
             <span className="hidden sm:inline text-white/40">|</span>
-            <span>Valencia ↔ Barcelona</span>
+            <span>Madrid ↔ Valencia</span>
+            <span className="hidden sm:inline text-white/40">|</span>
+            <span>Madrid ↔ Barcelona</span>
           </div>
           <p className="text-base md:text-lg text-white/70 mt-3">
             Desde 20€ • Viajes directos • Sin cancelación hasta 24h antes

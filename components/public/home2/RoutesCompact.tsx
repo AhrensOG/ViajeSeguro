@@ -15,6 +15,8 @@ interface Route {
 const routes: Route[] = [
   { from: "Barcelona", to: "Valencia", duration: "3.5h", price: 20 },
   { from: "Valencia", to: "Barcelona", duration: "3.5h", price: 20 },
+  { from: "Madrid", to: "Valencia", duration: "3.5h", price: 25 },
+  { from: "Madrid", to: "Barcelona", duration: "3.5h", price: 25 },
 ];
 
 const RoutesCompact = () => {
@@ -43,12 +45,12 @@ const RoutesCompact = () => {
           className="text-center mb-10"
         >
           <h2 className="text-3xl font-bold text-slate-800 mb-2">
-            Barcelona ↔ Valencia
+            Barcelona, Valencia y Madrid
           </h2>
           <p className="text-slate-500">Viajes directos • Desde 20€ por plaza</p>
         </motion.div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 max-w-5xl mx-auto">
           {routes.map((route, index) => (
             <motion.div
               key={index}
