@@ -17,9 +17,9 @@ interface EditVehicleModalProps {
 
 // ESTILOS REUTILIZABLES PARA EL FORMULARIO (iguales al modal de creación)
 const inputClass =
-  "w-full border border-custom-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-custom-golden-400 shadow-sm transition";
+  "w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 shadow-sm transition";
 const labelClass =
-  "block text-[0.75rem] font-semibold text-custom-gray-600 mb-1 uppercase tracking-wide";
+  "block text-[0.75rem] font-semibold text-gray-600 mb-1 uppercase tracking-wide";
 
 // CARACTERÍSTICAS DISPONIBLES (iguales al modal de creación)
 const FEATURES: { value: string; label: string }[] = [
@@ -313,13 +313,13 @@ export default function EditVehicleModal({ vehicle, isOpen, onClose, onSuccess }
                 {FEATURES.map(({ value, label }) => (
                   <label
                     key={value}
-                    className="flex items-center gap-2 bg-custom-gray-100 px-3 py-2 rounded-md shadow-inner text-sm"
+                    className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-md shadow-inner text-sm"
                   >
                     <input
                       type="checkbox"
                       value={value}
                       {...register("features")}
-                      className="accent-custom-golden-600"
+                      className="accent-amber-600"
                     />
                     <span>{label}</span>
                   </label>
@@ -333,10 +333,10 @@ export default function EditVehicleModal({ vehicle, isOpen, onClose, onSuccess }
                 type="file"
                 multiple
                 accept="image/*"
-                className="block w-full text-sm text-custom-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-custom-golden-600 file:text-white hover:file:bg-custom-golden-700"
+                className="block w-full text-sm text-gray-600 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-amber-600 file:text-white hover:file:bg-amber-700"
                 onChange={(e) => setImageFiles(e.target.files)}
               />
-              <p className="text-xs text-custom-gray-500 mt-1">
+              <p className="text-xs text-gray-500 mt-1">
                 Sube nuevas imágenes del vehículo (máx. 10). Las imágenes actuales se mantendrán.
               </p>
             </div>
@@ -345,14 +345,14 @@ export default function EditVehicleModal({ vehicle, isOpen, onClose, onSuccess }
               <button
                 type="button"
                 onClick={onClose}
-                className="cursor-pointer border border-custom-gray-300 text-custom-black-800 hover:bg-custom-gray-100 font-medium py-2.5 px-6 rounded-md transition"
+                className="cursor-pointer border border-gray-300 text-gray-800 hover:bg-gray-100 font-medium py-2.5 px-6 rounded-md transition"
               >
                 Cancelar
               </button>
               <button
                 type="submit"
                 disabled={isLoading}
-                className="cursor-pointer bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold py-2.5 px-6 rounded-md transition shadow disabled:opacity-50 disabled:cursor-not-allowed"
+                className="cursor-pointer bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2.5 px-6 rounded-md transition shadow disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? "Actualizando..." : "Actualizar vehículo"}
               </button>

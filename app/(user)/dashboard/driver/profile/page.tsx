@@ -1,5 +1,10 @@
+import type { Metadata } from "next";
 import ProfilePage from "@/components/user/profile/ProfilePage";
-import React from "react";
+
+export const metadata: Metadata = {
+  title: "Mi perfil",
+  robots: { index: false, follow: false },
+};
 
 const Profile = () => {
     return <ProfilePage />;

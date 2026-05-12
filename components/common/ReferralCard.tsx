@@ -44,56 +44,58 @@ export default function ReferralCard({ referralCode, title, subtitle, referredCo
   };
 
   return (
-    <div className="w-full p-4 md:p-5 bg-custom-white-100 border border-custom-gray-300 rounded-lg shadow-sm">
-      <div className="flex items-start gap-3">
-        <div className="shrink-0 mt-0.5">
-          <Gift className="text-custom-golden-600" size={20} />
-        </div>
-        <div className="flex-1">
-          <div className="flex items-center gap-2">
-            <h3 className="text-base font-semibold text-custom-black-900">
-              {title || "Comparte y gana"}
-            </h3>
-            {referredCount > 0 && (
-              <span className="inline-flex items-center text-xs px-2 py-0.5 rounded-full bg-custom-golden-100 text-custom-golden-700 border border-custom-golden-500">
-                {referredCount === 1 ? "Tienes 1 referido" : `Tienes ${referredCount} referidos`}
-              </span>
-            )}
+    <div className="w-full bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden">
+      <div className="p-5 md:p-6">
+        <div className="flex items-start gap-4">
+          <div className="shrink-0 w-10 h-10 rounded-xl bg-amber-50 border border-amber-200 flex items-center justify-center">
+            <Gift className="text-amber-500" size={20} />
           </div>
-          <p className="text-sm text-custom-gray-700 mt-1">
-            {subtitle || "Invita a tus amigos con tu enlace de referido"}
-          </p>
-          {referredCount === 0 && (
-            <p className="text-sm text-custom-gray-500 mt-1">
-              Todavía no tienes amigos o invitadores
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-3 flex-wrap">
+              <h3 className="text-base font-semibold text-gray-900">
+                {title || "Comparte y gana"}
+              </h3>
+              {referredCount > 0 && (
+                <span className="inline-flex items-center text-xs font-medium px-2.5 py-0.5 rounded-full bg-amber-50 text-amber-700 border border-amber-200">
+                  {referredCount === 1 ? "1 referido" : `${referredCount} referidos`}
+                </span>
+              )}
+            </div>
+            <p className="text-sm text-gray-500 mt-1">
+              {subtitle || "Invita a tus amigos con tu enlace de referido"}
             </p>
-          )}
+            {referredCount === 0 && (
+              <p className="text-xs text-gray-400 mt-1">
+                Todavía no tienes referidos
+              </p>
+            )}
 
-          <div className="mt-3 flex items-center gap-2">
-            <input
-              readOnly
-              value={link}
-              onClick={handleCopy}
-              className="flex-1 font-mono text-xs md:text-sm bg-white border border-custom-gray-300 rounded-md px-3 py-2 text-custom-golden-700 cursor-pointer"
-            />
-            <button
-              type="button"
-              onClick={handleCopy}
-              className="px-3 py-2 rounded-md border border-custom-gray-300 text-custom-black-800 hover:bg-custom-gray-100"
-              aria-label="Copiar"
-            >
-              <Copy size={16} />
-            </button>
-            <button
-              type="button"
-              onClick={handleShare}
-              className="px-3 py-2 rounded-md bg-custom-golden-600 hover:bg-custom-golden-700 text-white"
-            >
-              <div className="flex items-center gap-2 text-sm">
-                <Share2 size={16} />
-                <span>Compartir</span>
+            <div className="mt-4 flex items-center gap-2">
+              <div className="relative flex-1">
+                <input
+                  readOnly
+                  value={link}
+                  onClick={handleCopy}
+                  className="w-full font-mono text-xs md:text-sm bg-gray-50 border border-gray-200 rounded-xl px-3 py-2.5 text-amber-700 cursor-pointer pr-10"
+                />
               </div>
-            </button>
+              <button
+                type="button"
+                onClick={handleCopy}
+                className="shrink-0 w-10 h-10 rounded-xl border border-gray-200 text-gray-500 hover:text-amber-600 hover:border-amber-300 hover:bg-amber-50 transition-all flex items-center justify-center"
+                aria-label="Copiar"
+              >
+                <Copy size={16} />
+              </button>
+              <button
+                type="button"
+                onClick={handleShare}
+                className="shrink-0 h-10 rounded-xl bg-gradient-to-r from-amber-500 to-amber-600 hover:from-amber-600 hover:to-amber-700 text-white px-4 flex items-center gap-2 text-sm font-medium transition-all shadow-sm"
+              >
+                <Share2 size={16} />
+                <span className="hidden sm:inline">Compartir</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>

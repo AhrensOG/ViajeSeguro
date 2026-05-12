@@ -44,9 +44,9 @@ type FormData = {
 };
 
 const inputClass =
-  "w-full border border-custom-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-custom-golden-400 transition";
+  "w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400 transition";
 const labelClass =
-  "block text-xs font-semibold text-custom-gray-500 mb-1 uppercase tracking-wide";
+  "block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide";
 
 const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
   const { data: session } = useSession();
@@ -172,19 +172,19 @@ const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
     <div className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white rounded-xl shadow-2xl p-8 my-8 w-full max-w-4xl max-h-[95vh] overflow-y-auto relative border border-custom-gray-300"
+        className="bg-white rounded-xl shadow-2xl p-8 my-8 w-full max-w-4xl max-h-[95vh] overflow-y-auto relative border border-gray-300"
       >
         <button
           onClick={onClose}
-          className="absolute top-4 right-4 text-custom-gray-400 hover:text-custom-gray-600 transition-colors"
+          className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
         >
           <X size={24} />
         </button>
 
-        <h2 className="text-2xl font-bold mb-2 text-custom-golden-700">
+        <h2 className="text-2xl font-bold mb-2 text-amber-700">
           Editar Oferta de Vehículo
         </h2>
-        <p className="text-custom-gray-600 mb-6">
+        <p className="text-gray-600 mb-6">
           Modifica los detalles de tu oferta de alquiler
         </p>
 
@@ -233,7 +233,7 @@ const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
               placeholder="200.00"
               disabled={isLoading}
             />
-            <p className="text-xs text-custom-gray-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               La fianza se devuelve al devolver el vehículo sin incidencias.
             </p>
             {errors.depositAmount && (
@@ -262,7 +262,7 @@ const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
                 {errors.pricePerDay.message || "Campo obligatorio"}
               </p>
             )}
-            <p className="text-xs text-custom-gray-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               Incluye {watch("dailyMileageLimit") || 200} km/día. El exceso se cobra a 0,50€/km.
             </p>
           </div>
@@ -280,7 +280,7 @@ const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
               placeholder="200"
               disabled={isLoading}
             />
-            <p className="text-xs text-custom-gray-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               Define cuántos km incluye el precio base por día.
             </p>
             {errors.dailyMileageLimit && (
@@ -305,7 +305,7 @@ const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
               readOnly
               disabled={isLoading}
             />
-            <p className="text-xs text-custom-gray-500 mt-1">
+            <p className="text-xs text-gray-500 mt-1">
               Se calcula automáticamente como el 22% del precio por día
             </p>
             {errors.agencyFee && (
@@ -414,14 +414,14 @@ const EditOfferModal = ({ onClose, onSuccess, userVehicles, offer }: Props) => {
             <button
               type="button"
               onClick={onClose}
-              className="cursor-pointer border border-custom-gray-300 text-custom-black-800 hover:bg-custom-gray-100 font-medium py-2 px-5 rounded-md"
+              className="cursor-pointer border border-gray-300 text-gray-800 hover:bg-gray-100 font-medium py-2 px-5 rounded-md"
               disabled={isLoading}
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="cursor-pointer bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold py-2 px-5 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
+              className="cursor-pointer bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2 px-5 rounded-md disabled:opacity-50 disabled:cursor-not-allowed"
               disabled={isLoading || approvedVehicles.length === 0}
             >
               {isLoading ? "Actualizando..." : "Actualizar oferta"}

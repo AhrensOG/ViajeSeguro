@@ -24,9 +24,9 @@ interface Props {
 
 // ESTILOS REUTILIZABLES PARA EL FORMULARIO
 const inputClass =
-  "w-full border border-custom-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-custom-golden-400 shadow-sm transition";
+  "w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400 shadow-sm transition";
 const labelClass =
-  "block text-[0.75rem] font-semibold text-custom-gray-600 mb-1 uppercase tracking-wide";
+  "block text-[0.75rem] font-semibold text-gray-600 mb-1 uppercase tracking-wide";
 
 /**
  * CARACTERÍSTICAS DISPONIBLES PARA LOS VEHÍCULOS
@@ -147,7 +147,7 @@ const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
       {/* CONTENEDOR PRINCIPAL DEL MODAL */}
       <div
         onClick={(e) => e.stopPropagation()} // Evitar que se cierre al hacer click dentro del modal
-        className="bg-white rounded-2xl shadow-xl ring-1 ring-custom-gray-200 p-8 my-8 w-full max-w-4xl max-h-[95vh] overflow-y-auto relative"
+        className="bg-white rounded-2xl shadow-xl ring-1 ring-gray-200 p-8 my-8 w-full max-w-4xl max-h-[95vh] overflow-y-auto relative"
       >
         {/* BOTÓN DE CERRAR (X) EN LA ESQUINA SUPERIOR DERECHA */}
         <button
@@ -159,10 +159,10 @@ const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
         </button>
 
         {/* ENCABEZADO DEL MODAL */}
-        <h2 className="text-2xl font-bold mb-1 text-custom-golden-700 tracking-tight">
+        <h2 className="text-2xl font-bold mb-1 text-amber-700 tracking-tight">
           Registrar vehículo (particular)
         </h2>
-        <p className="text-sm text-custom-gray-500 mb-4 leading-relaxed">
+        <p className="text-sm text-gray-500 mb-4 leading-relaxed">
           Completa los datos de tu coche. <strong>Usa información real y verificable.</strong> Una vez enviado, nuestro equipo revisará tu solicitud. Al ser aprobada, podrás publicarlo para alquiler.
         </p>
 
@@ -177,11 +177,11 @@ const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
         {/* FORMULARIO PRINCIPAL */}
         <form
           onSubmit={handleSubmit(submit)} // Maneja el envío con react-hook-form
-          className="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm text-custom-black-800"
+          className="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm text-gray-800"
         >
           {/* SECCIÓN: DATOS DEL VEHÍCULO */}
           <div className="col-span-full">
-            <h3 className="text-base font-semibold text-custom-golden-600 mb-1">
+            <h3 className="text-base font-semibold text-amber-600 mb-1">
               Datos del vehículo
             </h3>
             <hr className="mb-4" />
@@ -350,13 +350,13 @@ const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
               {FEATURES.map(({ value, label }) => (
                 <label
                   key={value}
-                  className="flex items-center gap-2 bg-custom-gray-100 px-3 py-2 rounded-md shadow-inner text-sm"
+                  className="flex items-center gap-2 bg-gray-100 px-3 py-2 rounded-md shadow-inner text-sm"
                 >
                   <input
                     type="checkbox"
                     value={value}
                     {...register("features")}
-                    className="accent-custom-golden-600"
+                    className="accent-amber-600"
                   />
                   <span>{label}</span>
                 </label>
@@ -370,7 +370,7 @@ const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
 
             {/* Input de archivo oculto + Botón de subida personalizado o Input visible */}
             <div className="mt-2">
-              <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 border border-custom-gray-300 rounded-md shadow-sm text-sm font-medium text-custom-gray-700 bg-white hover:bg-custom-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-custom-golden-500">
+              <label className="cursor-pointer inline-flex items-center gap-2 px-4 py-2 border border-gray-300 rounded-md shadow-sm text-sm font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-amber-500">
                 <span>Seleccionar imágenes</span>
                 <input
                   type="file"
@@ -380,7 +380,7 @@ const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
                   onChange={handleImageChange}
                 />
               </label>
-              <span className="ml-3 text-xs text-custom-gray-500">
+              <span className="ml-3 text-xs text-gray-500">
                 {imageFiles.length} / 10 imágenes seleccionadas
               </span>
             </div>
@@ -389,7 +389,7 @@ const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
             {imageFiles.length > 0 && (
               <div className="mt-4 grid grid-cols-2 sm:grid-cols-4 md:grid-cols-5 gap-4">
                 {imageFiles.map((file, index) => (
-                  <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-custom-gray-200">
+                  <div key={index} className="relative group aspect-square rounded-lg overflow-hidden border border-gray-200">
                     {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img
                       src={URL.createObjectURL(file)}
@@ -410,7 +410,7 @@ const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
               </div>
             )}
 
-            <p className="text-xs text-custom-gray-500 mt-2">
+            <p className="text-xs text-gray-500 mt-2">
               Sube al menos una imagen clara del vehículo. Format: jpg, png, webp.
             </p>
           </div>
@@ -419,13 +419,13 @@ const CreateVehicleModalPartner = ({ onClose, onSuccess }: Props) => {
             <button
               type="button"
               onClick={onClose}
-              className="cursor-pointer border border-custom-gray-300 text-custom-black-800 hover:bg-custom-gray-100 font-medium py-2.5 px-6 rounded-md transition"
+              className="cursor-pointer border border-gray-300 text-gray-800 hover:bg-gray-100 font-medium py-2.5 px-6 rounded-md transition"
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="cursor-pointer bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold py-2.5 px-6 rounded-md transition shadow"
+              className="cursor-pointer bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2.5 px-6 rounded-md transition shadow"
             >
               Enviar a revisión
             </button>

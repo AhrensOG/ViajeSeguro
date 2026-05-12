@@ -85,7 +85,7 @@ export function RentalOfferCard({ offer, onEdit, onView, onDelete }: RentalOffer
   }
 
   return (
-    <div className="bg-white rounded-lg shadow-md hover:shadow-lg transition-shadow border border-gray-200">
+    <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-shadow border border-gray-200">
       {/* Header con imagen */}
       <div className="relative">
         <div className="w-full h-48 bg-gray-200 rounded-t-lg overflow-hidden">
@@ -122,7 +122,7 @@ export function RentalOfferCard({ offer, onEdit, onView, onDelete }: RentalOffer
         {/* Precio y tipo */}
         <div className="flex justify-between items-center">
           <div>
-            <p className="text-2xl font-bold text-custom-golden-600">€{offer.pricePerDay}</p>
+            <p className="text-2xl font-bold text-amber-600">€{offer.pricePerDay}</p>
             <p className="text-sm text-gray-600">por día</p>
             <p className="text-[10px] text-gray-500 leading-3 mt-1 max-w-[120px]">
               Incluye 200km/día. Exceso 0,50€/km

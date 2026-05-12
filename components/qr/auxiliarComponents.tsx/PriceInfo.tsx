@@ -1,6 +1,7 @@
 "use client";
 
 import { ReservationResponse } from "@/lib/api/reservation/reservation.types";
+import { Wallet, CheckCircle2, AlertTriangle } from "lucide-react";
 
 type Props = {
   reservation: ReservationResponse;
@@ -8,7 +9,7 @@ type Props = {
 
 const PriceInfo = ({ reservation }: Props) => {
   const { priceDetails, price, paymentMethod } = reservation;
-  if (paymentMethod !== "CASH") return null;
+  const isCash = paymentMethod === "CASH";
 
   const pricePerBag = 5;
   const extraBagsMatch = reservation.seatCode?.match(/EXTRA_BAGS:(\d+)/);
@@ -18,57 +19,84 @@ const PriceInfo = ({ reservation }: Props) => {
   const ivaAmount = (price * IVA) / 100;
   const totalWithIva = price + ivaAmount;
 
+  if (!isCash) {
+    return (
+      <section className="rounded-xl border border-emerald-200 bg-emerald-50 p-4 flex items-center gap-3">
+        <div className="p-2 bg-emerald-100 rounded-full">
+          <CheckCircle2 className="size-6 text-emerald-600" />
+        </div>
+        <div>
+          <p className="font-semibold text-emerald-800">Pagado</p>
+          <p className="text-xs text-emerald-600">El pasajero ya abonó todo por Stripe. No requiere cobro.</p>
+        </div>
+        <span className="ml-auto text-xs font-medium text-emerald-700 bg-emerald-100 px-2 py-1 rounded-full">Stripe</span>
+      </section>
+    );
+  }
+
   return (
-    <section className="bg-custom-gray-100 p-4 rounded-lg text-sm flex flex-col gap-2">
-      <div className="flex justify-between items-center">
-        <span className="text-custom-gray-600">Precio base:</span>
-        <span className="text-custom-black-900 font-medium">
-          € {priceDetails.basePrice.toFixed(2).replace(".", ",")}
-        </span>
+    <section className="rounded-xl border-2 border-amber-400 overflow-hidden bg-amber-50">
+      <div className="bg-gradient-to-r from-amber-500 to-orange-500 px-4 py-3">
+        <div className="flex items-center gap-2 text-white">
+          <Wallet className="size-5" />
+          <span className="font-bold text-sm uppercase tracking-wide">Pendiente de cobro</span>
+        </div>
       </div>
 
-      {priceDetails.discounts.length > 0 && (
-        <div className="mt-2">
-          <p className="font-medium text-custom-black-800 mb-1">
-            Descuentos aplicados:
-          </p>
-          <ul className="list-disc list-inside text-custom-gray-700">
-            {priceDetails.discounts.map((discount, idx) => (
-              <li key={idx}>
-                {discount.description}: -€
-                {discount.amount.toFixed(2).replace(".", ",")}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-
-      {extraBags > 0 && (
-        <div className="mt-2">
-          <p className="font-medium text-custom-black-800 mb-1">Equipaje adicional</p>
-          <div className="flex justify-between items-center text-custom-gray-700">
-            <span>
-              Maletas adicionales ({extraBags} x € {pricePerBag.toFixed(2).replace(".", ",")}):
-            </span>
-            <span>€ {extrasAmount.toFixed(2).replace(".", ",")}</span>
+      <div className="p-4 space-y-3">
+        <div className="flex items-center gap-2 px-3 py-3 bg-white border border-amber-300 rounded-xl">
+          <AlertTriangle className="size-6 text-amber-600 shrink-0" />
+          <div>
+            <p className="text-base font-bold text-amber-900">Debes cobrar al pasajero</p>
+            <p className="text-2xl font-black text-amber-600">€ {totalWithIva.toFixed(2).replace(".", ",")}</p>
           </div>
         </div>
-      )}
 
-      <hr className="border-t border-custom-gray-300 my-2" />
+        <div className="bg-white rounded-lg p-3 space-y-2 text-sm border border-amber-200">
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600">Precio base</span>
+            <span className="text-gray-900 font-medium">
+              € {priceDetails.basePrice.toFixed(2).replace(".", ",")}
+            </span>
+          </div>
 
-      <div className="flex justify-between items-center">
-        <span className="text-custom-gray-600">IVA ({IVA}%):</span>
-        <span className="text-custom-black-900 font-medium">
-          € {ivaAmount.toFixed(2).replace(".", ",")}
-        </span>
-      </div>
+          {priceDetails.discounts.length > 0 && (
+            <div className="space-y-1">
+              <p className="text-xs font-medium text-gray-500">Descuentos:</p>
+              {priceDetails.discounts.map((discount, idx) => (
+                <div key={idx} className="flex justify-between items-center text-xs">
+                  <span className="text-gray-500">- {discount.description}</span>
+                  <span className="text-red-500">–€ {discount.amount.toFixed(2).replace(".", ",")}</span>
+                </div>
+              ))}
+            </div>
+          )}
 
-      <div className="flex justify-between items-center">
-        <span className="text-custom-gray-700">Total con IVA:</span>
-        <span className="text-lg font-bold text-custom-black-900">
-          € {totalWithIva.toFixed(2).replace(".", ",")}
-        </span>
+          {extraBags > 0 && (
+            <div className="flex justify-between items-center">
+              <span className="text-gray-600">Equipaje adicional ({extraBags} × €5)</span>
+              <span className="text-gray-900">€ {extrasAmount.toFixed(2).replace(".", ",")}</span>
+            </div>
+          )}
+
+          <div className="border-t border-amber-200 pt-2 mt-2" />
+
+          <div className="flex justify-between items-center">
+            <span className="text-gray-600">IVA ({IVA}%)</span>
+            <span className="text-gray-900">€ {ivaAmount.toFixed(2).replace(".", ",")}</span>
+          </div>
+
+          <div className="flex justify-between items-center pt-1">
+            <span className="text-sm font-semibold text-gray-900">Total</span>
+            <span className="text-lg font-bold text-amber-700">
+              € {totalWithIva.toFixed(2).replace(".", ",")}
+            </span>
+          </div>
+        </div>
+
+        <p className="text-xs text-amber-700 text-center font-medium">
+          No confirmes el abordaje hasta haber recibido el pago
+        </p>
       </div>
     </section>
   );

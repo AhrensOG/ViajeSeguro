@@ -29,7 +29,7 @@ export default function PaymentsPage() {
   }, [session?.user?.id]);
 
   return (
-    <div className="w-full flex flex-col items-center px-0 md:px-6 my-4 pb-10 bg-white">
+    <div className="w-full bg-gradient-to-b from-gray-50 to-white min-h-full pb-10">
       <div className="w-full flex flex-col justify-start items-start">
         <h1 className="text-xl font-semibold text-gray-900 mb-2">Mis Pagos</h1>
       </div>
@@ -37,8 +37,8 @@ export default function PaymentsPage() {
       {loading ? (
         <div className="flex flex-col justify-center items-center w-full gap-4">
           <div className="w-full h-[72px] bg-yellow-50 border-l-4 border-yellow-400 p-4 rounded-md text-sm mb-4 space-y-2">
-            <div className="h-2 w-[90%] bg-custom-gray-300 rounded" />
-            <div className="h-2 w-[80%] bg-custom-gray-300 rounded" />
+            <div className="h-2 w-[90%] bg-gray-300 rounded" />
+                        <div className="h-2 w-[80%] bg-gray-300 rounded" />
           </div>
           {Array.from({ length: 3 }).map((_, i) => (
             <ReservationCardFallback key={i} />

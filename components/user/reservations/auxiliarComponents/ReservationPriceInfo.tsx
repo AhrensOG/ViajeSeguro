@@ -41,20 +41,20 @@ const ReservationPriceInfo = ({ reservation }: Props) => {
   const totalWithIVA = subtotal + ivaAmount;
 
   return (
-    <div className="rounded-xl border border-custom-gray-200 bg-[#f9fafb] p-4 flex flex-col gap-4">
+    <div className="rounded-xl border border-gray-200 bg-[#f9fafb] p-4 flex flex-col gap-4">
       {/* Total pagado */}
       <div className="flex items-center justify-between">
-        <p className="text-sm text-custom-gray-700 font-medium">
+        <p className="text-sm text-gray-700 font-medium">
           {reservation.paymentMethod === "CASH" ? "Total a pagar: " : "Total pagado: "}
         </p>
-        <p className="text-lg font-bold text-custom-black-900">
+        <p className="text-lg font-bold text-gray-900">
           € {totalWithIVA.toFixed(2).replace(".", ",")}
         </p>
       </div>
 
       {/* Comprar/Agregar equipaje adicional (siempre visible) */}
-      <div className="rounded-xl border border-dashed border-custom-gray-300 bg-white p-4 flex flex-col gap-3">
-        <p className="text-sm text-custom-gray-700">
+      <div className="rounded-xl border border-dashed border-gray-300 bg-white p-4 flex flex-col gap-3">
+        <p className="text-sm text-gray-700">
           {extraBags > 0 ? (
             <>
               Ya tienes <span className="font-semibold">{extraBags}</span> maleta(s) adicional(es). ¿Quieres agregar más?
@@ -64,7 +64,7 @@ const ReservationPriceInfo = ({ reservation }: Props) => {
           )}
         </p>
         <div className="flex items-center gap-3">
-          <label className="text-sm text-custom-black-800">Maletas a agregar:</label>
+          <label className="text-sm text-gray-800">Maletas a agregar:</label>
           <input
             type="number"
             min={1}
@@ -73,7 +73,7 @@ const ReservationPriceInfo = ({ reservation }: Props) => {
               const v = Number(e.target.value);
               if (!Number.isFinite(v) || v < 1) e.currentTarget.value = "1";
             }}
-            className="w-16 text-center py-1 border border-custom-gray-300 rounded-md"
+            className="w-16 text-center py-1 border border-gray-300 rounded-md"
           />
           <button
             onClick={(e) => {
@@ -82,19 +82,19 @@ const ReservationPriceInfo = ({ reservation }: Props) => {
               const n = input ? Math.max(1, Number(input.value || 1)) : 1;
               router.push(`/purchase?id=${reservation.tripId}&&type=trip&&extraBags=${n}&&extrasOnly=1&&reservationId=${reservation.id}`);
             }}
-            className="px-3 py-1.5 rounded-md bg-custom-golden-700 text-white text-sm font-medium hover:bg-custom-golden-800 transition"
+            className="px-3 py-1.5 rounded-md bg-amber-700 text-white text-sm font-medium hover:bg-amber-800 transition"
           >
             {extraBags > 0 ? "Agregar más (Stripe)" : "Pagar equipaje (Stripe)"}
           </button>
-          <span className="text-xs text-custom-gray-600">Precio: € {(pricePerBag).toFixed(2).replace(".", ",")} por maleta</span>
+          <span className="text-xs text-gray-600">Precio: € {(pricePerBag).toFixed(2).replace(".", ",")} por maleta</span>
         </div>
       </div>
 
       {/* Detalle de descuentos */}
-      <div className="text-sm text-custom-gray-700">
+      <div className="text-sm text-gray-700">
         <button
           onClick={() => setShowDetails(!showDetails)}
-          className="flex items-center gap-1 text-custom-golden-700 font-medium hover:underline transition">
+          className="flex items-center gap-1 text-amber-700 font-medium hover:underline transition">
           {showDetails ? (
             <>
               <ChevronUp size={16} />
@@ -115,9 +115,9 @@ const ReservationPriceInfo = ({ reservation }: Props) => {
               animate={{ opacity: 1, height: "auto", y: 0 }}
               exit={{ opacity: 0, height: 0, y: -6 }}
               transition={{ duration: 0.2 }}
-              className="mt-2 space-y-1 text-custom-gray-700"
+              className="mt-2 space-y-1 text-gray-700"
             >
-              <ul className="space-y-1 border-l border-custom-gray-200 pl-3">
+              <ul className="space-y-1 border-l border-gray-200 pl-3">
                 <li className="flex justify-between">
                   <span className="font-medium">Precio base:</span>
                   <span>€ {priceDetails.basePrice.toFixed(2).replace(".", ",")}</span>
@@ -145,7 +145,7 @@ const ReservationPriceInfo = ({ reservation }: Props) => {
                   <span>€ {ivaAmount.toFixed(2).replace(".", ",")}</span>
                 </li>
 
-                <li className="flex justify-between font-semibold text-custom-black-900">
+                <li className="flex justify-between font-semibold text-gray-900">
                   <span>Total:</span>
                   <span>€ {totalWithIVA.toFixed(2).replace(".", ",")}</span>
                 </li>
@@ -156,8 +156,8 @@ const ReservationPriceInfo = ({ reservation }: Props) => {
       </div>
 
       {/* Promo referidos */}
-      {/* <div className="flex items-start gap-3 text-sm text-custom-gray-700">
-        <Gift className="h-5 w-5 text-custom-golden-700 flex-shrink-0" />
+      {/* <div className="flex items-start gap-3 text-sm text-gray-700">
+        <Gift className="h-5 w-5 text-amber-700 flex-shrink-0" />
         <div>
           <p>
             ¿Sabías que puedes obtener{" "}
@@ -165,7 +165,7 @@ const ReservationPriceInfo = ({ reservation }: Props) => {
             Comparte tu enlace de referidos y gana beneficios exclusivos.
           </p>
           <button
-            className="mt-2 inline-flex items-center gap-1 text-custom-golden-700 font-medium hover:underline transition"
+            className="mt-2 inline-flex items-center gap-1 text-amber-700 font-medium hover:underline transition"
             onClick={() => {
               // Futuro: modal o copiar link
             }}>

@@ -192,7 +192,7 @@ export default function PartnerRiderRequestsPage() {
       )}
 
       {/* Banner de Aprobación */}
-      {bids.some(b => b.status === 'ACCEPTED') && (
+      {bids.some(b => b.status === 'ACCEPTED' && new Date(b.request?.departureAt ?? 0) > new Date()) && (
         <div className="mb-6 p-4 bg-emerald-600 rounded-lg shadow-md text-white flex items-center justify-between animate-in fade-in slide-in-from-top-4 duration-500">
           <div className="flex items-center gap-3">
             <div className="bg-white/20 p-2 rounded-full">
@@ -214,18 +214,18 @@ export default function PartnerRiderRequestsPage() {
       )}
 
       <div className="flex gap-2 mb-4">
-        <button onClick={() => setTab("nuevos")} className={`px-3 py-2 rounded-md text-sm ${tab === "nuevos" ? "bg-custom-golden-600 text-white" : "bg-custom-gray-200"}`}>Nuevos</button>
-        <button onClick={() => setTab("mis")} className={`px-3 py-2 rounded-md text-sm ${tab === "mis" ? "bg-custom-golden-600 text-white" : "bg-custom-gray-200"}`}>Mis viajes</button>
-        <button onClick={() => setTab("postulaciones")} className={`px-3 py-2 rounded-md text-sm ${tab === "postulaciones" ? "bg-custom-golden-600 text-white" : "bg-custom-gray-200"}`}>Mis postulaciones</button>
+        <button onClick={() => setTab("nuevos")} className={`px-3 py-2 rounded-md text-sm ${tab === "nuevos" ? "bg-amber-600 text-white" : "bg-gray-200"}`}>Nuevos</button>
+        <button onClick={() => setTab("mis")} className={`px-3 py-2 rounded-md text-sm ${tab === "mis" ? "bg-amber-600 text-white" : "bg-gray-200"}`}>Mis viajes</button>
+        <button onClick={() => setTab("postulaciones")} className={`px-3 py-2 rounded-md text-sm ${tab === "postulaciones" ? "bg-amber-600 text-white" : "bg-gray-200"}`}>Mis postulaciones</button>
         <div className="flex-1" />
         <button onClick={loadAll} className="px-3 py-2 rounded-md text-sm border border-slate-300 hover:bg-slate-50">Refrescar</button>
       </div>
 
-      {loading && <div className="text-sm text-custom-gray-700">Cargando...</div>}
+      {loading && <div className="text-sm text-gray-700">Cargando...</div>}
 
       {!loading && tab === "nuevos" && (
         <div className="space-y-3">
-          {openRequests.length === 0 && <div className="text-sm text-custom-gray-600">No hay solicitudes recientes.</div>}
+          {openRequests.length === 0 && <div className="text-sm text-gray-600">No hay solicitudes recientes.</div>}
           {openRequests.map((r) => (
             <SectionCard key={r.id} req={r} bidStatus={bidByRequest[r.id]?.status} />
           ))}
@@ -234,7 +234,7 @@ export default function PartnerRiderRequestsPage() {
 
       {!loading && tab === "mis" && (
         <div className="space-y-3">
-          {assigned.length === 0 && <div className="text-sm text-custom-gray-600">Aún no tienes viajes asignados.</div>}
+          {assigned.length === 0 && <div className="text-sm text-gray-600">Aún no tienes viajes asignados.</div>}
           {assigned.map((r) => (
             <SectionCard key={r.id} req={r} bidStatus="ACCEPTED" />
           ))}
@@ -243,7 +243,7 @@ export default function PartnerRiderRequestsPage() {
 
       {!loading && tab === "postulaciones" && (
         <div className="space-y-3">
-          {bids.length === 0 && <div className="text-sm text-custom-gray-600">Aún no realizaste postulaciones.</div>}
+          {bids.length === 0 && <div className="text-sm text-gray-600">Aún no realizaste postulaciones.</div>}
           {bids.map((b) => {
             const img = b.vehicle?.images && b.vehicle.images[0]?.url;
             const vm = `${b.vehicle?.brand ?? ''} ${b.vehicle?.model ?? ''}`.trim();
@@ -300,17 +300,17 @@ export default function PartnerRiderRequestsPage() {
       {bidTarget && (
         <div className="fixed inset-0 z-50 flex items-center justify-center">
           <div className="absolute inset-0 bg-black/40" onClick={closeBidModal} />
-          <div className="relative bg-white w-full max-w-md mx-auto rounded-lg shadow-lg border border-custom-gray-300 p-6">
-            <h3 className="text-lg font-semibold text-custom-black-900 mb-2">Postularme como conductor</h3>
-            <p className="text-sm text-custom-gray-800 mb-3">Selecciona el vehículo con el que deseas postularte.</p>
+          <div className="relative bg-white w-full max-w-md mx-auto rounded-lg shadow-lg border border-gray-300 p-6">
+            <h3 className="text-lg font-semibold text-gray-900 mb-2">Postularme como conductor</h3>
+            <p className="text-sm text-gray-800 mb-3">Selecciona el vehículo con el que deseas postularte.</p>
             <select value={selectedVehicleId} onChange={(e) => setSelectedVehicleId(e.target.value)} className="w-full border rounded-md px-3 py-2 mb-4">
               {approvedVehicles.map((v) => (
                 <option key={v.id} value={v.id}>{`${v.brand} ${v.model} · ${v.plate}`}</option>
               ))}
             </select>
             <div className="flex items-center justify-end gap-2">
-              <button onClick={closeBidModal} className="px-3 py-2 text-sm rounded-md border border-custom-gray-300 text-custom-gray-800">Cancelar</button>
-              <button onClick={confirmBid} disabled={submitting || !selectedVehicleId} className="px-3 py-2 text-sm rounded-md bg-custom-golden-600 hover:bg-custom-golden-700 text-white disabled:opacity-60">
+              <button onClick={closeBidModal} className="px-3 py-2 text-sm rounded-md border border-gray-300 text-gray-800">Cancelar</button>
+              <button onClick={confirmBid} disabled={submitting || !selectedVehicleId} className="px-3 py-2 text-sm rounded-md bg-amber-600 hover:bg-amber-700 text-white disabled:opacity-60">
                 {submitting ? "Enviando..." : "Confirmar"}
               </button>
             </div>

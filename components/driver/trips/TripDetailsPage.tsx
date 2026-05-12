@@ -1,15 +1,23 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { useSearchParams } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 import { DateTime } from "luxon";
-import { CalendarDays, Clock, QrCode } from "lucide-react";
+import { CalendarDays, Clock, QrCode, ArrowLeft, Users, Luggage, CreditCard, Phone, Scan } from "lucide-react";
 import { getTripById } from "@/lib/api/driver-profile/intex";
 import { TripDetailsResponse } from "@/lib/api/driver-profile/driverProfile.types";
 import { Passengers } from "@/lib/api/admin/trips/trips.type";
 
+const statusConfig: Record<string, { label: string; classes: string }> = {
+  PENDING: { label: "Pendiente", classes: "bg-amber-100 text-amber-700" },
+  CONFIRMED: { label: "Confirmado", classes: "bg-emerald-100 text-emerald-700" },
+  CANCELLED: { label: "Cancelado", classes: "bg-red-100 text-red-700" },
+  COMPLETED: { label: "Completado", classes: "bg-blue-100 text-blue-700" },
+};
+
 const TripDetailsPage = () => {
   const searchParams = useSearchParams();
+  const router = useRouter();
   const id = searchParams.get("id");
   const [trip, setTrip] = useState<TripDetailsResponse | null>(null);
   const [extraBagsById, setExtraBagsById] = useState<Record<string, number>>({});
@@ -63,12 +71,10 @@ const TripDetailsPage = () => {
             const seatCode: string | null = res?.seatCode ?? null;
             const m = seatCode?.match(/^EXTRA_BAGS:(\d+)$/);
             const extraBags = m ? Number(m[1]) : 0;
-            // Normalizar QR: el backend devuelve un array de QRs. Tomamos uno no eliminado si existe, o el primero.
             const rawQr = res?.qr;
             const qrArray = Array.isArray(rawQr) ? (rawQr as Qr[]) : null;
             const qr: Qr | null = qrArray ? (qrArray.find((q) => !q?.isDeleted) ?? qrArray[0] ?? null) : ((rawQr as Qr | null | undefined) ?? null);
 
-            // Guardar extraBags por pasajero para usar en UI sin alterar el tipo
             extraMap[res.id] = extraBags;
             return {
               id: res.id,
@@ -102,77 +108,156 @@ const TripDetailsPage = () => {
     fetchTrip();
   }, [id]);
 
-  if (loading) return <div className="p-6">Cargando detalles del viaje...</div>;
-  if (!trip) return <div className="p-6">Viaje no encontrado.</div>;
+  if (loading) return (
+    <div className="w-full max-w-7xl mx-auto p-4 md:p-6 animate-pulse">
+      <div className="h-5 w-32 bg-gray-200 rounded mb-6" />
+      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+        <div className="h-6 w-64 bg-gray-200 rounded mb-2" />
+        <div className="h-4 w-48 bg-gray-200 rounded mb-4" />
+        <div className="h-4 w-36 bg-gray-200 rounded mb-2" />
+        <div className="h-4 w-40 bg-gray-200 rounded" />
+      </div>
+      <div className="h-5 w-40 bg-gray-200 rounded mb-4" />
+      {[1, 2, 3].map((i) => (
+        <div key={i} className="bg-white rounded-xl border border-gray-200 p-4 mb-3">
+          <div className="h-4 w-48 bg-gray-200 rounded mb-2" />
+          <div className="h-3 w-32 bg-gray-200 rounded" />
+        </div>
+      ))}
+    </div>
+  );
+
+  if (!trip) return (
+    <div className="w-full max-w-7xl mx-auto p-4 md:p-6">
+      <button onClick={() => router.back()} className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-6 transition-colors">
+        <ArrowLeft className="size-4" />
+        Volver
+      </button>
+      <div className="bg-white rounded-xl border border-gray-200 p-8 text-center">
+        <p className="text-gray-500">Viaje no encontrado.</p>
+      </div>
+    </div>
+  );
 
   const departure = DateTime.fromISO(trip.departure).setZone(
     trip.originalTimeZone
   );
   const arrival = DateTime.fromISO(trip.arrival).setZone(trip.originalTimeZone);
 
+  const tripStatus = statusConfig[trip.status] ?? { label: trip.status, classes: "bg-gray-100 text-gray-700" };
+
+  const confirmedCount = trip.passengers.filter(p => p.status === "CONFIRMED").length;
+  const pendingCount = trip.passengers.filter(p => p.status === "PENDING").length;
+  const cancelledCount = trip.passengers.filter(p => p.status === "CANCELLED").length;
 
   return (
     <div className="w-full max-w-7xl mx-auto p-4 md:p-6">
-      <h1 className="text-2xl font-bold mb-6 text-custom-black-900">
-        Detalles del viaje
-      </h1>
+      <button
+        onClick={() => router.back()}
+        className="flex items-center gap-2 text-sm text-gray-600 hover:text-gray-900 mb-6 transition-colors group"
+      >
+        <div className="p-1 rounded-lg group-hover:bg-gray-100 transition-colors">
+          <ArrowLeft className="size-4" />
+        </div>
+        <span>Volver a mis viajes</span>
+      </button>
 
-      <div className="bg-custom-white-100 shadow-md rounded-xl p-6 border border-custom-gray-200">
-        <h2 className="text-xl font-semibold text-custom-black-900 mb-1">
-          {trip.origin} → {trip.destination}
-        </h2>
-        <p className="text-sm text-custom-gray-500 mb-4">
-          {trip.originLocation} — {trip.destinationLocation}
-        </p>
-
-        <div className="flex items-center gap-2 mb-2 text-custom-gray-700 text-sm">
-          <CalendarDays className="size-4" />
-          <span>{departure.setLocale("es").toFormat("cccc, d 'de' LLLL")}</span>
+      <div className="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden mb-8">
+        <div className="bg-gradient-to-r from-amber-500 to-amber-600 px-6 py-5">
+          <div className="flex items-center justify-between">
+            <div>
+              <h1 className="text-xl md:text-2xl font-bold text-white mb-1">
+                {trip.origin} → {trip.destination}
+              </h1>
+              <p className="text-amber-100 text-sm">
+                {trip.originLocation} — {trip.destinationLocation}
+              </p>
+            </div>
+            <span className={`px-3 py-1.5 rounded-full text-xs font-bold shadow-sm ${tripStatus.classes}`}>
+              {tripStatus.label}
+            </span>
+          </div>
         </div>
 
-        <div className="flex items-center gap-2 mb-2 text-custom-gray-700 text-sm">
-          <Clock className="size-4" />
-          <span>
-            {departure.toFormat("HH:mm")} — {arrival.toFormat("HH:mm")}
-          </span>
+        <div className="p-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div className="flex items-center gap-3 text-sm">
+              <div className="p-2 rounded-lg bg-amber-50">
+                <CalendarDays className="size-5 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Fecha</p>
+                <p className="font-medium text-gray-900">{departure.setLocale("es").toFormat("cccc, d 'de' LLLL")}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 text-sm">
+              <div className="p-2 rounded-lg bg-amber-50">
+                <Clock className="size-5 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Horario</p>
+                <p className="font-medium text-gray-900">{departure.toFormat("HH:mm")} — {arrival.toFormat("HH:mm")}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 text-sm">
+              <div className="p-2 rounded-lg bg-amber-50">
+                <Users className="size-5 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Capacidad</p>
+                <p className="font-medium text-gray-900">{trip.capacity} plazas &middot; mín. {trip.minPassengers}</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-3 text-sm">
+              <div className="p-2 rounded-lg bg-amber-50">
+                <Luggage className="size-5 text-amber-600" />
+              </div>
+              <div>
+                <p className="text-xs text-gray-500">Precio base</p>
+                <p className="font-medium text-gray-900">€ {trip.basePrice.toFixed(2).replace(".", ",")}</p>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <p className="text-sm text-custom-gray-700">
-          <strong>Estado del viaje:</strong> {trip.status}
-        </p>
-        <p className="text-sm text-custom-gray-700">
-          <strong>Capacidad:</strong> {trip.capacity} — <strong>Mínimo:</strong>{" "}
-          {trip.minPassengers}
-        </p>
-
       </div>
 
-      <div className="mt-8">
-        <h3 className="text-lg font-semibold text-custom-black-900 mb-3">
-          Pasajeros ({trip.passengers.length}/{trip.capacity})
-        </h3>
+      <div className="mb-6">
+        <div className="flex items-center justify-between mb-4">
+          <h3 className="text-lg font-semibold text-gray-900">
+            Pasajeros ({trip.passengers.length}/{trip.capacity})
+          </h3>
+          <div className="flex items-center gap-3 text-xs">
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-emerald-500" /> {confirmedCount} confirmado(s)</span>
+            <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-amber-500" /> {pendingCount} pendiente(s)</span>
+            {cancelledCount > 0 && <span className="flex items-center gap-1"><span className="w-2 h-2 rounded-full bg-red-500" /> {cancelledCount} cancelado(s)</span>}
+          </div>
+        </div>
+
         {trip.passengers.length === 0 ? (
-          <p className="text-sm text-custom-gray-600 italic">
-            No hay pasajeros en este viaje aún.
-          </p>
+          <div className="bg-white rounded-xl border border-dashed border-gray-300 p-8 text-center">
+            <Users className="size-10 text-gray-300 mx-auto mb-3" />
+            <p className="text-sm text-gray-500">No hay pasajeros en este viaje aún.</p>
+          </div>
         ) : (
           <>
-            {/* Vista de Escritorio (Desktop) */}
-            <div className="hidden md:block overflow-x-auto border border-custom-gray-200 rounded-xl bg-white">
+            <div className="hidden md:block overflow-hidden rounded-xl border border-gray-200 bg-white">
               <table className="min-w-full text-sm text-left">
-                <thead className="bg-custom-golden-100 text-custom-golden-800">
-                  <tr>
-                    <th className="px-4 py-3">Nombre</th>
-                    <th className="px-4 py-3">Teléfono</th>
-                    <th className="px-4 py-3">Método de pago</th>
-                    <th className="px-4 py-3">Escanear</th>
-                    <th className="px-4 py-3">Equipaje</th>
-                    <th className="px-4 py-3">Estado</th>
-                    <th className="px-4 py-3">Abordaje</th>
+                <thead>
+                  <tr className="bg-gray-50 border-b border-gray-200">
+                    <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">Nombre</th>
+                    <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">Contacto</th>
+                    <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">Pago</th>
+                    <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">Equipaje</th>
+                    <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">Estado</th>
+                    <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">Abordaje</th>
+                    <th className="px-5 py-3.5 font-semibold text-gray-600 text-xs uppercase tracking-wide">QR</th>
                   </tr>
                 </thead>
                 <tbody>
-                  {trip.passengers.map((passenger) => (
+                  {trip.passengers.map((passenger, idx) => (
                     <React.Fragment key={passenger.id}>
                       <tr
                         onClick={() => {
@@ -182,64 +267,86 @@ const TripDetailsPage = () => {
                             );
                           }
                         }}
-                        className={`border-t border-custom-gray-100 hover:bg-custom-golden-50 ${passenger.status === "CANCELLED" ? "cursor-pointer" : ""
-                          }`}
+                        className={`border-t border-gray-100 transition-colors ${
+                          idx % 2 === 0 ? "bg-white" : "bg-gray-50/50"
+                        } hover:bg-amber-50/50 ${passenger.status === "CANCELLED" ? "cursor-pointer" : ""}`}
                       >
-                        <td className="px-4 py-3 font-medium text-custom-black-900">{passenger.fullName}</td>
-                        <td className="px-4 py-3">
+                        <td className="px-5 py-3.5">
+                          <div>
+                            <p className="font-medium text-gray-900">{passenger.fullName}</p>
+                            <p className="text-xs text-gray-500">{passenger.email}</p>
+                          </div>
+                        </td>
+                        <td className="px-5 py-3.5">
                           {passenger.phone ? (
                             <a
                               href={`tel:${passenger.phone}`}
-                              className="text-blue-600 hover:underline"
+                              className="inline-flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium"
                               onClick={(e) => e.stopPropagation()}
                             >
+                              <Phone className="size-3.5" />
                               {passenger.phone}
                             </a>
                           ) : (
-                            <span className="text-gray-400 italic">Sin teléfono</span>
+                            <span className="text-gray-400 italic text-xs">Sin teléfono</span>
                           )}
                         </td>
-                        <td className="px-4 py-3">{passenger.paymentMethod}</td>
-                        <td className="px-4 py-3">
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-1.5">
+                            <CreditCard className="size-3.5 text-gray-400" />
+                            <span className="text-gray-700">{passenger.paymentMethod}</span>
+                          </div>
+                        </td>
+                        <td className="px-5 py-3.5">
+                          <div className="flex items-center gap-1.5">
+                            <Luggage className="size-3.5 text-gray-400" />
+                            <span>{extraBagsById[passenger.id] ?? 0} maleta(s)</span>
+                          </div>
+                        </td>
+                        <td className="px-5 py-3.5">
+                          <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
+                            passenger.status === "CONFIRMED"
+                              ? "bg-emerald-100 text-emerald-700"
+                              : passenger.status === "PENDING"
+                                ? "bg-amber-100 text-amber-700"
+                                : "bg-red-100 text-red-700"
+                          }`}>
+                            {passenger.status === "CONFIRMED" ? "Confirmado" : passenger.status === "PENDING" ? "Pendiente" : "Cancelado"}
+                          </span>
+                        </td>
+                        <td className="px-5 py-3.5">
+                          {passenger.qr && !passenger.qr.isDeleted ? (
+                            !passenger.qr.isValid && passenger.qr.usedAt ? (
+                              <span className="inline-flex items-center gap-1 text-emerald-700 font-medium">
+                                <span className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
+                                Abordó
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 text-amber-700">
+                                <span className="w-1.5 h-1.5 rounded-full bg-amber-500" />
+                                Pendiente
+                              </span>
+                            )
+                          ) : (
+                            <span className="text-red-600 font-medium text-xs">QR inválido</span>
+                          )}
+                        </td>
+                        <td className="px-5 py-3.5">
                           <a
                             href={`/qr/${passenger.id}/reservation`}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="flex items-center gap-1 text-blue-600 hover:text-blue-800 font-medium"
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 bg-amber-50 text-amber-700 rounded-lg text-xs font-semibold hover:bg-amber-100 transition-colors border border-amber-200"
                             onClick={(e) => e.stopPropagation()}
                           >
-                            <QrCode className="size-4" />
-                            <span className="underline">Verificar</span>
+                            <Scan className="size-3.5" />
+                            Verificar
                           </a>
-                        </td>
-
-                        <td className="px-4 py-3">{extraBagsById[passenger.id] ?? 0} maleta(s)</td>
-                        <td className="px-4 py-3">
-                          <span
-                            className={`px-2 py-1 rounded-full text-xs font-semibold ${passenger.status === "CONFIRMED"
-                              ? "bg-green-100 text-green-700"
-                              : passenger.status === "PENDING"
-                                ? "bg-yellow-100 text-yellow-700"
-                                : "bg-red-100 text-red-700"
-                              }`}>
-                            {passenger.status === "CONFIRMED" ? "Confirmado" : passenger.status === "PENDING" ? "Pendiente" : "Cancelado"}
-                          </span>
-                        </td>
-                        <td className="px-4 py-3">
-                          {passenger.qr && !passenger.qr.isDeleted ? (
-                            !passenger.qr.isValid && passenger.qr.usedAt ? (
-                              <span className="text-green-700 font-medium">Abordó</span>
-                            ) : (
-                              <span className="text-yellow-700">Pendiente</span>
-                            )
-                          ) : (
-                            <span className="text-red-600">QR inválido</span>
-                          )}
                         </td>
                       </tr>
                       {expandedPassengerId === passenger.id && (
-                        <tr className="bg-red-50 border-t border-custom-gray-100">
-                          <td colSpan={7} className="px-4 py-3">
+                        <tr className="bg-red-50 border-t border-red-100">
+                          <td colSpan={7} className="px-5 py-3.5">
                             <div className="flex flex-col gap-1 text-sm text-red-800">
                               <strong>Motivo de cancelación:</strong>
                               <p>{passenger.cancelReason}</p>
@@ -253,12 +360,13 @@ const TripDetailsPage = () => {
               </table>
             </div>
 
-            {/* Vista de Móvil (Cards) */}
-            <div className="block md:hidden space-y-4">
+            <div className="block md:hidden space-y-3">
               {trip.passengers.map((passenger) => (
                 <div
                   key={`mobile-${passenger.id}`}
-                  className={`bg-white border rounded-xl p-4 shadow-sm ${passenger.status === "CANCELLED" ? "border-red-200" : "border-custom-gray-200"}`}
+                  className={`bg-white border rounded-xl p-4 shadow-sm transition-all ${
+                    passenger.status === "CANCELLED" ? "border-red-200" : "border-gray-200"
+                  }`}
                   onClick={() => {
                     if (passenger.status === "CANCELLED" && passenger.cancelReason) {
                       setExpandedPassengerId(expandedPassengerId === passenger.id ? null : passenger.id);
@@ -267,47 +375,47 @@ const TripDetailsPage = () => {
                 >
                   <div className="flex justify-between items-start mb-3">
                     <div>
-                      <p className="font-bold text-custom-black-900 text-base">{passenger.fullName}</p>
-                      <p className="text-xs text-custom-gray-500">{passenger.email}</p>
+                      <p className="font-semibold text-gray-900">{passenger.fullName}</p>
+                      <p className="text-xs text-gray-500">{passenger.email}</p>
                     </div>
-                    <span
-                      className={`px-2 py-1 rounded-full text-[10px] font-bold uppercase ${passenger.status === "CONFIRMED"
-                        ? "bg-green-100 text-green-700"
+                    <span className={`px-2.5 py-1 rounded-full text-xs font-semibold ${
+                      passenger.status === "CONFIRMED"
+                        ? "bg-emerald-100 text-emerald-700"
                         : passenger.status === "PENDING"
-                          ? "bg-yellow-100 text-yellow-700"
+                          ? "bg-amber-100 text-amber-700"
                           : "bg-red-100 text-red-700"
-                        }`}>
+                    }`}>
                       {passenger.status === "CONFIRMED" ? "Confirmado" : passenger.status === "PENDING" ? "Pendiente" : "Cancelado"}
                     </span>
                   </div>
 
                   <div className="grid grid-cols-2 gap-3 text-sm mb-4">
                     <div>
-                      <p className="text-custom-gray-500 text-xs">Teléfono</p>
+                      <p className="text-gray-500 text-xs flex items-center gap-1"><Phone className="size-3" /> Teléfono</p>
                       {passenger.phone ? (
                         <a href={`tel:${passenger.phone}`} className="text-blue-600 font-medium">{passenger.phone}</a>
                       ) : (
-                        <span className="text-gray-400 italic">N/A</span>
+                        <span className="text-gray-400 italic text-xs">N/A</span>
                       )}
                     </div>
                     <div>
-                      <p className="text-custom-gray-500 text-xs">Pago</p>
-                      <p className="text-custom-black-800 font-medium">{passenger.paymentMethod}</p>
+                      <p className="text-gray-500 text-xs flex items-center gap-1"><CreditCard className="size-3" /> Pago</p>
+                      <p className="text-gray-800 font-medium">{passenger.paymentMethod}</p>
                     </div>
                     <div>
-                      <p className="text-custom-gray-500 text-xs">Equipaje</p>
-                      <p className="text-custom-black-800 font-medium">{extraBagsById[passenger.id] ?? 0} maleta(s)</p>
+                      <p className="text-gray-500 text-xs flex items-center gap-1"><Luggage className="size-3" /> Equipaje</p>
+                      <p className="text-gray-800 font-medium">{extraBagsById[passenger.id] ?? 0} maleta(s)</p>
                     </div>
                     <div>
-                      <p className="text-custom-gray-500 text-xs">Abordaje</p>
+                      <p className="text-gray-500 text-xs flex items-center gap-1"><Scan className="size-3" /> Abordaje</p>
                       {passenger.qr && !passenger.qr.isDeleted ? (
                         !passenger.qr.isValid && passenger.qr.usedAt ? (
-                          <span className="text-green-700 font-medium">Abordó</span>
+                          <span className="text-emerald-700 font-medium text-xs">Abordó</span>
                         ) : (
-                          <span className="text-yellow-700 font-medium">Pendiente</span>
+                          <span className="text-amber-700 font-medium text-xs">Pendiente</span>
                         )
                       ) : (
-                        <span className="text-red-600 font-medium">Inválido</span>
+                        <span className="text-red-600 font-medium text-xs">Inválido</span>
                       )}
                     </div>
                   </div>
@@ -317,7 +425,7 @@ const TripDetailsPage = () => {
                       href={`/qr/${passenger.id}/reservation`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-blue-50 text-blue-600 rounded-lg font-semibold text-sm border border-blue-100"
+                      className="flex-1 flex items-center justify-center gap-2 py-2.5 bg-amber-50 text-amber-700 rounded-lg font-semibold text-sm border border-amber-200 hover:bg-amber-100 transition-colors"
                       onClick={(e) => e.stopPropagation()}
                     >
                       <QrCode className="size-4" />

@@ -16,7 +16,7 @@ export function RentalOffersEmpty({ onCreateOffer }: RentalOffersEmptyProps) {
         </div>
         <button 
           onClick={onCreateOffer} 
-          className="inline-flex items-center px-4 py-2 bg-custom-golden-500 hover:bg-custom-golden-600 text-white rounded-lg font-medium transition-colors"
+          className="inline-flex items-center px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-medium transition-colors"
         >
           <Plus className="w-4 h-4 mr-2" />
           Crear Oferta
@@ -26,8 +26,8 @@ export function RentalOffersEmpty({ onCreateOffer }: RentalOffersEmptyProps) {
       {/* Estado vacío */}
       <div className="border-2 border-dashed border-gray-300 bg-gray-50/50 rounded-lg">
         <div className="flex flex-col items-center justify-center py-16 px-6 text-center">
-          <div className="w-24 h-24 bg-custom-golden-100 rounded-full flex items-center justify-center mb-6">
-            <Car className="w-12 h-12 text-custom-golden-600" />
+          <div className="w-24 h-24 bg-amber-100 rounded-full flex items-center justify-center mb-6">
+            <Car className="w-12 h-12 text-amber-600" />
           </div>
 
           <h3 className="text-xl font-semibold text-gray-900 mb-2">¡Comienza a generar ingresos!</h3>
@@ -65,7 +65,7 @@ export function RentalOffersEmpty({ onCreateOffer }: RentalOffersEmptyProps) {
 
           <button 
             onClick={onCreateOffer} 
-            className="inline-flex items-center px-6 py-3 bg-custom-golden-500 hover:bg-custom-golden-600 text-white rounded-lg font-medium transition-colors text-lg"
+            className="inline-flex items-center px-6 py-3 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-medium transition-colors text-lg"
           >
             <Plus className="w-5 h-5 mr-2" />
             Crear mi primera oferta

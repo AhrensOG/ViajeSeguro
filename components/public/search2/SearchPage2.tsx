@@ -4,7 +4,6 @@ import NavBar from "../navigation/NavBar";
 import Footer from "../navigation/Footer";
 import HeroBusqueda from "./HeroBusqueda";
 import ResultsList2 from "./ResultsList2";
-import AuthPromptModal from "@/components/common/AuthPromptModal";
 
 export default function SearchPage2() {
   return (
@@ -15,7 +14,6 @@ export default function SearchPage2() {
         <ResultsList2 />
       </div>
       <Footer />
-      <AuthPromptModal delay={2} />
     </div>
   );
 }

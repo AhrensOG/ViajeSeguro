@@ -58,8 +58,8 @@ export default function VehiclesGrid({ vehicles, onRegisterClick, onVehicleUpdat
         <button
           onClick={onRegisterClick}
           className="inline-flex items-center gap-2 rounded-xl px-4 py-2.5 
-                     bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-medium shadow-lg
-                     focus:outline-none focus:ring-2 focus:ring-custom-golden-300 transition"
+                     bg-amber-600 hover:bg-amber-700 text-white font-medium shadow-lg
+                     focus:outline-none focus:ring-2 focus:ring-amber-300 transition"
         >
           <Plus className="w-4 h-4" />
           Registrar vehículo
@@ -75,7 +75,7 @@ export default function VehiclesGrid({ vehicles, onRegisterClick, onVehicleUpdat
             placeholder="Buscar por marca, modelo o matrícula..."
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-custom-golden-400 bg-white"
+            className="w-full pl-10 pr-4 py-2.5 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-amber-400 bg-white"
           />
         </div>
         <button className="inline-flex items-center gap-2 px-4 py-2.5 border border-gray-300 rounded-lg bg-white hover:bg-gray-50 transition">
@@ -100,7 +100,7 @@ export default function VehiclesGrid({ vehicles, onRegisterClick, onVehicleUpdat
 
       {/* Status Cards */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-lg hover:shadow-lg transition-all cursor-pointer">
+        <div className="bg-gradient-to-br from-emerald-50 to-emerald-100 border border-emerald-200 rounded-lg hover:shadow-md transition-all cursor-pointer">
           <div className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -114,7 +114,7 @@ export default function VehiclesGrid({ vehicles, onRegisterClick, onVehicleUpdat
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 rounded-lg hover:shadow-lg transition-all cursor-pointer">
+        <div className="bg-gradient-to-br from-amber-50 to-amber-100 border border-amber-200 rounded-lg hover:shadow-md transition-all cursor-pointer">
           <div className="p-6">
             <div className="flex items-center justify-between">
               <div>
@@ -128,7 +128,7 @@ export default function VehiclesGrid({ vehicles, onRegisterClick, onVehicleUpdat
           </div>
         </div>
 
-        <div className="bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-lg hover:shadow-lg transition-all cursor-pointer">
+        <div className="bg-gradient-to-br from-red-50 to-red-100 border border-red-200 rounded-lg hover:shadow-md transition-all cursor-pointer">
           <div className="p-6">
             <div className="flex items-center justify-between">
               <div>

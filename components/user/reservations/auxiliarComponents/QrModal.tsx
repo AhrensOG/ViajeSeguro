@@ -36,11 +36,11 @@ const QrModal = ({ isOpen, onClose, qrUrl, reservationId }: Props) => {
               <X className="w-5 h-5" />
             </button>
 
-            <h2 className="text-lg font-semibold mb-4 text-center text-custom-black-900">
+            <h2 className="text-lg font-semibold mb-4 text-center text-gray-900">
               Código QR de tu viaje
             </h2>
 
-            <p className="text-sm text-center text-custom-gray-600">
+            <p className="text-sm text-center text-gray-600">
               Muestra este código al conductor al momento del embarque.
             </p>
 
@@ -54,9 +54,9 @@ const QrModal = ({ isOpen, onClose, qrUrl, reservationId }: Props) => {
               />
             </div>
 
-            <p className="text-xs text-center text-custom-gray-400 mt-1">
+            <p className="text-xs text-center text-gray-400 mt-1">
               Si el QR falla, proporciona este ID al conductor:{" "}
-              <span className="font-semibold text-custom-black-700">
+              <span className="font-semibold text-gray-700">
                 {reservationId}
               </span>
             </p>

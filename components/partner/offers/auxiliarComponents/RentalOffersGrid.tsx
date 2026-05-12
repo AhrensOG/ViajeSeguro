@@ -87,7 +87,7 @@ export function RentalOffersGrid({
         </div>
         <button 
           onClick={onCreateOffer}
-          className="inline-flex items-center px-4 py-2 bg-custom-golden-500 hover:bg-custom-golden-600 text-white rounded-lg font-medium transition-colors"
+          className="inline-flex items-center px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-medium transition-colors"
         >
           <Plus className="w-4 h-4 mr-2" />
           Nueva Oferta
@@ -102,8 +102,8 @@ export function RentalOffersGrid({
               <p className="text-sm text-gray-600">Total Ofertas</p>
               <p className="text-2xl font-bold text-gray-900">{stats.total}</p>
             </div>
-            <div className="w-12 h-12 bg-custom-golden-100 rounded-full flex items-center justify-center">
-              <DollarSign className="w-6 h-6 text-custom-golden-600" />
+            <div className="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
+              <DollarSign className="w-6 h-6 text-amber-600" />
             </div>
           </div>
         </div>
@@ -180,7 +180,7 @@ export function RentalOffersGrid({
           onClick={() => setFilter("all")}
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
             filter === "all"
-              ? "bg-custom-golden-500 text-white"
+              ? "bg-amber-500 text-white"
               : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
           }`}
         >
@@ -190,7 +190,7 @@ export function RentalOffersGrid({
           onClick={() => setFilter("AVAILABLE")}
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
             filter === "AVAILABLE"
-              ? "bg-custom-golden-500 text-white"
+              ? "bg-amber-500 text-white"
               : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
           }`}
         >
@@ -200,7 +200,7 @@ export function RentalOffersGrid({
           onClick={() => setFilter("RENTED")}
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
             filter === "RENTED"
-              ? "bg-custom-golden-500 text-white"
+              ? "bg-amber-500 text-white"
               : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
           }`}
         >
@@ -210,7 +210,7 @@ export function RentalOffersGrid({
           onClick={() => setFilter("UNAVAILABLE")}
           className={`px-4 py-2 rounded-lg font-medium transition-colors ${
             filter === "UNAVAILABLE"
-              ? "bg-custom-golden-500 text-white"
+              ? "bg-amber-500 text-white"
               : "bg-white border border-gray-300 text-gray-700 hover:bg-gray-50"
           }`}
         >
@@ -246,7 +246,7 @@ export function RentalOffersGrid({
           {filter === "all" && (
             <button 
               onClick={onCreateOffer}
-              className="inline-flex items-center px-4 py-2 bg-custom-golden-500 hover:bg-custom-golden-600 text-white rounded-lg font-medium transition-colors"
+              className="inline-flex items-center px-4 py-2 bg-amber-500 hover:bg-amber-600 text-white rounded-lg font-medium transition-colors"
             >
               <Plus className="w-4 h-4 mr-2" />
               Crear Primera Oferta

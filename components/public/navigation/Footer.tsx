@@ -46,7 +46,7 @@ const Footer = () => {
                 aria-label="Mensaje directo">
                 <Image
                   src="/main/whatsapp.png"
-                  alt="Telegram icon"
+                  alt="WhatsApp ViajeSeguro"
                   width={32}
                   height={32}
                 />
@@ -59,7 +59,7 @@ const Footer = () => {
                 aria-label="Mensaje directo">
                 <Image
                   src="/main/telegram.png"
-                  alt="Telegram icon"
+                  alt="Telegram ViajeSeguro"
                   width={32}
                   height={32}
                 />

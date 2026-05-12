@@ -50,7 +50,7 @@ const FoundersSection = () => {
               <div className="relative h-64">
                 <Image
                   src={founder.image}
-                  alt={founder.name}
+                  alt={`${founder.name}, ${founder.title} de ViajeSeguro`}
                   fill
                   className="object-cover"
                 />

@@ -305,8 +305,12 @@ export default function TripsPanel() {
                                     >
                                         <td className="px-4 py-2 font-medium border-b border-r border-custom-gray-200">{trip.origin} </td>
                                         <td className="px-4 py-2 border-b border-r border-custom-gray-200">{trip.destination}</td>
-                                        <td className="px-4 py-2 border-b border-r border-custom-gray-200">
-                                            {new Date(trip.departure).toLocaleString()}
+                                        <td className="px-4 py-2 border-b border-r border-custom-gray-200 whitespace-nowrap">
+                                            {new Date(trip.departure).toLocaleDateString("es", { weekday: "short", day: "numeric", month: "short", year: "numeric" })}
+                                            <br />
+                                            <span className="text-xs text-custom-gray-500">
+                                                {new Date(trip.departure).toLocaleTimeString("es", { hour: "2-digit", minute: "2-digit" })}
+                                            </span>
                                         </td>
                                         <td className="px-4 py-2 border-b border-r border-custom-gray-200">€ {trip.basePrice.toFixed(2)}</td>
                                         <td className="px-4 py-2 border-b border-r border-custom-gray-200">{trip.capacity}</td>

@@ -59,7 +59,7 @@ export default function CancelTripModalPartner({
         <div className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50 p-4">
             <div
                 onClick={(e) => e.stopPropagation()}
-                className="bg-white rounded-xl shadow-2xl p-6 md:p-8 w-full max-w-lg relative border border-custom-gray-300 transform transition-all"
+                className="bg-white rounded-xl shadow-2xl p-6 md:p-8 w-full max-w-lg relative border border-gray-300 transform transition-all"
             >
                 <button
                     onClick={onClose}
@@ -74,9 +74,9 @@ export default function CancelTripModalPartner({
                         <AlertTriangle className="h-8 w-8 text-red-600" aria-hidden="true" />
                     </div>
 
-                    <h2 className="text-xl font-bold mb-2 text-custom-black-800">¿Estás seguro de cancelar este viaje?</h2>
+                    <h2 className="text-xl font-bold mb-2 text-gray-800">¿Estás seguro de cancelar este viaje?</h2>
 
-                    <p className="text-sm text-custom-gray-600 mb-6">
+                    <p className="text-sm text-gray-600 mb-6">
                         Vas a cancelar el viaje de <strong>{origin}</strong> a <strong>{destination}</strong>.
                         Esta acción no se puede deshacer.
                     </p>
@@ -100,7 +100,7 @@ export default function CancelTripModalPartner({
                         <button
                             type="button"
                             onClick={onClose}
-                            className="cursor-pointer border border-custom-gray-300 text-custom-black-800 hover:bg-custom-gray-100 font-medium py-2.5 px-5 rounded-md w-full sm:w-auto transition-colors"
+                            className="cursor-pointer border border-gray-300 text-gray-800 hover:bg-gray-100 font-medium py-2.5 px-5 rounded-md w-full sm:w-auto transition-colors"
                             disabled={submitting}
                         >
                             Mantener el viaje

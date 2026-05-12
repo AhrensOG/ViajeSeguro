@@ -106,13 +106,13 @@ export default function PartnerTripsList({ onRequestCreate, onItemsLoaded }: Pro
   if (loading) {
     return (
       <div className="w-full max-w-4xl mt-4">
-        <div className="flex items-center gap-2 text-custom-gray-700 mb-3">
+        <div className="flex items-center gap-2 text-gray-700 mb-3">
           <Loader2 className="h-4 w-4 animate-spin" />
           Cargando tus viajes...
         </div>
         <div className="grid gap-3">
           {[...Array(2)].map((_, i) => (
-            <div key={i} className="h-24 rounded-xl border border-custom-gray-200 bg-custom-gray-100 animate-pulse" />
+            <div key={i} className="h-24 rounded-xl border border-gray-200 bg-gray-100 animate-pulse" />
           ))}
         </div>
       </div>
@@ -135,16 +135,16 @@ export default function PartnerTripsList({ onRequestCreate, onItemsLoaded }: Pro
   return (
     <div className="w-full max-w-4xl mt-6">
       <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-custom-black-800">Mis viajes publicados</h2>
+        <h2 className="text-xl font-semibold text-gray-800">Mis viajes publicados</h2>
         <button
           onClick={onRequestCreate}
-          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-custom-golden-700 hover:bg-custom-golden-800 text-white text-sm font-medium shadow-sm transition cursor-pointer"
+          className="inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-amber-700 hover:bg-amber-800 text-white text-sm font-medium shadow-sm transition cursor-pointer"
         >
           <PlusCircle className="h-4 w-4" /> Crear nuevo viaje
         </button>
       </div>
 
-      <div className="flex bg-custom-gray-100 p-1 rounded-xl mb-6 w-full md:w-fit overflow-x-auto no-scrollbar">
+      <div className="flex bg-gray-100 p-1 rounded-xl mb-6 w-full md:w-fit overflow-x-auto no-scrollbar">
         {[
           { id: "ALL", label: "Todos" },
           { id: "UPCOMING", label: "Próximos" },
@@ -155,15 +155,15 @@ export default function PartnerTripsList({ onRequestCreate, onItemsLoaded }: Pro
             key={tab.id}
             onClick={() => setActiveTab(tab.id as "ALL" | "UPCOMING" | "PAST" | "CANCELLED")}
             className={`cursor-pointer px-4 py-2 rounded-lg text-sm font-medium transition-colors whitespace-nowrap ${activeTab === tab.id
-              ? "bg-white text-custom-black-800 shadow-sm"
-              : "text-custom-gray-600 hover:text-custom-black-800 hover:bg-custom-gray-200"
+              ? "bg-white text-gray-800 shadow-sm"
+              : "text-gray-600 hover:text-gray-800 hover:bg-gray-200"
               }`}
           >
             {tab.label}
             {trips && (
               <span className={`ml-2 inline-flex items-center justify-center px-2 py-0.5 text-xs rounded-full ${activeTab === tab.id
-                ? "bg-custom-gray-100 text-custom-black-800"
-                : "bg-custom-gray-200 text-custom-gray-600"
+                ? "bg-gray-100 text-gray-800"
+                : "bg-gray-200 text-gray-600"
                 }`}>
                 {
                   trips.filter((t) => {
@@ -183,10 +183,10 @@ export default function PartnerTripsList({ onRequestCreate, onItemsLoaded }: Pro
 
       <div className="grid gap-4">
         {filteredTrips.length === 0 ? (
-          <div className="text-center py-12 bg-white rounded-xl border border-custom-gray-200">
-            <Route className="mx-auto h-12 w-12 text-custom-gray-300" />
-            <h3 className="mt-2 text-sm font-semibold text-custom-black-800">Ningún viaje encontrado</h3>
-            <p className="mt-1 text-sm text-custom-gray-500">
+          <div className="text-center py-12 bg-white rounded-xl border border-gray-200">
+            <Route className="mx-auto h-12 w-12 text-gray-300" />
+            <h3 className="mt-2 text-sm font-semibold text-gray-800">Ningún viaje encontrado</h3>
+            <p className="mt-1 text-sm text-gray-500">
               {activeTab === "ALL"
                 ? "Aún no tienes viajes publicados."
                 : "No hay viajes que coincidan con este filtro."}
@@ -194,14 +194,14 @@ export default function PartnerTripsList({ onRequestCreate, onItemsLoaded }: Pro
           </div>
         ) : (
           filteredTrips.map((t) => (
-            <div key={t.id} className="rounded-xl border border-custom-gray-200 bg-white shadow-sm p-4">
+            <div key={t.id} className="rounded-xl border border-gray-200 bg-white shadow-sm p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <div className="flex items-center gap-2 text-custom-black-800 font-semibold">
-                    <Route className="h-4 w-4 text-custom-golden-700" />
+                  <div className="flex items-center gap-2 text-gray-800 font-semibold">
+                    <Route className="h-4 w-4 text-amber-700" />
                     {t.origin} → {t.destination}
                   </div>
-                  <div className="mt-1 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-custom-gray-700">
+                  <div className="mt-1 grid grid-cols-1 md:grid-cols-2 gap-2 text-sm text-gray-700">
                     <div className="flex items-center gap-2">
                       <MapPin className="h-4 w-4" />
                       <span className="truncate">{t.originLocation || "Origen"}</span>
@@ -211,7 +211,7 @@ export default function PartnerTripsList({ onRequestCreate, onItemsLoaded }: Pro
                       <span className="truncate">{t.destinationLocation || "Destino"}</span>
                     </div>
                   </div>
-                  <div className="mt-2 flex items-center gap-2 text-sm text-custom-gray-700">
+                  <div className="mt-2 flex items-center gap-2 text-sm text-gray-700">
                     <CalendarDays className="h-4 w-4" />
                     <span>
                       {new Date(t.departure).toLocaleString()} — {new Date(t.arrival).toLocaleString()}
@@ -220,13 +220,13 @@ export default function PartnerTripsList({ onRequestCreate, onItemsLoaded }: Pro
                 </div>
                 <div className="text-right flex flex-col items-end gap-2">
                   <div>
-                    <div className="text-sm font-semibold text-custom-black-800">
+                    <div className="text-sm font-semibold text-gray-800">
                       {t.basePrice.toFixed(2)} €
                     </div>
-                    <div className="text-xs text-custom-gray-600">Capacidad: {t.capacity}</div>
+                    <div className="text-xs text-gray-600">Capacidad: {t.capacity}</div>
                     <div className="text-xs mt-1">
                       <span className="inline-block px-2 py-0.5 rounded-md border text-[11px] uppercase tracking-wide
-                      border-custom-gray-300 text-custom-gray-700">
+                      border-gray-300 text-gray-700">
                         {t.status}
                       </span>
                     </div>

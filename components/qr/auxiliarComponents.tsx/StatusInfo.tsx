@@ -1,7 +1,7 @@
 "use client";
 
 import { ReservationResponse } from "@/lib/api/reservation/reservation.types";
-import { AlertTriangle, CheckCircle2 } from "lucide-react";
+import { CheckCircle2, AlertTriangle } from "lucide-react";
 
 type Props = {
     reservation: ReservationResponse;
@@ -10,42 +10,65 @@ type Props = {
 const StatusInfo = ({ reservation }: Props) => {
     const { status, trip } = reservation;
 
+    const reservationOk = status === "CONFIRMED";
+    const tripOk = trip.status === "CONFIRMED";
+    const allOk = reservationOk && tripOk;
+
     return (
-        <section className="bg-custom-gray-100 p-4 rounded-lg text-sm">
-            <div className="flex flex-col gap-2">
-                <div>
-                    <p className="text-custom-black-800 font-medium mb-1">Estado de la reserva:</p>
-                    {status === "CONFIRMED" ? (
-                        <span className="text-green-700 font-semibold">Confirmada</span>
-                    ) : status === "PENDING" ? (
-                        <span className="text-yellow-600 font-medium">Pendiente de pago</span>
+        <section className="rounded-xl border border-gray-200 overflow-hidden">
+            <div className={`px-4 py-3 border-b border-gray-200 ${
+                allOk ? "bg-gradient-to-r from-emerald-50 to-emerald-100/50" : "bg-gradient-to-r from-red-50 to-red-100/50"
+            }`}>
+                <div className="flex items-center gap-2">
+                    {allOk ? (
+                        <CheckCircle2 className="size-4 text-emerald-600" />
                     ) : (
-                        <span className="text-red-600 font-medium">Cancelada</span>
+                        <AlertTriangle className="size-4 text-red-600" />
                     )}
+                    <span className={`font-semibold text-sm ${allOk ? "text-emerald-700" : "text-red-700"}`}>
+                        {allOk ? "Todo en orden" : "Revisar estado"}
+                    </span>
+                </div>
+            </div>
+
+            <div className="p-4 space-y-3">
+                <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Estado de reserva</span>
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                        reservationOk
+                            ? "bg-emerald-100 text-emerald-700"
+                            : status === "PENDING"
+                                ? "bg-amber-100 text-amber-700"
+                                : "bg-red-100 text-red-700"
+                    }`}>
+                        {reservationOk ? "Confirmada" : status === "PENDING" ? "Pendiente" : "Cancelada"}
+                    </span>
                 </div>
 
-                <div>
-                    <p className="text-custom-black-800 font-medium mb-1">Estado del viaje:</p>
-                    {trip.status === "CONFIRMED" ? (
-                        <span className="text-green-700 font-semibold">Confirmado</span>
-                    ) : trip.status === "PENDING" ? (
-                        <span className="text-yellow-600 font-medium">Pendiente - se confirmará cuando se alcancen los pasajeros mínimos</span>
-                    ) : (
-                        <span className="text-red-600 font-medium">Cancelado por el organizador</span>
-                    )}
+                <div className="flex items-center justify-between text-sm">
+                    <span className="text-gray-600">Estado del viaje</span>
+                    <span className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold ${
+                        tripOk
+                            ? "bg-emerald-100 text-emerald-700"
+                            : trip.status === "PENDING"
+                                ? "bg-amber-100 text-amber-700"
+                                : "bg-red-100 text-red-700"
+                    }`}>
+                        {tripOk ? "Confirmado" : trip.status === "PENDING" ? "Pendiente" : "Cancelado"}
+                    </span>
                 </div>
 
-                {status === "CONFIRMED" && trip.status === "CONFIRMED" && (
-                    <div className="flex items-center gap-2 mt-2 text-green-700 font-medium">
-                        <CheckCircle2 className="size-5" />
-                        <span>¡Reserva y viaje confirmados!</span>
+                {!allOk && (
+                    <div className="flex items-center gap-2 mt-2 px-3 py-2 bg-red-50 rounded-lg text-xs text-red-700">
+                        <AlertTriangle className="size-4 shrink-0" />
+                        <span>Verifica bien antes de dejar subir al pasajero.</span>
                     </div>
                 )}
 
-                {(status !== "CONFIRMED" || trip.status !== "CONFIRMED") && (
-                    <div className="flex items-center gap-2 mt-2 text-red-600 font-medium">
-                        <AlertTriangle className="size-5" />
-                        <span>Verifica bien antes de dejar subir al pasajero.</span>
+                {allOk && (
+                    <div className="flex items-center gap-2 mt-2 px-3 py-2 bg-emerald-50 rounded-lg text-xs text-emerald-700">
+                        <CheckCircle2 className="size-4 shrink-0" />
+                        <span>Reserva y viaje confirmados. Pasajero listo para abordar.</span>
                     </div>
                 )}
             </div>

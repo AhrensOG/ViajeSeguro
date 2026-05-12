@@ -1,7 +1,12 @@
+import type { Metadata } from "next";
 import PurchasePage from "@/components/public/purchase/PurchasePage";
-import React from "react";
 
 import { Suspense } from "react";
+
+export const metadata: Metadata = {
+  title: "Confirmar compra",
+  robots: { index: false, follow: false },
+};
 
 const Purchase = () => {
   return (

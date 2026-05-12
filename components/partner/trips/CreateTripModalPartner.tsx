@@ -16,8 +16,8 @@ interface Props {
 }
 
 const inputClass =
-  "w-full border border-custom-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-custom-golden-400 transition";
-const labelClass = "block text-xs font-semibold text-custom-gray-500 mb-1 uppercase tracking-wide";
+  "w-full border border-gray-300 rounded-md px-4 py-2 focus:outline-none focus:ring-2 focus:ring-amber-400 transition";
+const labelClass = "block text-xs font-semibold text-gray-500 mb-1 uppercase tracking-wide";
 
 export default function CreateTripModalPartner({ onClose, onSuccess }: Props) {
   const { data: session } = useSession();
@@ -121,18 +121,18 @@ export default function CreateTripModalPartner({ onClose, onSuccess }: Props) {
     <div className="fixed inset-0 bg-transparent backdrop-blur-sm bg-opacity-70 flex justify-center items-center z-50">
       <div
         onClick={(e) => e.stopPropagation()}
-        className="bg-white rounded-xl shadow-2xl p-8 my-8 w-full max-w-4xl max-h-[95vh] overflow-y-auto relative border border-custom-gray-300"
+        className="bg-white rounded-xl shadow-2xl p-8 my-8 w-full max-w-4xl max-h-[95vh] overflow-y-auto relative border border-gray-300"
       >
         <button onClick={onClose} className="cursor-pointer absolute top-4 right-4 text-gray-500 hover:text-black" aria-label="Cerrar">
           <X className="size-5" />
         </button>
 
-        <h2 className="text-2xl font-bold mb-2 text-custom-golden-700">Publicar nuevo viaje</h2>
-        <p className="text-sm text-custom-gray-500 mb-6">Completa los datos a continuación para publicar tu viaje.</p>
+        <h2 className="text-2xl font-bold mb-2 text-amber-700">Publicar nuevo viaje</h2>
+        <p className="text-sm text-gray-500 mb-6">Completa los datos a continuación para publicar tu viaje.</p>
 
-        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm text-custom-black-800">
+        <form onSubmit={handleSubmit} className="grid grid-cols-1 md:grid-cols-2 gap-5 text-sm text-gray-800">
           <div className="col-span-full">
-            <h3 className="text-base font-semibold text-custom-golden-600 mb-1">Ubicación y horario</h3>
+            <h3 className="text-base font-semibold text-amber-600 mb-1">Ubicación y horario</h3>
             <hr className="mb-4" />
           </div>
 
@@ -197,7 +197,7 @@ export default function CreateTripModalPartner({ onClose, onSuccess }: Props) {
           </div>
 
           <div className="col-span-full mt-6">
-            <h3 className="text-base font-semibold text-custom-golden-600 mb-1">Configuración del viaje</h3>
+            <h3 className="text-base font-semibold text-amber-600 mb-1">Configuración del viaje</h3>
             <hr className="mb-4" />
           </div>
 
@@ -249,14 +249,14 @@ export default function CreateTripModalPartner({ onClose, onSuccess }: Props) {
             <button
               type="button"
               onClick={onClose}
-              className="cursor-pointer border border-custom-gray-300 text-custom-black-800 hover:bg-custom-gray-100 font-medium py-2 px-5 rounded-md"
+              className="cursor-pointer border border-gray-300 text-gray-800 hover:bg-gray-100 font-medium py-2 px-5 rounded-md"
               disabled={submitting}
             >
               Cancelar
             </button>
             <button
               type="submit"
-              className="cursor-pointer bg-custom-golden-600 hover:bg-custom-golden-700 text-white font-semibold py-2 px-5 rounded-md disabled:opacity-50"
+              className="cursor-pointer bg-amber-600 hover:bg-amber-700 text-white font-semibold py-2 px-5 rounded-md disabled:opacity-50"
               disabled={submitting || !form.origin || !form.destination || !form.departure || !form.arrival || !form.basePrice}
             >
               {submitting ? "Creando..." : "Crear viaje"}
