@@ -6,12 +6,12 @@ import { ArrowRight, Clock } from "lucide-react";
 import { TripCardType } from "@/lib/shared/types/trip-service-type.type";
 import { DateTime } from "luxon";
 
-interface TripCard2Props {
+interface TripCardProps {
   trip: TripCardType;
   timeZone: string;
 }
 
-const TripCard2 = ({ trip, timeZone }: TripCard2Props) => {
+const TripCard = ({ trip, timeZone }: TripCardProps) => {
   const departureTime = DateTime.fromISO(trip.departure).setZone(timeZone).toFormat("HH:mm");
   const arrivalTime = DateTime.fromISO(trip.arrival).setZone(timeZone).toFormat("HH:mm");
   
@@ -33,7 +33,7 @@ const TripCard2 = ({ trip, timeZone }: TripCard2Props) => {
       whileHover={{ y: -2 }}
       transition={{ duration: 0.2 }}
     >
-      <Link href={`/trip2?id=${trip.id}`} className="block">
+      <Link href={`/trip?id=${trip.id}`} className="block">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-200 hover:shadow-md transition-shadow overflow-hidden">
           {/* Header */}
           <div className="p-5">
@@ -97,4 +97,4 @@ const TripCard2 = ({ trip, timeZone }: TripCard2Props) => {
   );
 };
 
-export default TripCard2;
+export default TripCard;

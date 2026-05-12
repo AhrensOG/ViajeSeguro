@@ -47,7 +47,7 @@ const HeroBusqueda = () => {
       mode: "car",
     });
 
-    router.push(`/search2?${params.toString()}`);
+    router.push(`/search?${params.toString()}`);
   };
 
   return (

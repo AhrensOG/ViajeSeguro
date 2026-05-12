@@ -1,18 +1,19 @@
-import { Suspense } from "react";
+"use client";
+
 import NavBar from "../navigation/NavBar";
-import SearchProcessFallback from "@/lib/client/components/fallbacks/search/SearchProcessFallback";
-import SearchWrapper from "./auxiliarComponents/SearchWrapper";
-import FiltersBar from "./auxiliarComponents/FiltersBar";
+import Footer from "../navigation/Footer";
+import HeroBusqueda from "./HeroBusqueda";
+import ResultsList from "./ResultsList";
 
 export default function SearchPage() {
-    return (
-        <div className="min-h-screen flex flex-col bg-custom-white-50 relative">
-            <NavBar shadow={false} />
-            <Suspense fallback={<SearchProcessFallback />}>
-                <FiltersBar />
-                {/* <SearchProcess /> */}
-                <SearchWrapper />
-            </Suspense>
-        </div>
-    );
+  return (
+    <div className="bg-gradient-to-b from-gray-50 to-white min-h-screen">
+      <NavBar />
+      <HeroBusqueda />
+      <div className="container mx-auto px-4 py-8">
+        <ResultsList />
+      </div>
+      <Footer />
+    </div>
+  );
 }

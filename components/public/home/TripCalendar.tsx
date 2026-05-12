@@ -128,7 +128,7 @@ const TripCalendar = ({ origin, destination, selectedDate, onDateSelect }: TripC
         serviceType: "SIMPLE_TRIP",
         mode: "car",
       });
-      router.push(`/search2?${params.toString()}`);
+      router.push(`/search?${params.toString()}`);
     }
   };
 

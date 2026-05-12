@@ -9,7 +9,7 @@ import PaymentMethods from "./PaymentMethods";
 import CTAMinimal from "./CTAMinimal";
 import Footer from "../navigation/Footer";
 
-const Home2Page = () => {
+const HomePage = () => {
   return (
     <div className="bg-gradient-to-b from-gray-50 to-white">
       <NavBar />
@@ -47,4 +47,4 @@ const Home2Page = () => {
   );
 };
 
-export default Home2Page;
+export default HomePage;
