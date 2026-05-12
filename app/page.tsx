@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import Home2Page from "@/components/public/home2/Home2Page";
+import HomePage from "@/components/public/home/HomePage";
 
 export const metadata: Metadata = {
   title: "Coche Compartido Barcelona Valencia desde 20€ | ViajeSeguro",
@@ -19,5 +19,5 @@ export const metadata: Metadata = {
 };
 
 export default function Home() {
-  return <Home2Page />;
+  return <HomePage />;
 }

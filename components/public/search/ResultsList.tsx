@@ -8,8 +8,8 @@ import { MapPin, Calendar, Loader2, Home } from "lucide-react";
 import { searchTrips } from "@/lib/api/trip";
 import { SearchTrip, SearchTripResult } from "@/lib/shared/types/trip-service-type.type";
 import { DateTime } from "luxon";
-import TripCard2 from "./TripCard2";
-import CalendarMonth from "../search/auxiliarComponents/CalendarMonth";
+import TripCard from "./TripCard";
+import CalendarMonth from "./auxiliarComponents/CalendarMonth";
 
 const VALID_CITIES = ["Barcelona", "Valencia"];
 
@@ -23,7 +23,7 @@ const EMPTY_RESULT: SearchTripResult = {
 const yyyyMmDd = (d: Date) =>
   `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
 
-const ResultsList2 = () => {
+const ResultsList = () => {
   const searchParams = useSearchParams();
   const router = useRouter();
   const pathname = usePathname();
@@ -229,7 +229,7 @@ const ResultsList2 = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                 >
-                  <TripCard2 trip={trip} timeZone={userTimeZone} />
+                  <TripCard trip={trip} timeZone={userTimeZone} />
                 </motion.div>
               ))}
             </div>
@@ -247,7 +247,7 @@ const ResultsList2 = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                 >
-                  <TripCard2 trip={trip} timeZone={userTimeZone} />
+                  <TripCard trip={trip} timeZone={userTimeZone} />
                 </motion.div>
               ))}
             </div>
@@ -265,7 +265,7 @@ const ResultsList2 = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.3, delay: index * 0.05 }}
                 >
-                  <TripCard2 trip={trip} timeZone={userTimeZone} />
+                  <TripCard trip={trip} timeZone={userTimeZone} />
                 </motion.div>
               ))}
             </div>
@@ -297,4 +297,4 @@ const ResultsList2 = () => {
   );
 };
 
-export default ResultsList2;
+export default ResultsList;

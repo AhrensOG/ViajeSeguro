@@ -232,7 +232,7 @@ const ViajeBarcelonaValencia = () => {
             </h2>
             <p className="text-white/90 mb-6 text-lg">Desde 20€ • Conductor profesional • Sin cancelaciones</p>
             <Link
-              href={`/search2?${searchParams.toString()}`}
+              href={`/search?${searchParams.toString()}`}
               className="inline-block bg-white text-amber-600 font-bold px-10 py-4 rounded-xl text-lg hover:bg-amber-50 transition shadow-lg"
             >
               Reservar ahora

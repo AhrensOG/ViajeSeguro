@@ -40,7 +40,7 @@ const JsonLd = () => {
       target: {
         "@type": "EntryPoint",
         urlTemplate:
-          "https://viajeseguro.site/search2?origin={origin}&destination={destination}&serviceType=SIMPLE_TRIP&mode=car",
+          "https://viajeseguro.site/search?origin={origin}&destination={destination}&serviceType=SIMPLE_TRIP&mode=car",
       },
       "query-input": "required name=origin",
     },
