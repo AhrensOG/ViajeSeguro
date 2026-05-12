@@ -1,13 +1,13 @@
 "use client";
 
 import React, { useState } from "react";
+import { motion } from "framer-motion";
 import NavBar from "../navigation/NavBar";
 import Footer from "../navigation/Footer";
 import Link from "next/link";
 import {
   Search,
   ChevronDown,
-  ChevronUp,
   CreditCard,
   Calendar,
   Clock,
@@ -17,7 +17,6 @@ import {
   MessageSquare,
   Star,
 } from "lucide-react";
-import { AnimatePresence, motion } from "framer-motion";
 import CTASection from "./auxiliarComponents/CTASection";
 
 type FAQItem = {
@@ -622,24 +621,20 @@ const FAQPage = () => {
                                   toggleQuestion(category.id, index)
                                 }>
                                 <span>{faq.question}</span>
-                                {isOpen ? (
-                                  <ChevronUp className="min-h-5 min-w-5 text-custom-gray-500" />
-                                ) : (
-                                  <ChevronDown className="min-h-5 min-w-5 text-custom-gray-500" />
-                                )}
+                                <ChevronDown
+                                  className={`min-h-5 min-w-5 text-custom-gray-500 transition-transform duration-300 ${
+                                    isOpen ? "rotate-180" : ""
+                                  }`}
+                                />
                               </button>
-                              <AnimatePresence>
-                                {isOpen && (
-                                  <motion.div
-                                    initial={{ opacity: 0, height: 0 }}
-                                    animate={{ opacity: 1, height: "auto" }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                    transition={{ duration: 0.3 }}
-                                    className="p-4 pt-0 border-t border-custom-gray-200 text-custom-gray-700">
-                                    {faq.answer}
-                                  </motion.div>
-                                )}
-                              </AnimatePresence>
+                              <div
+                                className={`border-t border-custom-gray-200 ${
+                                  isOpen ? "block" : "hidden"
+                                }`}>
+                                <div className="p-4 text-custom-gray-700">
+                                  {faq.answer}
+                                </div>
+                              </div>
                             </motion.div>
                           );
                         })}
