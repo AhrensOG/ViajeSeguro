@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import dynamic from "next/dynamic";
 import { motion } from "framer-motion";
 import { DateTime } from "luxon";
 import { Search, CalendarDays } from "lucide-react";
 import CustomDatePicker from "@/lib/client/components/CustomDatePicker";
-import TripCalendar from "./TripCalendar";
+
+const TripCalendar = dynamic(() => import("./TripCalendar"), { ssr: false });
 
 const ROUTES = [
   { label: "Barcelona → Valencia", short: "BCN → VLC", origin: "Barcelona", destination: "Valencia" },
@@ -60,17 +62,12 @@ const HeroMinimal = () => {
           className="text-center mb-10"
         >
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-4 leading-tight">
-            <span className="text-black">Viaje</span><span className="text-custom-golden-600">Seguro</span>
+            Coche compartido Barcelona ↔ Valencia
           </h1>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-1 sm:gap-4 text-lg md:text-xl text-white/90 font-light">
-            <span>Barcelona ↔ Valencia</span>
-            <span className="hidden sm:inline text-white/40">|</span>
-            <span>Madrid ↔ Valencia</span>
-            <span className="hidden sm:inline text-white/40">|</span>
-            <span>Madrid ↔ Barcelona</span>
-          </div>
-          <p className="text-base md:text-lg text-white/70 mt-3">
-            Desde 20€ • Viajes directos • Sin cancelación hasta 24h antes
+          <p className="text-base md:text-lg text-white/80 max-w-2xl mx-auto mt-2 leading-relaxed">
+            Viaja entre Barcelona y Valencia desde 20€ en coche compartido con conductor profesional. 
+            Trayecto directo de 3.5h, seguro incluido y cancelación gratuita hasta 24h antes. 
+            Reserva tu plaza online y disfruta del viaje.
           </p>
         </motion.div>
 

@@ -7,20 +7,20 @@ const steps = [
   {
     icon: Search,
     number: "1",
-    title: "Busca",
-    description: "Elige origen, destino y fecha",
+    title: "Elige tu viaje Barcelona Valencia",
+    description: "Origen, destino y fecha",
   },
   {
     icon: CalendarCheck,
     number: "2",
-    title: "Reserva",
-    description: "Elige plaza y paga fácil",
+    title: "Cómo reservar tu plaza",
+    description: "Elige asiento y paga fácil",
   },
   {
     icon: CarFront,
     number: "3",
-    title: "Viaja",
-    description: "Enjoy tu viaje",
+    title: "Viaja cómodo y seguro",
+    description: "Disfruta tu viaje",
   },
 ];
 

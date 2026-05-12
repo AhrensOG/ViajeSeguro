@@ -70,28 +70,28 @@ const Footer = () => {
           {/* Columna 2 */}
           <div>
             <h3 className="text-custom-white-100 font-medium mb-4">
-              Servicios
+              Rutas
             </h3>
             <ul className="space-y-2">
               <li>
                 <Link
-                  href="/services"
+                  href="/viaje-barcelona-valencia"
                   className="text-custom-gray-500 hover:text-custom-golden-500">
-                  Venta de plazas
+                  Barcelona a Valencia
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/services"
+                  href="/viaje-valencia-barcelona"
                   className="text-custom-gray-500 hover:text-custom-golden-500">
-                  Próximamente: Alquiler de vehículos
+                  Valencia a Barcelona
                 </Link>
               </li>
               <li>
                 <Link
-                  href="/services"
+                  href="/faq"
                   className="text-custom-gray-500 hover:text-custom-golden-500">
-                  Próximamente: Arma tu propio viaje
+                  Preguntas frecuentes sobre rutas
                 </Link>
               </li>
             </ul>
