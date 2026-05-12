@@ -14,26 +14,26 @@ const montserrat = Montserrat({
 });
 
 export const metadata: Metadata = {
+  metadataBase: new URL("https://viajeseguro.site"),
   title: {
-    default: "ViajeSeguro - Viaje compartido entre ciudades",
+    default: "Coche Compartido Barcelona Valencia desde 20€ | ViajeSeguro",
     template: "%s | ViajeSeguro",
   },
   description:
-    "Viaja entre Madrid, Barcelona y Valencia desde 27€. Comparte viaje y ahorra con ViajeSeguro, la plataforma de carpooling segura en España.",
+    "Reserva tu plaza de coche compartido entre Barcelona y Valencia desde 20€. Viaje directo en 3.5h, conductor profesional, sin cancelaciones hasta 24h antes.",
   keywords: [
-    "viaje compartido",
-    "carpooling",
-    "Madrid",
-    "Barcelona",
-    "Valencia",
+    "coche compartido Barcelona Valencia",
+    "viaje compartido Barcelona",
+    "carpooling Barcelona Valencia",
     "ViajeSeguro",
-    "compartir coche",
-    "viajes económicos",
+    "compartir coche Barcelona",
+    "viajes económicos Barcelona Valencia",
+    "transporte Barcelona Valencia",
   ],
   openGraph: {
-    title: "ViajeSeguro - Viaje compartido entre ciudades",
+    title: "Coche Compartido Barcelona Valencia desde 20€ | ViajeSeguro",
     description:
-      "Viaja entre Madrid, Barcelona y Valencia desde 27€. Comparte viaje y ahorra.",
+      "Reserva tu plaza de coche compartido entre Barcelona y Valencia desde 20€. Viaje directo en 3.5h, conductor profesional, sin cancelaciones hasta 24h antes.",
     url: "https://viajeseguro.site",
     siteName: "ViajeSeguro",
     locale: "es_ES",
@@ -43,15 +43,15 @@ export const metadata: Metadata = {
         url: "https://viajeseguro.site/main/plaza.jpeg",
         width: 1200,
         height: 630,
-        alt: "ViajeSeguro - Viaje compartido",
+        alt: "Coche compartido Barcelona Valencia - ViajeSeguro",
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "ViajeSeguro - Viaje compartido entre ciudades",
+    title: "Coche Compartido Barcelona Valencia desde 20€ | ViajeSeguro",
     description:
-      "Viaja entre Madrid, Barcelona y Valencia desde 27€. Comparte viaje y ahorra.",
+      "Reserva tu plaza de coche compartido entre Barcelona y Valencia desde 20€. Viaje directo en 3.5h, conductor profesional, sin cancelaciones hasta 24h antes.",
     images: ["https://viajeseguro.site/main/plaza.jpeg"],
   },
   robots: {

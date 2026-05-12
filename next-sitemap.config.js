@@ -12,7 +12,7 @@ module.exports = {
     ],
   },
   transform: async (config, path) => {
-    if (path.startsWith('/coche-compartido/')) {
+    if (path.startsWith('/coche-compartido/') || path.startsWith('/viaje-')) {
       return { loc: path, changefreq: 'daily', priority: 0.9 };
     }
     return { loc: path, changefreq: config.changefreq, priority: config.priority };

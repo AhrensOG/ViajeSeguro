@@ -2,19 +2,19 @@ import type { Metadata } from "next";
 import Home2Page from "@/components/public/home2/Home2Page";
 
 export const metadata: Metadata = {
-  title: "Coche Compartido Barcelona, Valencia y Madrid | ViajeSeguro",
+  title: "Coche Compartido Barcelona Valencia desde 20€ | ViajeSeguro",
   description:
-    "Viaja en coche compartido entre Barcelona, Valencia y Madrid desde 20€. Conductor profesional, sin cancelaciones, seguro incluido. Reserva en minutos.",
+    "Reserva tu plaza de coche compartido entre Barcelona y Valencia desde 20€. Viaje directo en 3.5h, conductor profesional, sin cancelaciones hasta 24h antes.",
   openGraph: {
-    title: "Coche Compartido Barcelona, Valencia y Madrid | ViajeSeguro",
+    title: "Coche Compartido Barcelona Valencia desde 20€ | ViajeSeguro",
     description:
-      "Viaja en coche compartido entre Barcelona, Valencia y Madrid desde 20€. Conductor profesional, sin cancelaciones, seguro incluido.",
+      "Reserva tu plaza de coche compartido entre Barcelona y Valencia desde 20€. Viaje directo en 3.5h, conductor profesional, sin cancelaciones hasta 24h antes.",
     url: "https://viajeseguro.site",
   },
   twitter: {
-    title: "Coche Compartido Barcelona, Valencia y Madrid | ViajeSeguro",
+    title: "Coche Compartido Barcelona Valencia desde 20€ | ViajeSeguro",
     description:
-      "Viaja en coche compartido entre Barcelona, Valencia y Madrid desde 20€. Conductor profesional, sin cancelaciones, seguro incluido.",
+      "Reserva tu plaza de coche compartido entre Barcelona y Valencia desde 20€. Viaje directo en 3.5h, conductor profesional, sin cancelaciones hasta 24h antes.",
   },
 };
 
