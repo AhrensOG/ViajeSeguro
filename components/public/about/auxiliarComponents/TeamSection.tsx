@@ -17,7 +17,7 @@ const teamMembers = [
   },
   {
     name: "Francisco Javier ",
-    role: "Gefe de Trafico y Gestión de Viajes",
+    role: "Jefe de Tráfico y Gestión de Viajes",
     image: "/main/img_placeholder.webp",
   },
   {

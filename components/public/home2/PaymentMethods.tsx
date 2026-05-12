@@ -57,7 +57,7 @@ const PaymentMethods = () => {
               className="flex items-center gap-2 text-slate-600"
             >
               <Headphones className="w-6 h-6" />
-              <span className="font-medium">Support 24/7</span>
+              <span className="font-medium">Atención 24/7</span>
             </motion.div>
           </div>
         </motion.div>
